@@ -1,0 +1,184 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "@ag-grid-community/styles/ag-grid.css";
+@import "@ag-grid-community/styles/ag-theme-alpine.css";
+
+/* Firefox */
+* {
+  -ms-overflow-style: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+}
+
+html,
+body {
+  scrollbar-width: none;
+  height: 100vh;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.ag-watermark {
+  display: none !important;
+}
+.ag-watermark-text {
+  display: none !important;
+}
+
+#newRowsCountt {
+  padding: 5px;
+  height: 30px;
+  border-radius: 8px;
+  width: 100px;
+  border: 1px solid #5dc9ef;
+}
+
+#newRowsCountt:focus {
+  border-color: #3a9fc7;
+  box-shadow: 0 0 5px rgba(93, 201, 239, 0.5);
+  outline: none;
+}
+
+.ant-layout {
+  height: auto;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Global Dark Mode Variables */
+:root {
+  --bg-dark: #242526;
+  --bg-card: #18191a;
+  --bg-hover: #3a3b3c;
+  --text-primary: #e4e6eb;
+  --text-secondary: #b0b3b8;
+}
+
+html.dark {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+
+  .ant-layout {
+    background-color: var(--bg-dark) !important;
+  }
+  .button-query {
+    background-color: #efb008 !important;
+    color: white !important;
+  }
+  .btn-query {
+    background-color: #efb008 !important;
+    color: white !important;
+  }
+  .query-button {
+    background-color: #efb008 !important;
+    color: white !important;
+  }
+  .chuyen-tau-div {
+    background-color: var(--bg-card) !important;
+  }
+  .Toastify__toast {
+    background-color: var(--bg-hover) !important; /* Màu nền cho toast */
+    color: var(--text-primary) !important; /* Màu chữ cho toast */
+  }
+  .Toastify__toast-body {
+    color: var(--text-primary) !important; /* Màu chữ cho nội dung toast */
+  }
+  .Toastify__close-button {
+    color: var(--text-secondary) !important; /* Màu nút đóng */
+  }
+}
+
+html.dark body {
+  background-color: var(--bg-dark) !important;
+  color: var(--bg-card) !important;
+}
+
+html.dark .ant-layout {
+  background-color: var(--bg-dark) !important;
+}
+
+/* Performance optimizations for animations across browsers */
+/* Especially for Microsoft Edge */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Hardware acceleration for all animated elements */
+.page-container *[class*="animate"],
+.page-container *[class*="transition"],
+.page-container .modern-login-card,
+.page-container .category__name,
+.page-container .category__name-quarter-circle,
+.page-container__background-image {
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  -moz-perspective: 1000px;
+  -ms-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Edge-specific optimizations */
+@supports (-ms-ime-align: auto) {
+  .page-container__background-image {
+    animation-fill-mode: both;
+    animation-play-state: running;
+    -ms-animation-fill-mode: both;
+    -ms-animation-play-state: running;
+  }
+
+  .category__name {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: alpha(opacity=0);
+  }
+
+  .category__name.slide-from-bottom {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    filter: alpha(opacity=100);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    /* transition-duration: 1s !important; */
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Critical rendering optimizations */
+.page-container {
+  -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  -ms-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+/* Force GPU acceleration for Edge */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .page-container__background-image,
+  .modern-login-card,
+  .category__name {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=1, M12=0, M21=0, M22=1, SizingMethod='auto expand')";
+  }
+}

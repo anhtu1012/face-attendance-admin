@@ -1,0 +1,417 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36" version="28.0.7">
+  <diagram name="Face Attendance Screens Flow" id="face-attendance-flow">
+    <mxGraphModel dx="1489" dy="803" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="2336" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Central Login Screen -->
+        <mxCell id="login-page" value="Login Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="600" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Homepage -->
+        <mxCell id="homepage" value="Homepage" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="600" y="450" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ADMIN FLOW -->
+        <!-- Admin Dashboard -->
+        <mxCell id="admin-dashboard" value="Admin Dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="200" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Employee Management Flow -->
+        <mxCell id="employee-list" value="Employee List Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="50" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="employee-detail" value="Employee Detail Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="50" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="employee-form" value="Employee Form Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="50" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Organization Management -->
+        <mxCell id="branch-list" value="Branch List Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="200" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="shift-management" value="Shift Management Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="350" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="position-list" value="Position List Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="350" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Schedule Management -->
+        <mxCell id="schedule-management" value="Schedule Management Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="200" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="assign-shift" value="Assign Shift" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="320" y="250" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Request Management -->
+        <mxCell id="request-list" value="Request List Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="350" y="350" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="request-detail" value="Request Detail Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="500" y="350" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="approve-request" value="Approve" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="650" y="300" width="60" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="reject-request" value="Reject" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="650" y="360" width="60" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Reports -->
+        <mxCell id="reports-page" value="Reports Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="200" y="350" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="export-report" value="Export Report" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="50" y="350" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- MANAGER/HR FLOW -->
+        <mxCell id="manager-dashboard" value="Manager Dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="800" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="staff-list" value="Staff List Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="950" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="staff-detail" value="Staff Detail Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="1100" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="approval-queue" value="Approval Queue Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="950" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="staff-reports" value="Staff Reports Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="800" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="schedule-coordination" value="Schedule Coordination Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="950" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="quick-approve" value="Quick Approve" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="1100" y="150" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- STAFF MOBILE APP FLOW -->
+        <mxCell id="staff-dashboard" value="Staff Dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="600" y="650" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Face Recognition Flow -->
+        <mxCell id="face-registration" value="Face Registration Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="400" y="550" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="camera-access" value="Camera Access" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="280" y="550" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="face-capture" value="Face Capture" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="280" y="630" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Attendance Flow -->
+        <mxCell id="attendance-page" value="Attendance Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="800" y="550" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="face-scan" value="Face Scan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="950" y="500" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gps-validation" value="GPS Validation" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="1050" y="550" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="attendance-success" value="Success" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="1150" y="500" width="60" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="attendance-failed" value="Failed" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="1150" y="560" width="60" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Request Management -->
+        <mxCell id="create-request" value="Create Request Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="400" y="750" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="request-form" value="Request Form" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="280" y="750" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="request-status" value="Request Status Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="600" y="750" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="request-history" value="Request History Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="800" y="750" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Personal Information -->
+        <mxCell id="personal-info" value="Personal Info Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="400" y="650" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="work-schedule" value="Work Schedule Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="800" y="650" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="salary-report" value="Salary Report Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="400" y="850" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="contract-info" value="Contract Info Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="600" y="850" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="company-selection" value="Company Selection Page" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="800" y="850" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- AI Chatbot -->
+        <mxCell id="chatbot" value="AI Chatbot" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="1000" y="650" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="chat-interface" value="Chat Interface" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="1150" y="650" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Forgot Password -->
+        <mxCell id="forgot-password" value="Forgot Password" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="750" y="300" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- CONNECTIONS/ARROWS -->
+        
+        <!-- Login to Homepage -->
+        <mxCell id="edge0" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="login-page" target="homepage" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge0-label" value="After Login" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="edge0" vertex="1" connectable="0">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Homepage to Main Dashboards -->
+        <mxCell id="edge1" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="homepage" target="admin-dashboard" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1-label" value="Admin" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="edge1" vertex="1" connectable="0">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge2" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="homepage" target="manager-dashboard" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2-label" value="Manager/HR" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="edge2" vertex="1" connectable="0">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge3" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="homepage" target="staff-dashboard" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3-label" value="Staff" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="edge3" vertex="1" connectable="0">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Forgot Password -->
+        <mxCell id="edge4" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="login-page" target="forgot-password" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Admin Flow Connections -->
+        <mxCell id="edge5" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="admin-dashboard" target="employee-list" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge6" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="employee-list" target="employee-detail" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge7" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="employee-detail" target="employee-form" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge8" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="admin-dashboard" target="branch-list" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge9" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="admin-dashboard" target="shift-management" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge10" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="admin-dashboard" target="position-list" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge11" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="admin-dashboard" target="schedule-management" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge12" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="schedule-management" target="assign-shift" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge13" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="admin-dashboard" target="request-list" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge14" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="request-list" target="request-detail" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge15" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="request-detail" target="approve-request" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge16" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="request-detail" target="reject-request" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge17" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="admin-dashboard" target="reports-page" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge18" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="reports-page" target="export-report" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Manager Flow Connections -->
+        <mxCell id="edge19" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="manager-dashboard" target="staff-list" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge20" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-list" target="staff-detail" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge21" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="manager-dashboard" target="approval-queue" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge22" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="approval-queue" target="quick-approve" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge23" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="manager-dashboard" target="staff-reports" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge24" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="manager-dashboard" target="schedule-coordination" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Staff Flow Connections -->
+        <mxCell id="edge25" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-dashboard" target="face-registration" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge25-label" value="First Time" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="edge25" vertex="1" connectable="0">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge26" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="face-registration" target="camera-access" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge27" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="camera-access" target="face-capture" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge28" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-dashboard" target="attendance-page" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge29" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="attendance-page" target="face-scan" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge30" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="attendance-page" target="gps-validation" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge31" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="gps-validation" target="attendance-success" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge32" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="gps-validation" target="attendance-failed" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge33" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-dashboard" target="create-request" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge34" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="create-request" target="request-form" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge35" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-dashboard" target="request-status" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge36" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="request-status" target="request-history" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge37" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-dashboard" target="personal-info" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge38" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-dashboard" target="work-schedule" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge39" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="personal-info" target="salary-report" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge40" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="personal-info" target="contract-info" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge41" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-dashboard" target="company-selection" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge42" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="staff-dashboard" target="chatbot" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge43" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="chatbot" target="chat-interface" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

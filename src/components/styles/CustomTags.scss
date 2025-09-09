@@ -1,0 +1,16 @@
+@use "@/styles/variables" as vars;
+
+.category-tags {
+  margin-bottom: 20px;
+
+  .category-tag {
+    border-radius: 16px;
+    padding: 5px 12px;
+
+    &.active {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+    }
+  }
+}

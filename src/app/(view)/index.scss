@@ -1,0 +1,367 @@
+@use "@/styles/variables" as vars;
+
+// AOS animation overrides
+[data-aos] {
+  transition-timing-function: ease-out;
+
+  &[data-aos][data-aos-duration="500"] {
+    transition-duration: 500ms;
+  }
+
+  &[data-aos][data-aos-duration="800"] {
+    transition-duration: 800ms;
+  }
+}
+
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  background-color: #f0f2f5;
+
+  section {
+    margin-bottom: 80px;
+    width: 100%;
+    // Add perspective for better 3D animations
+    perspective: 1000px;
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: vars.$text-color;
+  }
+
+  // Hero Section
+  .hero-section {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    &.full-height {
+      min-height: 90vh;
+      padding: 0;
+      border-radius: 0;
+      margin-top: 0;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .hero-content-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 40px 0;
+      flex: 1;
+
+      @media (max-width: vars.$screen-md) {
+        flex-direction: column;
+      }
+    }
+
+    .hero-content {
+      flex: 1;
+      padding-right: 40px;
+      text-align: left; /* Thay đổi từ center sang left */
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start; /* Thay đổi từ center sang flex-start */
+      transition: all 0.3s ease;
+
+      @media (max-width: vars.$screen-md) {
+        padding-right: 0;
+        margin-bottom: 40px;
+      }
+
+      h1 {
+        font-size: 42px;
+        line-height: 1.2;
+        margin-bottom: 24px;
+        color: vars.$text-color;
+
+        @media (max-width: vars.$screen-md) {
+          font-size: 32px;
+        }
+      }
+
+      .hero-description {
+        font-size: 18px;
+        margin-bottom: 32px;
+        color: rgba(vars.$text-color, 0.8);
+        text-align: left; /* Đảm bảo căn lề trái */
+        width: 100%; /* Đảm bảo chiều rộng tối đa */
+      }
+
+      .app-download-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+
+        .store-button {
+          text-decoration: none;
+          display: block;
+          transition: all 0.5s ease;
+
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+          }
+
+          .store-image {
+            border-radius: 8px;
+            object-fit: contain;
+          }
+        }
+      }
+    }
+
+    .hero-image-container {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s ease;
+
+      .hero-image-placeholder {
+        background-color: transparent;
+        border-radius: 8px;
+        overflow: hidden;
+        text-align: center;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: transform 0.5s ease;
+
+        &:hover {
+          transform: scale(1.02);
+        }
+
+        img {
+          max-width: 100%;
+          height: auto;
+          display: block;
+          border-radius: 8px;
+        }
+      }
+    }
+
+    .benefits-container {
+      padding: 20px 0 60px;
+      width: 100%;
+
+      .section-title {
+        margin-bottom: 20px;
+      }
+
+      .benefits-row {
+        padding: 0;
+      }
+    }
+
+    .hero-scroll-down {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+
+      .scroll-arrow {
+        width: 24px;
+        height: 24px;
+        border-right: 3px solid vars.$primary-color;
+        border-bottom: 3px solid vars.$primary-color;
+        transform: rotate(45deg);
+        animation: scrollArrow 2s infinite;
+        margin-bottom: 8px;
+      }
+
+      @keyframes scrollArrow {
+        0% {
+          opacity: 0;
+          transform: rotate(45deg) translate(-10px, -10px);
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: rotate(45deg) translate(10px, 10px);
+        }
+      }
+    }
+  }
+
+  // Benefits
+  .benefit-card {
+    height: 100%;
+    border-radius: 8px;
+    transition: all 0.5s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .benefit-title {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: vars.$primary-color;
+      text-align: left; /* Đảm bảo căn lề trái */
+    }
+
+    .benefit-description {
+      color: rgba(vars.$text-color, 0.8);
+      text-align: left; /* Đảm bảo căn lề trái */
+    }
+  }
+
+  // Features Section
+  .features-section {
+    padding: 40px 0;
+
+    .feature-row {
+      &.reverse {
+        flex-direction: row-reverse;
+
+        @media (max-width: vars.$screen-md) {
+          flex-direction: column-reverse;
+        }
+      }
+
+      @media (max-width: vars.$screen-md) {
+        flex-direction: column-reverse;
+      }
+    }
+
+    .feature-image-col {
+      .feature-image-placeholder {
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        overflow: hidden;
+        text-align: center;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: transform 0.5s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+
+        img {
+          max-width: 100%;
+          height: auto;
+          display: block;
+          border-radius: 8px;
+        }
+
+        .feature-icon,
+        .anticon {
+          font-size: 64px;
+          color: vars.$primary-color;
+        }
+      }
+    }
+
+    .feature-content-col {
+      .feature-title {
+        font-size: 28px;
+        margin-bottom: 8px;
+        color: vars.$text-color;
+        text-align: left; /* Đảm bảo căn lề trái */
+      }
+
+      .feature-subtitle {
+        font-size: 20px;
+        margin-bottom: 16px;
+        color: vars.$primary-color;
+        text-align: left; /* Đảm bảo căn lề trái */
+      }
+
+      .feature-description {
+        font-size: 16px;
+        color: rgba(vars.$text-color, 0.8);
+        max-width: 445px;
+        margin: 0; /* Loại bỏ auto margin để căn trái */
+        text-align: left; /* Đảm bảo căn lề trái */
+
+        @media (max-width: vars.$screen-md) {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+
+  /* Ghi đè style mặc định của Ant Design cho Paragraph */
+  .ant-typography {
+    &.app-description {
+      text-align: left !important;
+      width: 100% !important;
+      max-width: 445px !important;
+      margin: 0 0 32px 0 !important;
+    }
+  }
+
+  // FAQ Section
+  .faq-section {
+    padding: 40px 0;
+
+    .faq-subtitle {
+      display: block;
+      text-align: center;
+      margin-bottom: 32px;
+      font-size: 16px;
+      color: rgba(vars.$text-color, 0.7);
+    }
+
+    .faq-collapse {
+      background-color: transparent;
+      transition: all 0.5s ease;
+
+      .ant-collapse-item {
+        margin-bottom: 16px;
+        border-radius: 4px;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: rgba(vars.$primary-color, 0.3);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .ant-collapse-header {
+          font-weight: 600;
+          padding: 16px 24px;
+          background-color: #f9f9f9;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: rgba(vars.$primary-color, 0.05);
+          }
+        }
+
+        .ant-collapse-content-box {
+          padding: 16px 24px;
+          text-align: left; /* Đảm bảo nội dung FAQ căn lề trái */
+
+          p {
+            text-align: left;
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+}

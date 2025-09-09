@@ -1,0 +1,116 @@
+.contract-view-mode {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .contract-header {
+    margin-bottom: 24px;
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      h2 {
+        margin: 0 0 8px 0;
+        font-size: 22px;
+        font-weight: 600;
+        color: #1d3557;
+      }
+
+      .edit-icon-btn {
+        margin-left: 12px;
+        // Để nút nhỏ gọn hơn
+        min-width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    p {
+      margin: 0;
+      color: #888;
+      font-size: 15px;
+    }
+  }
+
+  .section-title {
+    font-weight: 500;
+    font-size: 17px;
+    color: #457b9d;
+    margin-bottom: 12px;
+  }
+
+  .info-item {
+    margin-bottom: 12px;
+    .label {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 2px;
+    }
+    .value {
+      font-size: 16px;
+      color: #222;
+      &.employee-name {
+        font-weight: 500;
+      }
+      &.salary {
+        color: #e76f51;
+        font-weight: 600;
+      }
+      &.manager {
+        color: #457b9d;
+      }
+      &.date {
+        color: #457b9d;
+      }
+      &.duration {
+        color: #264653;
+      }
+      &.position {
+        color: #2a9d8f;
+      }
+    }
+    .description-box {
+      background: #f8f9fa;
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: #444;
+      font-size: 15px;
+    }
+  }
+
+  .salary-highlight {
+    background: #f1faee;
+    border-radius: 4px;
+    padding: 8px 12px;
+  }
+
+  .status-tag {
+    font-weight: 500;
+    font-size: 14px;
+    &.status-active {
+      background: #e0f7fa;
+      color: #00796b;
+      border: none;
+    }
+  }
+
+  .branch-tag {
+    background: #f0efeb;
+    color: #6d6875;
+    border: none;
+    font-size: 14px;
+    margin-right: 6px;
+  }
+
+  .pdf-button {
+    .ant-btn-link {
+      color: #457b9d;
+      font-weight: 500;
+    }
+  }
+}

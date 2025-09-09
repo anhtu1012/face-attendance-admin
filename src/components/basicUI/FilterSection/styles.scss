@@ -1,0 +1,63 @@
+@import "../../../styles/variables.scss";
+
+.filter-section {
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .filter-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .anticon {
+      color: $primary-color;
+    }
+  }
+
+  .filter-section-content {
+    overflow: hidden;
+    transition: height 0.3s ease-in-out;
+
+    &.collapsed {
+      height: 0 !important;
+    }
+
+    &.expanded {
+      // Height is dynamically set via inline style
+    }
+
+    .filter-content-inner {
+      padding: 10px;
+    }
+  }
+  .ant-card-body {
+    padding: 0 !important;
+  }
+
+  .ant-card-actions {
+    background-color: #fafafa;
+    border-top: 1px solid #f0f0f0;
+  }
+}
+
+// Dark mode support
+html.dark {
+  .filter-section {
+    background-color: #1f1f1f;
+    border-color: #303030;
+
+    .filter-section-header {
+      color: #e0e0e0;
+    }
+
+    .ant-card-actions {
+      background-color: #141414;
+      border-color: #303030;
+    }
+  }
+}

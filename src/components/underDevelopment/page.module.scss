@@ -1,0 +1,369 @@
+@import "../../styles/theme-variables";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-height: 85vh;
+  padding: 2rem;
+  width: 100%;
+  background-color: $background-color;
+  transition: all 0.3s ease;
+
+  :global(html.dark) & {
+    background-color: $background-color-dark-light;
+  }
+}
+
+.card {
+  background-color: $background-color-light;
+  border: 1px solid $border-color;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 30px -10px rgba(0, 0, 0, 0.1),
+    0 15px 15px -5px rgba(0, 0, 0, 0.04);
+  padding: 4rem;
+  max-width: 80rem;
+  width: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  :global(html.dark) & {
+    background-color: $background-color-dark-light;
+    border-color: $border-color-dark;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $primary-color, $primary-color-light);
+    opacity: 0.8;
+  }
+}
+
+.iconWrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.icon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  color: $primary-color;
+
+  :global(html.dark) & {
+    color: $info-color-dark;
+  }
+
+  svg {
+    font-size: 6rem;
+    animation: float 3s ease-in-out infinite;
+  }
+}
+
+.iconBackground {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12rem;
+  height: 12rem;
+  background-color: $primary-color-light;
+  border-radius: 50%;
+  opacity: 0.15;
+  animation: pulse 2s infinite;
+
+  :global(html.dark) & {
+    background-color: $info-color-dark;
+    opacity: 0.1;
+  }
+}
+
+.iconParticles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: $primary-color-light;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: particleFloat 3s infinite;
+
+  :global(html.dark) & {
+    background-color: $info-color-dark;
+  }
+
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) {
+      top: #{percentage($i / 6)};
+      left: #{percentage($i / 6)};
+      animation-delay: #{$i * 0.2}s;
+    }
+  }
+}
+
+.title {
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: #262626;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, $primary-color, $primary-color-light);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  :global(html.dark) & {
+    color: $text-color-dark;
+  }
+}
+
+.iconRow {
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  margin: 2.5rem 0;
+  flex-wrap: wrap;
+}
+
+.iconItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+
+  :global(html.dark) & {
+    background-color: rgba(45, 45, 45, 0.5);
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+
+    :global(html.dark) & {
+      background-color: rgba(45, 45, 45, 0.8);
+    }
+
+    svg {
+      transform: scale(1.1);
+      color: $primary-color-light;
+
+      :global(html.dark) & {
+        color: $info-color-dark;
+      }
+    }
+  }
+
+  svg {
+    font-size: 2.5rem;
+    color: $primary-color;
+    transition: all 0.3s ease;
+
+    :global(html.dark) & {
+      color: $info-color-dark;
+    }
+  }
+
+  span {
+    font-size: 1rem;
+    color: #595959;
+    font-weight: 500;
+
+    :global(html.dark) & {
+      color: #a6a6a6;
+    }
+  }
+}
+
+.description {
+  font-size: 1.25rem;
+  color: #595959;
+  margin: 2rem 0;
+  line-height: 1.8;
+  max-width: 60rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  :global(html.dark) & {
+    color: #a6a6a6;
+  }
+}
+
+.progressContainer {
+  margin-top: 4rem;
+  padding: 0 2rem;
+}
+
+.progressBar {
+  width: 100%;
+  background-color: $border-color;
+  border-radius: 9999px;
+  height: 1rem;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  :global(html.dark) & {
+    background-color: $border-color-dark;
+  }
+}
+
+.progress {
+  background: linear-gradient(90deg, $primary-color, $primary-color-light);
+  height: 100%;
+  border-radius: 9999px;
+  width: 70%;
+  animation: progress 2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.progressText {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: $text-color;
+
+  :global(html.dark) & {
+    color: $text-color-dark;
+  }
+}
+
+.estimatedTime {
+  font-size: 1rem;
+  color: $text-color-secondary;
+
+  :global(html.dark) & {
+    color: $text-color-secondary-dark;
+  }
+}
+
+.developmentIcons {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  gap: 1rem;
+  opacity: 0.5;
+}
+
+.devIcon {
+  font-size: 1.5rem;
+  color: $primary-color;
+  animation: spin 4s linear infinite;
+
+  :global(html.dark) & {
+    color: $info-color-dark;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.5s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 1s;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.1;
+  }
+}
+
+@keyframes particleFloat {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(10px, -10px);
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 70%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

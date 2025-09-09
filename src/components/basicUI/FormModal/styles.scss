@@ -1,0 +1,204 @@
+@import "../../../styles/variables.scss";
+
+.form-modal {
+  .ant-modal-content {
+    border-radius: 8px;
+    background-color: $background-color;
+  }
+
+  .ant-modal-header {
+    border-radius: 8px 8px 0 0;
+    background-color: $background-color;
+  }
+
+  .ant-modal-title {
+    font-weight: 600;
+    color: $text-color;
+  }
+
+  .ant-modal-close {
+    color: $text-color;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  .ant-modal-body {
+    background-color: $background-color;
+  }
+
+  .ant-modal-footer {
+    border-top: 1px solid $border-color;
+    background-color: $background-color;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .form-modal-content {
+    height: 100%;
+    padding-right: 8px;
+    margin-top: 12px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #aaa;
+    }
+  }
+
+  // Form element styles
+  .ant-form-item-label > label {
+    color: $text-color;
+  }
+
+  .ant-input,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-input-number,
+  .ant-checkbox-wrapper,
+  .ant-radio-wrapper {
+    background-color: white;
+    border-color: $border-color;
+    color: $text-color;
+  }
+
+  // Button styles
+  .ant-btn-primary {
+    background-color: $primary-color;
+    border-color: $primary-color;
+
+    &:hover,
+    &:focus {
+      background-color: $primary-color-light;
+      border-color: $primary-color-light;
+    }
+  }
+
+  .ant-btn-default {
+    background-color: $background-color;
+    border-color: $border-color;
+    color: $text-color;
+
+    &:hover,
+    &:focus {
+      border-color: $primary-color-light;
+      color: $primary-color-light;
+    }
+  }
+}
+
+// Dark mode styles
+html.dark {
+  .form-modal {
+    .ant-modal-content {
+      background-color: $background-color-dark;
+      box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48),
+        0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .ant-modal-header {
+      background-color: $background-color-dark;
+      border-bottom-color: $border-color-dark;
+    }
+
+    .ant-modal-title {
+      color: $text-color-dark;
+    }
+
+    .ant-modal-close {
+      color: $text-color-secondary-dark;
+
+      &:hover {
+        color: $text-color-dark;
+      }
+    }
+
+    .ant-modal-body {
+      background-color: $background-color-dark;
+    }
+
+    .ant-modal-footer {
+      border-top-color: $border-color-dark;
+      background-color: $background-color-dark;
+    }
+
+    .form-modal-content {
+      color: $text-color-dark;
+
+      &::-webkit-scrollbar-track {
+        background: $background-color-dark-light;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: $border-color-dark;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: lighten($border-color-dark, 10%);
+      }
+    }
+
+    // Form element styles - dark mode
+    .ant-form-item-label > label {
+      color: $text-color-dark;
+    }
+
+    .ant-input,
+    .ant-select-selector,
+    .ant-picker,
+    .ant-input-number,
+    .ant-input-number-input,
+    .ant-checkbox-wrapper,
+    .ant-radio-wrapper {
+      background-color: $background-color-dark-light;
+      border-color: $border-color-dark;
+      color: $text-color-dark;
+
+      &::placeholder {
+        color: $text-color-secondary-dark;
+      }
+    }
+
+    .ant-select-arrow,
+    .ant-picker-suffix,
+    .ant-input-number-handler-wrap {
+      color: $text-color-secondary-dark;
+    }
+
+    // Button styles - dark mode
+    .ant-btn-primary {
+      background-color: $primary-color-dark;
+      border-color: $primary-color-dark;
+
+      &:hover,
+      &:focus {
+        background-color: darken($primary-color-dark, 5%);
+        border-color: darken($primary-color-dark, 5%);
+      }
+    }
+
+    .ant-btn-default {
+      background-color: $background-color-dark;
+      border-color: $border-color-dark;
+      color: $text-color-dark;
+
+      &:hover,
+      &:focus {
+        border-color: $primary-color;
+        color: $primary-color;
+      }
+    }
+  }
+}

@@ -1,0 +1,357 @@
+// User Management page styles
+
+.userContainer {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(145deg, #ffffff, #f5f7fa);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.headerActions {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searchInput {
+  width: 300px;
+  transition: all 0.3s;
+
+  &:focus,
+  &:hover {
+    width: 320px;
+  }
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 24px;
+  position: relative;
+  padding-bottom: 12px;
+
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 3px;
+  }
+}
+
+.userInfoModal {
+  p {
+    margin-bottom: 12px;
+
+    strong {
+      margin-right: 8px;
+      color: #555;
+    }
+  }
+}
+
+.customDatePicker {
+  :global {
+    .ant-picker-input > input {
+      font-size: 14px;
+      padding: 8px 0;
+    }
+
+    .ant-picker {
+      border-radius: 8px;
+      border-color: #d1d5db;
+
+      &:hover,
+      &:focus,
+      &-focused {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+      }
+    }
+  }
+}
+
+.userModal {
+  :global {
+    .ant-modal-content {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .ant-picker {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .ant-picker-focused {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    // Calendar dropdown styling
+    .ant-picker-dropdown {
+      .ant-picker-panel-container {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+        background-color: #3b82f6;
+      }
+
+      .ant-picker-cell-in-view.ant-picker-cell-today
+        .ant-picker-cell-inner::before {
+        border-color: #3b82f6;
+      }
+    }
+
+    .ant-modal-header {
+      border-bottom: 1px solid #eaecef;
+      padding: 20px 24px;
+      background: #f9fafc;
+    }
+
+    .ant-modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #111827;
+      letter-spacing: -0.01em;
+    }
+
+    .ant-modal-body {
+      padding: 30px;
+      background: #fff;
+    }
+
+    .ant-modal-footer {
+      border-top: 1px solid #eaecef;
+      padding: 16px 24px;
+      background: #f9fafc;
+    }
+
+    .ant-btn {
+      border-radius: 8px;
+      height: 40px;
+      font-weight: 500;
+      transition: all 0.3s;
+
+      &-primary {
+        background: linear-gradient(135deg, #1890ff, #096dd9);
+        border: none;
+        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+
+        &:hover {
+          background: linear-gradient(135deg, #40a9ff, #1890ff);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(24, 144, 255, 0.4);
+        }
+      }
+
+      &-default {
+        border: 1px solid #d9d9d9;
+        background: #fff;
+
+        &:hover {
+          border-color: #40a9ff;
+          color: #40a9ff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+      }
+    }
+  }
+}
+
+.userForm {
+  :global {
+    .ant-form-item {
+      margin-bottom: 24px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateX(4px);
+      }
+    }
+
+    .ant-form-item-label > label {
+      font-weight: 600;
+      color: #374151;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .ant-input-affix-wrapper {
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 1px solid #d1d5db;
+      background: white;
+      transition: all 0.3s;
+
+      &:hover,
+      &:focus,
+      &-focused {
+        border-color: #60a5fa;
+        background: #fff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+      }
+
+      .anticon {
+        color: #6b7280;
+      }
+    }
+
+    .ant-input {
+      background: #f9fafb;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+
+      &:hover,
+      &:focus {
+        border-color: #60a5fa;
+        background: #fff;
+      }
+    }
+
+    .ant-input-password {
+      background: #f9fafb;
+      border-radius: 10px;
+
+      input {
+        background: transparent;
+      }
+
+      &:hover,
+      &:focus {
+        background: #fff;
+      }
+    }
+
+    .ant-select {
+      width: 100%;
+
+      .ant-select-selector {
+        border-radius: 10px;
+        padding: 6px 16px;
+        height: 46px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s;
+        background: white;
+        border: 1px solid #d1d5db;
+
+        &:hover {
+          border-color: #60a5fa;
+          background: #fff;
+        }
+      }
+
+      &-focused .ant-select-selector {
+        background: #fff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+      }
+    }
+
+    // Avatar styles
+    .ant-avatar {
+      border: 3px solid #fff;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    // Divider styling
+    .ant-divider {
+      margin: 16px 0;
+      border-color: #eaecef;
+    }
+  }
+}
+
+.tableContainer {
+  margin-top: 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  :global {
+    .ant-table {
+      background: #fff;
+
+      .ant-table-thead > tr > th {
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 600;
+        padding: 16px;
+      }
+
+      .ant-table-tbody > tr > td {
+        padding: 14px 16px;
+        transition: all 0.3s;
+      }
+
+      .ant-table-tbody > tr:hover > td {
+        background: #f8fafc;
+      }
+
+      .ant-table-row {
+        transition: transform 0.2s;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+    }
+
+    .ant-tag {
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: 500;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .ant-pagination {
+      margin: 16px 0;
+
+      .ant-pagination-item {
+        border-radius: 8px;
+
+        &-active {
+          border-color: #1890ff;
+          a {
+            color: #1890ff;
+          }
+        }
+      }
+    }
+  }
+}
+
+.faceImageUpload {
+  :global {
+    .ant-upload-list-picture-card-container,
+    .ant-upload.ant-upload-select-picture-card {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      max-width: 150px;
+      max-height: 150px;
+      margin-right: 0;
+    }
+
+    .ant-upload-list-picture-card .ant-upload-list-item {
+      padding: 4px;
+    }
+  }
+}

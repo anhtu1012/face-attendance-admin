@@ -1,0 +1,59 @@
+@use "@/styles/variables" as vars;
+
+.select {
+  display: flex;
+  .ant-select-selector {
+    border: none !important;
+    background-color: transparent !important;
+    padding: 0px;
+    box-shadow: none !important;
+  }
+  .ant-select-selection-item {
+    text-align: right;
+  }
+  .ant-select-arrow {
+    color: #000 !important;
+  }
+  span {
+    color: #000;
+  }
+}
+
+// Dark mode styles for select
+html.dark {
+  .language-label {
+    color: #fff;
+  }
+  .select {
+    .ant-select-arrow {
+      color: #fff !important;
+    }
+    span {
+      color: #fff;
+    }
+  }
+}
+
+.custom-dropdown {
+  .ant-select-item-option {
+    color: black; // Màu chữ mặc định cho các item
+
+    &:hover {
+      color: black; // Màu chữ khi hover
+      background-color: #e8f7fd !important; // Đổi màu nền khi hover
+    }
+  }
+}
+
+html.dark {
+  .custom-dropdown {
+    .ant-select-item-option {
+      color: #000; // Màu chữ sáng cho các item
+
+      &:hover {
+        color: #000; // Màu chữ khi hover
+        background-color: #444 !important; // Đổi màu nền khi hover
+      }
+    }
+  }
+}

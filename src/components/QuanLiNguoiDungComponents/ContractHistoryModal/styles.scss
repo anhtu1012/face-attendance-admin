@@ -1,0 +1,359 @@
+@import "../styles/common.scss";
+
+.contract-history-modal {
+  @extend .contract-component;
+
+  // Modal header styling
+  .ant-modal-header {
+    background: linear-gradient(135deg, #f0f7ff, #e6f4ff);
+    border-bottom: 1px solid rgba(24, 144, 255, 0.1);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+
+    .ant-modal-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      color: var(--primary-color);
+
+      .anticon {
+        font-size: 24px;
+        background: linear-gradient(135deg, var(--primary-color), #40a9ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+  }
+
+  // Modal content styling
+  .ant-modal-body {
+    padding: 0;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+
+  // History list container
+  .history-list-container {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 20px;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--background-light);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, var(--primary-color), #40a9ff);
+      border-radius: 3px;
+
+      &:hover {
+        background: linear-gradient(135deg, #40a9ff, #69c0ff);
+      }
+    }
+  }
+
+  // Contract history cards
+  .contract-history-card {
+    @include card-shadow;
+    border-radius: var(--border-radius-large);
+    border: 1px solid var(--border-light);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff, #fafafa);
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: rgba(24, 144, 255, 0.3);
+      box-shadow: 0 8px 24px rgba(24, 144, 255, 0.15);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .ant-card-body {
+      padding: 20px;
+    }
+
+    // Card header with contract title and status
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+
+      .contract-icon {
+        color: var(--primary-color);
+        font-size: 18px;
+      }
+
+      .contract-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        flex: 1;
+      }
+
+      .status-tag {
+        @extend .status-tag;
+
+        &.ant-tag {
+          margin: 0;
+        }
+      }
+    }
+
+    // Card content info
+    .card-content {
+      .info-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 13px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .info-label {
+          color: var(--text-light);
+          font-weight: 500;
+        }
+
+        .info-value {
+          color: var(--text-primary);
+          font-weight: 600;
+
+          &.highlight {
+            color: var(--primary-color);
+          }
+
+          &.success {
+            color: var(--success-color);
+          }
+
+          &.error {
+            color: var(--error-color);
+          }
+        }
+      }
+
+      // Special styling for salary
+      .salary-row .info-value {
+        @extend .salary-display;
+        font-size: 14px;
+      }
+    }
+
+    // Action button
+    .card-action {
+      margin-top: 16px;
+      text-align: right;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border-light);
+
+      .ant-btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #40a9ff);
+        border: none;
+        border-radius: var(--border-radius-large);
+        font-weight: 500;
+        padding: 6px 16px;
+        height: auto;
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+          background: linear-gradient(135deg, #40a9ff, #69c0ff);
+        }
+
+        .anticon {
+          margin-right: 6px;
+        }
+      }
+    }
+  }
+
+  // Empty state styling
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+
+    .empty-icon {
+      font-size: 64px;
+      color: #d9d9d9;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+  }
+
+  // Modal footer styling
+  .ant-modal-footer {
+    background: var(--background-light);
+    border-top: 1px solid var(--border-light);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+
+    .ant-btn {
+      border-radius: var(--border-radius);
+      font-weight: 500;
+
+      &.ant-btn-default {
+        border-color: var(--border-color);
+        color: var(--text-secondary);
+
+        &:hover {
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+        }
+      }
+
+      &.ant-btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #40a9ff);
+        border: none;
+
+        &:hover {
+          background: linear-gradient(135deg, #40a9ff, #69c0ff);
+        }
+      }
+    }
+  }
+
+  // Detail view specific styling
+  &.detail-view {
+    .ant-modal-body {
+      padding: 20px;
+    }
+
+    .detail-header {
+      background: linear-gradient(135deg, #f5f5f5, #fafafa);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: center;
+      border: 1px solid var(--border-light);
+
+      h2 {
+        margin: 0 0 8px 0;
+        font-size: 20px;
+        font-weight: 700;
+        @include gradient-text;
+      }
+
+      p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+    }
+
+    .detail-section {
+      margin-bottom: 24px;
+
+      .ant-divider {
+        margin: 16px 0;
+        border-color: var(--border-light);
+
+        .ant-divider-inner-text {
+          font-weight: 600;
+          color: var(--text-primary);
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+// Loading state
+.contract-history-loading {
+  .ant-spin-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+
+  .ant-spin-dot {
+    .ant-spin-dot-item {
+      background-color: var(--primary-color);
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .contract-history-modal {
+    .ant-modal {
+      max-width: 95vw !important;
+      margin: 10px !important;
+    }
+
+    .history-list-container {
+      padding: 16px;
+    }
+
+    .contract-history-card {
+      .ant-card-body {
+        padding: 16px;
+      }
+
+      .card-content .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+
+      .card-action {
+        text-align: center;
+      }
+    }
+  }
+}
+
+// Animation for cards
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.contract-history-card {
+  animation: cardSlideIn 0.3s ease-out;
+
+  &:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  &:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  &:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  &:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+}

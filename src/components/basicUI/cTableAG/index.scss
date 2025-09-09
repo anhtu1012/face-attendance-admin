@@ -1,0 +1,748 @@
+.ag-theme-quartz {
+  // Customize header styles
+  --ag-header-height: 45px;
+  --ag-selected-row-background-color: #f9f8ec;
+  --ag-hover-row-background-color: #f9f8ec; // Set hover background color to match selected
+  --ag-font-size: 13px; // Decreased font size for the entire grid
+
+  .ag-header {
+    background-color: #015c92; // Header background color
+    color: #fff; // Header text color
+    border-bottom: 2px solid #1872ce; // Header bottom border
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    font-style: normal;
+    font-size: 14px;
+    z-index: 2;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+  .ag-header-cell-text {
+    color: #fff !important;
+  }
+  .ag-cell.ag-cell-not-inline-editing.ag-cell-normal-height.ag-cell-value {
+    padding: 4px 15px;
+    display: flex;
+    align-items: center; // Vertical centering
+  }
+  // Pin header name
+  .ag-theme-quartz .ag-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .ag-icon {
+    color: #fff !important;
+  }
+
+  // Infinite scroll loading animation
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  // .stt-column {
+  //   background-color: #1872ce !important; // Default background color for STT column
+  // }
+
+  // Ensure the header of the first column (STT) also has a different background
+  .ag-header-cell:first-of-type {
+    background-color: linear-gradient(
+      135deg,
+      #295587,
+      #3f87a6
+    ) !important; // Background color for STT header
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+
+  // Customize body cells with border for all cells
+  .ag-cell {
+    border: 1px solid #b9e7f8; // Border for all sides of the cell
+    background-color: rgba(
+      255,
+      255,
+      255,
+      0.8
+    ); // Slightly transparent background to see grid lines better
+    display: flex;
+    align-items: center; // Vertical centering
+    justify-content: flex-start; // Horizontal alignment
+  }
+
+  // Zebra striping for rows (updated with extremely subtle even row color)
+  .ag-row {
+    &:nth-child(odd) {
+      background-color: rgba(
+        255,
+        255,
+        255,
+        0.9
+      ) !important; // White-ish background for odd rows
+
+      .ag-cell {
+        background-color: rgba(
+          255,
+          255,
+          255,
+          0.9
+        ) !important; // Match cell background to row
+      }
+    }
+
+    &:nth-child(even) {
+      background-color: rgba(
+        249,
+        252,
+        253,
+        0.9
+      ) !important; // Extremely subtle difference for even rows
+
+      .ag-cell {
+        background-color: rgba(
+          249,
+          252,
+          253,
+          0.9
+        ) !important; // Match cell background to row
+      }
+    }
+
+    // When hovering over a row, change the entire row background
+    &:hover {
+      background-color: #f9f8ec !important; // Hover background for the entire row
+
+      .ag-cell {
+        background-color: #e6f1fb !important; // Change cell background on row hover
+      }
+    }
+
+    // When the row is selected (clicked)
+    &.ag-row-selected {
+      background-color: #f9f8ec !important; // Set the selected background color
+
+      .ag-cell {
+        background-color: #f9f8ec !important; // Cells in selected rows
+      }
+    }
+  }
+
+  // Adding a border to the entire grid
+  .ag-root-wrapper {
+    border: 1px solid #dee5e7; // Main grid border
+    background-color: #f0faff; // Light background to make grid lines more visible
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+  .no-underline-header .ag-header-cell-resize {
+    display: none !important;
+  }
+  .ag-header-cell.ag-header-parent-hidden.ag-header-cell-sortable.ag-focus-managed {
+    border-right: 2px solid #b9e7f8;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+
+  // Adding styles for filter array button
+  .filter-array-controls {
+    button {
+      transition: background-color 0.2s, transform 0.1s;
+
+      &:hover {
+        background-color: #d1ebf5;
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+  // Pagination arrow custom color
+  .ag-paging-panel {
+    .ag-paging-button {
+      .ag-icon {
+        color: #000000 !important; // Màu xanh dương cho mũi tên enabled
+        font-size: 18px;
+        transition: color 0.2s;
+        &:hover:not(.ag-disabled) {
+          color: #000000 !important; // Đậm hơn khi hover
+        }
+        &.ag-disabled {
+          color: #000000 !important; // Màu xám khi disabled
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  // Loading overlay styles
+  .ag-overlay-loading-wrapper {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    z-index: 1000 !important;
+  }
+
+  // Enhanced loading animation keyframes
+  @keyframes loading-wave-animation {
+    0% {
+      height: 10px;
+      transform: scaleY(1);
+      opacity: 0.5;
+    }
+    50% {
+      height: 50px;
+      transform: scaleY(2.5);
+      opacity: 1;
+    }
+    100% {
+      height: 10px;
+      transform: scaleY(1);
+      opacity: 0.5;
+    }
+  }
+
+  // Alternative simple loading for fallback
+  @keyframes simple-loading {
+    0%,
+    80%,
+    100% {
+      transform: scale(0);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  // Enhanced letter bounce animation keyframes
+  @keyframes letter-bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.7;
+    }
+    40% {
+      transform: translateY(-20px);
+      opacity: 1;
+    }
+    60% {
+      transform: translateY(-10px);
+      opacity: 0.9;
+    }
+  }
+
+  // Alternative wave effect for letters
+  @keyframes letter-wave {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-15px);
+    }
+  }
+
+  // Loading text styles
+  .loading-text {
+    display: inline-block;
+    animation: letter-bounce 1.4s ease-in-out infinite;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    color: #1890ff;
+  }
+}
+
+.ag-theme-quartz-dark {
+  // Customize header styles for dark mode
+  --ag-header-height: 45px;
+  --ag-font-size: 13px; // Decreased font size for the entire grid in dark mode
+
+  .ag-header {
+    background-color: #003366; // Header background color
+    border-bottom: 2px solid #1872ce; // Header bottom border
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    font-style: normal;
+    font-size: 14px;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+
+  .ag-cell.ag-cell-not-inline-editing.ag-cell-normal-height.ag-cell-value {
+    padding: 4px 15px;
+    display: flex;
+    align-items: center; // Vertical centering
+  }
+  // Pin header name
+  .ag-theme-quartz .ag-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  // Ensure the header of the first column (STT) also has a different background
+  .ag-header-cell:first-of-type {
+    background-color: #003366 !important; // Background color for STT header
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+
+  // Customize body cells with border for all cells
+  .ag-cell {
+    border: 1px solid #b9e7f8; // Border for all sides of the cell
+    background-color: rgba(
+      0,
+      0,
+      0,
+      0.65
+    ) !important; // Adjusted for better visibility in dark mode
+    display: flex;
+    align-items: center; // Vertical centering
+  }
+
+  // Zebra striping for rows in dark mode (with extremely subtle contrast)
+  .ag-row {
+    &:nth-child(odd) {
+      background-color: rgba(
+        30,
+        30,
+        30,
+        0.9
+      ) !important; // Darker background for odd rows
+
+      .ag-cell {
+        background-color: rgba(
+          30,
+          30,
+          30,
+          0.9
+        ) !important; // Match cell background to row
+      }
+    }
+
+    &:nth-child(even) {
+      background-color: rgba(
+        31,
+        31,
+        31,
+        0.9
+      ) !important; // Barely different from odd rows
+
+      .ag-cell {
+        background-color: rgba(
+          31,
+          31,
+          31,
+          0.9
+        ) !important; // Match cell background to row
+      }
+    }
+
+    // When hovering over a row in dark mode
+    &:hover {
+      background-color: rgba(60, 60, 60, 0.9) !important; // Hover background
+
+      .ag-cell {
+        background-color: rgba(
+          60,
+          60,
+          60,
+          0.9
+        ) !important; // Change cell background on row hover
+      }
+    }
+
+    // Selected row in dark mode
+    &.ag-row-selected {
+      background-color: rgba(
+        70,
+        90,
+        100,
+        0.9
+      ) !important; // Selected row background
+
+      .ag-cell {
+        background-color: rgba(
+          70,
+          90,
+          100,
+          0.9
+        ) !important; // Cells in selected rows
+      }
+    }
+  }
+
+  // Adding a border to the entire grid
+  .ag-root-wrapper {
+    border: 1px solid #0000; // Main grid border
+    background-color: #1a1a1a; // Dark background to make grid lines more visible
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+  .no-underline-header .ag-header-cell-resize {
+    display: none !important;
+  }
+  .ag-header-cell.ag-header-parent-hidden.ag-header-cell-sortable.ag-focus-managed {
+    border-right: 2px solid #b9e7f8;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+  .ag-row-selected {
+    background-color: #b9e7f8 !important; // Áp dụng màu nền cho toàn bộ row
+  }
+
+  // Các ô trong dòng được chọn
+  .ag-row-selected .ag-cell {
+    background-color: #1d1d1d9d !important; // Đồng bộ màu nền cho từng ô
+    border-color: #b9e7f8;
+  }
+
+  // Đảm bảo .selected-cell có mức ưu tiên cao hơn
+  .ag-row-selected .selected-cell,
+  .selected-cell {
+    background-color: #505657 !important; // Màu xanh nhạt cho ô được chọn
+    border: 2px solid #ffff !important; // Viền dày hơn
+    font-weight: bold !important; // Chữ in đậm
+  }
+  .containerr {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading-wave {
+    width: 300px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+
+  .loading-bar {
+    width: 20px;
+    height: 10px;
+    margin: 0 5px;
+    background-color: #3498db;
+    border-radius: 5px;
+    animation: loading-wave-animation 1s ease-in-out infinite;
+  }
+
+  .loading-bar:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .loading-bar:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  .loading-bar:nth-child(4) {
+    animation-delay: 0.3s;
+  }
+
+  // Loading overlay styles for dark theme
+  .ag-overlay-loading-wrapper {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    z-index: 1000 !important;
+  }
+
+  // Same animation for dark theme
+  @keyframes loading-wave-animation {
+    0% {
+      height: 10px;
+      transform: scaleY(1);
+      opacity: 0.5;
+    }
+    50% {
+      height: 50px;
+      transform: scaleY(2.5);
+      opacity: 1;
+    }
+    100% {
+      height: 10px;
+      transform: scaleY(1);
+      opacity: 0.5;
+    }
+  }
+
+  // Enhanced letter bounce animation keyframes
+  @keyframes letter-bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.7;
+    }
+    40% {
+      transform: translateY(-20px);
+      opacity: 1;
+    }
+    60% {
+      transform: translateY(-10px);
+      opacity: 0.9;
+    }
+  }
+
+  // Loading text styles for dark theme
+  .loading-text {
+    display: inline-block;
+    animation: letter-bounce 1.4s ease-in-out infinite;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    color: #64b5f6;
+  }
+
+  // Adding styles for filter array button in dark mode
+  .filter-array-controls {
+    button {
+      transition: background-color 0.2s, transform 0.1s;
+
+      &:hover {
+        background-color: #3a4f64;
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+  // Pagination arrow custom color
+  .ag-paging-panel {
+    .ag-paging-button {
+      color: #90caf9 !important; // Màu xanh nhạt cho dark mode
+      font-size: 18px;
+      transition: color 0.2s;
+      &:hover:not(.ag-disabled) {
+        color: #42a5f5 !important;
+      }
+      &.ag-disabled {
+        color: #616161 !important;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+.filter-summary-container {
+  cursor: pointer;
+
+  .filter-summary {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Normal state shows filter summary
+  .filter-text {
+    display: block;
+  }
+
+  .remove-filter {
+    display: none;
+    color: #ff4d4f;
+  }
+
+  // On hover, hide summary and show remove option
+  &:hover {
+    .filter-text {
+      display: none;
+    }
+
+    .remove-filter {
+      display: block;
+    }
+  }
+}
+input[type="checkbox"]:checked {
+  accent-color: #1890ff; // Màu xanh dương, có thể đổi sang màu bạn muốn
+}
+.loading-bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+@keyframes loading-wave-animation {
+  0% {
+    height: 10px;
+  }
+
+  50% {
+    height: 50px;
+  }
+
+  100% {
+    height: 10px;
+  }
+}
+
+.small-container .filter-array-modal,
+.job-table-container .filter-array-modal,
+.popup-modal .filter-array-modal {
+  scale: 0.76 !important;
+}
+
+// Fill handle styles
+.fill-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #0078d7;
+  border: 2px solid #fff;
+  cursor: crosshair;
+  z-index: 1001 !important;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: none !important; // Loại bỏ hoàn toàn transition
+  pointer-events: auto;
+  will-change: transform, top, left; // Tối ưu hóa cho animation
+  transform: translate3d(0, 0, 0); // Force hardware acceleration
+
+  &:hover {
+    background-color: #106ebe;
+    transform: scale(1.2) translate3d(0, 0, 0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  &:active {
+    background-color: #005a9e;
+    transform: scale(1.1) translate3d(0, 0, 0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  // Đảm bảo không có hiệu ứng transition khi thay đổi vị trí
+  &[style*="top"],
+  &[style*="left"] {
+    transition: none !important;
+  }
+
+  // Auto-scroll indicator
+  &.auto-scrolling {
+    background-color: #ff6b35;
+    animation: pulse 1s infinite;
+  }
+}
+
+// Auto-scroll pulse animation
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Đảm bảo grid container có position relative để fill handle absolute đúng
+.ag-theme-quartz,
+.ag-theme-quartz-dark {
+  .ag-root-wrapper {
+    position: relative;
+  }
+
+  // Prevent scroll jumping when selecting checkboxes
+  .ag-body-viewport {
+    scroll-behavior: auto !important;
+  }
+
+  // Ensure smooth scrolling and prevent auto-scroll to top
+  .ag-body-vertical-scroll-viewport {
+    scroll-behavior: auto !important;
+  }
+
+  // Prevent automatic scroll restoration
+  .ag-body-vertical-scroll-container {
+    scroll-behavior: auto !important;
+  }
+}
+
+// Fill target cells styling
+.ag-cell.fill-target {
+  background-color: rgba(0, 120, 215, 0.2) !important;
+  border: 1px dashed #0078d7 !important;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid #0078d7;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+// Selected cell styling enhancement
+.ag-cell.selected-cell {
+  background-color: #d3ebf5 !important;
+  border: 2px solid #0078d7 !important;
+  font-weight: bold !important;
+}
+
+// Dark theme fill handle
+.ag-theme-quartz-dark {
+  .fill-handle {
+    background-color: #64b5f6;
+    border: 1px solid #333;
+
+    &:hover {
+      background-color: #42a5f5;
+    }
+  }
+
+  .ag-cell.fill-target {
+    background-color: rgba(100, 181, 246, 0.2) !important;
+    border: 1px dashed #64b5f6 !important;
+  }
+
+  .ag-cell.selected-cell {
+    background-color: #505657 !important;
+    border: 2px solid #64b5f6 !important;
+  }
+}

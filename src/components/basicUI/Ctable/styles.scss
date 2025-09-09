@@ -1,0 +1,381 @@
+@import "../../../styles/variables.scss";
+
+.tableHT {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  // Custom row height
+  --row-height: 28px;
+
+  .ant-table {
+    margin-bottom: 0;
+
+    .ant-table-thead > tr > th {
+      background-color: $primary-color; // Primary blue color for headers
+      color: #fff;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-bottom: 1px solid $border-color;
+      border-right: 1px solid rgba(255, 255, 255, 0.2); // Add vertical border to header cells
+      text-align: left;
+
+      &:last-child {
+        border-right: none; // Remove right border from last header cell
+      }
+    }
+
+    .ant-table-tbody > tr > td {
+      padding: 0 16px; // Giảm padding để tối ưu hóa độ cao hàng
+      height: var(--row-height);
+      line-height: var(--row-height);
+      border-bottom: 1px solid $border-color;
+      border-right: 1px solid $border-color; // Add vertical border to body cells
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      &:last-child {
+        border-right: none; // Remove right border from last body cell
+      }
+      &:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(30, 64, 175, 0.03) 100%);
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      > td {
+        border-bottom: 1px solid rgba(233, 236, 239, 0.6);
+        padding: 12px;
+      }
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background-color: rgba($primary-color-light, 0.05);
+    }
+
+    // Adjust fixed columns
+
+    .ant-table-cell-fix-left,
+    .ant-table-cell-fix-right {
+      background-color: inherit;
+    }
+
+    // Add higher z-index to action column without changing header color
+
+    .ant-table-cell-fix-left,
+    .ant-table-cell-fix-right {
+      z-index: 4 !important; // Higher z-index for action column
+    }
+
+    // Keep the header styles as they are
+    .ant-table-thead .ant-table-cell-fix-left,
+    .ant-table-thead .ant-table-cell-fix-right {
+      background-color: $primary-color !important; // Match the header color
+      color: #fff !important;
+    }
+
+    // Only for body cells in action column
+    .ant-table-tbody .ant-table-cell-fix-left,
+    .ant-table-tbody .ant-table-cell-fix-right {
+      background-color: #fff !important; // White background for body cells
+    }
+  }
+
+  .ant-table-tbody {
+    > tr.even-row > td {
+      background-color: #ffffff;
+
+      &.ant-table-cell-fix-right {
+        background-color: #fff !important; // Always white for action column
+      }
+
+      &.ant-table-cell-fix-left {
+        background-color: #fff !important; // Always white for action column
+      }
+    }
+
+    > tr.odd-row > td {
+      background-color: rgba($primary-color, 0.02);
+
+      &.ant-table-cell-fix-right {
+        background-color: #fff !important; // Always white for action column
+      }
+
+      &.ant-table-cell-fix-left {
+        background-color: #fff !important; // Always white for action column
+      }
+
+    }
+
+    // Enhance hover effects for all rows
+    > tr:hover > td {
+      background-color: rgba($primary-color-light, 0.08);
+    }
+
+    // Add selected row styling for all selection types
+    > tr.ant-table-row-selected > td {
+      background-color: rgba($primary-color-light, 0.12) !important;
+
+      &.ant-table-cell-fix-left,
+      &.ant-table-cell-fix-right {
+        background-color: rgba($primary-color-light, 0.12) !important;
+      }
+    }
+  }
+
+  .table-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 8px;
+    // border-top: 1px solid $border-color;
+
+    .table-column-settings {
+      margin-left: auto;
+    }
+
+    .table-info {
+      font-size: 14px;
+      color: $text-color-secondary;
+    }
+  }
+
+  .ant-pagination {
+    margin: 16px 0;
+  }
+
+  .ant-btn-icon-only {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  // Dark theme variant (can be applied via class)
+  &.dark-theme {
+    .ant-table-thead > tr > th {
+      background-color: $primary-color-dark;
+      color: $text-color-dark;
+    }
+
+    .ant-table-tbody {
+      > tr.even-row > td {
+        background-color: $background-color-dark;
+      }
+
+      > tr.odd-row > td {
+        background-color: rgba($primary-color, 0.08);
+      }
+
+      > tr:hover > td {
+        background-color: rgba($primary-color-light, 0.15);
+      }
+
+      > tr.ant-table-row-selected > td {
+        background-color: rgba($primary-color-dark, 0.25) !important;
+
+        &.ant-table-cell-fix-left,
+        &.ant-table-cell-fix-right {
+          background-color: rgba($primary-color-dark, 0.25) !important;
+        }
+      }
+    }
+  }
+
+  // Custom scrollbar styles
+  .ant-table-body::-webkit-scrollbar,
+  .ant-table-content::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .ant-table-body::-webkit-scrollbar-track,
+  .ant-table-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .ant-table-body::-webkit-scrollbar-thumb,
+  .ant-table-content::-webkit-scrollbar-thumb {
+    background: $primary-color-light;
+    border-radius: 4px;
+  }
+
+  .ant-table-body::-webkit-scrollbar-thumb:hover,
+  .ant-table-content::-webkit-scrollbar-thumb:hover {
+    background: $primary-color;
+  }
+}
+
+// Editable cell styles
+.editable-cell-value-wrap {
+  padding: 5px 12px;
+  cursor: pointer;
+  min-height: 24px;
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+  border: 1px dashed #d9d9d9;
+  border-radius: 4px;
+  padding: 4px 11px;
+}
+
+// Dark mode support for editable cells
+.dark-theme {
+  .editable-row:hover .editable-cell-value-wrap {
+    border: 1px dashed #434343;
+  }
+}
+
+.ant-dropdown.css-dev-only-do-not-override-187wg9o.ant-dropdown-placement-bottomLeft {
+  z-index: 1;
+}
+// Dark mode styles
+html.dark {
+  .tableHT {
+    .ant-table {
+      .ant-table-thead > tr > th {
+        background-color: $primary-color-dark;
+        color: $text-color-dark;
+        border-bottom-color: $border-color-dark;
+        border-right: 1px solid rgba(255, 255, 255, 0.1); // Add vertical border to header cells in dark mode
+
+        &:last-child {
+          border-right: none; // Remove right border from last header cell
+        }
+      }
+
+      .ant-table-tbody > tr > td {
+        border-bottom-color: $border-color-dark;
+        border-right: 1px solid $border-color-dark; // Add vertical border to body cells in dark mode
+
+        &:last-child {
+          border-right: none; // Remove right border from last body cell
+        }
+      }
+
+      // Dark mode styles for fixed columns
+      .ant-table-thead .ant-table-cell-fix-left,
+      .ant-table-thead .ant-table-cell-fix-right {
+        background-color: $primary-color-dark !important; // Match the dark header color
+        color: $text-color-dark !important;
+      }
+
+      // Dark mode styles for body fixed columns
+      .ant-table-tbody .ant-table-cell-fix-left,
+      .ant-table-tbody .ant-table-cell-fix-right {
+        background-color: $background-color-dark !important; // Dark background for body cells
+      }
+    }
+
+    .ant-table-tbody {
+      > tr.even-row > td {
+        background-color: $background-color-dark;
+
+        &.ant-table-cell-fix-left,
+        &.ant-table-cell-fix-right {
+          background-color: $background-color-dark !important; // Match dark background
+        }
+      }
+
+      > tr.odd-row > td {
+        background-color: darken($background-color-dark, 2%);
+
+        &.ant-table-cell-fix-left,
+        &.ant-table-cell-fix-right {
+          background-color: darken(
+            $background-color-dark,
+            2%
+          ) !important; // Match darker background
+        }
+      }
+    }
+
+    .table-footer {
+      border-top-color: $border-color-dark;
+
+      .table-info {
+        color: $text-color-secondary-dark;
+      }
+    }
+
+    // Dark mode scrollbar styles
+    .ant-table-body::-webkit-scrollbar-track,
+    .ant-table-content::-webkit-scrollbar-track {
+      background: $background-color-dark;
+    }
+
+    .ant-table-body::-webkit-scrollbar-thumb,
+    .ant-table-content::-webkit-scrollbar-thumb {
+      background: darken($primary-color-dark, 10%);
+    }
+
+    .ant-table-body::-webkit-scrollbar-thumb:hover,
+    .ant-table-content::-webkit-scrollbar-thumb:hover {
+      background: $primary-color-dark;
+    }
+  }
+}
+
+.dark-dropdown-content {
+  background-color: $background-color-light !important;
+  color: $text-color-dark !important;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+}
+
+html.dark .dark-dropdown-content {
+  background-color: $background-color-dark !important;
+  color: $text-color-dark !important;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+}
+
+// Add styles for clickable rows (single selection mode)
+.clickable-row {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(24, 144, 255, 0.08) !important;
+  }
+
+  &.ant-table-row-selected {
+    background-color: rgba(24, 144, 255, 0.15) !important;
+
+    td {
+      background-color: transparent !important;
+      border-left: 2px solid #1890ff !important;
+    }
+
+    &:hover {
+      background-color: rgba(24, 144, 255, 0.25) !important;
+    }
+  }
+}
+
+// Dark mode styles for clickable rows
+html.dark {
+  .tableHT {
+    .clickable-row {
+      &:hover {
+        background-color: rgba(45, 140, 240, 0.15) !important;
+      }
+
+      &.ant-table-row-selected {
+        background-color: rgba(45, 140, 240, 0.25) !important;
+
+        td {
+          background-color: transparent !important;
+          border-left: 2px solid #1890ff !important;
+        }
+
+        &:hover {
+          background-color: rgba(45, 140, 240, 0.35) !important;
+        }
+      }
+    }
+  }
+}
+
