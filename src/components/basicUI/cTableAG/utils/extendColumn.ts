@@ -1,5 +1,5 @@
 import { ColDef } from "@ag-grid-community/core";
-import { ExtendedColDef } from "./agProps";
+import { ExtendedColDef } from "../interface/agProps";
 import dayjs from "dayjs";
 import AntdSelectCellEditor from "@/utils/client/CustomTableInput/AntdSelectCellEditor";
 import { DatepickerCellEditor } from "@/utils/client/CustomTableInput/EditorDateTable";

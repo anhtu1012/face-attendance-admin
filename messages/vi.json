@@ -22,7 +22,8 @@
     "SelectAll": "Chọn tất cả",
     "NoColumnsFound": "Không tìm thấy cột",
     "entervalue": "Nhập giá trị",
-    "Cancel": "Hủy"
+    "Cancel": "Hủy",
+    "ApplyFilter": "Áp dụng"
   },
   "message": {
     "success": "Thành công",

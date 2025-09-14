@@ -7,7 +7,7 @@ import {
   RowDoubleClickedEvent,
 } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
-import { InputSearchProps } from "../InputSearch";
+import { InputSearchProps } from "../../InputSearch";
 import { ActionButtonsProps } from "@/components/action-button";
 export interface ExtendedColDef extends ColDef {
   typeColumn?: "Select" | "Text" | "Number" | "Date"; // Add other types as needed

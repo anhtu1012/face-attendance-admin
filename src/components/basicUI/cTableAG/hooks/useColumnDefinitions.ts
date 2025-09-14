@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { ColDef, CellStyle, CellClassParams } from "@ag-grid-community/core";
-import { processColumnDefs } from "../extendColumn";
-import ErrorCellRenderer from "../ErrorCellRenderer";
+import { processColumnDefs } from "../utils/extendColumn";
+import ErrorCellRenderer from "../components/ErrorCellRenderer";
 
 interface UseColumnDefinitionsProps {
   columnDefs: ColDef[];

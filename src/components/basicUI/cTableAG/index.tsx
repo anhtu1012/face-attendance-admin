@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import ActionButtons from "@/components/action-button";
-import ErrorCellRenderer from "@/components/basicUI/cTableAG/ErrorCellRenderer";
+import ErrorCellRenderer from "@/components/basicUI/cTableAG/components/ErrorCellRenderer";
 import InputSearch from "@/components/basicUI/InputSearch";
 
 import usePasteHandler from "@/utils/client/usePasteHandler";
@@ -21,9 +21,9 @@ import { useTheme } from "next-themes";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { BsFiletypeXlsx } from "react-icons/bs";
 import { FiUpload } from "react-icons/fi";
-import { AgGridComponentProps } from "./agProps";
-import { CustomTooltip } from "./CustomTooltip";
-import FilterArrayModal from "./FilterArrayModal";
+import { AgGridComponentProps } from "./interface/agProps";
+import { CustomTooltip } from "./components/CustomTooltip";
+import FilterArrayModal from "./components/FilterArrayModal";
 import { useAutoScroll } from "./hooks/useAutoScroll";
 import { useClipboard } from "./hooks/useClipboard";
 import { useColumnDefinitions } from "./hooks/useColumnDefinitions";

@@ -22,7 +22,8 @@
     "SelectAll": "Select All",
     "NoColumnsFound": "No columns found",
     "entervalue": "Enter value",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+    "ApplyFilter": "Apply Filter"
   },
   "message": {
     "success": "Success",
