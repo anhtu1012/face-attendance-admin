@@ -7,8 +7,8 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import ClientOnly from "../ClientOnly";
 import HeaderComponent from "./header";
-import CollapsedMenuCard from "./CollapsedMenuCard";
 import "./index.scss";
+import SiderMain from "./sider";
 
 const { Content } = Layout;
 
@@ -70,7 +70,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     >
       <ClientOnly>
         <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} />
-        <CollapsedMenuCard collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SiderMain
+          openMenu={!collapsed}
+          setOpenMenu={(open: boolean) => setCollapsed(!open)}
+        />
       </ClientOnly>
 
       <Layout

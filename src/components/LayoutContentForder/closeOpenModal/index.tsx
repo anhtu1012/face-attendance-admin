@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
 import React, { useState, ReactNode, useEffect, useRef } from "react";
 import "./style.scss";
 import FloatButton from "../floatButton";

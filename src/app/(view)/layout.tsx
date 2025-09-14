@@ -1,10 +1,9 @@
 "use client";
-
-import MainLayout from "@/components/layout";
 import React, { useEffect, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingTruck from "../loading";
-// import "./index.scss";
+import "./index.scss";
+import AdminLayout from "@/components/layoutAdmin";
 
 // Use a stable component structure that matches between server and client
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
@@ -33,7 +32,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return <MainLayout>{children}</MainLayout>;
+  return <AdminLayout>{children}</AdminLayout>;
 };
 
 export default RootLayout;

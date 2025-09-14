@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // redux/authSlice.js
-import { UserInfor } from "@/dtos/auth/auth.dto";
+import { ResourcePermission, UserInfor } from "@/dtos/auth/auth.dto";
 import { RootState } from "@/lib/store";
 import { createSlice } from "@reduxjs/toolkit";
 
@@ -8,6 +8,7 @@ const initialState = {
   accessToken: "",
   refreshToken: "",
   userProfile: {} as UserInfor,
+  permissions: [] as ResourcePermission[],
 };
 
 const authSlice = createSlice({
@@ -15,15 +16,18 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuthData: (state, action) => {
-      const { accessToken, refreshToken, userProfile } = action.payload;
+      const { accessToken, refreshToken, userProfile, permissions } =
+        action.payload;
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;
       state.userProfile = userProfile;
+      state.permissions = permissions;
     },
     clearAuthData: (state) => {
       state.accessToken = "";
       state.refreshToken = "";
-      state.userProfile = {} as any; // Reset to initial state
+      state.userProfile = {} as UserInfor; // Reset to initial state
+      state.permissions = [];
     },
   },
 });

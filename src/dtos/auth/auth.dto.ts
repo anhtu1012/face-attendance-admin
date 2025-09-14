@@ -31,3 +31,16 @@ export const UserInforSchema = z.object({
 });
 
 export type UserInfor = z.infer<typeof UserInforSchema>;
+
+export const ResourcePermissionSchema = z.object({
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  groupCode: z.string(),
+  resourceCode: z.string(),
+  resourceName: z.string(),
+  parentName: z.string(),
+  scopes: z.array(z.enum(["view", "create", "update", "delete"])),
+});
+
+export type ResourcePermission = z.infer<typeof ResourcePermissionSchema>;

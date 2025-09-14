@@ -27,6 +27,7 @@ const { Header } = Layout;
 interface HeaderProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
+  Component?: React.ComponentType;
 }
 
 const HeaderComponent: React.FC<HeaderProps> = ({
