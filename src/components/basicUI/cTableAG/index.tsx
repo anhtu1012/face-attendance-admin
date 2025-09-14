@@ -2490,14 +2490,17 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
         font-size: 32px;
         color: #1890ff;
       ">
-        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0s;">V</span>
-        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.1s;">T</span>
-        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.2s;">O</span>
-        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.3s;">S</span>
-        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.4s;">-</span>
-        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.5s;">P</span>
-        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.6s;">R</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0s;">H</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.1s;">U</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.2s;">M</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.3s;">A</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.4s;">N</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.5s;">&</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.6s;">M</span>
         <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.7s;">O</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.8s;">N</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 0.9s;">E</span>
+        <span style="animation: letter-bounce 1.4s ease-in-out infinite 1.0s;">Y</span>
       </div>
       <div style="
         font-size: 16px;

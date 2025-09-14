@@ -2,6 +2,60 @@
   "Profile": {
     "changepass": "Change password"
   },
+  "AgGridComponent": {
+    "search": "Search",
+    "Filteredby": "Filtered by",
+    "ClearFilter": "Clear Filter",
+    "Nodata": "No data",
+    "items_per_page": "Items per page",
+    "jump_to": "Jump to",
+    "prev_page": "Previous page",
+    "next_page": "Next page",
+    "totalRow": "Total rows"
+  },
+  "FilterArrayModal": {
+    "FilterArray": "Filter Array",
+    "SelectColumnsHelpText": "Select columns to filter",
+    "Selected": "Selected",
+    "SearchColumns": "Search columns",
+    "DeselectAll": "Deselect All",
+    "SelectAll": "Select All",
+    "NoColumnsFound": "No columns found",
+    "entervalue": "Enter value",
+    "Cancel": "Cancel"
+  },
+  "message": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info",
+    "deleteConfirm": "Are you sure you want to delete this item?",
+    "yes": "Yes",
+    "no": "No",
+    "updateSuccess": "Update successful",
+    "updateError": "Update failed",
+    "deleteSuccess": "Delete successful",
+    "deleteError": "Delete failed",
+    "createSuccess": "Create successful",
+    "createError": "Create failed",
+    "fetchError": "Data fetch failed",
+    "noData": "No data available",
+    "invalidInput": "Invalid input, please check again"
+  },
+  "ActionButtons": {
+    "add": "Add",
+    "edit": "Edit",
+    "save": "Save",
+    "delete": "Delete",
+    "item": "Item",
+    "Yes": "Yes",
+    "No": "No",
+    "rowadd": "Add Row",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "rownumber": "Row Number",
+    "confirmDelete": "Confirm Delete"
+  },
   "Ctable": {
     "total": "Total",
     "stt": "No.",
@@ -12,6 +66,10 @@
     "showHideColumns": "Column",
     "import": "Import",
     "export": "Export"
+  },
+  "NhomNguoiDung": {
+    "roleCode": "Role Code",
+    "roleName": "Description"
   },
   "QuanLiChamCong": {
     "maChamCong": "Time Tracking ID",
