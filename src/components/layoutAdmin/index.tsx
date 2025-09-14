@@ -64,7 +64,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   }, []);
   // Render the layout with a stable structure for both server and client
   return (
-    <Layout style={{ minHeight: "100vh" }} className={collapsed ? "layout-collapsed" : ""}>
+    <Layout
+      style={{ height: "100vh" }}
+      className={collapsed ? "layout-collapsed" : ""}
+    >
       <ClientOnly>
         <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} />
         <CollapsedMenuCard collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -72,7 +75,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
 
       <Layout
         style={{
-          // marginLeft: 0,
+          height: "90vh",
           marginTop: 54,
           transition: "margin 0.2s",
         }}
@@ -91,8 +94,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
               }))}
             />
           </div>
-
-          <div className="content-container">{children}</div>
+          {children}
+          {/* <div className="content-container"></div> */}
         </Content>
       </Layout>
     </Layout>

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import AgGridComponent from "@/components/basicUI/cTableAG";
+import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { showError } from "@/hook/useNotification";
 import CauHinhMenuServices from "@/services/admin/quan-tri-he-thong/cau-hinh-menu.service";
 import {
@@ -19,7 +20,7 @@ import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 function Page() {
   const notiMessage = useTranslations("message");
   const t = useTranslations("CauHinhMenu");
-  const gridRef = useRef<AgGridReact>(null);
+  const gridRef = useRef<AgGridReact>({} as any);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -68,13 +69,6 @@ function Page() {
     },
     [currentPage, pageSize, notiMessage]
   );
-
-  const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current!.api.setGridOption(
-      "quickFilterText",
-      (document.getElementById("filter-text-box") as HTMLInputElement).value
-    );
-  }, []);
 
   useEffect(() => {
     handleFetchMenu(currentPage, pageSize);
@@ -301,33 +295,37 @@ function Page() {
   };
 
   return (
-    <div>
-      <AgGridComponent
-        showSearch={true}
-        inputSearchProps={{
-          id: "filter-text-box",
-          onInput: onFilterTextBoxChanged,
-        }}
-        loading={loading}
-        rowData={displayData}
-        columnDefs={columnDefs}
-        gridRef={gridRef}
-        total={totalItems}
-        pagination={true}
-        maxRowsVisible={5}
-        onChangePage={handlePageChange}
-        columnFlex={0}
-        showActionButtons={true}
-        // actionButtonsProps={{
-        //   onDelete: deleteRow,
-        //   onSave: onSave,
-        //   rowSelected,
-        //   showAddRowsModal: true,
-        //   modalInitialCount: 1,
-        //   onModalOk: handleModalOk,
-        // }}
-      />
-    </div>
+    <LayoutContent
+      layoutType={1}
+      content1={
+        <AgGridComponent
+          showSearch={true}
+          inputSearchProps={{
+            id: "filter-text-box",
+            idSearch: "filter-text-box",
+            gridRef: gridRef,
+          }}
+          loading={loading}
+          rowData={displayData}
+          columnDefs={columnDefs}
+          gridRef={gridRef}
+          total={totalItems}
+          pagination={true}
+          maxRowsVisible={5}
+          onChangePage={handlePageChange}
+          columnFlex={0}
+          showActionButtons={true}
+          // actionButtonsProps={{
+          //   onDelete: deleteRow,
+          //   onSave: onSave,
+          //   rowSelected,
+          //   showAddRowsModal: true,
+          //   modalInitialCount: 1,
+          //   onModalOk: handleModalOk,
+          // }}
+        />
+      }
+    />
   );
 }
 

@@ -879,6 +879,7 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
                 <InputSearch
                   // id="filter-text-box"
                   placeholder={t("search")}
+                  gridRef={gridRef}
                   {...inputSearchProps}
                   isFiltered={isFiltered}
                   onFilterClick={handleOpenFilterModal}
