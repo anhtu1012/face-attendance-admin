@@ -5,7 +5,7 @@ import { AgGridReact } from "@ag-grid-community/react";
 import React, { useMemo, useRef } from "react";
 
 function Page() {
-  const gridRef = useRef<AgGridReact>(null);
+  const gridRef = useRef<AgGridReact>({} as AgGridReact);
   const rowData = [{ TEST: "Data 1" }];
   const columnDefs: ColDef[] = useMemo(
     () => [

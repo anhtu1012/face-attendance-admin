@@ -1,4 +1,6 @@
 // Notification styling
+@use "sass:color";
+
 // Color variables
 $primary-color: #0056b3; // Darker blue for better visibility outdoors
 $secondary-color: #1890ff; // Standard blue
@@ -18,7 +20,7 @@ $equipment-bg-color: #e2f7ff; // Another shade for equipment section
 $section-header-bg: linear-gradient(
   to right,
   $primary-color,
-  lighten($primary-color, 15%)
+  color.adjust($primary-color, $lightness: 15%)
 ); // Gradient for section headers
 
 :root {

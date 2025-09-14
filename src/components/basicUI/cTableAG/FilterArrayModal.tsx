@@ -1,6 +1,5 @@
 import { useTranslations } from "next-intl";
-import React, { useState, useEffect } from "react";
-import Draggable from "react-draggable";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 interface FilterArrayModalProps {
   isOpen: boolean;
@@ -26,13 +25,91 @@ const FilterArrayModal: React.FC<FilterArrayModalProps> = ({
   const [filterText, setFilterText] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
+  // Draggable state
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const modalRef = useRef<HTMLDivElement>(null);
+
   // Initialize state when modal opens
   useEffect(() => {
     if (isOpen) {
       setSelectedColumns(initialSelectedColumns);
       setFilterText(initialFilterValues);
+      // Reset position when modal opens
+      setPosition({ x: 0, y: 0 });
     }
   }, [isOpen, initialSelectedColumns, initialFilterValues]);
+
+  // Draggable handlers
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!modalRef.current) return;
+
+    setIsDragging(true);
+    // Calculate offset from mouse position to current modal position
+    // Since modal is centered, we use the center point as reference
+    const rect = modalRef.current.getBoundingClientRect();
+    const modalCenterX = rect.left + rect.width / 2;
+    const modalCenterY = rect.top + rect.height / 2;
+
+    setDragOffset({
+      x: e.clientX - modalCenterX,
+      y: e.clientY - modalCenterY,
+    });
+
+    e.preventDefault();
+  }, []);
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging || !modalRef.current) return;
+
+      // Calculate new position relative to viewport center
+      const viewportCenterX = window.innerWidth / 2;
+      const viewportCenterY = window.innerHeight / 2;
+
+      const newX = e.clientX - dragOffset.x - viewportCenterX;
+      const newY = e.clientY - dragOffset.y - viewportCenterY;
+
+      // Improved bounds checking to keep modal fully visible
+      const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+
+      const modalRect = modalRef.current.getBoundingClientRect();
+
+      // Calculate bounds to keep modal fully within viewport
+      // Allow small margin for better UX
+      const margin = 20;
+      const minX = -viewport.width / 2 + modalRect.width / 2 + margin;
+      const maxX = viewport.width / 2 - modalRect.width / 2 - margin;
+      const minY = -viewport.height / 2 + modalRect.height / 2 + margin;
+      const maxY = viewport.height / 2 - modalRect.height / 2 - margin;
+
+      setPosition({
+        x: Math.max(minX, Math.min(maxX, newX)),
+        y: Math.max(minY, Math.min(maxY, newY)),
+      });
+    },
+    [isDragging, dragOffset]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Set up global event listeners for dragging
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      return () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   // Handle checkbox changes
   const handleColumnToggle = (field: string) => {
@@ -106,6 +183,9 @@ const FilterArrayModal: React.FC<FilterArrayModalProps> = ({
     overflow: "hidden",
     color: isDark ? "#eee" : "#333",
     position: "absolute", // Added for draggable positioning
+    left: "50%",
+    top: "50%",
+    transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
   };
 
   const modalHeaderStyle: React.CSSProperties = {
@@ -115,7 +195,8 @@ const FilterArrayModal: React.FC<FilterArrayModalProps> = ({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: isDark ? "#333" : "#f9f9f9",
-    cursor: "move", // Added cursor to indicate draggable
+    cursor: isDragging ? "grabbing" : "grab", // Updated cursor for dragging
+    userSelect: "none", // Prevent text selection while dragging
   };
 
   const modalBodyStyle: React.CSSProperties = {
@@ -222,140 +303,146 @@ const FilterArrayModal: React.FC<FilterArrayModalProps> = ({
 
   return (
     <div style={modalOverlayStyle}>
-      <Draggable handle=".modal-draggable-handle" bounds="parent">
-        <div style={modalContentStyle} className="filter-array-modal">
-          <div style={modalHeaderStyle} className="modal-draggable-handle">
-            <h3 style={{ margin: 0, fontSize: "16px" }}>{t("FilterArray")}</h3>
-            <button
-              onClick={onClose}
-              style={{
-                background: "none",
-                border: "none",
-                fontSize: "18px",
-                cursor: "pointer",
-                color: isDark ? "#ccc" : "#666",
-              }}
-            >
-              &times;
-            </button>
-          </div>
+      <div
+        ref={modalRef}
+        style={modalContentStyle}
+        className="filter-array-modal"
+      >
+        <div
+          style={modalHeaderStyle}
+          className="modal-draggable-handle"
+          onMouseDown={handleMouseDown}
+        >
+          <h3 style={{ margin: 0, fontSize: "16px" }}>{t("FilterArray")}</h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              fontSize: "18px",
+              cursor: "pointer",
+              color: isDark ? "#ccc" : "#666",
+            }}
+          >
+            &times;
+          </button>
+        </div>
 
-          <div style={modalBodyStyle}>
-            {/* Left side - Column selection */}
-            <div style={columnSectionStyle}>
-              <div style={columnHelpTextStyle}>
-                {t("SelectColumnsHelpText")}
-                {selectedColumns.length > 0 && (
-                  <span
-                    style={{
-                      color: isDark ? "#8bd8f4" : "#0078d7",
-                    }}
-                  >
-                    {" "}
-                    ({selectedColumns.length} {t("Selected")})
-                  </span>
-                )}
-              </div>
-              <input
-                type="text"
-                placeholder={t("SearchColumns")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={searchInputStyle}
-              />
-
-              <button onClick={toggleAllColumns} style={toggleAllStyle}>
-                {selectedColumns.length === columns.length
-                  ? t("DeselectAll")
-                  : t("SelectAll")}
-              </button>
-
-              <div style={{ overflowY: "auto" }}>
-                {filteredColumns.map((column) => (
-                  <div
-                    key={column.field}
-                    style={checkboxContainerStyle}
-                    onClick={() => handleColumnToggle(column.field)}
-                  >
-                    <input
-                      type="checkbox"
-                      id={`col-${column.field}`}
-                      checked={selectedColumns.includes(column.field)}
-                      onChange={() => {}} // Handled by onClick on container
-                      style={{ cursor: "pointer" }}
-                    />
-                    <label
-                      htmlFor={`col-${column.field}`}
-                      style={checkboxLabelStyle}
-                    >
-                      {column.headerName}
-                    </label>
-                  </div>
-                ))}
-
-                {filteredColumns.length === 0 && (
-                  <div
-                    style={{
-                      color: isDark ? "#999" : "#666",
-                      padding: "10px 0",
-                    }}
-                  >
-                    {t("NoColumnsFound")}
-                  </div>
-                )}
-              </div>
+        <div style={modalBodyStyle}>
+          {/* Left side - Column selection */}
+          <div style={columnSectionStyle}>
+            <div style={columnHelpTextStyle}>
+              {t("SelectColumnsHelpText")}
+              {selectedColumns.length > 0 && (
+                <span
+                  style={{
+                    color: isDark ? "#8bd8f4" : "#0078d7",
+                  }}
+                >
+                  {" "}
+                  ({selectedColumns.length} {t("Selected")})
+                </span>
+              )}
             </div>
+            <input
+              type="text"
+              placeholder={t("SearchColumns")}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={searchInputStyle}
+            />
 
-            {/* Right side - Filter values */}
-            <div style={valueSectionStyle}>
-              <div
-                style={{
-                  marginBottom: "10px",
-                  fontSize: "14px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <span>{t("entervalue")}</span>
-                {filterValueCount > 0 && (
-                  <span
-                    style={{
-                      color: isDark ? "#8bd8f4" : "#0078d7",
-                    }}
+            <button onClick={toggleAllColumns} style={toggleAllStyle}>
+              {selectedColumns.length === columns.length
+                ? t("DeselectAll")
+                : t("SelectAll")}
+            </button>
+
+            <div style={{ overflowY: "auto" }}>
+              {filteredColumns.map((column) => (
+                <div
+                  key={column.field}
+                  style={checkboxContainerStyle}
+                  onClick={() => handleColumnToggle(column.field)}
+                >
+                  <input
+                    type="checkbox"
+                    id={`col-${column.field}`}
+                    checked={selectedColumns.includes(column.field)}
+                    onChange={() => {}} // Handled by onClick on container
+                    style={{ cursor: "pointer" }}
+                  />
+                  <label
+                    htmlFor={`col-${column.field}`}
+                    style={checkboxLabelStyle}
                   >
-                    {filterValueCount} values
-                  </span>
-                )}
-              </div>
-              <textarea
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
-                style={textareaStyle}
-                placeholder={t("entervalue")}
-              />
+                    {column.headerName}
+                  </label>
+                </div>
+              ))}
+
+              {filteredColumns.length === 0 && (
+                <div
+                  style={{
+                    color: isDark ? "#999" : "#666",
+                    padding: "10px 0",
+                  }}
+                >
+                  {t("NoColumnsFound")}
+                </div>
+              )}
             </div>
           </div>
 
-          <div style={footerStyle}>
-            <button style={cancelButtonStyle} onClick={onClose}>
-              {t("Cancel")}
-            </button>
-            <button
+          {/* Right side - Filter values */}
+          <div style={valueSectionStyle}>
+            <div
               style={{
-                ...buttonStyle,
-                opacity:
-                  selectedColumns.length === 0 || filterValueCount === 0
-                    ? 0.5
-                    : 1,
+                marginBottom: "10px",
+                fontSize: "14px",
+                display: "flex",
+                justifyContent: "space-between",
               }}
-              onClick={handleApply}
-              disabled={selectedColumns.length === 0 || filterValueCount === 0}
             >
-              {t("ApplyFilter")}
-            </button>
+              <span>{t("entervalue")}</span>
+              {filterValueCount > 0 && (
+                <span
+                  style={{
+                    color: isDark ? "#8bd8f4" : "#0078d7",
+                  }}
+                >
+                  {filterValueCount} values
+                </span>
+              )}
+            </div>
+            <textarea
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              style={textareaStyle}
+              placeholder={t("entervalue")}
+            />
           </div>
         </div>
-      </Draggable>
+
+        <div style={footerStyle}>
+          <button style={cancelButtonStyle} onClick={onClose}>
+            {t("Cancel")}
+          </button>
+          <button
+            style={{
+              ...buttonStyle,
+              opacity:
+                selectedColumns.length === 0 || filterValueCount === 0
+                  ? 0.5
+                  : 1,
+            }}
+            onClick={handleApply}
+            disabled={selectedColumns.length === 0 || filterValueCount === 0}
+          >
+            {t("ApplyFilter")}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
