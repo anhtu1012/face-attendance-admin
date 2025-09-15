@@ -3,13 +3,13 @@
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { showError } from "@/hook/useNotification";
-import CauHinhMenuServices from "@/services/admin/quan-tri-he-thong/cau-hinh-menu.service";
+import PhanQuyenServices from "@/services/admin/quan-tri-he-thong/phan-quyen.service";
 import {
   convertToTreeData,
   flattenTreeData,
   toggleNodeExpansion,
-  updateNodeCheckbox,
   TreeNode,
+  updateNodeCheckbox,
 } from "@/utils/tree-data.utils";
 import { CellStyle, ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
@@ -19,7 +19,7 @@ import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 
 function Page() {
   const notiMessage = useTranslations("message");
-  const t = useTranslations("CauHinhMenu");
+  const t = useTranslations("PhanQuyen");
   const gridRef = useRef<AgGridReact>({} as any);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
@@ -28,7 +28,7 @@ function Page() {
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [displayData, setDisplayData] = useState<TreeNode[]>([]);
 
-  const handleFetchMenu = useCallback(
+  const handleFetchPermission = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
       setLoading(true);
       try {
@@ -36,11 +36,13 @@ function Page() {
           { key: "limit", type: "=", value: limit },
           { key: "offset", type: "=", value: (page - 1) * limit },
         ];
-        const params: any = {};
+        const params: any = {
+          groupCodes: "ADMIN",
+        };
         if (quickSearch && quickSearch.trim() !== "") {
           params.quickSearch = quickSearch;
         }
-        const response = await CauHinhMenuServices.getCauHinhMenu(
+        const response = await PhanQuyenServices.getPhanQuyen(
           searchFilter,
           params
         );
@@ -51,7 +53,7 @@ function Page() {
           idField: "id",
           scopesField: "scopes",
         };
-        const convertedTreeData = convertToTreeData(response.data, treeConfig);
+        const convertedTreeData = convertToTreeData(response, treeConfig);
         setTreeData(convertedTreeData);
         console.log("convertedTreeData", convertedTreeData);
 
@@ -60,7 +62,7 @@ function Page() {
         setDisplayData(flattenedData);
         console.log("flattenedData", flattenedData);
 
-        setTotalItems(response.count);
+        setTotalItems(response.length);
         setLoading(false);
       } catch (error: any) {
         showError(error.response?.data?.message || notiMessage("fetchError"));
@@ -71,11 +73,9 @@ function Page() {
   );
 
   useEffect(() => {
-    handleFetchMenu(currentPage, pageSize);
-  }, [currentPage, handleFetchMenu, pageSize]);
+    handleFetchPermission(currentPage, pageSize);
+  }, [currentPage, handleFetchPermission, pageSize]);
 
-  //#region EXPAND/COLLAPSE
-  // Hàm toggle expand/collapse node
   const handleNodeToggle = useCallback(
     (nodeId: string) => {
       const updatedTreeData = toggleNodeExpansion(treeData, nodeId);
@@ -87,7 +87,6 @@ function Page() {
     [treeData]
   );
 
-  // Custom cell renderer cho expand/collapse
   const ExpandCellRenderer = useCallback(
     (params: any) => {
       const node = params.data as TreeNode;
@@ -133,10 +132,7 @@ function Page() {
     },
     [handleNodeToggle]
   );
-  //#endregion
 
-  // #region CELL RENDER
-  // Custom cell renderer cho resource tùy theo column
   const ResourceRenderer = useCallback((params: any) => {
     const node = params.data as TreeNode;
     if (node.isParent) return null;
@@ -150,10 +146,7 @@ function Page() {
       </span>
     );
   }, []);
-  //#endregion
 
-  //#region CHECKBOX
-  // Hàm update checkbox state
   const handleCheckboxChange = useCallback(
     (
       nodeId: string,
@@ -174,7 +167,6 @@ function Page() {
     [treeData]
   );
 
-  // Custom checkbox cho các cột permission
   const CheckboxRenderer = useCallback(
     (params: any) => {
       const node = params.data as TreeNode;
@@ -211,7 +203,6 @@ function Page() {
     },
     [handleCheckboxChange]
   );
-  //#endregion
 
   const centerStyle: CellStyle = useMemo(
     () => ({ paddingLeft: 0, display: "flex", justifyContent: "center" }),
@@ -291,41 +282,35 @@ function Page() {
   const handlePageChange = (page: number, size: number) => {
     setCurrentPage(page);
     setPageSize(size);
-    handleFetchMenu(page, size);
+    handleFetchPermission(page, size);
   };
 
   return (
-    <LayoutContent
-      layoutType={1}
-      content1={
-        <AgGridComponent
-          showSearch={true}
-          inputSearchProps={{
-            id: "filter-text-box",
-            idSearch: "filter-text-box",
-            gridRef: gridRef,
-          }}
-          loading={loading}
-          rowData={displayData}
-          columnDefs={columnDefs}
-          gridRef={gridRef}
-          total={totalItems}
-          pagination={true}
-          maxRowsVisible={5}
-          onChangePage={handlePageChange}
-          columnFlex={0}
-          showActionButtons={true}
-          // actionButtonsProps={{
-          //   onDelete: deleteRow,
-          //   onSave: onSave,
-          //   rowSelected,
-          //   showAddRowsModal: true,
-          //   modalInitialCount: 1,
-          //   onModalOk: handleModalOk,
-          // }}
-        />
-      }
-    />
+    <div>
+      <LayoutContent
+        layoutType={5}
+        content1={<>ASS</>}
+        content2={
+          <AgGridComponent
+            showSearch={true}
+            inputSearchProps={{
+              id: "filter-text-box",
+              idSearch: "filter-text-box",
+            }}
+            loading={loading}
+            rowData={displayData}
+            columnDefs={columnDefs}
+            gridRef={gridRef}
+            total={totalItems}
+            pagination={true}
+            maxRowsVisible={5}
+            onChangePage={handlePageChange}
+            columnFlex={0}
+            showActionButtons={true}
+          />
+        }
+      />
+    </div>
   );
 }
 

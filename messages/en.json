@@ -33,6 +33,10 @@
     "deleteConfirm": "Are you sure you want to delete this item?",
     "yes": "Yes",
     "no": "No",
+    "addNewRow": "Add New Row",
+    "rowsAdded": "Rows",
+    "errorUpdate": "Error updating",
+    "noRowsSelected": "No rows selected",
     "updateSuccess": "Update successful",
     "updateError": "Update failed",
     "deleteSuccess": "Delete successful",
@@ -68,9 +72,42 @@
     "import": "Import",
     "export": "Export"
   },
+  "NguoiDung": {
+    "roleCode": "Role Code",
+    "userName": "User Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "password": "Password",
+    "faceImg": "Face Image",
+    "birthDay": "Birth Day",
+    "gender": "Gender",
+    "phone": "Phone",
+    "address": "Address",
+    "isActive": "Status"
+  },
   "NhomNguoiDung": {
     "roleCode": "Role Code",
     "roleName": "Description"
+  },
+  "CauHinhMenu": {
+    "parentName": "Menu Configuration",
+    "resourceCode": "Resource Code",
+    "resourceName": "Resource Name",
+    "all": "All",
+    "view": "View",
+    "create": "Create",
+    "update": "Update",
+    "delete": "Delete"
+  },
+  "PhanQuyen": {
+    "parentName": "Permission Configuration",
+    "resourceCode": "Resource Code",
+    "resourceName": "Resource Name",
+    "all": "All",
+    "view": "View",
+    "create": "Create",
+    "update": "Update",
+    "delete": "Delete"
   },
   "QuanLiChamCong": {
     "maChamCong": "Time Tracking ID",

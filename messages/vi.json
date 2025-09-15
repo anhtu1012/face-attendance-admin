@@ -33,6 +33,10 @@
     "deleteConfirm": "Bạn có chắc chắn muốn xóa mục này không?",
     "yes": "Có",
     "no": "Không",
+    "addNewRow": "Thêm dòng mới",
+    "rowsAdded": "Dòng",
+    "errorUpdate": "Lỗi khi cập nhật",
+    "noRowsSelected": "Không có dòng nào được chọn",
     "updateSuccess": "Cập nhật thành công",
     "updateError": "Cập nhật thất bại",
     "deleteSuccess": "Xóa thành công",
@@ -86,6 +90,16 @@
     "roleName": "Mô tả"
   },
   "CauHinhMenu": {
+    "parentName": "Danh sách",
+    "resourceCode": "Mã màn hình",
+    "resourceName": "Tên màn hình",
+    "all": "Tất cả",
+    "view": "Xem",
+    "create": "Thêm",
+    "update": "Sửa",
+    "delete": "Xóa"
+  },
+  "PhanQuyen": {
     "parentName": "Danh sách",
     "resourceCode": "Mã màn hình",
     "resourceName": "Tên màn hình",

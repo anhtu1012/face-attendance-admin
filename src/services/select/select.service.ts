@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { PaginatedSelectOptionsResponse } from "@/dtos/select/select.response.dto";
 import { AxiosService } from "../../apis/axios.base";
 import { SelectOptionsArray } from "../../dtos/select/select.dto";
 
@@ -51,6 +52,11 @@ class SelectServicesBase extends AxiosService {
       `${this.basePath}/dropdown-position`,
       new URLSearchParams({ roleCode })
     );
+  }
+
+  // Cấu hình menu (Danh mục cha)
+  async getSelectParentMenu(): Promise<PaginatedSelectOptionsResponse> {
+    return this.get(`${this.basePath}/resource`);
   }
 }
 
