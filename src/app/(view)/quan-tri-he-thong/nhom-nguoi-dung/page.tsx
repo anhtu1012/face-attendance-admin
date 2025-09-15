@@ -18,7 +18,7 @@ import React, {
 function Page() {
   const notiMessage = useTranslations("message");
   const t = useTranslations("NhomNguoiDung");
-  const gridRef = useRef<AgGridReact>(null);
+  const gridRef = useRef<AgGridReact>({} as AgGridReact);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -51,13 +51,6 @@ function Page() {
     [currentPage, pageSize, notiMessage]
   );
 
-  const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current!.api.setGridOption(
-      "quickFilterText",
-      (document.getElementById("filter-text-box") as HTMLInputElement).value
-    );
-  }, []);
-
   useEffect(() => {
     handleFetchUser(currentPage, pageSize);
   }, [currentPage, handleFetchUser, pageSize]);
@@ -88,10 +81,6 @@ function Page() {
     <div>
       <AgGridComponent
         showSearch={true}
-        inputSearchProps={{
-          id: "filter-text-box",
-          onInput: onFilterTextBoxChanged,
-        }}
         loading={loading}
         rowData={rowData}
         columnDefs={columnDefs}

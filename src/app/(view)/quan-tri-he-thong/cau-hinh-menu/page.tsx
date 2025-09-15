@@ -32,9 +32,9 @@ function Page() {
   const [loading, setLoading] = useState(false);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [displayData, setDisplayData] = useState<TreeNode[]>([]);
-  const [editedRows, setEditedRows] = useState<{ [key: string]: TreeNode }>({});
+  // const [editedRows, setEditedRows] = useState<{ [key: string]: TreeNode }>({});
   const [rowSelected, setRowSelected] = useState<number>(0);
-  const [selectedResourceName, setSelectedResourceName] = useState("");
+  const [, setSelectedResourceName] = useState("");
   const [newRowsCount, setNewRowsCount] = useState<number>(1);
   const [parentNameOptions, setparentNameOptions] = useState<
     { label: string; value: string }[]

@@ -91,7 +91,7 @@ ImportExcelProps<T>) {
   const [loading, setLoading] = useState<boolean>(false);
   const [previewData, setPreviewData] = useState<ImportRow<T>[]>([]);
   const [importError, setImportError] = useState<string | null>(null);
-  const gridRef = useRef<AgGridReact>(null);
+  const gridRef = useRef<AgGridReact>({} as AgGridReact);
   // Track if there are any errors in the data
   const hasErrors = previewData.some((row) => row.hasErrors);
   const mes = useTranslations("HandleNotion");
