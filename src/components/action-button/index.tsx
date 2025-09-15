@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/display-name */
-import { checkPermissionByRsname } from "@/lib/store/slices/permissions";
+import { RootState } from "@/lib/store";
 import { getCookie } from "@/utils/client/getCookie";
 import { Button, Modal, Popconfirm } from "antd";
 import { useTranslations } from "next-intl";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { GoTrash } from "react-icons/go";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { TbCloudDownload } from "react-icons/tb";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAuthLogin } from "../../lib/store/slices/loginSlice";
+import { useSelector } from "react-redux";
+import { selectPermissionByRsname } from "../../lib/store/slices/loginSlice";
 import "./index.scss";
 
 // Export the type so it can be imported by other components
@@ -55,20 +55,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = React.memo(
     saveButtonContent, // add this line
   }) => {
     const t = useTranslations("ActionButtons");
-    const dispatch = useDispatch();
     const url = getCookie("_url");
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [newRowsCount, setNewRowsCount] = useState<number>(modalInitialCount);
 
-    const urlMain = url?.toString().replace(/^\/+/, "");
-    // Get selectedPermission from Redux store
-    const { selectedPermission } = useSelector(selectAuthLogin);
-    useEffect(() => {
-      if (urlMain) {
-        // Dispatch the action to find the permission by rsname
-        dispatch(checkPermissionByRsname(urlMain));
-      }
-    }, [dispatch, urlMain]);
+    const urlMain = url?.toString().replace(/^\/+/, "") ?? "";
+    const selectedPermission = useSelector((state: RootState) =>
+      selectPermissionByRsname(state, urlMain)
+    );
+
     const normalizedScopes = selectedPermission?.scopes.map((scope) =>
       scope.toLowerCase()
     );

@@ -44,5 +44,9 @@ const authSlice = createSlice({
 
 export const { setAuthData, clearAuthData } = authSlice.actions;
 export const selectAuthLogin = (state: RootState) => state.auth;
+export const selectPermissionByRsname = (
+  state: RootState,
+  resourceCode: string
+) => state.auth.permissions.find((item) => item.resourceCode === resourceCode);
 
 export default authSlice.reducer;
