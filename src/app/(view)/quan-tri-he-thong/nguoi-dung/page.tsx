@@ -2,7 +2,7 @@
 "use client";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
-import { showError } from "@/hook/useNotification";
+import { showError } from "@/hooks/useNotification";
 import NguoiDungServices from "@/services/admin/quan-tri-he-thong/nguoi-dung.service";
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";

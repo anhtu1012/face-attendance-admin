@@ -5,14 +5,16 @@ import {
   showSuccess,
   showInfo,
   showWarning,
-} from "@/hook/useNotification";
+} from "@/hooks/useNotification";
 
 interface UseDataGridOperationsConfig<T> {
   gridRef: React.RefObject<any>;
   createNewItem: (index: number) => T;
-  mes: any; // Translation function
+  mes: any;
   getItemId?: (item: T) => string;
   duplicateCheckField?: keyof T;
+  rowData: T[];
+  setRowData: React.Dispatch<React.SetStateAction<T[]>>;
 }
 
 export function useDataGridOperations<T extends Record<string, any>>({
@@ -21,10 +23,11 @@ export function useDataGridOperations<T extends Record<string, any>>({
   mes,
   getItemId = (item) => item.id || item.unitKey || "",
   duplicateCheckField,
+  rowData,
+  setRowData,
 }: UseDataGridOperationsConfig<T>) {
   // Basic state
   const [isClient, setIsClient] = useState(false);
-  const [rowData, setRowData] = useState<T[]>([]);
   const [editedRows, setEditedRows] = useState<T[]>([]);
   const [rowSelected, setRowSelected] = useState<number>(0);
   const [duplicateIDs, setDuplicateIDs] = useState<string[]>([]);
@@ -38,7 +41,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
   const onSelectionChanged = useCallback(() => {
     const selectedNodes = gridRef.current?.api.getSelectedNodes();
     setRowSelected(selectedNodes ? selectedNodes.length : 0);
-  }, []);
+  }, [gridRef]);
 
   // Handle adding new rows
   const handleModalOk = useCallback(
@@ -54,7 +57,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
         showError(mes("error.invalidRowCount"));
       }
     },
-    [createNewItem, mes]
+    [createNewItem, mes, setRowData]
   );
 
   // Handle cell value changes
@@ -64,7 +67,6 @@ export function useDataGridOperations<T extends Record<string, any>>({
       const id = data.id;
       const itemId = getItemId(data);
       const fieldName = colDef.field;
-
       // Update changedValues for existing records (có id)
       if (id) {
         setChangedValues((prevChangedValues) => {
@@ -118,23 +120,15 @@ export function useDataGridOperations<T extends Record<string, any>>({
         return updatedRows;
       });
     },
-    [rowData, duplicateCheckField, getItemId]
+    [rowData, duplicateCheckField, getItemId, gridRef]
   );
-
-  // Handle search
-  const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current?.api.setGridOption(
-      "quickFilterText",
-      (document.getElementById("filter-text-box") as HTMLInputElement).value
-    );
-  }, []);
 
   // Save function - generic
   const createSaveHandler = useCallback(
     (
       validateRowData: (data: T) => boolean,
-      addAPI?: (item: T) => Promise<any>,
-      updateAPI?: (id: string, data: any) => Promise<any>,
+      addAPI?: (item: any) => Promise<any>,
+      updateAPI?: (item: any) => Promise<any>,
       fetchData?: () => Promise<void>
     ) => {
       return async () => {
@@ -184,7 +178,9 @@ export function useDataGridOperations<T extends Record<string, any>>({
 
             // Add new rows
             if (newRows.length > 0 && addAPI) {
-              await Promise.all(newRows.map(async (row) => await addAPI(row)));
+              // const res = await addAPI(newRows);
+              console.log("New Rows to add:", newRows);
+
               showSuccess(mes("success.rowsAdded", { count: newRows.length }));
             }
 
@@ -192,7 +188,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
             if (changedValues.length > 0 && updateAPI) {
               await Promise.all(
                 changedValues.map(async (row: any) => {
-                  await updateAPI(row.id, row.data);
+                  await updateAPI(row.data);
                 })
               );
               showSuccess(
@@ -228,7 +224,16 @@ export function useDataGridOperations<T extends Record<string, any>>({
         }
       };
     },
-    [editedRows, duplicateIDs, changedValues, rowData, mes, getItemId]
+    [
+      editedRows,
+      duplicateIDs,
+      changedValues,
+      rowData,
+      mes,
+      getItemId,
+      gridRef,
+      setRowData,
+    ]
   );
 
   // Delete function - generic
@@ -278,7 +283,80 @@ export function useDataGridOperations<T extends Record<string, any>>({
         }
       };
     },
-    [rowData, mes, getItemId]
+    [rowData, mes, getItemId, gridRef, setRowData]
+  );
+
+  function processBooleanFields<T extends Record<string, any>>(
+    data: T[],
+    booleanFields: string[]
+  ): T[] {
+    return data.map((item) => {
+      const processedItem = { ...item } as any;
+      booleanFields.forEach((field) => {
+        if (
+          processedItem[field] !== undefined &&
+          typeof processedItem[field] === "string"
+        ) {
+          processedItem[field] =
+            processedItem[field]?.toString().toLowerCase() === "true" ||
+            processedItem[field] === "1";
+        }
+      });
+      return processedItem;
+    });
+  }
+
+  function useCustomTooltipCss() {
+    useEffect(() => {
+      const styleElement = document.createElement("style");
+      styleElement.textContent = `
+      .ag-tooltip {
+        background-color: #ffeeee !important;
+        color: #d32f2f !important;
+        font-weight: bold !important;
+        border: 1px solid #d32f2f !important;
+        padding: 6px 10px !important;
+      }
+    `;
+      document.head.appendChild(styleElement);
+      return () => {
+        document.head.removeChild(styleElement);
+      };
+    }, []);
+  }
+
+  useCustomTooltipCss();
+
+  // Paste handler
+  const createPasteHandler = useCallback(
+    (booleanFields: string[], customProcess?: (newData: T[]) => T[]) => {
+      const handleFillChanges = (newData: T[]) => {
+        let processedData = processBooleanFields(newData, booleanFields);
+        if (customProcess) {
+          processedData = customProcess(processedData);
+        }
+        setRowData(processedData);
+        setEditedRows((prevEditedRows) => {
+          const updatedEditedRows = [...prevEditedRows];
+          processedData.forEach((newItem) => {
+            const existingIndex = updatedEditedRows.findIndex(
+              (editedItem) => getItemId(editedItem) === getItemId(newItem)
+            );
+            if (existingIndex !== -1) {
+              updatedEditedRows[existingIndex] = {
+                ...updatedEditedRows[existingIndex],
+                ...newItem,
+              };
+            } else {
+              updatedEditedRows.push(newItem);
+            }
+          });
+          return updatedEditedRows;
+        });
+      };
+      return { handleFillChanges };
+    },
+    [setRowData, setEditedRows, getItemId]
   );
 
   return {
@@ -301,10 +379,10 @@ export function useDataGridOperations<T extends Record<string, any>>({
     onSelectionChanged,
     handleModalOk,
     onCellValueChanged,
-    onFilterTextBoxChanged,
 
     // Factory functions
     createSaveHandler,
     createDeleteHandler,
+    createPasteHandler,
   };
 }

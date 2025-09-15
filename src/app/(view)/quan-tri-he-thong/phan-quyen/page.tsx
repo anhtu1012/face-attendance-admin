@@ -2,7 +2,7 @@
 "use client";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { showError } from "@/hook/useNotification";
+import { showError } from "@/hooks/useNotification";
 import PhanQuyenServices from "@/services/admin/quan-tri-he-thong/phan-quyen.service";
 import {
   convertToTreeData,

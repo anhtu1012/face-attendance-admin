@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NotificationItem } from "@/dtos/notification/notification.response.dto";
-import useSocket from "@/hook/useSocket";
+import useSocket from "@/hooks/useSocket";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { NotificationService } from "@/services/notification/notification.service";
 import {

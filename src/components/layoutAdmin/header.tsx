@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useBroadcastChannel } from "@/hook/useBroadcastChannel";
+import { useBroadcastChannel } from "@/hooks/useBroadcastChannel";
 import { clearAllColumnPreferences } from "@/lib/store/slices/columnPreferencesSlice";
 import { clearAuthData, selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { toggleDarkMode } from "@/utils/theme-utils";

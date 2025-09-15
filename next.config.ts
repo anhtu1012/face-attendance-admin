@@ -3,21 +3,42 @@ import createNextIntlPlugin from "next-intl/plugin";
 import path from "path";
 
 const withNextIntl = createNextIntlPlugin();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // swcMinify is default in Next.js 15, remove deprecated option
-  experimental: {
-    // Enable compilation optimizations
-    optimizePackageImports: ["@ant-design/icons", "antd", "react-icons"],
-    turbotrace: {
-      // Reduce bundle analysis time
-      logLevel: "error",
+  // Configure Turbopack (stable in Next.js 15)
+  turbopack: {
+    // Optimize for faster compilation
+    resolveAlias: {
+      // Map AG-Grid imports to specific entry points to reduce bundle scanning
+      "@ag-grid-community/core": "@ag-grid-community/core/dist/esm/es6/main.js",
+      "@ag-grid-community/react":
+        "@ag-grid-community/react/dist/esm/es6/index.js",
+    },
+    rules: {
+      // Optimize AG-Grid modules
+      "*.ag-grid.js": {
+        loaders: ["swc-loader"],
+        as: "*.js",
+      },
     },
   },
-  // Improve build performance
+  // Enable experimental features for better performance
+  experimental: {
+    // Enable optimizePackageImports for common packages
+    optimizePackageImports: [
+      "antd",
+      "@ag-grid-community/core",
+      "@ag-grid-community/react",
+      "@ag-grid-enterprise/column-tool-panel",
+      "@ag-grid-enterprise/menu",
+      "react-icons",
+    ],
+  },
+  // Keep webpack config for production builds (when not using turbopack)
   webpack: (config: any, { dev, isServer }: any) => {
+    // Only apply webpack optimizations for production builds
     if (!dev && !isServer) {
-      // Enable webpack optimizations for production
       config.optimization = {
         ...config.optimization,
         splitChunks: {
@@ -58,15 +79,9 @@ const nextConfig = {
   },
   sassOptions: {
     includePaths: [path.join(process.cwd(), "src/styles")],
-    // Using @use/@forward instead of @import
     additionalData: `@use "@/styles/_index.scss" as *;`,
   },
   reactStrictMode: true,
-
-  // i18n: {
-  //   locales: ["en", "vi"], // Khai báo các ngôn ngữ
-  //   defaultLocale: "vi",
-  // },
 };
 
 export default withNextIntl(nextConfig);

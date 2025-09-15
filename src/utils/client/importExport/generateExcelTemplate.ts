@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import ExcelJS from "exceljs";
 import { ColDef } from "@ag-grid-community/core";
-import { showError, showSuccess } from "@/hook/useNotification";
+import { showError, showSuccess } from "@/hooks/useNotification";
 
 export type ForeignKeyMapping = {
   field: string; // Field (dataIndex) cần tạo dropdown

@@ -11,8 +11,8 @@ import React, {
 import { Select, Spin } from "antd";
 import { ICellEditorParams } from "@ag-grid-community/core";
 import type { SelectProps } from "antd";
-import useDebounce from "@/hook/useDebounce";
-import { useBroadcastChannel } from "@/hook/useBroadcastChannel";
+import useDebounce from "@/hooks/useDebounce";
+import { useBroadcastChannel } from "@/hooks/useBroadcastChannel";
 
 interface AntdSelectCellEditorProps extends ICellEditorParams {
   values?: { label: string; value: string }[] | string[];

@@ -38,16 +38,16 @@ export class AxiosService extends Authorization implements RepositoryPort {
   async getWithFilter<T>(
     url: string,
     filterParams?: FilterQueryStringType,
+    extraQueryString?: string,
     regularParams?: Record<string | number | symbol, string | number | boolean>
   ): Promise<T> {
     const http = await this._http();
-    const queryString = filterQueryString(filterParams ?? []);
+    const filterStr = filterQueryString(filterParams ?? []);
 
-    // Handle additional regular parameters
-    let finalUrl = `${url}${queryString}`;
+    let finalUrl = `${url}${filterStr}`;
 
     if (regularParams && Object.keys(regularParams).length > 0) {
-      const separator = queryString ? "&" : "?";
+      const separator = filterStr ? "&" : "?";
       const stringifiedParams: Record<string, string> = Object.fromEntries(
         Object.entries(regularParams).map(([key, value]) => [
           String(key),
@@ -58,6 +58,12 @@ export class AxiosService extends Authorization implements RepositoryPort {
         stringifiedParams
       ).toString();
       finalUrl += `${separator}${regularQueryString}`;
+    }
+
+    if (extraQueryString) {
+      // Nếu đã có dấu ? thì nối bằng &, ngược lại nối bằng ?
+      const hasQuery = finalUrl.includes("?");
+      finalUrl += hasQuery ? `&${extraQueryString}` : `?${extraQueryString}`;
     }
 
     const response = await http.get<T>(finalUrl);

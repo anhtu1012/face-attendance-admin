@@ -1,27 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import ActionButtons from "@/components/action-button";
-import ErrorCellRenderer from "@/components/basicUI/cTableAG/components/ErrorCellRenderer";
-import InputSearch from "@/components/basicUI/InputSearch";
-
+// Lazy imports for better code splitting
 import usePasteHandler from "@/utils/client/usePasteHandler";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { ModuleRegistry } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
-import "@ag-grid-community/styles/ag-grid.css";
-import "@ag-grid-community/styles/ag-theme-quartz.css";
-import { ColumnsToolPanelModule } from "@ag-grid-enterprise/column-tool-panel";
-import { MenuModule } from "@ag-grid-enterprise/menu";
 import { Pagination } from "antd";
 import Dropdown from "antd/es/dropdown/dropdown";
 import { Tooltip } from "antd/lib";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { lazy, useCallback, useEffect, useRef, useState } from "react";
 import { BsFiletypeXlsx } from "react-icons/bs";
 import { FiUpload } from "react-icons/fi";
-import { AgGridComponentProps } from "./interface/agProps";
 import { CustomTooltip } from "./components/CustomTooltip";
 import FilterArrayModal from "./components/FilterArrayModal";
 import { useAutoScroll } from "./hooks/useAutoScroll";
@@ -34,13 +26,38 @@ import { useMouseHandlers } from "./hooks/useMouseHandlers";
 import { usePagination } from "./hooks/usePagination";
 import { useTableFilter } from "./hooks/useTableFilter";
 import "./index.scss";
+import { AgGridComponentProps } from "./interface/agProps";
 import { useExcelExport } from "./utils/excelExport";
 
-ModuleRegistry.registerModules([
-  ClientSideRowModelModule,
-  ColumnsToolPanelModule,
-  MenuModule,
-]);
+// Lazy load heavy components
+const ActionButtons = lazy(() => import("@/components/action-button"));
+const ErrorCellRenderer = lazy(
+  () => import("@/components/basicUI/cTableAG/components/ErrorCellRenderer")
+);
+const InputSearch = lazy(() => import("@/components/basicUI/InputSearch"));
+
+// Dynamic import for AG-Grid Enterprise modules (only load when needed)
+const loadEnterpriseModules = async () => {
+  const [{ ColumnsToolPanelModule }, { MenuModule }] = await Promise.all([
+    import("@ag-grid-enterprise/column-tool-panel"),
+    import("@ag-grid-enterprise/menu"),
+  ]);
+  return { ColumnsToolPanelModule, MenuModule };
+};
+
+// Register base module immediately
+ModuleRegistry.registerModules([ClientSideRowModelModule]);
+
+// Load and register enterprise modules dynamically
+let enterpriseModulesLoaded = false;
+const loadEnterpriseModulesIfNeeded = async () => {
+  if (!enterpriseModulesLoaded) {
+    const { ColumnsToolPanelModule, MenuModule } =
+      await loadEnterpriseModules();
+    ModuleRegistry.registerModules([ColumnsToolPanelModule, MenuModule]);
+    enterpriseModulesLoaded = true;
+  }
+};
 
 // Import ActionButtonsProps type for prop spreading
 
@@ -176,6 +193,16 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     maxReachedPage,
     total,
   });
+
+  // Load AG-Grid styles and enterprise modules when needed
+  useEffect(() => {
+    // Dynamically load AG-Grid CSS
+    import("@/styles/ag-grid-styles");
+
+    if (sideBar && Object.keys(sideBar).length > 0) {
+      loadEnterpriseModulesIfNeeded();
+    }
+  }, [sideBar]);
 
   // Sync internal state with props when they change
   useEffect(() => {
@@ -1231,4 +1258,9 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   );
 };
 
-export default AgGridComponent;
+// Wrapper với Suspense để handle lazy loading
+const AgGridComponentWrapper: React.FC<AgGridComponentProps> = (props) => {
+  return <AgGridComponent {...props} />;
+};
+
+export default AgGridComponentWrapper;

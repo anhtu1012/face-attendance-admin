@@ -4,7 +4,7 @@ import ActionButtons from "@/components/action-button";
 import AutoCompleteWithLabel from "@/components/basicUI/cAutoCompleteSelection";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { showError, showWarning } from "@/hook/useNotification";
+import { showError, showWarning } from "@/hooks/useNotification";
 import CauHinhMenuServices from "@/services/admin/quan-tri-he-thong/cau-hinh-menu.service";
 import SelectServices from "@/services/select/select.service";
 import {

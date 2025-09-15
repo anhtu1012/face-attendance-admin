@@ -15,7 +15,7 @@ import { exportErrorsToExcel, DateColumnConfig } from "./exportErrorsToExcel";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 
 import { useTranslations } from "next-intl";
-import { showError, showSuccess } from "@/hook/useNotification";
+import { showError, showSuccess } from "@/hooks/useNotification";
 import { MesError } from "@/models/error";
 
 export type ForeignKeyMapping = {
