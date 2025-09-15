@@ -2,6 +2,65 @@
   "Profile": {
     "changepass": "Thay đổi mật khẩu"
   },
+  "AgGridComponent": {
+    "search": "Tìm kiếm",
+    "Filteredby": "Lọc bởi",
+    "ClearFilter": "Xóa bộ lọc",
+    "Nodata": "Không có dữ liệu",
+    "items_per_page": "Dữ liệu trong 1 trang",
+    "jump_to": "Chuyển đến",
+    "prev_page": "Trang trước",
+    "next_page": "Trang sau",
+    "totalRow": "Tổng số dòng"
+  },
+  "FilterArrayModal": {
+    "FilterArray": "Bộ lọc mảng",
+    "SelectColumnsHelpText": "Chọn các cột để lọc",
+    "Selected": "Đã chọn",
+    "SearchColumns": "Tìm kiếm cột",
+    "DeselectAll": "Bỏ chọn tất cả",
+    "SelectAll": "Chọn tất cả",
+    "NoColumnsFound": "Không tìm thấy cột",
+    "entervalue": "Nhập giá trị",
+    "Cancel": "Hủy",
+    "ApplyFilter": "Áp dụng"
+  },
+  "message": {
+    "success": "Thành công",
+    "error": "Lỗi",
+    "warning": "Cảnh báo",
+    "info": "Thông tin",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa mục này không?",
+    "yes": "Có",
+    "no": "Không",
+    "addNewRow": "Thêm dòng mới",
+    "rowsAdded": "Dòng",
+    "errorUpdate": "Lỗi khi cập nhật",
+    "noRowsSelected": "Không có dòng nào được chọn",
+    "updateSuccess": "Cập nhật thành công",
+    "updateError": "Cập nhật thất bại",
+    "deleteSuccess": "Xóa thành công",
+    "deleteError": "Xóa thất bại",
+    "createSuccess": "Tạo thành công",
+    "createError": "Tạo thất bại",
+    "fetchError": "Lấy dữ liệu thất bại",
+    "noData": "Không có dữ liệu",
+    "invalidInput": "Dữ liệu nhập không hợp lệ"
+  },
+  "ActionButtons": {
+    "add": "Thêm mới",
+    "edit": "Chỉnh sửa",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "item": "Mục",
+    "Yes": "Có",
+    "No": "Không",
+    "rowadd": "Thêm dòng",
+    "ok": "OK",
+    "cancel": "Hủy",
+    "rownumber": "Số dòng",
+    "confirmDelete": "Xác nhận xóa"
+  },
   "Ctable": {
     "total": "Tổng",
     "stt": "STT",
@@ -12,6 +71,43 @@
     "showHideColumns": "Điều chỉnh column",
     "import": "Xuất Excel",
     "export": "Xuất Csv"
+  },
+  "NguoiDung": {
+    "roleCode": "Mã vai trò",
+    "userName": "Tên đăng nhập",
+    "firstName": "Tên",
+    "lastName": "Họ",
+    "password": "Mật khẩu",
+    "faceImg": "Ảnh đại diện",
+    "birthDay": "Ngày sinh",
+    "gender": "Giới tính",
+    "phone": "Số điện thoại",
+    "address": "Địa chỉ",
+    "isActive": "Trạng thái"
+  },
+  "NhomNguoiDung": {
+    "roleCode": "Mã vai trò",
+    "roleName": "Mô tả"
+  },
+  "CauHinhMenu": {
+    "parentName": "Danh sách",
+    "resourceCode": "Mã màn hình",
+    "resourceName": "Tên màn hình",
+    "all": "Tất cả",
+    "view": "Xem",
+    "create": "Thêm",
+    "update": "Sửa",
+    "delete": "Xóa"
+  },
+  "PhanQuyen": {
+    "parentName": "Danh sách",
+    "resourceCode": "Mã màn hình",
+    "resourceName": "Tên màn hình",
+    "all": "Tất cả",
+    "view": "Xem",
+    "create": "Thêm",
+    "update": "Sửa",
+    "delete": "Xóa"
   },
   "QuanLiChamCong": {
     "maChamCong": "Mã chấm công",
@@ -263,5 +359,10 @@
     "nghiOm": "Nghỉ ốm",
     "nghiViecRieng": "Nghỉ việc riêng",
     "nghiKhongLuong": "Nghỉ không lương"
+  },
+  "TAX": {
+    "taxCode": "Mã Thuế",
+    "taxName": "Tên Thuế",
+    "taxPercent": "Phần trăm"
   }
 }

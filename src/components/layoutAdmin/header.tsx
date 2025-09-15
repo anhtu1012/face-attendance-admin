@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useBroadcastChannel } from "@/hook/useBroadcastChannel";
+import { useBroadcastChannel } from "@/hooks/useBroadcastChannel";
 import { clearAllColumnPreferences } from "@/lib/store/slices/columnPreferencesSlice";
 import { clearAuthData, selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { toggleDarkMode } from "@/utils/theme-utils";
 import {
+  AppstoreAddOutlined,
+  AppstoreOutlined,
   LogoutOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   QuestionCircleOutlined,
   SearchOutlined,
   SettingOutlined,
@@ -27,6 +27,7 @@ const { Header } = Layout;
 interface HeaderProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
+  Component?: React.ComponentType;
 }
 
 const HeaderComponent: React.FC<HeaderProps> = ({
@@ -51,13 +52,8 @@ const HeaderComponent: React.FC<HeaderProps> = ({
       // if (token) {
       //   await AuthServices.logout(token);
       // }
-
       dispatch(clearAuthData());
       dispatch(clearAllColumnPreferences());
-
-      // Remove cookies
-      document.cookie = "token=; Max-Age=0; path=/;";
-      document.cookie = "refreshToken=; Max-Age=0; path=/;";
 
       window.location.href = "/login";
       toast.success("Đăng xuất thành công!!");
@@ -153,7 +149,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({
         >
           <Button
             type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            icon={collapsed ? <AppstoreAddOutlined /> : <AppstoreOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             className="toggle-btn"
             aria-label={collapsed ? "Mở rộng menu" : "Thu gọn menu"}

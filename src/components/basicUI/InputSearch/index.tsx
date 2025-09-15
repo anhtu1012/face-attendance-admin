@@ -1,15 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Badge, Input, Tooltip } from "antd";
-import React, { useState, useRef } from "react";
-import { TbFilterSearch } from "react-icons/tb";
+import React, { useState, useRef, useCallback } from "react";
+import { TbFilterSearch, TbX } from "react-icons/tb";
 import "./index.scss";
 
 // Export the interface so it can be imported by other components
 export interface InputSearchProps {
-  id?: string;
+  id?: string | "filter-text-box";
   placeholder?: string;
-  onInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  // onInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  idSearch?: string | "filter-text-box";
   onSearch?: (value: string) => void;
   onPressEnter?: () => void; // Thêm thuộc tính onPressEnter
+
+  gridRef?: React.RefObject<any>;
 
   // New filter-related props
   enableFilterButton?: boolean;
@@ -34,14 +38,15 @@ const InputSearch: React.FC<InputSearchProps> = ({
   placeholder = "Search...",
   onSearch,
   onPressEnter,
-  onInput,
+  idSearch,
+  gridRef,
   // Filter props with defaults
   enableFilterButton = true,
   onFilterClick,
   isFiltered = false,
-  // onResetFilter,
+  onResetFilter,
   filterTooltip = "Mở bộ lọc",
-  // resetTooltip = "Clear",
+  resetTooltip = "Xóa bộ lọc",
   searchTooltip = "Tìm kiếm",
   filterCount = 0,
   onInputValueChange,
@@ -65,10 +70,24 @@ const InputSearch: React.FC<InputSearchProps> = ({
   };
 
   const handleSearch = () => {
-    if (enableFilterButton && onFilterClick) {
-      onFilterClick(); // Call filter function if enabled
-    } else if (onSearch) {
-      onSearch(inputValue); // Otherwise call regular search
+    if (onSearch) {
+      onSearch(inputValue);
+    }
+  };
+
+  const handleFilterClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (onFilterClick) {
+      onFilterClick();
+    }
+  };
+
+  const handleResetFilter = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (onResetFilter) {
+      onResetFilter();
     }
   };
 
@@ -78,23 +97,50 @@ const InputSearch: React.FC<InputSearchProps> = ({
       if (onPressEnter) onPressEnter(); // Gọi hàm onPressEnter khi nhấn Enter
     }
   };
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef?.current!.api.setGridOption(
+      "quickFilterText",
+      (document.getElementById(`${idSearch}`) as HTMLInputElement).value
+    );
+  }, [idSearch, gridRef]);
 
   // Choose appropriate icon based on whether filter mode is enabled
   const iconComponent = enableFilterButton ? (
-    <div className="filter-icon-container" onClick={handleSearch}>
-      <Tooltip title={filterTooltip} placement="top">
-        {isFiltered ? (
-          // Only show the reset overlay when isFiltered is true
-          <div className="filter-with-reset">
+    <div className="filter-icon-container">
+      {isFiltered ? (
+        // Show filter icon with reset overlay when filtered
+        <div className="filter-with-reset">
+          <Tooltip title={filterTooltip} placement="top">
             <Badge count={filterCount > 0 ? filterCount : 0} size="small">
-              <TbFilterSearch size={16} className="search__icon" />
+              <TbFilterSearch
+                size={16}
+                className="search__icon"
+                onClick={handleFilterClick}
+              />
             </Badge>
-          </div>
-        ) : (
-          // Regular filter icon when not filtered
-          <TbFilterSearch size={16} className="search__icon" />
-        )}
-      </Tooltip>
+          </Tooltip>
+          {onResetFilter && (
+            <div className="reset-button-overlay">
+              <Tooltip title={resetTooltip} placement="top">
+                <TbX
+                  size={12}
+                  className="reset-filter-icon"
+                  onClick={handleResetFilter}
+                />
+              </Tooltip>
+            </div>
+          )}
+        </div>
+      ) : (
+        // Regular filter icon when not filtered
+        <Tooltip title={filterTooltip} placement="top">
+          <TbFilterSearch
+            size={16}
+            className="search__icon"
+            onClick={handleFilterClick}
+          />
+        </Tooltip>
+      )}
     </div>
   ) : (
     <Tooltip title={searchTooltip} placement="top">
@@ -110,7 +156,7 @@ const InputSearch: React.FC<InputSearchProps> = ({
     <div className="input-search-container">
       <Input
         id={id}
-        onInput={onInput}
+        onInput={onFilterTextBoxChanged}
         type="text"
         className="search"
         placeholder={placeholder}

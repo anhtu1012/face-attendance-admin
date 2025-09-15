@@ -1,0 +1,504 @@
+html.dark {
+  .content1,
+  .content2,
+  .content3,
+  .content4 {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+  }
+}
+
+[class*="layoutType"] .content1.hideContent,
+[class*="layoutType"] .content2.hideContent,
+[class*="layoutType"] .content3.hideContent,
+[class*="layoutType"] .content4.hideContent {
+  display: none !important;
+}
+
+// Responsive Design for LayoutContent
+.hideContent {
+  display: none !important;
+}
+
+// Mobile breakpoint (up to 768px)
+@media (max-width: 768px) {
+  // Layout type 1 - single content
+  .content1 {
+    padding: 8px !important;
+    border-radius: 6px !important;
+  }
+
+  // Layout type 2 - stack vertically on mobile
+  section[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    section[style*="flex: 6.5"] {
+      flex: none !important;
+      width: 100% !important;
+      order: 1;
+    }
+
+    section[style*="flex: 3.5"] {
+      flex: none !important;
+      width: 100% !important;
+      order: 2;
+    }
+  }
+
+  // Layout type 3 - adjust flex ratios
+  div[style*="flexDirection: column"] {
+    gap: 8px !important;
+
+    div[style*="flex: 2"] {
+      flex: 1 !important;
+    }
+
+    div[style*="flex: 8"] {
+      flex: 3 !important;
+    }
+  }
+
+  // Layout type 4 - adjust flex ratios
+  div[style*="flexDirection: column"] {
+    div[style*="flex: 7"] {
+      flex: 4 !important;
+    }
+
+    div[style*="flex: 3"] {
+      flex: 2 !important;
+    }
+  }
+
+  // Layout type 5 - stack vertically on mobile
+  div[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    div[style*="flex"] {
+      flex: none !important;
+      width: 100% !important;
+    }
+  }
+
+  // Layout type 6 - stack vertically on mobile
+  section[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    section[style*="flex: 6.5"] {
+      flex: none !important;
+      width: 100% !important;
+      order: 1;
+      height: auto !important;
+    }
+
+    section[style*="flex: 3.5"] {
+      flex: none !important;
+      width: 100% !important;
+      order: 2;
+      height: auto !important;
+    }
+  }
+
+  // Layout type 7 - stack vertically on mobile
+  section[style*="flex: 7"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 1;
+  }
+
+  section[style*="flex: 3"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 2;
+  }
+
+  // Layout type 8 - stack vertically on mobile
+  section[style*="flex: 7"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 1;
+  }
+
+  section[style*="flex: 3"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 2;
+  }
+
+  // Layout type 9 - stack vertically on mobile
+  section[style*="flex: 7"] {
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  // Layout type 10 - stack vertically on mobile
+  section[style*="flex: 2"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 1;
+    height: auto !important;
+  }
+
+  section[style*="flex: 8"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 2;
+    height: auto !important;
+  }
+
+  // Layout type 11 - stack vertically on mobile
+  section[style*="flex: 6.5"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 1;
+  }
+
+  section[style*="flex: 3.5"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 2;
+  }
+
+  // Layout type 12 - stack vertically on mobile
+  section[style*="flex: 5"] {
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  // Layout type 13 - stack vertically on mobile
+  section[style*="flex: 2"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 1;
+  }
+
+  section[style*="flex: 8"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 2;
+    height: auto !important;
+  }
+
+  // Layout type 14 - stack vertically on mobile
+  section[style*="flex: 3"] {
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  // Layout type 15 - stack vertically on mobile
+  section[style*="flex: 0.3"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 1;
+  }
+
+  section[style*="flex: 1"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 2;
+  }
+
+  // Layout type 16 - stack vertically on mobile
+  section[style*="flex: 7"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 1;
+  }
+
+  section[style*="flex: 3"] {
+    flex: none !important;
+    width: 100% !important;
+    order: 2;
+  }
+
+  // Reduce padding for mobile
+  .content1,
+  .content2,
+  .content3,
+  .content4 {
+    padding: 8px !important;
+    border-radius: 6px !important;
+  }
+
+  // Ensure proper spacing
+  section[style*="marginBottom: 12px"] {
+    margin-bottom: 8px !important;
+  }
+
+  // Adjust gaps for mobile
+  section[style*="gap: 12px"] {
+    gap: 8px !important;
+  }
+
+  div[style*="gap: 12px"] {
+    gap: 8px !important;
+  }
+}
+
+// Small mobile breakpoint (up to 480px)
+@media (max-width: 480px) {
+  // Further reduce padding for very small screens
+  .content1,
+  .content2,
+  .content3,
+  .content4 {
+    padding: 6px !important;
+    border-radius: 4px !important;
+  }
+
+  // Reduce gaps
+  section[style*="display: flex"] {
+    gap: 6px !important;
+  }
+
+  section[style*="marginBottom: 12px"] {
+    margin-bottom: 6px !important;
+  }
+
+  // Adjust gaps for small mobile
+  section[style*="gap: 12px"] {
+    gap: 6px !important;
+  }
+
+  div[style*="gap: 12px"] {
+    gap: 6px !important;
+  }
+
+  // Reduce margins
+  section[style*="marginTop: 12px"] {
+    margin-top: 6px !important;
+  }
+
+  section[style*="marginRight: 12px"] {
+    margin-right: 6px !important;
+  }
+}
+
+// Landscape orientation adjustments for mobile
+@media (max-width: 768px) and (orientation: landscape) {
+  // Optimize for landscape mode - keep some horizontal layouts
+  section[style*="display: flex"] {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 6px !important;
+
+    section[style*="flex: 6.5"] {
+      flex: 5 !important;
+      width: 50% !important;
+      order: 1;
+    }
+
+    section[style*="flex: 3.5"] {
+      flex: 5 !important;
+      width: 50% !important;
+      order: 2;
+    }
+
+    section[style*="flex: 7"] {
+      flex: 6 !important;
+      width: 60% !important;
+      order: 1;
+    }
+
+    section[style*="flex: 3"] {
+      flex: 4 !important;
+      width: 40% !important;
+      order: 2;
+    }
+
+    section[style*="flex: 0.3"] {
+      flex: 0.4 !important;
+      width: 40% !important;
+      order: 1;
+    }
+
+    section[style*="flex: 1"] {
+      flex: 0.6 !important;
+      width: 60% !important;
+      order: 2;
+    }
+  }
+
+  // Reduce vertical spacing in landscape
+  .content1,
+  .content2,
+  .content3,
+  .content4 {
+    padding: 6px !important;
+  }
+
+  section[style*="marginBottom: 12px"] {
+    margin-bottom: 4px !important;
+  }
+}
+
+// High DPI displays
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .content1,
+  .content2,
+  .content3,
+  .content4 {
+    border-width: 0.5px;
+  }
+}
+
+// Focus states for accessibility
+.content1:focus,
+.content2:focus,
+.content3:focus,
+.content4:focus {
+  outline: 2px solid #265b8e;
+  outline-offset: 2px;
+}
+
+// Touch-friendly improvements for mobile
+@media (max-width: 768px) {
+  // Ensure minimum touch target size
+  button,
+  input,
+  select,
+  .ant-btn {
+    min-height: 44px !important;
+  }
+
+  // Improve scrolling
+  .content1,
+  .content2,
+  .content3,
+  .content4 {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.layoutType3 {
+  .close-open-modal__content > div[style*="flexDirection: column"] {
+    gap: 0 !important;
+  }
+
+  .close-open-modal {
+    .content1 + .content2 {
+      margin-top: 12px;
+    }
+
+    // Đảm bảo content1 collapse hoàn toàn khi bị ẩn
+    .content1.hide {
+      height: 0 !important;
+      min-height: 0 !important;
+      flex: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .content1.hide + .content2 {
+      margin-top: 0 !important;
+    }
+  }
+}
+
+// Layout 113 specific styles to prevent overflow
+.layoutType113 {
+  // Content1 - top panel
+  .content1 {
+    overflow: hidden !important;
+    // max-height: 30vh !important;
+
+    // If content1 has too much content, make it scrollable
+    &:has(> *:nth-child(n + 5)) {
+      overflow-y: auto !important;
+      max-height: 25vh !important;
+    }
+  }
+
+  // Main content area with flex layout
+  > section:nth-child(2) {
+    overflow: hidden !important;
+    min-height: 0 !important;
+    flex: 1 !important;
+  }
+
+  // Content2 - left panel (25%)
+  .content2 {
+    overflow: auto !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+
+    // Ensure proper scroll behavior
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+
+    // Custom scrollbar for webkit browsers
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+
+      &:hover {
+        background: #a8a8a8;
+      }
+    }
+  }
+
+  // Content3 - right panel (75%)
+  .content3 {
+    overflow: auto !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+
+    // Ensure proper scroll behavior
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+
+    // Custom scrollbar for webkit browsers
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+
+      &:hover {
+        background: #a8a8a8;
+      }
+    }
+  }
+
+  // Hide content when panels are closed
+  .hideContent {
+    display: none !important;
+  }
+
+  // Responsive behavior when content is hidden
+  .content2.hideContent ~ .content3 {
+    flex: 1 !important;
+    width: 100% !important;
+  }
+
+  .content3.hideContent ~ .content2 {
+    flex: 1 !important;
+    width: 100% !important;
+  }
+
+  // Ensure float button doesn't interfere with layout
+  .floatButton {
+    z-index: 1001 !important;
+    pointer-events: auto !important;
+  }
+}

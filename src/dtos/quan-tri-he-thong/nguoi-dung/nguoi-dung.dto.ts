@@ -1,0 +1,22 @@
+import { z } from "zod";
+
+// Người dùng Schema
+export const NguoiDungItemSchema = z.object({
+  id: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  userName: z.string(),
+  password: z.string(),
+  roleCode: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string(),
+  faceImg: z.string().optional(),
+  birthDay: z.date(),
+  gender: z.enum(["M", "F"]),
+  phone: z.string().min(10, "Số điện thoại không hợp lệ"),
+  address: z.string().max(255, "Địa chỉ không hợp lệ").optional(),
+  isActive: z.boolean(),
+});
+
+export type NguoiDungItem = z.infer<typeof NguoiDungItemSchema>;

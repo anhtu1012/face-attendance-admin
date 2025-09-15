@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { setAuthData } from "@/lib/store/slices/loginSlice";
+import { selectAuthLogin, setAuthData } from "@/lib/store/slices/loginSlice";
 import AuthServices from "@/services/auth/api.service";
-import { clearAllCookies, setCookie } from "@/utils/client/getCookie";
+import { clearAllCookies } from "@/utils/client/getCookie";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import backgroundImage from "../../../public/assets/image/BackgroundFaceAI.png";
 import "./login.scss";
+import { useSelector } from "react-redux";
 
 interface LoginForm {
   username: string;
@@ -28,32 +29,33 @@ const LoginPage: React.FC = () => {
   const [signInForm] = useForm<LoginForm>();
   const [isNavigating, setIsNavigating] = useState(false);
   const dispatch = useDispatch();
+  const { accessToken } = useSelector(selectAuthLogin);
   const router = useRouter();
   useEffect(() => {
-    // Kiểm tra nếu đã đăng nhập thì chuyển hướng đến trang chính
+    if (accessToken) {
+      const base64Url = accessToken.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const payload = JSON.parse(atob(base64));
+      const currentTime = Math.floor(Date.now() / 1000);
+      const expDate = payload.exp;
+      const timeLeft = expDate - currentTime;
+      const timeLeftInMinutes = Math.floor(timeLeft / 60);
+      if (timeLeftInMinutes > 0) {
+        router.push("/");
+        return;
+      }
+    }
     clearAllCookies();
-  }, [router]);
+  }, [router, accessToken]);
   const onFinish = async (values: any) => {
     if (isLogin || isNavigating) return;
     setIsLogin(true);
     try {
       const res = await AuthServices.login(values);
-      setCookie("token", res.accessToken);
-      setCookie("refreshToken", res.refreshToken);
       dispatch(setAuthData(res));
-      toast.success("Đăng nhập thành công"); //t("success")
+      toast.success("Đăng nhập thành công");
       setIsNavigating(true);
-      console.log("Login successful:", res.userProfile.roleCode);
-
-      if (res.userProfile.roleCode === "R1") {
-        router.push("/admin");
-      } else if (res.userProfile.roleCode === "R2") {
-        router.push("/hr");
-      } else if (res.userProfile.roleCode === "R3") {
-        router.push("/manager");
-      } else {
-        router.push("/");
-      }
+      router.push("/");
       setTimeout(() => {
         setIsLogin(false);
         setIsNavigating(false);

@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:fast": "next build --no-lint",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rmdir /s /q .next && rmdir /s /q node_modules\\.cache"
   },
   "dependencies": {
     "@ag-grid-community/client-side-row-model": "^32.3.9",
