@@ -45,7 +45,7 @@ function Page() {
             gridRef={gridRef}
             pagination={true}
             maxRowsVisible={5}
-            columnFlex={0}
+            columnFlex={1}
             showActionButtons={true}
           />
         </>

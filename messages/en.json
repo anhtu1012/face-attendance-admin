@@ -359,5 +359,10 @@
     "nghiOm": "Sick Leave",
     "nghiViecRieng": "Personal Leave",
     "nghiKhongLuong": "Unpaid Leave"
+  },
+  "TAX": {
+    "taxCode": "Tax Code",
+    "taxName": "Tax Name",
+    "taxPercent": "Percent"
   }
 }

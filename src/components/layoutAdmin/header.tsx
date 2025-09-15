@@ -8,12 +8,10 @@ import { toggleDarkMode } from "@/utils/theme-utils";
 import {
   AppstoreAddOutlined,
   AppstoreOutlined,
-  DownSquareOutlined,
   LogoutOutlined,
   QuestionCircleOutlined,
   SearchOutlined,
   SettingOutlined,
-  UpSquareOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Avatar, Button, Dropdown, Layout, Tooltip, theme } from "antd";
@@ -54,13 +52,8 @@ const HeaderComponent: React.FC<HeaderProps> = ({
       // if (token) {
       //   await AuthServices.logout(token);
       // }
-
       dispatch(clearAuthData());
       dispatch(clearAllColumnPreferences());
-
-      // Remove cookies
-      document.cookie = "token=; Max-Age=0; path=/;";
-      document.cookie = "refreshToken=; Max-Age=0; path=/;";
 
       window.location.href = "/login";
       toast.success("Đăng xuất thành công!!");
@@ -156,7 +149,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({
         >
           <Button
             type="text"
-            icon={collapsed ? <AppstoreAddOutlined />:  <AppstoreOutlined />}
+            icon={collapsed ? <AppstoreAddOutlined /> : <AppstoreOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             className="toggle-btn"
             aria-label={collapsed ? "Mở rộng menu" : "Thu gọn menu"}

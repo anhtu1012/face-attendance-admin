@@ -2,13 +2,14 @@
 // redux/authSlice.js
 import { ResourcePermission, UserInfor } from "@/dtos/auth/auth.dto";
 import { RootState } from "@/lib/store";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
   accessToken: "",
   refreshToken: "",
   userProfile: {} as UserInfor,
   permissions: [] as ResourcePermission[],
+  selectedPermission: undefined as ResourcePermission | undefined,
 };
 
 const authSlice = createSlice({
@@ -28,6 +29,15 @@ const authSlice = createSlice({
       state.refreshToken = "";
       state.userProfile = {} as UserInfor; // Reset to initial state
       state.permissions = [];
+      state.selectedPermission = undefined;
+    },
+    checkPermissionByRsname: (state, action: PayloadAction<string>) => {
+      // Tìm kiếm permission có rsname khớp
+      const foundPermission = state.permissions.find(
+        (item) => item.resourceCode === action.payload
+      );
+      // Gán kết quả tìm được vào selectedPermission
+      state.selectedPermission = foundPermission ?? undefined;
     },
   },
 });

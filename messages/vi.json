@@ -359,5 +359,10 @@
     "nghiOm": "Nghỉ ốm",
     "nghiViecRieng": "Nghỉ việc riêng",
     "nghiKhongLuong": "Nghỉ không lương"
+  },
+  "TAX": {
+    "taxCode": "Mã Thuế",
+    "taxName": "Tên Thuế",
+    "taxPercent": "Phần trăm"
   }
 }
