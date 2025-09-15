@@ -71,7 +71,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       <ClientOnly>
         <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} />
         <SiderMain
-          openMenu={!collapsed}
+          openMenu={collapsed}
           setOpenMenu={(open: boolean) => setCollapsed(!open)}
         />
       </ClientOnly>

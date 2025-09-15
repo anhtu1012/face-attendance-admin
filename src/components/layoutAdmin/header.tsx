@@ -6,12 +6,14 @@ import { clearAllColumnPreferences } from "@/lib/store/slices/columnPreferencesS
 import { clearAuthData, selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { toggleDarkMode } from "@/utils/theme-utils";
 import {
+  AppstoreAddOutlined,
+  AppstoreOutlined,
+  DownSquareOutlined,
   LogoutOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   QuestionCircleOutlined,
   SearchOutlined,
   SettingOutlined,
+  UpSquareOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Avatar, Button, Dropdown, Layout, Tooltip, theme } from "antd";
@@ -154,7 +156,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({
         >
           <Button
             type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            icon={collapsed ? <AppstoreAddOutlined />:  <AppstoreOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             className="toggle-btn"
             aria-label={collapsed ? "Mở rộng menu" : "Thu gọn menu"}

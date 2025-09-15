@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NEXT_PUBLIC_SITE_URL } from "@/constants/api-constants";
 // Đã loại bỏ import AuthServices để tránh vòng lặp import
+import { store } from "@/lib/store";
 import { isValidToken } from "@/utils/client/api";
 import { filterQueryString } from "@/utils/client/filterQueryString ";
-import { getCookie } from "@/utils/client/getCookie";
 import axios, { AxiosInstance, AxiosRequestHeaders } from "axios";
 import { Authorization } from "./authorization";
 import { FilterQueryStringType, RepositoryPort } from "./ddd/repository.port";
+import { setAuthData } from "@/lib/store/slices/loginSlice";
 
 export class AxiosService extends Authorization implements RepositoryPort {
   private static instance: AxiosService;
@@ -88,9 +89,8 @@ export class AxiosService extends Authorization implements RepositoryPort {
     });
 
     http.interceptors.request.use(async (config) => {
-      // Lấy token trực tiếp từ cookie để tránh vòng lặp import
-      const token = getCookie("token");
-      const refreshTokenn = getCookie("refreshToken");
+      const token = store.getState().auth.accessToken;
+      const refreshTokenn = store.getState().auth.refreshToken;
 
       const header = {
         Accept: "application/json",
@@ -108,18 +108,11 @@ export class AxiosService extends Authorization implements RepositoryPort {
           const timeLeftInMinutes = Math.floor(timeLeft / 60);
 
           if (timeLeftInMinutes > 0 && timeLeftInMinutes < 8) {
-            console.log(
-              "Token is about to expire in less than 8 minutes. Refreshing token..."
-            );
-
             const res = await axios.post(
               `${process.env.NEXT_PUBLIC_SITE_URL}/v1/auth/refresh-token`,
               { refreshToken: refreshTokenn }
             );
-            // Set cookies trực tiếp
-            document.cookie = `token=${res.data.accessToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
-            document.cookie = `refreshToken=${res.data.refreshToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
-
+            store.dispatch(setAuthData(res.data));
             // Update the token we'll use for this request
             header.Authorization = `Bearer ${res.data.accessToken}`;
           } else {
@@ -146,26 +139,10 @@ export class AxiosService extends Authorization implements RepositoryPort {
         return response;
       },
       (error) => {
-        // // Check if error response contains NO_LOGIN flag
-        // if (error.response?.data?.NO_LOGIN) {
-        //   // Redirect to login page
-        //   if (typeof window !== "undefined") {
-        //     window.location.href = "/login";
-        //   }
-        // }
         return Promise.reject(error);
       }
     );
 
     return http;
-  }
-
-  // Helper method to set cookies consistently
-  private setCookieSecurely(name: string, value: string): void {
-    document.cookie = `${name}=${value}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
-    // Also update the token in the instance if it's the access token
-    if (name === "token") {
-      this.token = value;
-    }
   }
 }

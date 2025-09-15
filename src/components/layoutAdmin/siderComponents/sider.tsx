@@ -3,8 +3,9 @@ import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { createCategoriesData } from "@/utils/client/createCategoriesData";
 import { uppercase } from "@/utils/client/string";
 import Link from "next/link";
-import React, { JSX, useLayoutEffect, useRef, useState } from "react";
-import { FaArrowCircleUp } from "react-icons/fa";
+import { usePathname } from "next/navigation";
+import React, { JSX, useLayoutEffect, useRef, useState, useEffect } from "react";
+import { FaArrowCircleUp, FaCheck, FaUsers, FaUserTie, FaClock, FaBuilding, FaChartLine, FaCog, FaBell, FaFileAlt, FaHome, FaIdCard } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import "./index.scss";
 // Interface
@@ -57,10 +58,71 @@ const toRomanNumeral = (num: number): string => {
   return result;
 };
 
+// Function to get icon based on category title
+const getCategoryIcon = (title: string): JSX.Element => {
+  const titleLower = title.toLowerCase();
+  
+  if (titleLower.includes('đơn') || titleLower.includes('request')) {
+    return <FaFileAlt />;
+  } else if (titleLower.includes('chức vụ') || titleLower.includes('position')) {
+    return <FaUserTie />;
+  } else if (titleLower.includes('ca làm') || titleLower.includes('shift')) {
+    return <FaClock />;
+  } else if (titleLower.includes('chi nhánh') || titleLower.includes('branch')) {
+    return <FaBuilding />;
+  } else if (titleLower.includes('báo cáo') || titleLower.includes('report')) {
+    return <FaChartLine />;
+  } else if (titleLower.includes('cài đặt') || titleLower.includes('setting')) {
+    return <FaCog />;
+  } else if (titleLower.includes('thông báo') || titleLower.includes('notification')) {
+    return <FaBell />;
+  } else if (titleLower.includes('người dùng') || titleLower.includes('user')) {
+    return <FaUsers />;
+  } else if (titleLower.includes('trang chủ') || titleLower.includes('home')) {
+    return <FaHome />;
+  } else if (titleLower.includes('nhân viên') || titleLower.includes('employee')) {
+    return <FaIdCard />;
+  } else {
+    return <FaFileAlt />; // Default icon
+  }
+};
+
+// Function to get category description
+const getCategoryDescription = (title: string): string => {
+  const titleLower = title.toLowerCase();
+  
+  if (titleLower.includes('đơn')) {
+    return 'Quản lý các đơn từ và yêu cầu';
+  } else if (titleLower.includes('chức vụ')) {
+    return 'Quản lý chức vụ và vị trí công việc';
+  } else if (titleLower.includes('ca làm')) {
+    return 'Quản lý ca làm việc và lịch trình';
+  } else if (titleLower.includes('chi nhánh')) {
+    return 'Quản lý chi nhánh và địa điểm';
+  } else if (titleLower.includes('báo cáo')) {
+    return 'Xem báo cáo và thống kê';
+  } else if (titleLower.includes('cài đặt')) {
+    return 'Cài đặt hệ thống và tùy chọn';
+  } else if (titleLower.includes('thông báo')) {
+    return 'Quản lý thông báo và tin nhắn';
+  } else if (titleLower.includes('người dùng')) {
+    return 'Quản lý tài khoản người dùng';
+  } else if (titleLower.includes('trang chủ')) {
+    return 'Trang chủ và tổng quan';
+  } else if (titleLower.includes('nhân viên')) {
+    return 'Quản lý thông tin nhân viên';
+  } else {
+    return 'Chức năng quản lý hệ thống';
+  }
+};
+
 const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
   const { permissions } = useSelector(selectAuthLogin);
   const [activeGroupKey, setActiveGroupKey] = useState<string>("");
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState<number>(-1);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const pathname = usePathname();
+  
   const { categoriesData, moduleData } = createCategoriesData({
     permission: permissions,
   }) as {
@@ -69,42 +131,53 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
   };
   console.log({ categoriesData, moduleData });
 
-  // Function to get active group key based on current URL
-  const getActiveGroupKeyFromUrl = (): string => {
-    // Get current URL from cookie
-    const cookies = document.cookie.split(";");
-    const urlCookie = cookies.find((cookie) =>
-      cookie.trim().startsWith("_url=")
-    );
-    const currentUrl = urlCookie
-      ? decodeURIComponent(urlCookie.split("=")[1])
-      : "";
+  // Function to get active group key and category index based on current URL
+  const getActiveStateFromUrl = (): { groupKey: string; categoryIndex: number } => {
+    // Use pathname directly instead of cookies for more reliable tracking
+    const currentUrl = pathname || "";
 
-    if (!currentUrl) return "";
+    if (!currentUrl) return { groupKey: "", categoryIndex: -1 };
 
-    // Find which group contains the current URL
+    // Find which group and category contains the current URL
     for (const groupKey of Object.keys(categoriesData)) {
       const categories = categoriesData[groupKey];
-      if (categories.some((category) => category.link === currentUrl)) {
-        return groupKey;
+      const categoryIndex = categories.findIndex((category) => 
+        category.link === currentUrl || currentUrl.startsWith(category.link + "/")
+      );
+      
+      if (categoryIndex !== -1) {
+        return { groupKey, categoryIndex };
       }
     }
 
-    return "";
+    return { groupKey: "", categoryIndex: -1 };
   };
 
-  // Set active group based on current URL or default to first group (only on initial load)
+  // Set active group and category based on current URL or default to first group (only on initial load)
   useLayoutEffect(() => {
     if (Object.keys(moduleData).length > 0 && !isInitialized) {
-      const urlBasedGroupKey = getActiveGroupKeyFromUrl();
-      if (urlBasedGroupKey) {
-        setActiveGroupKey(urlBasedGroupKey);
+      const { groupKey, categoryIndex } = getActiveStateFromUrl();
+      if (groupKey) {
+        setActiveGroupKey(groupKey);
+        setActiveCategoryIndex(categoryIndex);
       } else {
         setActiveGroupKey(Object.keys(moduleData)[0]);
+        setActiveCategoryIndex(-1);
       }
       setIsInitialized(true);
     }
   }, [moduleData, categoriesData, isInitialized]);
+
+  // Update active states when pathname changes
+  useEffect(() => {
+    if (Object.keys(categoriesData).length > 0) {
+      const { groupKey, categoryIndex } = getActiveStateFromUrl();
+      if (groupKey) {
+        setActiveGroupKey(groupKey);
+        setActiveCategoryIndex(categoryIndex);
+      }
+    }
+  }, [pathname, categoriesData]);
 
   const canvasRefs = useRef<Array<HTMLCanvasElement | null>>([]);
 
@@ -269,26 +342,47 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
               <div className="sider-content-container">
                 <div className="sider_content">
                   {categoriesData[activeGroupKey].map(
-                    (category, categoryIndex) => (
-                      <div
-                        className="item__content"
-                        key={`category-${activeGroupKey}-${categoryIndex}`}
-                        style={{ "--item-index": categoryIndex } as React.CSSProperties}
-                        onClick={() => {
-                          setOpenMenu(false);
-                          handleClick(categoryIndex, category);
-                        }}
-                      >
-                        <Link
-                          href={category.link}
-                          className="item__content-title"
+                    (category, categoryIndex) => {
+                      const isActive = activeCategoryIndex === categoryIndex;
+                      const isCurrentPath = pathname === category.link || pathname?.startsWith(category.link + "/");
+                      
+                      return (
+                        <div
+                          className={`item__content ${isActive || isCurrentPath ? "active" : ""}`}
+                          key={`category-${activeGroupKey}-${categoryIndex}`}
+                          style={{ "--item-index": categoryIndex } as React.CSSProperties}
+                          onClick={() => {
+                            setOpenMenu(false);
+                            handleClick(categoryIndex, category);
+                            setActiveCategoryIndex(categoryIndex);
+                          }}
                         >
-                          <span className="category-title">
-                            {category.title}
-                          </span>
-                        </Link>
-                      </div>
-                    )
+                          <Link
+                            href={category.link}
+                            className="item__content-title"
+                          >
+                            <div className="category-content">
+                              <div className="category-icon">
+                                {getCategoryIcon(category.title)}
+                              </div>
+                              <div className="category-info">
+                                <h3 className="category-title">
+                                  {category.title}
+                                </h3>
+                                <p className="category-description">
+                                  {getCategoryDescription(category.title)}
+                                </p>
+                              </div>
+                              {(isActive || isCurrentPath) && (
+                                <div className="active-indicator">
+                                  <FaCheck size={14} />
+                                </div>
+                              )}
+                            </div>
+                          </Link>
+                        </div>
+                      );
+                    }
                   )}
                 </div>
               </div>
