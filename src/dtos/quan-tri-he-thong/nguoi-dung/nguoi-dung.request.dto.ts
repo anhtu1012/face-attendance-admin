@@ -31,6 +31,7 @@ export const UpdateNguoiDungSchema = NguoiDungItemSchema.omit({
 })
   .partial()
   .extend({
+    unitKey: z.string().min(1, "Mã unitKey là bắt buộc").optional(),
     roleCode: z.string().min(1, "Mã vai trò là bắt buộc").optional(),
   });
 

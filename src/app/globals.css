@@ -76,6 +76,10 @@ html.dark {
     background-color: #efb008 !important;
     color: white !important;
   }
+  .btn-permission {
+    background-color: rgb(93, 201, 239) !important;
+    color: white !important;
+  }
   .query-button {
     background-color: #efb008 !important;
     color: white !important;

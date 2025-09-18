@@ -2,7 +2,7 @@
 "use client";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { showError } from "@/hooks/useNotification";
+import { showError, showSuccess, showWarning } from "@/hooks/useNotification";
 import PhanQuyenServices from "@/services/admin/quan-tri-he-thong/phan-quyen.service";
 import {
   convertToTreeData,
@@ -14,22 +14,77 @@ import {
 import { CellStyle, ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
+import FormSubmit from "./components/FormSubmit";
+import UserAccount from "./components/UserAccount";
 
 function Page() {
-  const notiMessage = useTranslations("message");
+  const mes = useTranslations("HandleNotion");
   const t = useTranslations("PhanQuyen");
   const gridRef = useRef<AgGridReact>({} as any);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [rowSelected, setRowSelected] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [editedRows, setEditedRows] = useState<{ [key: string]: TreeNode }>({});
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [displayData, setDisplayData] = useState<TreeNode[]>([]);
+  const [selectedRoleCode, setSelectedRoleCode] = useState<string>("");
+  const [shouldFetchUserAccount, setShouldFetchUserAccount] =
+    useState<boolean>(false);
+  const [allPermissionsSelected, setAllPermissionsSelected] =
+    useState<boolean>(false);
+
+  // Check toàn bộ permissions đã được chọn hay chưa
+  const checkAllPermissionsSelected = useCallback(() => {
+    if (!treeData || treeData.length === 0) {
+      return false;
+    }
+
+    // Hàm đệ quy để lấy tất cả các node con
+    const getAllChildNodes = (nodes: TreeNode[]): TreeNode[] => {
+      const allChildren: TreeNode[] = [];
+
+      nodes.forEach((node) => {
+        if (!node.isParent) {
+          // Nếu là child, thêm vào danh sách
+          allChildren.push(node);
+        }
+
+        // Nếu node này có children, đệ quy lấy tất cả children của nó
+        if (node.children && node.children.length > 0) {
+          allChildren.push(...getAllChildNodes(node.children));
+        }
+      });
+
+      return allChildren;
+    };
+
+    const allChildren = getAllChildNodes(treeData);
+    if (allChildren.length === 0) {
+      return false;
+    }
+
+    // Kiểm tra nếu tất cả các child node đều có đủ scope thì trả về true
+    return allChildren.every(
+      (node) => node.view && node.create && node.update && node.delete
+    );
+  }, [treeData]);
+
+  useEffect(() => {
+    const isAllSelected = checkAllPermissionsSelected();
+    setAllPermissionsSelected(isAllSelected);
+  }, [treeData, checkAllPermissionsSelected]);
 
   const handleFetchPermission = useCallback(
-    async (page = currentPage, limit = pageSize, quickSearch?: string) => {
+    async (
+      page = currentPage,
+      limit = pageSize,
+      roleCode: string,
+      quickSearch?: string
+    ) => {
       setLoading(true);
       try {
         const searchFilter: any = [
@@ -37,7 +92,7 @@ function Page() {
           { key: "offset", type: "=", value: (page - 1) * limit },
         ];
         const params: any = {
-          groupCodes: "ADMIN",
+          roleCode,
         };
         if (quickSearch && quickSearch.trim() !== "") {
           params.quickSearch = quickSearch;
@@ -51,30 +106,43 @@ function Page() {
         const treeConfig = {
           parentField: "parentName",
           idField: "id",
-          scopesField: "scopes",
+          scopesField: "menuScopes",
         };
         const convertedTreeData = convertToTreeData(response, treeConfig);
         setTreeData(convertedTreeData);
-        console.log("convertedTreeData", convertedTreeData);
 
         // Flatten để hiển thị
         const flattenedData = flattenTreeData(convertedTreeData);
         setDisplayData(flattenedData);
-        console.log("flattenedData", flattenedData);
 
         setTotalItems(response.length);
         setLoading(false);
       } catch (error: any) {
-        showError(error.response?.data?.message || notiMessage("fetchError"));
+        showError(error.response?.data?.message || mes("fetchError"));
         setLoading(false);
       }
     },
-    [currentPage, pageSize, notiMessage]
+    [currentPage, pageSize, mes]
   );
 
-  useEffect(() => {
-    handleFetchPermission(currentPage, pageSize);
-  }, [currentPage, handleFetchPermission, pageSize]);
+  const handleRoleChange = useCallback(
+    (roleCode: string) => {
+      setSelectedRoleCode(roleCode);
+      // Reset về trang đầu khi thay đổi role
+      setCurrentPage(1);
+      // Trigger fetch cho cả UserAccount và Permission
+      setShouldFetchUserAccount(true);
+      if (roleCode === "") {
+        setDisplayData([]);
+        return;
+      }
+      handleFetchPermission(1, pageSize, roleCode);
+
+      // Reset shouldFetchUserAccount sau một khoảng thời gian ngắn
+      setTimeout(() => setShouldFetchUserAccount(false), 100);
+    },
+    [handleFetchPermission, pageSize]
+  );
 
   const handleNodeToggle = useCallback(
     (nodeId: string) => {
@@ -86,6 +154,132 @@ function Page() {
     },
     [treeData]
   );
+
+  const onSelectionChanged = useCallback(() => {
+    // Cập nhật số lượng dòng được chọn
+    const selectedNodes = gridRef.current?.api.getSelectedNodes();
+    setRowSelected(selectedNodes ? selectedNodes.length : 0);
+  }, []);
+
+  const handleCheckboxChange = useCallback(
+    (
+      nodeId: string,
+      field: "view" | "create" | "update" | "delete" | "all",
+      checked: boolean
+    ) => {
+      const updatedTreeData = updateNodeCheckbox(
+        treeData,
+        nodeId,
+        field,
+        checked
+      );
+      setTreeData(updatedTreeData);
+
+      const flattenedData = flattenTreeData(updatedTreeData);
+      setDisplayData(flattenedData);
+      const updatedNode = flattenedData.find((node) => node.id === nodeId);
+
+      if (updatedNode) {
+        setEditedRows((prev) => {
+          const newEditedRows = {
+            ...prev,
+            [nodeId]: {
+              // Lấy data từ node hiện tại, không phải từ editedRows cũ
+              ...updatedNode,
+              // Override với checkbox states mới
+              view: updatedNode.view,
+              create: updatedNode.create,
+              update: updatedNode.update,
+              delete: updatedNode.delete,
+              all: updatedNode.all,
+            },
+          };
+          return newEditedRows;
+        });
+      }
+
+      // CHỈ cập nhật children nếu click vào parent
+      if (updatedNode?.isParent && updatedNode.children) {
+        updatedNode.children.forEach((child) => {
+          const childInDisplay = flattenedData.find(
+            (node) => node.id === child.id
+          );
+
+          if (childInDisplay) {
+            setEditedRows((prev) => ({
+              ...prev,
+              [child.id]: {
+                // Lấy data từ child hiện tại, không phải từ editedRows cũ
+                ...childInDisplay,
+                // Override với checkbox states mới
+                view: childInDisplay.view,
+                create: childInDisplay.create,
+                update: childInDisplay.update,
+                delete: childInDisplay.delete,
+                all: childInDisplay.all,
+              },
+            }));
+          }
+        });
+      }
+    },
+    [treeData]
+  );
+
+  const handleAllPermission = useCallback(() => {
+    if (!treeData || treeData.length === 0) {
+      showWarning(t("noDataToTogglePermissions"));
+      return;
+    }
+
+    // Nếu tất cả đều được chọn, bỏ chọn tất cả (newState = false)
+    // Nếu không phải tất cả đều được chọn, chọn tất cả (newState = true)
+    const newState = !allPermissionsSelected;
+
+    const updateAllNodes = (nodes: TreeNode[]): TreeNode[] => {
+      return nodes.map((node) => {
+        const updatedNode = {
+          ...node,
+          view: newState,
+          create: newState,
+          update: newState,
+          delete: newState,
+          all: newState,
+        };
+
+        if (node.children && node.children.length > 0) {
+          updatedNode.children = updateAllNodes(node.children);
+        }
+
+        return updatedNode;
+      });
+    };
+
+    const updatedTreeData = updateAllNodes(treeData);
+    setTreeData(updatedTreeData);
+    const flattenedData = flattenTreeData(updatedTreeData);
+    setDisplayData(flattenedData);
+
+    const newEditedRows: { [key: string]: TreeNode } = {};
+    flattenedData.forEach((node) => {
+      newEditedRows[node.id] = {
+        ...node,
+        view: newState,
+        create: newState,
+        update: newState,
+        delete: newState,
+        all: newState,
+      };
+    });
+
+    setEditedRows(newEditedRows);
+
+    if (newState) {
+      showSuccess(t("allPermissionsSelected"));
+    } else {
+      showSuccess(t("allPermissionsDeselected"));
+    }
+  }, [treeData, allPermissionsSelected]);
 
   const ExpandCellRenderer = useCallback(
     (params: any) => {
@@ -133,38 +327,26 @@ function Page() {
     [handleNodeToggle]
   );
 
-  const ResourceRenderer = useCallback((params: any) => {
-    const node = params.data as TreeNode;
-    if (node.isParent) return null;
+  const ResourceRenderer = useCallback(
+    (params: any) => {
+      const node = params.data as TreeNode;
+      if (node.isParent) return null;
 
-    const field = params.colDef.field as keyof TreeNode;
-    const value = node[field] as string;
+      const field = params.colDef.field as keyof TreeNode;
 
-    return (
-      <span style={{ marginLeft: `${((node.level || 0) + 1) * 10}px` }}>
-        {value}
-      </span>
-    );
-  }, []);
+      // Ưu tiên giá trị từ editedRows nếu có, nếu không thì dùng từ node
+      const editedNode = editedRows[node.id];
+      const value = editedNode
+        ? (editedNode[field] as string)
+        : (node[field] as string);
 
-  const handleCheckboxChange = useCallback(
-    (
-      nodeId: string,
-      field: "view" | "create" | "update" | "delete" | "all",
-      checked: boolean
-    ) => {
-      const updatedTreeData = updateNodeCheckbox(
-        treeData,
-        nodeId,
-        field,
-        checked
+      return (
+        <span style={{ marginLeft: `${((node.level || 0) + 1) * 10}px` }}>
+          {value}
+        </span>
       );
-      setTreeData(updatedTreeData);
-
-      const flattenedData = flattenTreeData(updatedTreeData);
-      setDisplayData(flattenedData);
     },
-    [treeData]
+    [editedRows]
   );
 
   const CheckboxRenderer = useCallback(
@@ -282,14 +464,112 @@ function Page() {
   const handlePageChange = (page: number, size: number) => {
     setCurrentPage(page);
     setPageSize(size);
-    handleFetchPermission(page, size);
+    handleFetchPermission(page, size, selectedRoleCode);
   };
 
+  const onCellValueChanged = useCallback((params: any) => {
+    const rowData = params.data as TreeNode;
+    const field = params.colDef.field;
+    const newValue = params.newValue;
+    const oldValue = params.oldValue;
+
+    // Chỉ track khi có thay đổi thực sự
+    if (newValue !== oldValue) {
+      setEditedRows((prev) => ({
+        ...prev,
+        [rowData.id]: {
+          // Giữ lại tất cả thay đổi trước đó
+          ...(prev[rowData.id] || rowData),
+          // Chỉ update field được edit
+          [field]: newValue,
+        },
+      }));
+    }
+  }, []);
+
+  const onSave = useCallback(async () => {
+    if (!editedRows || Object.keys(editedRows).length === 0) {
+      showWarning(t("noChangesToSave"));
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const editedRowsArray = Object.values(editedRows);
+      // Lọc permission
+      const permissions = editedRowsArray
+        .filter((row) => !row.isParent) // Chỉ lấy children, không lấy parent
+        .map((row) => {
+          // Build scopes array từ checkbox states
+          const scopes: string[] = [];
+          if (row.view) scopes.push("view");
+          if (row.create) scopes.push("create");
+          if (row.update) scopes.push("update");
+          if (row.delete) scopes.push("delete");
+          console.log("scopes", scopes);
+
+          return {
+            // unitKey: `unit_${Date.now()}_${Math.random()
+            //   .toString(36)
+            //   .substring(2, 9)}`,
+            resourceCode: row.resourceCode || "",
+            resourceName: row.resourceName || "",
+            parentName: row.parentName || "",
+            scopes: scopes,
+          };
+        });
+
+      // Validate payload
+      if (permissions.length === 0) {
+        showWarning(t("noValidDataToSave"));
+        return;
+      }
+
+      const finalPayload = {
+        groupCode: selectedRoleCode ? [selectedRoleCode] : [],
+        permissions,
+      };
+      const response = await PhanQuyenServices.savePhanQuyen(finalPayload);
+
+      if (response) {
+        const message =
+          Array.isArray(response) && response.length > 0
+            ? response[0].message
+            : response.message;
+        showSuccess(message || mes("saveSuccess"));
+        setEditedRows({});
+        await handleFetchPermission(currentPage, pageSize, selectedRoleCode);
+      }
+    } catch (error: any) {
+      showError(error.response?.data?.message || mes("saveError"));
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    editedRows,
+    t,
+    selectedRoleCode,
+    mes,
+    handleFetchPermission,
+    currentPage,
+    pageSize,
+  ]);
+
   return (
-    <div>
+    <>
+      <FormSubmit
+        onRoleChange={handleRoleChange}
+        onAllPermissionToggle={handleAllPermission}
+        allPermissionsSelected={allPermissionsSelected}
+      />
       <LayoutContent
         layoutType={5}
-        content1={<>ASS</>}
+        content1={
+          <UserAccount
+            roleCode={selectedRoleCode}
+            shouldFetch={shouldFetchUserAccount}
+          />
+        }
         content2={
           <AgGridComponent
             showSearch={true}
@@ -303,14 +583,25 @@ function Page() {
             gridRef={gridRef}
             total={totalItems}
             pagination={true}
-            maxRowsVisible={5}
+            maxRowsVisible={12}
             onChangePage={handlePageChange}
+            onSelectionChanged={onSelectionChanged}
+            onCellValueChanged={onCellValueChanged}
             columnFlex={0}
             showActionButtons={true}
+            actionButtonsProps={{
+              hideAdd: true,
+              hideDelete: true,
+              rowSelected: rowSelected,
+              onSave: onSave,
+            }}
           />
         }
+        option={{
+          sizeAdjust: [3, 7],
+        }}
       />
-    </div>
+    </>
   );
 }
 

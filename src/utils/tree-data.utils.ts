@@ -60,49 +60,34 @@ export function convertToTreeData<T extends Record<string, any>>(
 
   // Duyệt qua từng nhóm parent để tạo tree structure
   groupedByParent.forEach((children, parentValue) => {
-    if (children.length === 1) {
-      // Nếu chỉ có 1 item trong group, có thể là parent hoặc standalone item
-      const item = children[0];
-      const processedItem = processScopesToCheckboxes(item, scopesField);
-
-      treeData.push({
-        ...processedItem,
-        id: item[idField] || `single_${parentValue}`,
+    // Luôn tạo parent node bất kể có bao nhiêu children
+    const processedChildren = children.map((child, index) => {
+      const processedChild = processScopesToCheckboxes(child, scopesField);
+      return {
+        ...processedChild,
+        id: child[idField] || `child_${parentValue}_${index}`,
         isParent: false,
-        level: 0,
+        level: 1,
         expanded: false,
         children: [],
-      });
-    } else {
-      // Nếu có nhiều hơn 1 item, tạo parent node và children
-      const processedChildren = children.map((child, index) => {
-        const processedChild = processScopesToCheckboxes(child, scopesField);
-        return {
-          ...processedChild,
-          id: child[idField] || `child_${parentValue}_${index}`,
-          isParent: false,
-          level: 1,
-          expanded: false,
-          children: [],
-        };
-      });
-
-      // Tính toán checkbox của parent dựa trên children
-      const parentCheckboxes = calculateParentCheckboxes(processedChildren);
-
-      const parentNode: TreeNode<T> = {
-        id: `parent_${parentValue}`,
-        [parentField]: parentValue,
-        isParent: true,
-        level: 0,
-        expanded: false,
-        children: processedChildren,
-        // Thêm checkbox states cho parent
-        ...parentCheckboxes,
       };
+    });
 
-      treeData.push(parentNode);
-    }
+    // Tính toán checkbox của parent dựa trên children
+    const parentCheckboxes = calculateParentCheckboxes(processedChildren);
+
+    const parentNode: TreeNode<T> = {
+      id: `parent_${parentValue}`,
+      [parentField]: parentValue,
+      isParent: true,
+      level: 0,
+      expanded: false, // Mặc định expanded false
+      children: processedChildren,
+      // Thêm checkbox states cho parent
+      ...parentCheckboxes,
+    };
+
+    treeData.push(parentNode);
   });
 
   return treeData;
@@ -153,7 +138,7 @@ function processScopesToCheckboxes<T extends Record<string, any>>(
  * @param children - Array các child nodes
  * @returns Object chứa trạng thái checkbox của parent
  */
-function calculateParentCheckboxes<T>(children: TreeNode<T>[]): {
+export function calculateParentCheckboxes<T>(children: TreeNode<T>[]): {
   view: boolean;
   create: boolean;
   update: boolean;

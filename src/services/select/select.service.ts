@@ -58,6 +58,10 @@ class SelectServicesBase extends AxiosService {
   async getSelectParentMenu(): Promise<PaginatedSelectOptionsResponse> {
     return this.get(`${this.basePath}/resource`);
   }
+
+  async getSelectRole(): Promise<PaginatedSelectOptionsResponse> {
+    return this.get(`${this.basePath}/role`);
+  }
 }
 
 const SelectServices = new SelectServicesBase();

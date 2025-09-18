@@ -52,9 +52,9 @@ export function useDataGridOperations<T extends Record<string, any>>({
           newItems.push(createNewItem(i));
         }
         setRowData((prev) => [...newItems, ...prev]);
-        showSuccess(mes("success.rowsAdded", { count }));
+        showSuccess(mes("rowsAdded", { count }));
       } else {
-        showError(mes("error.invalidRowCount"));
+        showError(mes("invalidRowCount"));
       }
     },
     [createNewItem, mes, setRowData]
@@ -134,7 +134,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
       return async () => {
         if (editedRows.length > 0) {
           if (duplicateIDs.length > 0) {
-            showError(mes("error.duplicateIDs"));
+            showError(mes("duplicateIDs"));
             return;
           }
 
@@ -181,7 +181,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
               // const res = await addAPI(newRows);
               console.log("New Rows to add:", newRows);
 
-              showSuccess(mes("success.rowsAdded", { count: newRows.length }));
+              showSuccess(mes("rowsAdded", { count: newRows.length }));
             }
 
             // Update existing rows
@@ -192,7 +192,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
                 })
               );
               showSuccess(
-                mes("success.customersUpdated", { count: changedValues.length })
+                mes("customersUpdated", { count: changedValues.length })
               );
             }
 
@@ -217,10 +217,10 @@ export function useDataGridOperations<T extends Record<string, any>>({
           } catch (error: any) {
             const errorMessage =
               error.response?.data?.message || error.message || "Unknown error";
-            showError(mes("error.processingRows", { error: errorMessage }));
+            showError(mes("processingRows", { error: errorMessage }));
           }
         } else {
-          showInfo(mes("info.noChanges"));
+          showInfo(mes("noChanges"));
         }
       };
     },
@@ -270,16 +270,16 @@ export function useDataGridOperations<T extends Record<string, any>>({
               );
             }
             setRowData(remainingRows);
-            showSuccess(mes("success.rowsDeleted"));
+            showSuccess(mes("rowsDeleted"));
           } catch (error: any) {
             showError(
-              mes("error.deletingRows", {
+              mes("deletingRows", {
                 error: error.response?.data?.message,
               })
             );
           }
         } else {
-          showWarning(mes("warning.noRowsSelected"));
+          showWarning(mes("noRowsSelected"));
         }
       };
     },
