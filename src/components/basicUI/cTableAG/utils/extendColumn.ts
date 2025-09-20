@@ -1,8 +1,11 @@
 import { ColDef } from "@ag-grid-community/core";
 import { ExtendedColDef } from "../interface/agProps";
 import dayjs from "dayjs";
-import AntdSelectCellEditor from "@/utils/client/CustomTableInput/AntdSelectCellEditor";
-import { DatepickerCellEditor } from "@/utils/client/CustomTableInput/EditorDateTable";
+import {
+  DatepickerCellEditor,
+  TimeCellEditor,
+} from "../components/CustomTableInput/EditorDateTable";
+import AntdSelectCellEditor from "../components/CustomTableInput/AntdSelectCellEditor";
 
 // Update the processColumnDefs function to handle Number type
 export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
@@ -53,6 +56,21 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
         valueFormatter: (params) => {
           const date = dayjs(params.value);
           return date.isValid() ? date.format("DD/MM/YYYY HH:mm:ss") : ""; // Default display format
+        },
+      };
+    }
+
+    // Handle Time type columns - chỉ chọn giờ phút
+    if (colDef.typeColumn === "Time") {
+      return {
+        ...colDef,
+        cellEditor: TimeCellEditor, // Custom time editor
+        cellEditorParams: {
+          ...(colDef.cellEditorParams || {}),
+        },
+        valueFormatter: (params) => {
+          // Hiển thị format HH:mm
+          return params.value || "";
         },
       };
     }

@@ -1,11 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useState, useEffect } from "react";
 import {
   showError,
-  showSuccess,
   showInfo,
+  showSuccess,
   showWarning,
 } from "@/hooks/useNotification";
+import {
+  selectAllItemErrors,
+  addItemError,
+  removeItemError,
+} from "@/lib/store/slices/validationErrorsSlice";
+import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
+import { useCollectErrorMessagesForItem } from "@/utils/client/errorMessageHelpers";
+import { validateField } from "@/utils/client/validateTable/validateField ";
+import { useCallback, useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
 interface UseDataGridOperationsConfig<T> {
   gridRef: React.RefObject<any>;
@@ -15,6 +24,25 @@ interface UseDataGridOperationsConfig<T> {
   duplicateCheckField?: keyof T;
   rowData: T[];
   setRowData: React.Dispatch<React.SetStateAction<T[]>>;
+  validateRowData?: (data: T) => boolean;
+  handleQuicksearch?: (
+    searchText: string | "",
+    selectedFilterColumns: any[],
+    filterValues: string | "",
+    paginationSize: number
+  ) => void;
+  requiredFields?: Array<{ field: keyof T; label: string }>;
+  t?: any;
+  // New parameters for quicksearch functionality
+  setCurrentPage?: React.Dispatch<React.SetStateAction<number>>;
+  setPageSize?: React.Dispatch<React.SetStateAction<number>>;
+  setQuickSearchText?: React.Dispatch<React.SetStateAction<string | undefined>>;
+  fetchData?: (
+    currentPage: number,
+    pageSize: number,
+    quickSearchText: string | undefined
+  ) => Promise<void>;
+  columnDefs?: any[];
 }
 
 export function useDataGridOperations<T extends Record<string, any>>({
@@ -25,6 +53,16 @@ export function useDataGridOperations<T extends Record<string, any>>({
   duplicateCheckField,
   rowData,
   setRowData,
+  validateRowData: configValidateRowData,
+  handleQuicksearch: configHandleQuicksearch,
+  requiredFields,
+  t,
+  // New parameters for quicksearch functionality
+  setCurrentPage,
+  setPageSize,
+  setQuickSearchText,
+  fetchData,
+  columnDefs,
 }: UseDataGridOperationsConfig<T>) {
   // Basic state
   const [isClient, setIsClient] = useState(false);
@@ -32,10 +70,74 @@ export function useDataGridOperations<T extends Record<string, any>>({
   const [rowSelected, setRowSelected] = useState<number>(0);
   const [duplicateIDs, setDuplicateIDs] = useState<string[]>([]);
   const [changedValues, setChangedValues] = useState<any[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const itemErrorsFromRedux = useSelector(selectAllItemErrors);
+  const dispatch = useDispatch();
 
+  // Add a function to collect all error messages for a specific item
+  const collectErrorMessagesForItem =
+    useCollectErrorMessagesForItem(itemErrorsFromRedux);
+
+  useEffect(() => {
+    // Update the rowData to include error messages for tooltips
+    // Only update if there are actual changes to avoid infinite loops
+    setRowData((prevRowData) => {
+      let hasChanges = false;
+      const newRowData = prevRowData.map((row) => {
+        const itemId = getItemId(row);
+        const errorMessages = collectErrorMessagesForItem(itemId);
+        const currentErrorMessages = (row as any).errorMessages || "";
+
+        if (errorMessages !== currentErrorMessages) {
+          hasChanges = true;
+          return {
+            ...row,
+            errorMessages: errorMessages,
+          };
+        }
+        return row;
+      });
+
+      // Only return new array if there are actual changes
+      return hasChanges ? newRowData : prevRowData;
+    });
+  }, [itemErrorsFromRedux, collectErrorMessagesForItem, setRowData, getItemId]);
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Generate validateRowData if requiredFields is provided
+  const generatedValidateRowData = useCallback(
+    (data: T): boolean => {
+      if ((data as any).errorMessages) return false; // If there are any errors in the store, invalid
+      if (!requiredFields || !t || !mes) return true; // if not provided, assume valid
+      let isValid = true;
+      const itemId = getItemId(data);
+      requiredFields.forEach(({ field, label }) => {
+        if (
+          !validateField(
+            label,
+            data[field],
+            true,
+            String(field),
+            "string",
+            itemId,
+            (key, params) => {
+              try {
+                return mes(key, params);
+              } catch {
+                return `${label} không được để trống`;
+              }
+            }
+          )
+        ) {
+          isValid = false;
+        }
+      });
+      return isValid;
+    },
+    [requiredFields, t, mes, getItemId]
+  );
 
   // Handle selection changes
   const onSelectionChanged = useCallback(() => {
@@ -67,6 +169,10 @@ export function useDataGridOperations<T extends Record<string, any>>({
       const id = data.id;
       const itemId = getItemId(data);
       const fieldName = colDef.field;
+
+      // Set editing state
+      setIsEditing(true);
+
       // Update changedValues for existing records (có id)
       if (id) {
         setChangedValues((prevChangedValues) => {
@@ -106,6 +212,34 @@ export function useDataGridOperations<T extends Record<string, any>>({
           const duplicates = allIDs.filter(
             (id, index) => allIDs.indexOf(id) !== index
           );
+          const duplicateSet = new Set(duplicates);
+
+          // Clear previous duplicate errors
+          rowData.forEach((row) => {
+            const itemId = getItemId(row);
+            dispatch(
+              removeItemError({ itemId, field: String(duplicateCheckField) })
+            );
+          });
+
+          // Add errors for duplicates
+          rowData.forEach((row) => {
+            const value = row[duplicateCheckField];
+            if (value && duplicateSet.has(value)) {
+              const itemId = getItemId(row);
+              const errorMessage = mes("duplicateIDs");
+              dispatch(
+                addItemError({
+                  itemId,
+                  error: {
+                    field: String(duplicateCheckField),
+                    message: errorMessage,
+                  },
+                })
+              );
+            }
+          });
+
           setDuplicateIDs(Array.from(new Set(duplicates)));
         }
 
@@ -120,24 +254,32 @@ export function useDataGridOperations<T extends Record<string, any>>({
         return updatedRows;
       });
     },
-    [rowData, duplicateCheckField, getItemId, gridRef]
+    [
+      rowData,
+      duplicateCheckField,
+      getItemId,
+      gridRef,
+      dispatch,
+      mes,
+      setIsEditing,
+    ]
   );
 
   // Save function - generic
   const createSaveHandler = useCallback(
     (
-      validateRowData: (data: T) => boolean,
+      validateRowData?: (data: T) => boolean,
       addAPI?: (item: any) => Promise<any>,
       updateAPI?: (item: any) => Promise<any>,
       fetchData?: () => Promise<void>
     ) => {
+      const actualValidate =
+        validateRowData || configValidateRowData || generatedValidateRowData;
+      if (!actualValidate) {
+        throw new Error("validateRowData is required");
+      }
       return async () => {
         if (editedRows.length > 0) {
-          if (duplicateIDs.length > 0) {
-            showError(mes("duplicateIDs"));
-            return;
-          }
-
           const newRows = editedRows.filter(
             (row) => !row.id && row.unitKey !== undefined
           );
@@ -147,7 +289,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
             // Validate all rows
             const allRowsToValidate = [...newRows, ...updatedRows];
             const invalidRows = allRowsToValidate.filter(
-              (row) => !validateRowData(row)
+              (row) => !actualValidate(row)
             );
 
             if (invalidRows.length > 0) {
@@ -178,22 +320,25 @@ export function useDataGridOperations<T extends Record<string, any>>({
 
             // Add new rows
             if (newRows.length > 0 && addAPI) {
-              // const res = await addAPI(newRows);
-              console.log("New Rows to add:", newRows);
-
+              await addAPI(newRows);
               showSuccess(mes("rowsAdded", { count: newRows.length }));
             }
 
             // Update existing rows
             if (changedValues.length > 0 && updateAPI) {
-              await Promise.all(
-                changedValues.map(async (row: any) => {
-                  await updateAPI(row.data);
-                })
-              );
-              showSuccess(
-                mes("customersUpdated", { count: changedValues.length })
-              );
+              const updateData = changedValues.map((row: any) => ({
+                id: row.id,
+                ...row.data,
+              }));
+              try {
+                await updateAPI(updateData);
+                showSuccess(
+                  mes("customersUpdated", { count: changedValues.length })
+                );
+              } catch (updateError) {
+                throw updateError;
+              }
+            } else {
             }
 
             // Reset state
@@ -210,6 +355,20 @@ export function useDataGridOperations<T extends Record<string, any>>({
             setEditedRows([]);
             setDuplicateIDs([]);
             setChangedValues([]);
+            setIsEditing(false); // Reset editing state
+
+            // Clear duplicate errors if field is specified
+            if (duplicateCheckField) {
+              rowData.forEach((row) => {
+                const itemId = getItemId(row);
+                dispatch(
+                  removeItemError({
+                    itemId,
+                    field: String(duplicateCheckField),
+                  })
+                );
+              });
+            }
 
             if (fetchData) {
               fetchData();
@@ -217,7 +376,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
           } catch (error: any) {
             const errorMessage =
               error.response?.data?.message || error.message || "Unknown error";
-            showError(mes("processingRows", { error: errorMessage }));
+            showError(`Lỗi khi xử lý: ${errorMessage}`);
           }
         } else {
           showInfo(mes("noChanges"));
@@ -226,13 +385,17 @@ export function useDataGridOperations<T extends Record<string, any>>({
     },
     [
       editedRows,
-      duplicateIDs,
       changedValues,
       rowData,
       mes,
       getItemId,
       gridRef,
       setRowData,
+      configValidateRowData,
+      generatedValidateRowData,
+      duplicateCheckField,
+      dispatch,
+      setIsEditing,
     ]
   );
 
@@ -272,11 +435,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
             setRowData(remainingRows);
             showSuccess(mes("rowsDeleted"));
           } catch (error: any) {
-            showError(
-              mes("deletingRows", {
-                error: error.response?.data?.message,
-              })
-            );
+            showError(`Lỗi khi xóa: ${error.response?.data?.message}`);
           }
         } else {
           showWarning(mes("noRowsSelected"));
@@ -359,6 +518,47 @@ export function useDataGridOperations<T extends Record<string, any>>({
     [setRowData, setEditedRows, getItemId]
   );
 
+  // Quicksearch handler
+  const handleQuicksearch = useCallback(
+    (
+      searchText: string | "",
+      selectedFilterColumns: any[],
+      filterValues: string | "",
+      paginationSize: number
+    ) => {
+      // Skip fetch if currently editing to avoid overwriting changes
+      if (isEditing) return;
+
+      if (setCurrentPage) setCurrentPage(1);
+      if (setPageSize) setPageSize(paginationSize);
+
+      if (!searchText && !filterValues) {
+        if (setQuickSearchText) setQuickSearchText(undefined);
+        if (fetchData) fetchData(1, paginationSize, undefined);
+        return;
+      }
+
+      if (columnDefs) {
+        const params = buildQuicksearchParams(
+          searchText,
+          selectedFilterColumns,
+          filterValues,
+          columnDefs
+        );
+        if (setQuickSearchText) setQuickSearchText(params);
+        if (fetchData) fetchData(1, paginationSize, params);
+      }
+    },
+    [
+      isEditing,
+      setCurrentPage,
+      setPageSize,
+      setQuickSearchText,
+      columnDefs,
+      fetchData,
+    ]
+  );
+
   return {
     // State
     isClient,
@@ -367,6 +567,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
     rowSelected,
     duplicateIDs,
     changedValues,
+    isEditing,
 
     // State setters
     setRowData,
@@ -374,6 +575,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
     setRowSelected,
     setDuplicateIDs,
     setChangedValues,
+    setIsEditing,
 
     // Event handlers
     onSelectionChanged,
@@ -384,5 +586,8 @@ export function useDataGridOperations<T extends Record<string, any>>({
     createSaveHandler,
     createDeleteHandler,
     createPasteHandler,
+
+    // Additional functions
+    handleQuicksearch: configHandleQuicksearch || handleQuicksearch,
   };
 }

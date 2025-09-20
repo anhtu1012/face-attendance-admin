@@ -61,7 +61,17 @@
     "fetchSuccess": "Data fetched successfully",
     "noData": "No data available",
     "invalidInput": "Invalid input, please check again",
-    "duplicateValue": "Duplicate values are not allowed"
+    "duplicateValue": "Duplicate values are not allowed",
+    "validation": {
+      "required": "{field} is required",
+      "containerNumberFormat": "{field} must be 4 letters followed by 7 digits",
+      "booleanType": "{field} must be a boolean value",
+      "numberType": "{field} must be a number",
+      "dangerousCargo": "{field} is required for dangerous cargo with refrigeration",
+      "overSizeCargo": "{field} is required for oversized cargo",
+      "specialOverSizeCargo": "{field} is required for special oversized cargo",
+      "minimumValue": "{field} must be >= {minValue}"
+    }
   },
   "message": {
     "success": "Success",

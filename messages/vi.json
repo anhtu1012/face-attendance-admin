@@ -61,7 +61,17 @@
     "noData": "Không có dữ liệu",
     "fetchSuccess": "Lấy dữ liệu thành công",
     "invalidInput": "Dữ liệu nhập không hợp lệ",
-    "duplicateValue": "Giá trị trùng lặp không được phép"
+    "duplicateValue": "Giá trị trùng lặp không được phép",
+    "validation": {
+      "required": "{field} không được để trống",
+      "containerNumberFormat": "{field} phải có định dạng 4 chữ cái và 7 số",
+      "booleanType": "{field} phải là giá trị boolean",
+      "numberType": "{field} phải là số",
+      "dangerousCargo": "{field} không được để trống cho hàng nguy hiểm có làm lạnh",
+      "overSizeCargo": "{field} không được để trống cho hàng quá khổ",
+      "specialOverSizeCargo": "{field} không được để trống cho hàng quá khổ đặc biệt",
+      "minimumValue": "{field} phải có giá trị >= {minValue}"
+    }
   },
   "ActionButtons": {
     "add": "Thêm mới",
