@@ -2,19 +2,19 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import {
-  CreateFormRequest,
-  UpdateFormRequest,
-} from "@/dtos/danhMuc/don/don.request.dto";
-import { FormResponseGetItem } from "@/dtos/danhMuc/don/don.response.dto";
+  CreateBranchRequest,
+  UpdateBranchRequest,
+} from "@/dtos/danhMuc/chi-nhanh/chinhanh.request.dto";
+import { DanhMucBranchResponseGetItem } from "@/dtos/danhMuc/chi-nhanh/chinhanh.response.dto";
 
-class DanhMucDonServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/category/form";
+class DanhMucChiNhanhServicesBase extends AxiosService {
+  protected readonly basePath = "/v1/category/branch";
 
-  async getDanhMucDon(
+  async getDanhMucChiNhanh(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,
     params?: Record<string, string | number | boolean>
-  ): Promise<FormResponseGetItem> {
+  ): Promise<DanhMucBranchResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}`,
       searchFilter,
@@ -23,24 +23,24 @@ class DanhMucDonServicesBase extends AxiosService {
     );
   }
 
-  createDanhMucDon = async (data: CreateFormRequest[]): Promise<any> => {
+  createDanhMucChiNhanh = async (data: CreateBranchRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.post(`${this.basePath}`, payload);
   };
 
-  updateDanhMucDon = async (data: UpdateFormRequest[]): Promise<any> => {
+  updateDanhMucChiNhanh = async (data: UpdateBranchRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.put(`${this.basePath}`, payload);
   };
 
-  deleteDanhMucDon = async (id: string): Promise<any> => {
+  deleteDanhMucChiNhanh = async (id: string): Promise<any> => {
     return this.delete(`${this.basePath}/${id}`);
   };
 }
 
-const DanhMucDonServices = new DanhMucDonServicesBase();
-export default DanhMucDonServices;
+const DanhMucChiNhanhServices = new DanhMucChiNhanhServicesBase();
+export default DanhMucChiNhanhServices;

@@ -8,6 +8,4 @@ export const CaLamResponseGetSchema = z.object({
   data: z.array(CaLamItemSchema),
 });
 
-export type CaLamResponseGetItem = z.infer<
-  typeof CaLamResponseGetSchema
->; 
+export type CaLamResponseGetItem = z.infer<typeof CaLamResponseGetSchema>;

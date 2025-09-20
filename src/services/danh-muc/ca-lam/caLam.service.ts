@@ -2,19 +2,19 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import {
-  CreateFormRequest,
-  UpdateFormRequest,
-} from "@/dtos/danhMuc/don/don.request.dto";
-import { FormResponseGetItem } from "@/dtos/danhMuc/don/don.response.dto";
+  CreateCaLamRequest,
+  UpdateCaLamRequest,
+} from "@/dtos/danhMuc/ca-lam/ca-lam.request.dto";
+import { CaLamResponseGetItem } from "@/dtos/danhMuc/ca-lam/ca-lam.response.dto";
 
-class DanhMucDonServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/category/form";
+class DanhMucCaLamServicesBase extends AxiosService {
+  protected readonly basePath = "/v1/category/shift";
 
-  async getDanhMucDon(
+  async getDanhMucCaLam(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,
     params?: Record<string, string | number | boolean>
-  ): Promise<FormResponseGetItem> {
+  ): Promise<CaLamResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}`,
       searchFilter,
@@ -23,24 +23,24 @@ class DanhMucDonServicesBase extends AxiosService {
     );
   }
 
-  createDanhMucDon = async (data: CreateFormRequest[]): Promise<any> => {
+  createDanhMucCaLam = async (data: CreateCaLamRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.post(`${this.basePath}`, payload);
   };
 
-  updateDanhMucDon = async (data: UpdateFormRequest[]): Promise<any> => {
+  updateDanhMucCaLam = async (data: UpdateCaLamRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.put(`${this.basePath}`, payload);
   };
 
-  deleteDanhMucDon = async (id: string): Promise<any> => {
+  deleteDanhMucCaLam = async (id: string): Promise<any> => {
     return this.delete(`${this.basePath}/${id}`);
   };
 }
 
-const DanhMucDonServices = new DanhMucDonServicesBase();
-export default DanhMucDonServices;
+const DanhMucCaLamServices = new DanhMucCaLamServicesBase();
+export default DanhMucCaLamServices;

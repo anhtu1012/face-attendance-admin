@@ -2,19 +2,19 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import {
-  CreateFormRequest,
-  UpdateFormRequest,
-} from "@/dtos/danhMuc/don/don.request.dto";
-import { FormResponseGetItem } from "@/dtos/danhMuc/don/don.response.dto";
+  CreateKyNangRequest,
+  UpdateKyNangRequest,
+} from "@/dtos/danhMuc/ki-nang/kyNang.request.dto";
+import { KyNangResponseGetItem } from "@/dtos/danhMuc/ki-nang/kyNang.response.dto";
 
-class DanhMucDonServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/category/form";
+class DanhMucKyNangServicesBase extends AxiosService {
+  protected readonly basePath = "/v1/category/skill";
 
-  async getDanhMucDon(
+  async getDanhMucKyNang(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,
     params?: Record<string, string | number | boolean>
-  ): Promise<FormResponseGetItem> {
+  ): Promise<KyNangResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}`,
       searchFilter,
@@ -23,24 +23,24 @@ class DanhMucDonServicesBase extends AxiosService {
     );
   }
 
-  createDanhMucDon = async (data: CreateFormRequest[]): Promise<any> => {
+  createDanhMucKyNang = async (data: CreateKyNangRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.post(`${this.basePath}`, payload);
   };
 
-  updateDanhMucDon = async (data: UpdateFormRequest[]): Promise<any> => {
+  updateDanhMucKyNang = async (data: UpdateKyNangRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.put(`${this.basePath}`, payload);
   };
 
-  deleteDanhMucDon = async (id: string): Promise<any> => {
+  deleteDanhMucKyNang = async (id: string): Promise<any> => {
     return this.delete(`${this.basePath}/${id}`);
   };
 }
 
-const DanhMucDonServices = new DanhMucDonServicesBase();
-export default DanhMucDonServices;
+const DanhMucKyNangServices = new DanhMucKyNangServicesBase();
+export default DanhMucKyNangServices;
