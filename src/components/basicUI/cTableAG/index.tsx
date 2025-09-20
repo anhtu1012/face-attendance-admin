@@ -311,6 +311,8 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     fillTargetCells: hookFillTargetCells,
     showFillHandle: hookShowFillHandle,
     handleFillMouseDown: hookHandleFillMouseDown,
+    handleFillMouseUp: hookHandleFillMouseUp,
+    calculateFillTargetCells: hookCalculateFillTargetCells,
     setFillHandleVisible: hookSetFillHandleVisible,
     setFillSourceCell: hookSetFillSourceCell,
     setFillSourceCellInfo: hookSetFillSourceCellInfo,
@@ -397,6 +399,9 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     setMultiSelectionPattern,
     columnDefs: columnDefs, // Will be updated with extendedColumnDefs later
     gridWrapperRef: gridWrapperRef as React.RefObject<HTMLDivElement>,
+    gridRef: gridRef as React.RefObject<{
+      api: { refreshCells: (params: unknown) => void };
+    }>,
     showFillHandle: (event: any) => {
       if (event.rowIndex !== null && event.colDef?.field) {
         const cellEvent = {
@@ -527,6 +532,40 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     };
   }, [isSelecting]);
 
+  // Clear fill handle when selectedCells becomes empty
+  useEffect(() => {
+    if (selectedCells.size === 0 && hookFillHandleVisible) {
+      hookSetFillHandleVisible(false);
+      hookSetFillSourceCell(null);
+      hookSetFillSourceCellInfo(null);
+    }
+  }, [
+    selectedCells.size,
+    hookSetFillHandleVisible,
+    hookSetFillSourceCell,
+    hookSetFillSourceCellInfo,
+  ]); // Removed hookFillHandleVisible to prevent infinite loop
+
+  // Clear fill handle when clicking outside or on different cell
+  useEffect(() => {
+    if (
+      selectedCells.size > 0 &&
+      !hookFillHandleVisible &&
+      hookFillSourceCellInfo
+    ) {
+      // If we have selected cells but no visible fill handle, show it
+      hookSetFillHandleVisible(true);
+    }
+  }, [selectedCells.size, hookFillSourceCellInfo, hookSetFillHandleVisible]); // Removed hookFillHandleVisible to prevent infinite loop
+
+  // Refresh AG Grid cells when selectedCells changes to update CSS classes
+  useEffect(() => {
+    if (gridRef.current?.api && !gridRef.current.api.isDestroyed?.()) {
+      // Force refresh all cells to update selection styling
+      gridRef.current.api.refreshCells({ force: true });
+    }
+  }, [selectedCells, gridRef]);
+
   useEffect(() => {
     const documentMouseUpHandler = (event: MouseEvent) => {
       // console.log("Document mouseup detected", {
@@ -570,9 +609,42 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
       }
     };
 
+    // Thêm global mouse move handler cho fill handle dragging
+    const handleGlobalMouseMove = (event: MouseEvent) => {
+      if (isDraggingFill) {
+        console.log("Global mouse move during fill drag", {
+          clientX: event.clientX,
+          clientY: event.clientY,
+        });
+        event.preventDefault();
+        hookCalculateFillTargetCells(event.clientX, event.clientY);
+      }
+    };
+
+    // Thêm global mouse up handler cho fill handle
+    const handleGlobalMouseUp = (event: MouseEvent) => {
+      if (isDraggingFill) {
+        console.log("Global mouse up during fill drag", {
+          clientX: event.clientX,
+          clientY: event.clientY,
+        });
+        event.preventDefault();
+        hookHandleFillMouseUp();
+      }
+    };
+
     document.addEventListener("mousedown", hookHandleClickOutside);
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("mouseup", hookHandleMouseUp);
+    document.addEventListener("mousemove", handleGlobalMouseMove);
+    document.addEventListener("mouseup", handleGlobalMouseUp, {
+      capture: true,
+    });
+
+    // Thêm backup mouseup listener
+    document.addEventListener("mouseup", documentMouseUpHandler, {
+      capture: true,
+    });
 
     // Thêm backup mouseup listener
     document.addEventListener("mouseup", documentMouseUpHandler, {
@@ -589,6 +661,10 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
       document.removeEventListener("mousedown", hookHandleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("mouseup", hookHandleMouseUp);
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+      document.removeEventListener("mouseup", handleGlobalMouseUp, {
+        capture: true,
+      });
       document.removeEventListener("mouseup", documentMouseUpHandler, {
         capture: true,
       });
@@ -612,8 +688,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     autoScrollInterval,
     enableInfiniteScroll, // THÊM: để check infinite scroll state
   ]);
-
-  // Global mouse move is now handled by the hooks themselves - this useEffect is no longer needed
 
   // useEffect cho infinite scroll
   useEffect(() => {
@@ -985,12 +1059,17 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
           onSelectionChanged={handleSelectionChanged}
           onCellMouseDown={wrappedHandleMouseDown}
           onCellClicked={wrappedShowFillHandle}
-          onCellFocused={(event) => {
-            // Chỉ hiển thị fill handle khi focus nếu không đang trong trạng thái selection hoặc drag
-            if (!isSelecting && !isDraggingFill) {
-              wrappedShowFillHandle(event);
-            }
-          }}
+          // onCellFocused disabled - using onCellClicked instead to avoid conflicts
+          // onCellFocused={(event) => {
+          //   console.log("onCellFocused called", { rowIndex: event.rowIndex, colField: event.colDef?.field, isSelecting, isDraggingFill });
+          //   // Chỉ hiển thị fill handle khi focus nếu không đang trong trạng thái selection hoặc drag
+          //   if (!isSelecting && !isDraggingFill) {
+          //     // Delay để tránh conflict với mouse events
+          //     setTimeout(() => {
+          //       wrappedShowFillHandle(event);
+          //     }, 50);
+          //   }
+          // }}
           onCellMouseOver={wrappedHandleMouseOver}
           getRowStyle={getRowStyle}
           suppressRowClickSelection={false}
@@ -999,6 +1078,8 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
           rowHeight={40}
           headerHeight={headerHeight}
           stopEditingWhenCellsLoseFocus={true}
+          suppressCellFocus={false} // Cho phép focus để hiển thị fill handle
+          singleClickEdit={false} // Ngăn single click mở cell editor
           gridOptions={gridOptions}
           tooltipShowDelay={0}
           pinnedBottomRowData={pinnedBottomRowData}
@@ -1082,33 +1163,74 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
         )}
 
         {/* Fill Handle */}
-        {hookFillHandleVisible &&
-          hookFillHandlePosition.top !== undefined &&
-          hookFillHandlePosition.left !== undefined && (
-            <div
-              key={`${hookFillHandlePosition.top}-${hookFillHandlePosition.left}`} // Force re-render khi vị trí thay đổi
-              className={`fill-handle ${
-                autoScrollInterval ? "auto-scrolling" : ""
-              }`}
-              style={{
-                position: "absolute",
-                top: `${hookFillHandlePosition.top}px`,
-                left: `${hookFillHandlePosition.left}px`,
-                zIndex: 1001,
-                cursor: "crosshair",
-                transform: "translate3d(0, 0, 0)",
-                willChange: "transform",
-              }}
-              onMouseDown={hookHandleFillMouseDown}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!hookFillHandleVisible) {
-                  hookSetFillHandleVisible(true);
-                }
-              }}
-            />
-          )}
+        {(() => {
+          return (
+            hookFillHandleVisible &&
+            hookFillHandlePosition.top !== undefined &&
+            hookFillHandlePosition.left !== undefined
+          );
+        })() && (
+          <div
+            key={`${hookFillHandlePosition.top}-${hookFillHandlePosition.left}`} // Force re-render khi vị trí thay đổi
+            className={`fill-handle ${
+              autoScrollInterval ? "auto-scrolling" : ""
+            }`}
+            style={{
+              position: "absolute",
+              top: `${hookFillHandlePosition.top}px`,
+              left: `${hookFillHandlePosition.left}px`,
+              zIndex: 1001,
+              cursor: "crosshair",
+              transform: "translate3d(0, 0, 0)",
+              willChange: "transform",
+              // Add visible styling
+              width: "8px",
+              height: "8px",
+              backgroundColor: "#1890ff",
+              border: "2px solid #ffffff",
+              borderRadius: "50%",
+              boxShadow: "0 0 4px rgba(0,0,0,0.3)",
+            }}
+            onMouseDown={(e) => {
+              console.log("Fill handle mouse down", {
+                clientX: e.clientX,
+                clientY: e.clientY,
+              });
+              e.preventDefault();
+              e.stopPropagation();
+              hookHandleFillMouseDown(e);
+            }}
+            onMouseMove={(e) => {
+              console.log("Fill handle mouse move", {
+                clientX: e.clientX,
+                clientY: e.clientY,
+                isDraggingFill,
+              });
+              e.preventDefault();
+              e.stopPropagation();
+              // Handle mouse move during drag
+              if (isDraggingFill) {
+                hookCalculateFillTargetCells(e.clientX, e.clientY);
+              }
+            }}
+            onMouseUp={(e) => {
+              console.log("Fill handle mouse up", {
+                clientX: e.clientX,
+                clientY: e.clientY,
+              });
+              e.preventDefault();
+              e.stopPropagation();
+              hookHandleFillMouseUp();
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!hookFillHandleVisible) {
+                hookSetFillHandleVisible(true);
+              }
+            }}
+          />
+        )}
       </div>
 
       {/* Footer area with export button and row count */}

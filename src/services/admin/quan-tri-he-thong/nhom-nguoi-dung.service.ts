@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
+import { CreateNhomNguoiDungRequest } from "@/dtos/quan-tri-he-thong/nhom-nguoi-dung/nhom-nguoi-dung.request.dto";
 import { NhomNguoiDungResponseGetItem } from "@/dtos/quan-tri-he-thong/nhom-nguoi-dung/nhom-nguoi-dung.response.dto";
 
 class NhomNguoiDungServicesBase extends AxiosService {
   protected readonly basePath = "/v1/sa/role";
+  protected readonly additionalPath = "/v1/sa/role/array";
 
   async getNhomNguoiDung(
     searchFilter: FilterQueryStringTypeItem[] = [],
@@ -22,24 +24,15 @@ class NhomNguoiDungServicesBase extends AxiosService {
     return this.getWithFilter(`${this.basePath}`, searchFilter);
   }
 
-  async createNhomNguoiDung(formData: {
-    roleCode: string;
-    roleName: string;
-  }): Promise<any> {
-    return this.post(`${this.basePath}`, formData);
+  async createNhomNguoiDung(payload: CreateNhomNguoiDungRequest): Promise<any> {
+    return this.post(`${this.additionalPath}`, payload);
   }
 
-  async updateNhomNguoiDung(
-    id: string | undefined,
-    formData: { roleCode: string; roleName: string }
-  ): Promise<any> {
-    return this.put(`${this.basePath}/${id}`, formData);
+  async updateNhomNguoiDung(payload: CreateNhomNguoiDungRequest): Promise<any> {
+    return this.put(`${this.additionalPath}`, payload);
   }
 
-  async deleteNhomNguoiDung(
-    id: string,
-    status: { status: string }
-  ): Promise<any> {
+  async deleteNhomNguoiDung(id: string): Promise<any> {
     return this.delete(`${this.basePath}/${id}`, status);
   }
 }

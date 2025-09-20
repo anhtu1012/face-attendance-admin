@@ -10,7 +10,7 @@ import { AgGridReact } from "@ag-grid-community/react";
 import { InputSearchProps } from "../../InputSearch";
 import { ActionButtonsProps } from "@/components/action-button";
 export interface ExtendedColDef extends ColDef {
-  typeColumn?: "Select" | "Text" | "Number" | "Date"; // Add other types as needed
+  typeColumn?: "Select" | "Text" | "Number" | "Date" | "Time"; // Add Time type for time picker
   selectOptions?: Array<{ value: any; label: string }>; // Options for Select type
 }
 export interface AgGridComponentProps {

@@ -138,7 +138,7 @@ export const useItemErrorCellStyle = (
 
       // Chỉ hiển thị border lỗi nếu cả hai điều kiện đều đúng: trường có lỗi và hàng có trạng thái lỗi
       if (hasReduxError && hasRowError) {
-        return { border: "1px solid orange" };
+        return { border: "2px solid orange" };
       }
 
       return null;

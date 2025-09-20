@@ -1,11 +1,6 @@
 import { z } from "zod";
-import { PhanQuyenItemSchema } from "./phan-quyen.dto";
 
-/**
- * Schema and type for creating a user
- */
-export const CreatePhanQuyenSchema = z.object({
-  groupCode: z.string().min(2, "Mã vai trò là bắt buộc"),
+export const PhanQuyenSchemaPayload = z.object({
   resourceCode: z.string().min(2, "Mã màn hình là bắt buộc"),
   resourceName: z.string().min(2, "Tên màn hình là bắt buộc"),
   parentName: z.string().min(2, "Tên danh mục là bắt buộc"),
@@ -13,19 +8,9 @@ export const CreatePhanQuyenSchema = z.object({
   sort: z.string().optional(),
 });
 
-export type CreatePhanQuyenRequest = z.infer<typeof CreatePhanQuyenSchema>;
+export const savePhanQuyenSchema = z.object({
+  groupCode: z.string().array().min(2, "Mã vai trò là bắt buộc"),
+  permissions: z.array(PhanQuyenSchemaPayload),
+});
 
-/**
- * Schema and type for updating a user
- */
-export const UpdatePhanQuyenSchema = PhanQuyenItemSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-})
-  .partial()
-  .extend({
-    groupCode: z.string().min(2, "Mã vai trò là bắt buộc").optional(),
-  });
-
-export type UpdatePhanQuyenRequest = z.infer<typeof UpdatePhanQuyenSchema>;
+export type savePhanQuyenRequest = z.infer<typeof savePhanQuyenSchema>;

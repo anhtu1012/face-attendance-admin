@@ -4,10 +4,11 @@ import ActionButtons from "@/components/action-button";
 import AutoCompleteWithLabel from "@/components/basicUI/cAutoCompleteSelection";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { showError, showWarning } from "@/hooks/useNotification";
+import { showError, showSuccess, showWarning } from "@/hooks/useNotification";
 import CauHinhMenuServices from "@/services/admin/quan-tri-he-thong/cau-hinh-menu.service";
 import SelectServices from "@/services/select/select.service";
 import {
+  calculateParentCheckboxes,
   convertToTreeData,
   flattenTreeData,
   toggleNodeExpansion,
@@ -22,7 +23,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 
 function Page() {
-  const notiMessage = useTranslations("message");
+  const mes = useTranslations("HandleNotion");
   const t = useTranslations("CauHinhMenu");
   const gridRef = useRef<AgGridReact>({} as any);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -32,9 +33,9 @@ function Page() {
   const [loading, setLoading] = useState(false);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [displayData, setDisplayData] = useState<TreeNode[]>([]);
-  // const [editedRows, setEditedRows] = useState<{ [key: string]: TreeNode }>({});
+  const [editedRows, setEditedRows] = useState<{ [key: string]: TreeNode }>({});
   const [rowSelected, setRowSelected] = useState<number>(0);
-  const [, setSelectedResourceName] = useState("");
+  const [selectedResourceName, setSelectedResourceName] = useState("");
   const [newRowsCount, setNewRowsCount] = useState<number>(1);
   const [parentNameOptions, setparentNameOptions] = useState<
     { label: string; value: string }[]
@@ -76,11 +77,11 @@ function Page() {
         setTotalItems(response.count);
         setLoading(false);
       } catch (error: any) {
-        showError(error.response?.data?.message || notiMessage("fetchError"));
+        showError(error.response?.data?.message || mes("fetchError"));
         setLoading(false);
       }
     },
-    [currentPage, pageSize, notiMessage]
+    [currentPage, pageSize, mes]
   );
 
   useEffect(() => {
@@ -93,7 +94,6 @@ function Page() {
     (nodeId: string) => {
       const updatedTreeData = toggleNodeExpansion(treeData, nodeId);
       setTreeData(updatedTreeData);
-
       const flattenedData = flattenTreeData(updatedTreeData);
       setDisplayData(flattenedData);
     },
@@ -105,42 +105,55 @@ function Page() {
     (params: any) => {
       const node = params.data as TreeNode;
 
-      if (!node.isParent || !node.children || node.children.length === 0) {
+      // Chỉ hiển thị cho parent nodes, không quan tâm số lượng children
+      if (!node.isParent) {
         return null;
       }
+
+      // Nếu có children thì hiển thị expand/collapse icon, nếu không thì chỉ hiển thị tên
+      const hasChildren = node.children && node.children.length > 0;
 
       return (
         <div
           style={{
-            cursor: "pointer",
+            cursor: hasChildren ? "pointer" : "default",
             userSelect: "none",
             display: "flex",
             alignItems: "center",
           }}
-          onClick={() => handleNodeToggle(node.id)}
+          onClick={hasChildren ? () => handleNodeToggle(node.id) : undefined}
         >
-          <span style={{ marginRight: "10px" }}>
-            {node.expanded ? (
-              <IoChevronUp
-                style={{
-                  marginTop: "12px",
-                  marginLeft: "10px",
-                  transition: "transform 0.2s",
-                }}
-                size={20}
-              />
-            ) : (
-              <IoChevronDown
-                style={{
-                  marginTop: "12px",
-                  marginLeft: "10px",
-                  transition: "transform 0.2s",
-                }}
-                size={20}
-              />
-            )}
+          {hasChildren && (
+            <span style={{ marginRight: "10px" }}>
+              {node.expanded ? (
+                <IoChevronUp
+                  style={{
+                    marginTop: "12px",
+                    marginLeft: "10px",
+                    transition: "transform 0.2s",
+                  }}
+                  size={20}
+                />
+              ) : (
+                <IoChevronDown
+                  style={{
+                    marginTop: "12px",
+                    marginLeft: "10px",
+                    transition: "transform 0.2s",
+                  }}
+                  size={20}
+                />
+              )}
+            </span>
+          )}
+          <span
+            style={{
+              fontWeight: "bold",
+              marginLeft: hasChildren ? "0px" : "30px", // Indent nếu không có children
+            }}
+          >
+            {node.parentName}
           </span>
-          <span style={{ fontWeight: "bold" }}>{node.parentName}</span>
         </div>
       );
     },
@@ -148,21 +161,52 @@ function Page() {
   );
   //#endregion
 
+  //#region CELL EDITING
+  // Hàm xử lý khi cell được edit
+  const onCellValueChanged = useCallback((params: any) => {
+    const rowData = params.data as TreeNode;
+    const field = params.colDef.field;
+    const newValue = params.newValue;
+    const oldValue = params.oldValue;
+
+    // Chỉ track khi có thay đổi thực sự
+    if (newValue !== oldValue) {
+      setEditedRows((prev) => ({
+        ...prev,
+        [rowData.id]: {
+          // Giữ lại tất cả thay đổi trước đó
+          ...(prev[rowData.id] || rowData),
+          // Chỉ update field được edit
+          [field]: newValue,
+        },
+      }));
+    }
+  }, []);
+  //#endregion
+
   // #region CELL RENDER
   // Custom cell renderer cho resource tùy theo column
-  const ResourceRenderer = useCallback((params: any) => {
-    const node = params.data as TreeNode;
-    if (node.isParent) return null;
+  const ResourceRenderer = useCallback(
+    (params: any) => {
+      const node = params.data as TreeNode;
+      if (node.isParent) return null;
 
-    const field = params.colDef.field as keyof TreeNode;
-    const value = node[field] as string;
+      const field = params.colDef.field as keyof TreeNode;
 
-    return (
-      <span style={{ marginLeft: `${((node.level || 0) + 1) * 10}px` }}>
-        {value}
-      </span>
-    );
-  }, []);
+      // Ưu tiên giá trị từ editedRows nếu có, nếu không thì dùng từ node
+      const editedNode = editedRows[node.id];
+      const value = editedNode
+        ? (editedNode[field] as string)
+        : (node[field] as string);
+
+      return (
+        <span style={{ marginLeft: `${((node.level || 0) + 1) * 10}px` }}>
+          {value}
+        </span>
+      );
+    },
+    [editedRows]
+  );
   //#endregion
 
   //#region CHECKBOX
@@ -183,6 +227,48 @@ function Page() {
 
       const flattenedData = flattenTreeData(updatedTreeData);
       setDisplayData(flattenedData);
+
+      // Cập nhật tất cả nodes bị thay đổi
+      const updatedNode = flattenedData.find((node) => node.id === nodeId);
+      if (updatedNode) {
+        setEditedRows((prev) => ({
+          ...prev,
+          [nodeId]: {
+            // Giữ lại tất cả changes đã có trước đó
+            ...(prev[nodeId] || updatedNode),
+            // Chỉ override checkbox states
+            view: updatedNode.view,
+            create: updatedNode.create,
+            update: updatedNode.update,
+            delete: updatedNode.delete,
+            all: updatedNode.all,
+          },
+        }));
+      }
+
+      // Nếu là parent node và được click, cần track tất cả children bị affected
+      if (updatedNode?.isParent && updatedNode.children) {
+        updatedNode.children.forEach((child) => {
+          const childInDisplay = flattenedData.find(
+            (node) => node.id === child.id
+          );
+          if (childInDisplay) {
+            setEditedRows((prev) => ({
+              ...prev,
+              [child.id]: {
+                // Giữ lại tất cả changes đã có trước đó
+                ...(prev[child.id] || childInDisplay),
+                // Chỉ override checkbox states
+                view: childInDisplay.view,
+                create: childInDisplay.create,
+                update: childInDisplay.update,
+                delete: childInDisplay.delete,
+                all: childInDisplay.all,
+              },
+            }));
+          }
+        });
+      }
     },
     [treeData]
   );
@@ -192,7 +278,12 @@ function Page() {
     (params: any) => {
       const node = params.data as TreeNode;
       const field = params.colDef.field as keyof TreeNode;
-      const checked = node[field] as boolean;
+
+      // Ưu tiên giá trị từ editedRows nếu có, nếu không thì dùng từ node
+      const editedNode = editedRows[node.id];
+      const checked = editedNode
+        ? (editedNode[field] as boolean)
+        : (node[field] as boolean);
 
       // Hiển thị checkbox cho cả parent và child
       return (
@@ -222,7 +313,7 @@ function Page() {
         </div>
       );
     },
-    [handleCheckboxChange]
+    [handleCheckboxChange, editedRows]
   );
   //#endregion
 
@@ -237,7 +328,7 @@ function Page() {
         field: "parentName",
         headerName: t("parentName"),
         editable: false,
-        width: 250,
+        width: 240,
         cellRenderer: ExpandCellRenderer,
         cellStyle: { paddingLeft: 0 },
       },
@@ -245,7 +336,7 @@ function Page() {
         field: "resourceCode",
         headerName: t("resourceCode"),
         editable: true,
-        width: 230,
+        width: 250,
         cellRenderer: ResourceRenderer,
         cellStyle: { paddingLeft: 0 },
       },
@@ -327,245 +418,238 @@ function Page() {
             });
           }
         }
+        handleFetchMenu(currentPage, pageSize);
+        showSuccess(mes("deleteSuccess"));
       } catch (error: any) {
-        showError(error.response?.data?.message || notiMessage("deleteError"));
+        showError(error.response?.data?.message || mes("deleteError"));
       }
     } else {
-      showWarning(notiMessage("noRowsSelected"));
+      showWarning(mes("noRowsSelected"));
     }
-  }, [notiMessage]);
+  }, [currentPage, handleFetchMenu, mes, pageSize]);
 
   // Hàm xử lý khi lưu
   const addRow = useCallback(() => {
     setIsModalVisible(true);
   }, []);
 
-  // const onSave = useCallback(async () => {
-  //   if (editedRows.length === 0) {
-  //     showWarning(t("noChangesToSave"));
-  //     return;
-  //   }
-  //   setLoading(true);
+  const onSave = useCallback(async () => {
+    if (!editedRows || Object.keys(editedRows).length === 0) {
+      showWarning(t("noChangesToSave"));
+      return;
+    }
+    setLoading(true);
 
-  //   try {
-  //     const newRows = editedRows.filter(
-  //       (row) => !row.id && row.unitKey && row.type === "child"
-  //     );
-  //     const updatedRows = editedRows.filter(
-  //       (row) => row.id && row.type === "child"
-  //     );
+    try {
+      const editedRowsArray = Object.values(editedRows);
+      // Tạo payload theo format - chỉ lấy children nodes, không lấy parent
+      const payload = editedRowsArray
+        .filter((row) => !row.isParent) // Chỉ lấy children, không lấy parent
+        .map((row) => {
+          // Build scopes array từ checkbox states
+          const scopes: string[] = [];
+          if (row.view) scopes.push("view");
+          if (row.create) scopes.push("create");
+          if (row.update) scopes.push("update");
+          if (row.delete) scopes.push("delete");
 
-  //     const updatedParents = editedRows.filter(
-  //       (row) => row.id && row.type === "parent"
-  //     );
+          const basePayload = {
+            unitKey: `unit_${Date.now()}_${Math.random()
+              .toString(36)
+              .substring(2, 9)}`,
+            resourceCode: row.resourceCode || "",
+            resourceName: row.resourceName || "",
+            parentName: row.parentName || "",
+            scopes: scopes,
+          };
 
-  //     const allRowsValidate = [...newRows, ...updatedRows, ...updatedParents];
-  //     const invalidRows = allRowsValidate.filter(
-  //       (row) => !validateRowData(row)
-  //     );
+          if (
+            row.id &&
+            !row.id.toString().startsWith("new_") &&
+            !row.id.toString().startsWith("parent_")
+          ) {
+            return {
+              ...basePayload,
+              resourceId: row.id, // Sử dụng id từ response
+            };
+          } else {
+            // Create payload không cần id
+            return basePayload;
+          }
+        });
 
-  //     if (invalidRows.length > 0) {
-  //       setGridData((prevData) =>
-  //         prevData.map((row) =>
-  //           invalidRows.some(
-  //             (invalidRow) =>
-  //               (invalidRow.id || invalidRow.unitKey) ===
-  //               (row.id || row.unitKey)
-  //           )
-  //             ? { ...row, isError: true }
-  //             : { ...row, isError: false }
-  //         )
-  //       );
-  //       showError(mes("errorUpdate"));
-  //       setLoading(false);
-  //       return;
-  //     }
+      // Validate payload
+      if (payload.length === 0) {
+        showWarning(t("noValidDataToSave"));
+        return;
+      }
 
-  //     // New child rows
-  //     if (newRows.length > 0) {
-  //       const newPayload = newRows.map((row) => ({
-  //         name: row.screenName,
-  //         displayName: row.function,
-  //         attributes: {
-  //           parent: [row.parent || "Default Parent"],
-  //         },
-  //         scopes: [
-  //           ...(row.view ? [{ name: "view" }] : []),
-  //           ...(row.create ? [{ name: "create" }] : []),
-  //           ...(row.update ? [{ name: "update" }] : []),
-  //           ...(row.delete ? [{ name: "delete" }] : []),
-  //         ],
-  //       }));
-  //       await addMenu(newPayload);
-  //       showSuccess(mes("success.rowsAdded", { count: newRows.length }));
-  //     }
+      // Tách payload thành create và update
+      const createPayload = payload.filter((item) => !("resourceId" in item));
+      const updatePayload = payload.filter((item) => "resourceId" in item);
 
-  //     // Updated child rows
-  //     if (updatedRows.length > 0) {
-  //       const updatePayload = updatedRows.map((row) => {
-  //         const changedData =
-  //           changedValues.find((cv) => cv.id === row.id)?.data || {};
-  //         return {
-  //           resourceId: row.id!,
-  //           name: changedData.screenName ?? row.screenName,
-  //           displayName: changedData.function ?? row.function,
-  //           attributes: {
-  //             parent: [row.parent || "Default Parent"],
-  //           },
-  //           scopes: [
-  //             ...(changedData.view ?? row.view
-  //               ? [{ id: scopeMappings.view, name: "view" }]
-  //               : []),
-  //             ...(changedData.create ?? row.create
-  //               ? [{ id: scopeMappings.create, name: "create" }]
-  //               : []),
-  //             ...(changedData.update ?? row.update
-  //               ? [{ id: scopeMappings.update, name: "update" }]
-  //               : []),
-  //             ...(changedData.delete ?? row.delete
-  //               ? [{ id: scopeMappings.delete, name: "delete" }]
-  //               : []),
-  //           ],
-  //         };
-  //       });
-  //       await updateMenu(updatePayload);
-  //       showSuccess(t("successUpdate"));
-  //     }
+      let response;
 
-  //     // Updated parent rows
-  //     if (updatedParents.length > 0) {
-  //       const parentPayload = updatedParents.map((row) => ({
-  //         resourceId: row.id!,
-  //         name:
-  //           changedValues.find((cv) => cv.id === row.id)?.data.menu || row.menu,
-  //         displayName: row.menu,
-  //         attributes: {
-  //           parent: [],
-  //         },
-  //         scopes: [
-  //           ...(row.view ? [{ id: scopeMappings.view, name: "view" }] : []),
-  //           ...(row.create
-  //             ? [{ id: scopeMappings.create, name: "create" }]
-  //             : []),
-  //           ...(row.update
-  //             ? [{ id: scopeMappings.update, name: "update" }]
-  //             : []),
-  //           ...(row.delete
-  //             ? [{ id: scopeMappings.delete, name: "delete" }]
-  //             : []),
-  //         ],
-  //       }));
+      // Handle create requests
+      if (createPayload.length > 0) {
+        response = await CauHinhMenuServices.createCauHinhMenu({
+          payload: createPayload,
+        });
+      }
 
-  //       await updateMenu(parentPayload);
-  //       // showSuccess(t("parentsUpdated", { count: updatedParents.length }));
-  //     }
+      // Handle update requests
+      if (updatePayload.length > 0) {
+        response = await CauHinhMenuServices.updateCauHinhMenu({
+          payload: updatePayload,
+        });
+      }
 
-  //     setEditedRows([]);
-  //     setChangedValues([]);
-  //     await fetchData();
-  //   } catch (error: any) {
-  //     showError(t("updateFailed"));
-  //     console.error(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, [editedRows, changedValues, t, fetchData, mes, scopeMappings]);
+      if (response) {
+        // Extract message từ response
+        const message =
+          Array.isArray(response) && response.length > 0
+            ? response[0].message
+            : response.message;
 
-  // const handleModalOk = useCallback(() => {
-  //   if (newRowsCount <= 0) {
-  //     showError(notiMessage("errorUpdate"));
-  //     setLoading(false);
-  //     return;
-  //   }
+        // Show success với message từ server hoặc fallback
+        showSuccess(message || mes("saveSuccess"));
 
-  //   const timestamp = Date.now();
-  //   const newRows = Array.from({ length: newRowsCount }, (_, i) => ({
-  //     unitKey: `${timestamp}_${i}`,
-  //     menu: "",
-  //     screenName: "",
-  //     function: "",
-  //     all: true,
-  //     view: true,
-  //     create: true,
-  //     update: true,
-  //     delete: true,
-  //     type: "child",
-  //     isExpanded: false,
-  //     parent: selectedResourceName,
-  //   }));
-  //   setEditedRows((prev) => [...newRows, ...prev]);
+        // Clear edited rows
+        setEditedRows({});
 
-  //   setGridData((prev) => {
-  //     const filteredPrev = prev.filter(
-  //       (item) => item.type !== "child" || item.parent !== selectedResourceName
-  //     );
-  //     const updatedData = [...filteredPrev];
-  //     const parentIndex = updatedData.findIndex(
-  //       (item) => item.menu === selectedResourceName && item.type === "parent"
-  //     );
+        // Refresh data
+        await handleFetchMenu(currentPage, pageSize);
+      }
+    } catch (error: any) {
+      showError(error.response?.data?.message || mes("saveError"));
+    } finally {
+      setLoading(false);
+    }
+  }, [editedRows, t, mes, currentPage, pageSize, handleFetchMenu]);
 
-  //     if (parentIndex === -1) {
-  //       updatedData.push({
-  //         type: "parent",
-  //         menu: selectedResourceName,
-  //         screenName: "",
-  //         function: "",
-  //         all: false,
-  //         view: false,
-  //         create: false,
-  //         update: false,
-  //         delete: false,
-  //         isExpanded: true,
-  //         children: newRows,
-  //       });
-  //     } else {
-  //       const parent = updatedData[parentIndex];
-  //       updatedData[parentIndex] = {
-  //         ...parent,
-  //         children: [...(parent.children || []), ...newRows],
-  //         isExpanded: true,
-  //       };
-  //     }
+  const handleModalOk = useCallback(() => {
+    if (newRowsCount <= 0) {
+      showError(mes("createError"));
+      return;
+    }
 
-  //     const result: typeof updatedData = [];
-  //     const existingChildKeys = new Set(
-  //       updatedData
-  //         .filter((item) => item.type === "child")
-  //         .map((child) => child.unitKey)
-  //     );
-  //     for (const item of updatedData) {
-  //       result.push(item);
-  //       if (item.isExpanded && item.children?.length) {
-  //         for (const child of item.children) {
-  //           if (!existingChildKeys.has(child.unitKey)) {
-  //             result.push({
-  //               ...child,
-  //               type: "child",
-  //               isExpanded: child.isExpanded ?? false,
-  //               resourceId: child.id,
-  //             });
-  //           }
-  //         }
-  //       }
-  //     }
+    if (!selectedResourceName || selectedResourceName.trim() === "") {
+      showError(t("pleaseSelectResource"));
+      return;
+    }
 
-  //     return result;
-  //   });
+    try {
+      setLoading(true);
+      const timestamp = Date.now();
 
-  //   setIsModalVisible(false);
-  //   showSuccess(notiMessage("rowsAdded", { count: newRowsCount }));
-  // }, [newRowsCount, selectedResourceName, notiMessage]);
+      // Tạo children mới với default view
+      const newChildren = Array.from({ length: newRowsCount }, (_, i) => ({
+        id: `new_child_${timestamp}_${i}`,
+        unitKey: `${timestamp}_${i}`,
+        parentName: selectedResourceName,
+        resourceCode: "",
+        resourceName: "",
+        scopes: ["view"],
+        all: false,
+        view: true,
+        create: false,
+        update: false,
+        delete: false,
+        isParent: false,
+        level: 1,
+        expanded: false,
+      }));
+
+      setTreeData((prevTreeData) => {
+        // Tìm parent node đã tồn tại
+        const existingParentIndex = prevTreeData.findIndex(
+          (node) => node.isParent && node.parentName === selectedResourceName
+        );
+
+        let updatedTreeData: TreeNode[];
+
+        if (existingParentIndex !== -1) {
+          // Parent đã tồn tại - thêm children vào parent hiện tại
+          updatedTreeData = [...prevTreeData];
+          const existingParent = updatedTreeData[existingParentIndex];
+          const currentChildren = existingParent.children || [];
+          const allChildren = [...currentChildren, ...newChildren];
+
+          // Recalculate parent checkboxes dựa trên tất cả children
+          const parentCheckboxes = calculateParentCheckboxes(allChildren);
+
+          updatedTreeData[existingParentIndex] = {
+            ...existingParent,
+            children: allChildren,
+            expanded: true,
+            ...parentCheckboxes,
+          };
+        } else {
+          // Parent chưa tồn tại - tạo parent mới
+          const parentCheckboxes = calculateParentCheckboxes(newChildren);
+          const newParentNode: TreeNode = {
+            id: `parent_${timestamp}`,
+            unitKey: `parent_${timestamp}`,
+            parentName: selectedResourceName,
+            resourceCode: "",
+            resourceName: "",
+            scopes: [],
+            all: parentCheckboxes.all,
+            view: parentCheckboxes.view,
+            create: parentCheckboxes.create,
+            update: parentCheckboxes.update,
+            delete: parentCheckboxes.delete,
+            isParent: true,
+            level: 0,
+            expanded: true,
+            children: newChildren,
+          };
+
+          updatedTreeData = [...prevTreeData, newParentNode];
+        }
+
+        // Cập nhật displayData ngay trong cùng lần setState
+        const flattenedData = flattenTreeData(updatedTreeData);
+        setDisplayData(flattenedData);
+
+        return updatedTreeData;
+      });
+
+      // Reset modal state
+      setIsModalVisible(false);
+      setNewRowsCount(1);
+      setSelectedResourceName("");
+      showSuccess(mes("rowsAdded", { count: newRowsCount }));
+    } catch (error: any) {
+      showError(error.response?.data?.message || mes("addError"));
+    } finally {
+      setLoading(false);
+    }
+  }, [newRowsCount, selectedResourceName, mes, t]);
 
   const handleModalCancel = useCallback(() => {
     setIsModalVisible(false);
   }, []);
 
+  const buttonProps = {
+    return: (
+      <>
+        <ActionButtons
+          onAdd={addRow}
+          onDelete={handleDeleteRow}
+          onSave={onSave}
+          rowSelected={rowSelected}
+        />
+      </>
+    ),
+  };
+
   return (
     <>
       <Modal
-        title={notiMessage("addNewRow")}
-        visible={isModalVisible}
-        // onOk={handleModalOk}
+        title={mes("addNewRow")}
+        open={isModalVisible}
+        onOk={handleModalOk}
         onCancel={handleModalCancel}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -624,12 +708,6 @@ function Page() {
         layoutType={1}
         content1={
           <>
-            <ActionButtons
-              onAdd={addRow}
-              onDelete={handleDeleteRow}
-              // onSave={onSave}
-              rowSelected={rowSelected}
-            />
             <AgGridComponent
               showSearch={true}
               inputSearchProps={{
@@ -642,11 +720,18 @@ function Page() {
               gridRef={gridRef}
               total={totalItems}
               pagination={true}
-              maxRowsVisible={5}
+              maxRowsVisible={12}
               onChangePage={handlePageChange}
               onSelectionChanged={onSelectionChanged}
+              onCellValueChanged={onCellValueChanged}
               columnFlex={0}
-              showActionButtons={false}
+              showActionButtons={true}
+              actionButtonsProps={{
+                hideAdd: true,
+                hideDelete: true,
+                hideSave: true,
+                buttonProps: buttonProps,
+              }}
             />
           </>
         }

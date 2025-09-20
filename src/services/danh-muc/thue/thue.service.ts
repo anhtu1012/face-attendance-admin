@@ -23,17 +23,23 @@ class DanhMucThueServicesBase extends AxiosService {
     );
   }
 
-  async createDanhMucThue(payload: CreateThueRequest): Promise<any> {
+  createDanhMucThue = async (data: CreateThueRequest[]): Promise<any> => {
+    const payload = {
+      payload: data,
+    };
     return this.post(`${this.basePath}`, payload);
-  }
+  };
 
-  async updateDanhMucThue(payload: UpdateThueRequest): Promise<any> {
+  updateDanhMucThue = async (data: UpdateThueRequest[]): Promise<any> => {
+    const payload = {
+      payload: data,
+    };
     return this.put(`${this.basePath}`, payload);
-  }
+  };
 
-  async deleteDanhMucThue(id: string): Promise<any> {
+  deleteDanhMucThue = async (id: string): Promise<any> => {
     return this.delete(`${this.basePath}/${id}`);
-  }
+  };
 }
 
 const DanhMucThueServices = new DanhMucThueServicesBase();
