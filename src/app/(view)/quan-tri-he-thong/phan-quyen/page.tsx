@@ -25,7 +25,7 @@ function Page() {
   const gridRef = useRef<AgGridReact>({} as any);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(1000);
   const [rowSelected, setRowSelected] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [editedRows, setEditedRows] = useState<{ [key: string]: TreeNode }>({});
@@ -583,11 +583,13 @@ function Page() {
             gridRef={gridRef}
             total={totalItems}
             pagination={true}
+            paginationPageSize={pageSize}
+            paginationCurrentPage={currentPage}
             maxRowsVisible={12}
             onChangePage={handlePageChange}
             onSelectionChanged={onSelectionChanged}
             onCellValueChanged={onCellValueChanged}
-            columnFlex={0}
+            columnFlex={1}
             showActionButtons={true}
             actionButtonsProps={{
               hideAdd: true,

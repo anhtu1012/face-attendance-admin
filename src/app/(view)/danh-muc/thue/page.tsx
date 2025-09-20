@@ -25,8 +25,8 @@ function Page() {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("TAX");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [, setTotalItems] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(5);
+  const [totalItem, setTotalItems] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(defaultPageSize);
   const [loading, setLoading] = useState(false);
   const [rowData, setRowData] = useState<ThueItem[]>([]);
   const gridRef = useRef<AgGridReact>({} as AgGridReact);
@@ -154,12 +154,18 @@ function Page() {
           loading={loading}
           columnDefs={columnDefs}
           gridRef={gridRef}
+          total={totalItem}
           onCellValueChanged={dataGrid.onCellValueChanged}
           onSelectionChanged={dataGrid.onSelectionChanged}
           pagination={true}
           paginationPageSize={pageSize}
           paginationCurrentPage={currentPage}
-          maxRowsVisible={5}
+          onChangePage={(currentPage, pageSize) => {
+            setCurrentPage(currentPage);
+            setPageSize(pageSize);
+            fetchData(currentPage, pageSize, quickSearchText);
+          }}
+          maxRowsVisible={15}
           columnFlex={1}
           onQuicksearch={dataGrid.handleQuicksearch}
           showActionButtons={true}

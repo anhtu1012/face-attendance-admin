@@ -29,7 +29,7 @@ function Page() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(1000);
   const [loading, setLoading] = useState(false);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [displayData, setDisplayData] = useState<TreeNode[]>([]);
@@ -40,7 +40,6 @@ function Page() {
   const [parentNameOptions, setparentNameOptions] = useState<
     { label: string; value: string }[]
   >([]);
-
   const handleFetchMenu = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
       setLoading(true);
@@ -720,11 +719,13 @@ function Page() {
               gridRef={gridRef}
               total={totalItems}
               pagination={true}
-              maxRowsVisible={12}
+              paginationPageSize={pageSize}
+              paginationCurrentPage={currentPage}
+              maxRowsVisible={30}
               onChangePage={handlePageChange}
               onSelectionChanged={onSelectionChanged}
               onCellValueChanged={onCellValueChanged}
-              columnFlex={0}
+              columnFlex={1}
               showActionButtons={true}
               actionButtonsProps={{
                 hideAdd: true,
