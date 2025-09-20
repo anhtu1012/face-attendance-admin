@@ -71,6 +71,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
   const [duplicateIDs, setDuplicateIDs] = useState<string[]>([]);
   const [changedValues, setChangedValues] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [hasValidationErrors, setHasValidationErrors] = useState(false);
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const dispatch = useDispatch();
 
@@ -83,6 +84,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
     // Only update if there are actual changes to avoid infinite loops
     setRowData((prevRowData) => {
       let hasChanges = false;
+      let hasErrors = false;
       const newRowData = prevRowData.map((row) => {
         const itemId = getItemId(row);
         const errorMessages = collectErrorMessagesForItem(itemId);
@@ -92,6 +94,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
           hasChanges = true;
           if (errorMessages) {
             // Có lỗi thì thêm isError và isSaved
+            hasErrors = true;
             return {
               ...row,
               isError: true,
@@ -112,8 +115,15 @@ export function useDataGridOperations<T extends Record<string, any>>({
             };
           }
         }
+        // Check if existing row has error
+        if ((row as any).isError) {
+          hasErrors = true;
+        }
         return row;
       });
+
+      // Update hasValidationErrors
+      setHasValidationErrors(hasErrors);
 
       // Only return new array if there are actual changes
       return hasChanges ? newRowData : prevRowData;
@@ -635,6 +645,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
     duplicateIDs,
     changedValues,
     isEditing,
+    hasValidationErrors,
 
     // State setters
     setRowData,

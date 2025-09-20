@@ -42,6 +42,7 @@
     "invalidRowCount": "Số dòng không hợp lệ",
     "duplicateIDs": "Bị trùng lặp giá trị không được phép",
     "cannotSaveDuplicates": "Không thể lưu khi có dữ liệu trùng lặp",
+    "cannotSaveErrors": "Không thể lưu khi có lỗi validation",
     "addError": "Lỗi khi thêm",
     "errorUpdate": "Lỗi khi cập nhật",
     "noRowsSelected": "Không có dòng nào được chọn",
@@ -87,7 +88,8 @@
     "cancel": "Hủy",
     "rownumber": "Số dòng",
     "confirmDelete": "Xác nhận xóa",
-    "cannotSaveDuplicates": "Không thể lưu khi có dữ liệu trùng lặp"
+    "cannotSaveDuplicates": "Không thể lưu khi có dữ liệu trùng lặp",
+    "cannotSaveErrors": "Không thể lưu khi có lỗi validation"
   },
   "Ctable": {
     "total": "Tổng",

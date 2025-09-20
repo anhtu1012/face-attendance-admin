@@ -35,6 +35,8 @@ export type ActionButtonsProps = {
   saveButtonContent?: React.ReactNode; // add this line
   // New prop to disable save when there are duplicates
   hasDuplicates?: boolean;
+  // New prop to disable save when there are validation errors
+  hasErrors?: boolean;
 };
 
 const ActionButtons: React.FC<ActionButtonsProps> = React.memo(
@@ -56,6 +58,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = React.memo(
     buttonProps, // Add buttonProps to destructuring
     saveButtonContent, // add this line
     hasDuplicates = false, // add this line
+    hasErrors = false, // add this line
   }) => {
     const t = useTranslations("ActionButtons");
     const url = getCookie("_url");
@@ -150,14 +153,20 @@ const ActionButtons: React.FC<ActionButtonsProps> = React.memo(
           </Button>
           {/* Button Save */}
           <Tooltip
-            title={hasDuplicates ? t("cannotSaveDuplicates") : undefined}
+            title={
+              hasDuplicates
+                ? t("cannotSaveDuplicates")
+                : hasErrors
+                ? t("cannotSaveErrors")
+                : undefined
+            }
             placement="top"
           >
             <Button
               className="btn-save"
               type="primary"
               onClick={onSave}
-              disabled={!canSave || hasDuplicates}
+              disabled={!canSave || hasDuplicates || hasErrors}
               style={{
                 padding: "18px",
                 border: "1px solid #106754",
@@ -165,7 +174,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = React.memo(
                 backgroundColor: "white",
                 color: "#106754",
                 fontWeight: "bold",
-                opacity: !canSave || hasDuplicates ? 0.3 : 1,
+                opacity: !canSave || hasDuplicates || hasErrors ? 0.3 : 1,
                 // display: hideSave ? "none" : !hiddenSave ? "none" : "",
                 display: hideSave ? "none" : "",
               }}

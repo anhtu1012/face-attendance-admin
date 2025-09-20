@@ -171,6 +171,7 @@ function Page() {
             modalInitialCount: 1,
             onModalOk: dataGrid.handleModalOk,
             hasDuplicates: dataGrid.duplicateIDs.length > 0,
+            hasErrors: dataGrid.hasValidationErrors,
           }}
         />
       }

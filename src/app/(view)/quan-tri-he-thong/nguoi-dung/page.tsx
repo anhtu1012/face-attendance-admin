@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import AgGridComponent from "@/components/basicUI/cTableAG";
+import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
 import { useDataGridOperations } from "@/hooks/useDataGridOperations";
 import { showError } from "@/hooks/useNotification";
 import NguoiDungServices from "@/services/admin/quan-tri-he-thong/nguoi-dung.service";
-import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
-import { validateField } from "@/utils/client/validateTable/validateField ";
-import { getItemId } from "@/utils/client/validationHelpers";
+import {
+  getItemId,
+  useHasItemFieldError,
+  useItemErrorCellStyle,
+} from "@/utils/client/validationHelpers";
+import { useSelector } from "react-redux";
+import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
 import { formatFullDateTime } from "@/utils/dateTime";
 import { CellStyle, ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
@@ -27,6 +31,10 @@ function Page() {
   const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
     undefined
   );
+  const itemErrorsFromRedux = useSelector(selectAllItemErrors);
+  const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
+  const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
+  console.log("itemErrorsFromRedux", itemErrorsFromRedux);
 
   const handleFetchUser = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
@@ -70,24 +78,40 @@ function Page() {
         headerName: t("roleCode"),
         editable: true,
         width: 180,
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "roleCode", params);
+        },
       },
       {
         field: "userName",
         headerName: t("userName"),
         editable: true,
         width: 180,
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "userName", params);
+        },
       },
       {
         field: "lastName",
         headerName: t("lastName"),
         editable: true,
         width: 150,
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "lastName", params);
+        },
       },
       {
         field: "firstName",
         headerName: t("firstName"),
         editable: true,
         width: 150,
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "firstName", params);
+        },
       },
       {
         field: "password",
@@ -101,6 +125,10 @@ function Page() {
         headerName: "Email",
         editable: true,
         width: 180,
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "email", params);
+        },
       },
       {
         field: "faceImg",
@@ -117,6 +145,10 @@ function Page() {
           const date = formatFullDateTime(params.value, true);
           return date ? date : "";
         },
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "birthday", params);
+        },
       },
       {
         field: "gender",
@@ -125,12 +157,20 @@ function Page() {
         width: 150,
         valueGetter: (params) =>
           params.data.gender === "M" ? "Male" : "Female",
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "gender", params);
+        },
       },
       {
         field: "phone",
         headerName: t("phone"),
         editable: true,
         width: 170,
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "phone", params);
+        },
       },
       {
         field: "address",
@@ -146,7 +186,7 @@ function Page() {
         cellStyle: centerStyle,
       },
     ],
-    [centerStyle, t]
+    [centerStyle, t, itemErrorCellStyle]
   );
 
   const handlePageChange = (page: number, size: number) => {
@@ -154,42 +194,6 @@ function Page() {
     setPageSize(size);
     handleFetchUser(page, size);
   };
-
-  //#region VALIDATE ROW DATA
-  const validateRowData = useCallback(
-    (data: NguoiDungItem): boolean => {
-      let isValid = true;
-      const itemId = getItemId(data);
-      // const errorMessages: string[] = [];
-
-      const requiredFields: Array<{
-        field: keyof NguoiDungItem;
-        label: string;
-      }> = [
-        { field: "userName", label: t("userName") },
-        { field: "password", label: t("password") },
-        { field: "roleCode", label: t("roleCode") },
-        { field: "firstName", label: t("firstName") },
-        { field: "lastName", label: t("lastName") },
-        { field: "email", label: t("email") },
-        { field: "birthDay", label: t("birthDay") },
-        { field: "gender", label: t("gender") },
-        { field: "phone", label: t("phone") },
-        { field: "isActive", label: t("isActive") },
-      ];
-
-      requiredFields.forEach(({ field, label }) => {
-        if (
-          !validateField(label, data[field], true, field, "string", itemId, mes)
-        ) {
-          isValid = false;
-        }
-      });
-      return isValid;
-    },
-    [mes, t]
-  );
-  //#endregion
 
   const dataGrid = useDataGridOperations<NguoiDungItem>({
     gridRef,
@@ -212,11 +216,29 @@ function Page() {
     mes,
     rowData,
     setRowData,
+    requiredFields: [
+      { field: "userName", label: t("userName") },
+      { field: "password", label: t("password") },
+      { field: "roleCode", label: t("roleCode") },
+      { field: "firstName", label: t("firstName") },
+      { field: "lastName", label: t("lastName") },
+      { field: "email", label: t("email") },
+      { field: "birthDay", label: t("birthDay") },
+      { field: "gender", label: t("gender") },
+      { field: "phone", label: t("phone") },
+      { field: "isActive", label: t("isActive") },
+    ],
+    t,
+    // Quicksearch parameters
+    setCurrentPage,
+    setPageSize,
+    setQuickSearchText,
+    fetchData: handleFetchUser,
+    columnDefs,
   });
 
   // Create save handler (chờ API service được implement)
   const handleSave = dataGrid.createSaveHandler(
-    validateRowData,
     NguoiDungServices.createNguoiDung,
     NguoiDungServices.updateNguoiDung,
     () => handleFetchUser(currentPage, pageSize, quickSearchText)
@@ -228,45 +250,20 @@ function Page() {
     () => handleFetchUser(currentPage, pageSize, quickSearchText)
   );
 
-  const handleQuicksearch = useCallback(
-    (
-      searchText: string | "",
-      selectedFilterColumns: any[],
-      filterValues: string | "",
-      paginationSize: number
-    ) => {
-      setCurrentPage(1);
-      setPageSize(paginationSize);
-
-      if (!searchText && !filterValues) {
-        setQuickSearchText(undefined);
-        handleFetchUser(1, paginationSize, undefined);
-        return;
-      }
-      const params = buildQuicksearchParams(
-        searchText,
-        selectedFilterColumns,
-        filterValues,
-        columnDefs
-      );
-      setQuickSearchText(params);
-      handleFetchUser(1, paginationSize, params);
-    },
-    [columnDefs, handleFetchUser]
-  );
+  if (!dataGrid.isClient) {
+    return null;
+  }
 
   return (
     <div>
       <LayoutContent
         layoutType={1}
         content1={
-          <AgGridComponent
+          <AgGridComponentWrapper
             showSearch={true}
-            loading={loading}
             rowData={rowData}
+            loading={loading}
             columnDefs={columnDefs}
-            onCellValueChanged={dataGrid.onCellValueChanged}
-            onSelectionChanged={dataGrid.onSelectionChanged}
             gridRef={gridRef}
             total={totalItems}
             paginationPageSize={pageSize}
@@ -274,7 +271,7 @@ function Page() {
             pagination={true}
             maxRowsVisible={10}
             onChangePage={handlePageChange}
-            onQuicksearch={handleQuicksearch}
+            onQuicksearch={dataGrid.handleQuicksearch}
             columnFlex={0}
             showActionButtons={true}
             actionButtonsProps={{
@@ -284,6 +281,8 @@ function Page() {
               showAddRowsModal: true,
               modalInitialCount: 1,
               onModalOk: dataGrid.handleModalOk,
+              hasDuplicates: dataGrid.duplicateIDs.length > 0,
+              hasErrors: dataGrid.hasValidationErrors,
             }}
           />
         }
