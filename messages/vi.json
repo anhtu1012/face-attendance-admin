@@ -285,7 +285,8 @@
     "gioNghiTrua": "Giờ nghĩ trưa",
     "ngayTao": "Ngày tạo",
     "ngayCapNhat": "Ngày cập nhật",
-    "vuilongNhapThoiGianNghiTrua": "Vui lòng nhập giờ nghĩ trưa"
+    "vuilongNhapThoiGianNghiTrua": "Vui lòng nhập giờ nghĩ trưa",
+    "isActive": "Trạng thái"
   },
   "DanhMucChiNhanh": {
     "maChiNhanh": "Mã chi nhánh",

@@ -25,7 +25,7 @@ function Page() {
   const gridRef = useRef<AgGridReact>({} as AgGridReact);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(20);
   const [loading, setLoading] = useState(false);
   const [rowData, setRowData] = useState<NguoiDungItem[]>([]);
   const [quickSearchText, setQuickSearchText] = useState<string | undefined>(

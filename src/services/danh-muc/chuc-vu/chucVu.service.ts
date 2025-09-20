@@ -2,19 +2,19 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import {
-  CreateFormRequest,
-  UpdateFormRequest,
-} from "@/dtos/danhMuc/don/don.request.dto";
-import { FormResponseGetItem } from "@/dtos/danhMuc/don/don.response.dto";
+  CreatePositionRequest,
+  UpdatePositionRequest,
+} from "@/dtos/danhMuc/chuc-vu/chucVu.request.dto";
+import { DanhMucChucVuResponseGetItem } from "@/dtos/danhMuc/chuc-vu/chucVu.response.dto";
 
-class DanhMucDonServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/category/form";
+class DanhMucChucVuServicesBase extends AxiosService {
+  protected readonly basePath = "/v1/category/position";
 
-  async getDanhMucDon(
+  async getDanhMucChucVu(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,
     params?: Record<string, string | number | boolean>
-  ): Promise<FormResponseGetItem> {
+  ): Promise<DanhMucChucVuResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}`,
       searchFilter,
@@ -23,24 +23,24 @@ class DanhMucDonServicesBase extends AxiosService {
     );
   }
 
-  createDanhMucDon = async (data: CreateFormRequest[]): Promise<any> => {
+  createDanhMucChucVu = async (data: CreatePositionRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.post(`${this.basePath}`, payload);
   };
 
-  updateDanhMucDon = async (data: UpdateFormRequest[]): Promise<any> => {
+  updateDanhMucChucVu = async (data: UpdatePositionRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.put(`${this.basePath}`, payload);
   };
 
-  deleteDanhMucDon = async (id: string): Promise<any> => {
+  deleteDanhMucChucVu = async (id: string): Promise<any> => {
     return this.delete(`${this.basePath}/${id}`);
   };
 }
 
-const DanhMucDonServices = new DanhMucDonServicesBase();
-export default DanhMucDonServices;
+const DanhMucChucVuServices = new DanhMucChucVuServicesBase();
+export default DanhMucChucVuServices;

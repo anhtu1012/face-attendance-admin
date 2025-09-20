@@ -2,19 +2,19 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import {
-  CreateFormRequest,
-  UpdateFormRequest,
-} from "@/dtos/danhMuc/don/don.request.dto";
-import { FormResponseGetItem } from "@/dtos/danhMuc/don/don.response.dto";
+  CreateTroCapRequest,
+  UpdateTroCapRequest,
+} from "@/dtos/danhMuc/tro-cap/troCap.request.dto";
+import { TroCapResponseGetItem } from "@/dtos/danhMuc/tro-cap/troCap.response.dto";
 
-class DanhMucDonServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/category/form";
+class DanhMucTroCapServicesBase extends AxiosService {
+  protected readonly basePath = "/v1/category/allowance";
 
-  async getDanhMucDon(
+  async getDanhMucTroCap(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,
     params?: Record<string, string | number | boolean>
-  ): Promise<FormResponseGetItem> {
+  ): Promise<TroCapResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}`,
       searchFilter,
@@ -23,24 +23,24 @@ class DanhMucDonServicesBase extends AxiosService {
     );
   }
 
-  createDanhMucDon = async (data: CreateFormRequest[]): Promise<any> => {
+  createDanhMucTroCap = async (data: CreateTroCapRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.post(`${this.basePath}`, payload);
   };
 
-  updateDanhMucDon = async (data: UpdateFormRequest[]): Promise<any> => {
+  updateDanhMucTroCap = async (data: UpdateTroCapRequest[]): Promise<any> => {
     const payload = {
       payload: data,
     };
     return this.put(`${this.basePath}`, payload);
   };
 
-  deleteDanhMucDon = async (id: string): Promise<any> => {
+  deleteDanhMucTroCap = async (id: string): Promise<any> => {
     return this.delete(`${this.basePath}/${id}`);
   };
 }
 
-const DanhMucDonServices = new DanhMucDonServicesBase();
-export default DanhMucDonServices;
+const DanhMucTroCapServices = new DanhMucTroCapServicesBase();
+export default DanhMucTroCapServices;
