@@ -41,6 +41,9 @@ interface UseMouseHandlersProps {
   setMultiSelectionPattern: (value: unknown[][] | null) => void;
   columnDefs: ColDef[];
   gridWrapperRef: React.RefObject<HTMLDivElement>;
+  gridRef: React.RefObject<{
+    api: { refreshCells: (params: unknown) => void };
+  }>;
   showFillHandle: (event: CellEvent) => void;
   handleFillDrag: (event: CellEvent) => void;
   isDraggingFillRef: React.RefObject<boolean>;
@@ -66,6 +69,7 @@ export const useMouseHandlers = ({
   setMultiSelectionPattern,
   columnDefs,
   gridWrapperRef,
+  gridRef,
   showFillHandle,
   handleFillDrag,
   isDraggingFillRef,
@@ -103,6 +107,13 @@ export const useMouseHandlers = ({
         // Đánh dấu ô đầu tiên là đã chọn
         setSelectedCells(new Set([cellId]));
 
+        // Force refresh cells to update selection styling immediately
+        setTimeout(() => {
+          if (gridRef?.current?.api) {
+            gridRef.current.api.refreshCells({ force: true });
+          }
+        }, 0);
+
         // Bật trạng thái đang chọn (isSelecting = true)
         setIsSelecting(true);
         isSelectingRef.current = true;
@@ -128,6 +139,7 @@ export const useMouseHandlers = ({
       setIsSelecting,
       isSelectingRef,
       gridWrapperRef,
+      gridRef,
       showFillHandle,
       setMultiSelectionPattern,
       setMultiSelectionBounds,

@@ -41,6 +41,7 @@
     "rowsAdded": "Added successfully {count} rows",
     "invalidRowCount": "Invalid row count",
     "duplicateIDs": "Duplicate fields are not allowed",
+    "cannotSaveDuplicates": "Cannot save when there are duplicate values",
     "addError": "Error adding",
     "errorUpdate": "Error updating",
     "noRowsSelected": "No rows selected",
@@ -110,7 +111,8 @@
     "ok": "OK",
     "cancel": "Cancel",
     "rownumber": "Row Number",
-    "confirmDelete": "Confirm Delete"
+    "confirmDelete": "Confirm Delete",
+    "cannotSaveDuplicates": "Cannot save when there are duplicate values"
   },
   "Ctable": {
     "total": "Total",

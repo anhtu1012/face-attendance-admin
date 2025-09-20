@@ -41,6 +41,7 @@
     "rowsAdded": "Đã thêm thành công {count} dòng",
     "invalidRowCount": "Số dòng không hợp lệ",
     "duplicateIDs": "Bị trùng lặp giá trị không được phép",
+    "cannotSaveDuplicates": "Không thể lưu khi có dữ liệu trùng lặp",
     "addError": "Lỗi khi thêm",
     "errorUpdate": "Lỗi khi cập nhật",
     "noRowsSelected": "Không có dòng nào được chọn",
@@ -85,7 +86,8 @@
     "ok": "OK",
     "cancel": "Hủy",
     "rownumber": "Số dòng",
-    "confirmDelete": "Xác nhận xóa"
+    "confirmDelete": "Xác nhận xóa",
+    "cannotSaveDuplicates": "Không thể lưu khi có dữ liệu trùng lặp"
   },
   "Ctable": {
     "total": "Tổng",

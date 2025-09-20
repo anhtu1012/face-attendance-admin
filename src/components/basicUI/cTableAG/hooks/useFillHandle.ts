@@ -240,6 +240,11 @@ export const useFillHandle = ({
   // Hàm tính toán fill target cells dựa trên vị trí chuột
   const calculateFillTargetCells = useCallback(
     (mouseX: number, mouseY: number) => {
+      console.log("calculateFillTargetCells called", {
+        mouseX,
+        mouseY,
+        isDraggingFill,
+      });
       if (!isDraggingFill || !gridWrapperRef.current) return;
 
       // Throttle để tránh tính toán quá nhiều lần
@@ -258,6 +263,7 @@ export const useFillHandle = ({
       }
 
       const elementAtPoint = document.elementFromPoint(mouseX, mouseY);
+      console.log("elementAtPoint found", !!elementAtPoint);
 
       // Khôi phục pointer events của fill-handle
       if (fillHandleElement) {
@@ -270,6 +276,7 @@ export const useFillHandle = ({
       if (elementAtPoint) {
         // Tìm cell element gần nhất
         const cellElement = elementAtPoint.closest(".ag-cell");
+        console.log("cellElement found", !!cellElement);
         if (cellElement) {
           // Lấy thông tin row và column từ cell element
           const rowElement = cellElement.closest("[row-index]");
@@ -324,6 +331,12 @@ export const useFillHandle = ({
       const targetColIndex = columnOrder.indexOf(targetColField);
 
       const fillCells = new Set<string>();
+      console.log("Starting fill cells calculation", {
+        targetRowIndex,
+        targetColField,
+        targetColIndex,
+        selectedCellsSize: selectedCells.size,
+      });
 
       // Trường hợp chọn nhiều ô: kéo để fill cả block theo pattern
       if (
@@ -373,6 +386,10 @@ export const useFillHandle = ({
 
       setFillTargetCells(fillCells);
       setSelectedCells(fillCells);
+      console.log("Fill cells calculated", {
+        fillCellsSize: fillCells.size,
+        fillCells: Array.from(fillCells),
+      });
 
       // Cập nhật vị trí fill handle đến ô cuối cùng trong vùng fill
       if (fillCells.size > 0) {
@@ -434,6 +451,10 @@ export const useFillHandle = ({
   // Hàm xử lý khi drag fill handle qua các cell
   const handleFillDrag = useCallback(
     (event: CellEvent) => {
+      console.log("handleFillDrag called", {
+        rowIndex: event.rowIndex,
+        colField: event.colDef?.field,
+      });
       if (!isDraggingFill) return;
 
       // Xử lý auto-scroll dựa trên vị trí chuột
@@ -497,6 +518,9 @@ export const useFillHandle = ({
 
         setFillTargetCells(fillCells);
         setSelectedCells(fillCells);
+        console.log("handleFillDrag completed", {
+          fillCellsSize: fillCells.size,
+        });
       }
     },
     [

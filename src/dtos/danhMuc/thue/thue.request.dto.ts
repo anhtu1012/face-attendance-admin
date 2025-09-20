@@ -5,7 +5,7 @@ import { ThueItemSchema } from "./thue.dto";
  * Schema and type for creating a shift
  */
 export const CreateThueSchema = z.object({
-  unitKey: z.string().min(1, "Mã thuế làm là bắt buộc"),
+  unitKey: z.string().optional(), // unitKey is auto-generated, not user-provided
   taxCode: z.string().min(1, "Tên thuế làm là bắt buộc"),
   taxName: z.string().min(1, "Giờ bắt đầu là bắt buộc"),
   taxPercent: z.number().min(0, "Phần trăm là bắt buộc"),

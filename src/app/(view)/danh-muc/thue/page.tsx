@@ -36,6 +36,7 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
+  console.log("itemErrorsFromRedux", itemErrorsFromRedux);
 
   // Define columnDefs first before dataGrid hook
   const columnDefs: ColDef[] = useMemo(
@@ -128,7 +129,6 @@ function Page() {
 
   // Create save handler (chờ API service được implement)
   const handleSave = dataGrid.createSaveHandler(
-    undefined, // validateRowData is now in the hook config
     DanhMucThueServices.createDanhMucThue,
     DanhMucThueServices.updateDanhMucThue,
     () => fetchData(currentPage, pageSize, quickSearchText)
@@ -170,6 +170,7 @@ function Page() {
             showAddRowsModal: true,
             modalInitialCount: 1,
             onModalOk: dataGrid.handleModalOk,
+            hasDuplicates: dataGrid.duplicateIDs.length > 0,
           }}
         />
       }

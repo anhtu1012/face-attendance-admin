@@ -9,6 +9,7 @@ import {
   selectAllItemErrors,
   addItemError,
   removeItemError,
+  clearAllItemErrors,
 } from "@/lib/store/slices/validationErrorsSlice";
 import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
 import { useCollectErrorMessagesForItem } from "@/utils/client/errorMessageHelpers";
@@ -53,7 +54,6 @@ export function useDataGridOperations<T extends Record<string, any>>({
   duplicateCheckField,
   rowData,
   setRowData,
-  validateRowData: configValidateRowData,
   handleQuicksearch: configHandleQuicksearch,
   requiredFields,
   t,
@@ -90,10 +90,27 @@ export function useDataGridOperations<T extends Record<string, any>>({
 
         if (errorMessages !== currentErrorMessages) {
           hasChanges = true;
-          return {
-            ...row,
-            errorMessages: errorMessages,
-          };
+          if (errorMessages) {
+            // Có lỗi thì thêm isError và isSaved
+            return {
+              ...row,
+              isError: true,
+              isSaved: false,
+              errorMessages: errorMessages,
+            };
+          } else {
+            // Không có lỗi thì bỏ isError và isSaved
+            const rowWithoutErrorFlags = Object.keys(row).reduce((acc, key) => {
+              if (key !== "isError" && key !== "isSaved") {
+                acc[key] = row[key];
+              }
+              return acc;
+            }, {} as any);
+            return {
+              ...rowWithoutErrorFlags,
+              errorMessages: errorMessages,
+            };
+          }
         }
         return row;
       });
@@ -109,10 +126,10 @@ export function useDataGridOperations<T extends Record<string, any>>({
   // Generate validateRowData if requiredFields is provided
   const generatedValidateRowData = useCallback(
     (data: T): boolean => {
-      if ((data as any).errorMessages) return false; // If there are any errors in the store, invalid
       if (!requiredFields || !t || !mes) return true; // if not provided, assume valid
       let isValid = true;
       const itemId = getItemId(data);
+
       requiredFields.forEach(({ field, label }) => {
         if (
           !validateField(
@@ -213,18 +230,25 @@ export function useDataGridOperations<T extends Record<string, any>>({
             (id, index) => allIDs.indexOf(id) !== index
           );
           const duplicateSet = new Set(duplicates);
+          console.log("Duplicate IDs found:", Array.from(duplicateSet));
 
           // Clear previous duplicate errors
           rowData.forEach((row) => {
             const itemId = getItemId(row);
             dispatch(
-              removeItemError({ itemId, field: String(duplicateCheckField) })
+              removeItemError({
+                itemId,
+                field: String(duplicateCheckField),
+              })
             );
           });
 
           // Add errors for duplicates
           rowData.forEach((row) => {
             const value = row[duplicateCheckField];
+            console.log("Checking value for duplicates:", value);
+            console.log("duplicateCheckField:", duplicateCheckField);
+
             if (value && duplicateSet.has(value)) {
               const itemId = getItemId(row);
               const errorMessage = mes("duplicateIDs");
@@ -241,6 +265,51 @@ export function useDataGridOperations<T extends Record<string, any>>({
           });
 
           setDuplicateIDs(Array.from(new Set(duplicates)));
+        }
+
+        // Immediate required field validation
+        if (requiredFields && t && mes) {
+          const updatedData = { ...data, [fieldName]: newValue };
+
+          requiredFields.forEach(({ field, label }) => {
+            const fieldValue = updatedData[field];
+            const isValid = validateField(
+              label,
+              fieldValue,
+              true,
+              String(field),
+              "string",
+              itemId,
+              (key, params) => {
+                try {
+                  return mes(key, params);
+                } catch {
+                  return `${label} không được để trống`;
+                }
+              }
+            );
+
+            if (!isValid) {
+              // Add error for invalid required field
+              dispatch(
+                addItemError({
+                  itemId,
+                  error: {
+                    field: String(field),
+                    message: `${label} không được để trống`,
+                  },
+                })
+              );
+            } else {
+              // Remove error if field is now valid
+              dispatch(
+                removeItemError({
+                  itemId,
+                  field: String(field),
+                })
+              );
+            }
+          });
         }
 
         // Refresh cells
@@ -262,23 +331,34 @@ export function useDataGridOperations<T extends Record<string, any>>({
       dispatch,
       mes,
       setIsEditing,
+      requiredFields,
+      t,
     ]
   );
+  console.log("duplicateIDs", duplicateIDs);
 
   // Save function - generic
   const createSaveHandler = useCallback(
     (
-      validateRowData?: (data: T) => boolean,
       addAPI?: (item: any) => Promise<any>,
       updateAPI?: (item: any) => Promise<any>,
       fetchData?: () => Promise<void>
     ) => {
-      const actualValidate =
-        validateRowData || configValidateRowData || generatedValidateRowData;
+      const actualValidate = generatedValidateRowData;
+
       if (!actualValidate) {
         throw new Error("validateRowData is required");
       }
       return async () => {
+        console.log("editedRows", editedRows);
+        console.log("changedValues", changedValues);
+
+        // Check for duplicates before saving
+        if (duplicateIDs.length > 0) {
+          showError(mes("duplicateIDs"));
+          return;
+        }
+
         if (editedRows.length > 0) {
           const newRows = editedRows.filter(
             (row) => !row.id && row.unitKey !== undefined
@@ -321,6 +401,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
             // Add new rows
             if (newRows.length > 0 && addAPI) {
               await addAPI(newRows);
+              dispatch(clearAllItemErrors());
               showSuccess(mes("rowsAdded", { count: newRows.length }));
             }
 
@@ -335,6 +416,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
                 showSuccess(
                   mes("customersUpdated", { count: changedValues.length })
                 );
+                dispatch(clearAllItemErrors());
               } catch (updateError) {
                 throw updateError;
               }
@@ -355,21 +437,7 @@ export function useDataGridOperations<T extends Record<string, any>>({
             setEditedRows([]);
             setDuplicateIDs([]);
             setChangedValues([]);
-            setIsEditing(false); // Reset editing state
-
-            // Clear duplicate errors if field is specified
-            if (duplicateCheckField) {
-              rowData.forEach((row) => {
-                const itemId = getItemId(row);
-                dispatch(
-                  removeItemError({
-                    itemId,
-                    field: String(duplicateCheckField),
-                  })
-                );
-              });
-            }
-
+            setIsEditing(false);
             if (fetchData) {
               fetchData();
             }
@@ -391,11 +459,10 @@ export function useDataGridOperations<T extends Record<string, any>>({
       getItemId,
       gridRef,
       setRowData,
-      configValidateRowData,
       generatedValidateRowData,
-      duplicateCheckField,
       dispatch,
       setIsEditing,
+      duplicateIDs,
     ]
   );
 

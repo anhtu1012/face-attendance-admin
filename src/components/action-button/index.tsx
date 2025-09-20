@@ -2,7 +2,7 @@
 /* eslint-disable react/display-name */
 import { RootState } from "@/lib/store";
 import { getCookie } from "@/utils/client/getCookie";
-import { Button, Modal, Popconfirm } from "antd";
+import { Button, Modal, Popconfirm, Tooltip } from "antd";
 import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import { GoTrash } from "react-icons/go";
@@ -33,6 +33,8 @@ export type ActionButtonsProps = {
   // Updated type to accept both ReactNode and objects with return property
   buttonProps?: React.ReactNode | { return: React.ReactNode } | any;
   saveButtonContent?: React.ReactNode; // add this line
+  // New prop to disable save when there are duplicates
+  hasDuplicates?: boolean;
 };
 
 const ActionButtons: React.FC<ActionButtonsProps> = React.memo(
@@ -53,6 +55,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = React.memo(
     onModalCancel,
     buttonProps, // Add buttonProps to destructuring
     saveButtonContent, // add this line
+    hasDuplicates = false, // add this line
   }) => {
     const t = useTranslations("ActionButtons");
     const url = getCookie("_url");
@@ -146,31 +149,36 @@ const ActionButtons: React.FC<ActionButtonsProps> = React.memo(
             <IoAddCircleOutline size={20} /> {t("add")}
           </Button>
           {/* Button Save */}
-          <Button
-            className="btn-save"
-            type="primary"
-            onClick={onSave}
-            disabled={!canSave}
-            style={{
-              padding: "18px",
-              border: "1px solid #106754",
-              borderRadius: "4px",
-              backgroundColor: "white",
-              color: "#106754",
-              fontWeight: "bold",
-              opacity: !canSave ? 0.3 : 1,
-              // display: hideSave ? "none" : !hiddenSave ? "none" : "",
-              display: hideSave ? "none" : "",
-            }}
+          <Tooltip
+            title={hasDuplicates ? t("cannotSaveDuplicates") : undefined}
+            placement="top"
           >
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              {saveButtonContent ?? (
-                <>
-                  <TbCloudDownload size={20} /> {t("save")}
-                </>
-              )}
-            </span>
-          </Button>
+            <Button
+              className="btn-save"
+              type="primary"
+              onClick={onSave}
+              disabled={!canSave || hasDuplicates}
+              style={{
+                padding: "18px",
+                border: "1px solid #106754",
+                borderRadius: "4px",
+                backgroundColor: "white",
+                color: "#106754",
+                fontWeight: "bold",
+                opacity: !canSave || hasDuplicates ? 0.3 : 1,
+                // display: hideSave ? "none" : !hiddenSave ? "none" : "",
+                display: hideSave ? "none" : "",
+              }}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {saveButtonContent ?? (
+                  <>
+                    <TbCloudDownload size={20} /> {t("save")}
+                  </>
+                )}
+              </span>
+            </Button>
+          </Tooltip>
 
           <div
             className="vertical-divider"
