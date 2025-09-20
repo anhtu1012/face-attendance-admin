@@ -22,34 +22,36 @@ class CauHinhMenuServicesBase extends AxiosService {
     return this.getWithFilter(`${this.basePath}`, searchFilter);
   }
 
-  async createCauHinhMenu(formData: {
-    resourceCode: string;
-    resourceName: string;
-    parentName: string;
-    scopes: string[];
-    sort?: string;
-  }): Promise<any> {
-    return this.post(`${this.basePath}`, formData);
-  }
-
-  async updateCauHinhMenu(
-    id: string | undefined,
-    formData: {
-      resourceCode: string;
-      resourceName: string;
-      parentName: string;
-      scopes: string[];
-      sort?: string;
-    }
-  ): Promise<any> {
-    return this.put(`${this.basePath}/${id}`, formData);
-  }
-
   async deleteCauHinhMenu(
     id: string,
     status: { status: string }
   ): Promise<any> {
     return this.delete(`${this.basePath}/${id}`, status);
+  }
+
+  async createCauHinhMenu(payload: {
+    payload: Array<{
+      unitKey: string;
+      resourceCode: string;
+      resourceName: string;
+      parentName: string;
+      scopes: string[];
+    }>;
+  }): Promise<any> {
+    return this.post(`${this.basePath}`, payload);
+  }
+
+  async updateCauHinhMenu(payload: {
+    payload: Array<{
+      resourceId: string | number;
+      unitKey: string;
+      resourceCode: string;
+      resourceName: string;
+      parentName: string;
+      scopes: string[];
+    }>;
+  }): Promise<any> {
+    return this.put(`${this.basePath}`, payload);
   }
 }
 

@@ -1,10 +1,13 @@
+import { savePhanQuyenRequest } from "./../../../dtos/quan-tri-he-thong/phan-quyen/phan-quyen.request.dto";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import { PhanQuyenResponseGetItem } from "@/dtos/quan-tri-he-thong/phan-quyen/phan-quyen.response.dto";
+import { TaiKhoanNhomVaiTroResponseGetItem } from "@/dtos/quan-tri-he-thong/phan-quyen/tai-khoan/tai-khoan.response.dto";
 
 class PhanQuyenServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/sa/permission";
+  protected readonly basePath = "/v1/sa";
+  protected readonly additionPath = "/v1/sa/user/find-accounts";
 
   async getPhanQuyen(
     searchFilter: FilterQueryStringTypeItem[] = [],
@@ -17,36 +20,36 @@ class PhanQuyenServicesBase extends AxiosService {
           queryParams.append(key, String(value));
         }
       });
-      return this.getWithParams(`${this.basePath}`, queryParams);
+      return this.getWithParams(
+        `${this.basePath}/permission-by-role`,
+        queryParams
+      );
     }
-    return this.getWithFilter(`${this.basePath}`, searchFilter);
+    return this.getWithFilter(
+      `${this.basePath}/permission-by-role`,
+      searchFilter
+    );
   }
 
-  async createPhanQuyen(formData: {
-    resourceCode: string;
-    resourceName: string;
-    parentName: string;
-    scopes: string[];
-    sort?: string;
-  }): Promise<any> {
-    return this.post(`${this.basePath}`, formData);
+  async savePhanQuyen(payload: savePhanQuyenRequest): Promise<any> {
+    return this.post(`${this.basePath}/permission-array-by-group`, payload);
   }
 
-  async updatePhanQuyen(
-    id: string | undefined,
-    formData: {
-      resourceCode: string;
-      resourceName: string;
-      parentName: string;
-      scopes: string[];
-      sort?: string;
+  // Lấy danh sách người dùng thuộc nhóm vai trò
+  async getTaiKhoanNhomVaiTro(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    params?: any
+  ): Promise<TaiKhoanNhomVaiTroResponseGetItem> {
+    if (params && Object.keys(params).length > 0) {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value));
+        }
+      });
+      return this.getWithParams(`${this.additionPath}`, queryParams);
     }
-  ): Promise<any> {
-    return this.put(`${this.basePath}/${id}`, formData);
-  }
-
-  async deletePhanQuyen(id: string, status: { status: string }): Promise<any> {
-    return this.delete(`${this.basePath}/${id}`, status);
+    return this.getWithFilter(`${this.additionPath}`, searchFilter);
   }
 }
 

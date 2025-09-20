@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AntdThemeProvider from "./AntdThemeProvider";
 import { ReduxProvider } from "./StoreProvider";
+import NotificationHolder from "@/hooks/NotificationHolder";
 // import BubbleCursor from "@/components/BubbleCursor";
 
 export default async function RootLayout({
@@ -24,7 +25,10 @@ export default async function RootLayout({
           <ThemeProvider>
             <ReduxProvider>
               <AntdThemeProvider>
-                <AntdRegistry>{children}</AntdRegistry>
+                <AntdRegistry>
+                  <NotificationHolder />
+                  {children}
+                </AntdRegistry>
               </AntdThemeProvider>
               <ToastContainer />
             </ReduxProvider>

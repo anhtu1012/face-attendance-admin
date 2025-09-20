@@ -13,6 +13,11 @@
   color: white !important;
 }
 
+.btn-permission:hover {
+  background-color: rgb(93, 201, 239) !important;
+  color: white !important;
+}
+
 .btn-delete:hover {
   background-color: #d83232 !important;
   color: white !important;
@@ -37,6 +42,10 @@ html.dark {
   }
   .btn-delete {
     background-color: #d83232 !important;
+    color: white !important;
+  }
+  .btn-permission {
+    background-color: rgb(93, 201, 239) !important;
     color: white !important;
   }
 }
