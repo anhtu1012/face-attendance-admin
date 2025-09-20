@@ -193,7 +193,7 @@ function Page() {
             setPageSize(pageSize);
             fetchData(currentPage, pageSize, quickSearchText);
           }}
-          maxRowsVisible={15}
+          maxRowsVisible={13}
           columnFlex={1}
           onQuicksearch={dataGrid.handleQuicksearch}
           showActionButtons={true}
