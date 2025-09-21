@@ -312,7 +312,8 @@
     "gioNghiTrua": "Lunch Break",
     "ngayTao": "CreateAt",
     "ngayCapNhat": "UpdateAt",
-    "vuilongNhapThoiGianNghiTrua": "Please Enter time.."
+    "vuilongNhapThoiGianNghiTrua": "Please Enter time..",
+    "isActive": "isActive"
   },
   "DanhMucChiNhanh": {
     "maChiNhanh": "Branch Code",
@@ -433,5 +434,14 @@
     "taxCode": "Tax Code",
     "taxName": "Tax Name",
     "taxPercent": "Percent"
+  },
+  "Filter": {
+    "fromDate": "From Date",
+    "toDate": "To Date",
+    "query": "Query"
+  },
+  "UserWithByRole": {
+    "userName": "User Name",
+    "fullName": "Full Name"
   }
 }

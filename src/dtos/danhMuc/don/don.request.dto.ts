@@ -28,4 +28,4 @@ export const UpdateFormSchema = FormItemSchema.omit({
     roleCode: z.string().min(1, "Role code is required").optional(),
   });
 
-export type UpdateFormRequest = z.infer<typeof UpdateFormSchema>; 
+export type UpdateFormRequest = z.infer<typeof UpdateFormSchema>;

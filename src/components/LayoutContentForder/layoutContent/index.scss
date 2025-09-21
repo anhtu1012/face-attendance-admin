@@ -7,6 +7,11 @@ html.dark {
     color: var(--text-primary) !important;
   }
 }
+.card-layout {
+  .ant-card-body {
+    padding: 20px 10px !important;
+  }
+}
 
 [class*="layoutType"] .content1.hideContent,
 [class*="layoutType"] .content2.hideContent,

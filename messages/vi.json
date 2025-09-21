@@ -285,7 +285,8 @@
     "gioNghiTrua": "Giờ nghĩ trưa",
     "ngayTao": "Ngày tạo",
     "ngayCapNhat": "Ngày cập nhật",
-    "vuilongNhapThoiGianNghiTrua": "Vui lòng nhập giờ nghĩ trưa"
+    "vuilongNhapThoiGianNghiTrua": "Vui lòng nhập giờ nghĩ trưa",
+    "isActive": "Trạng thái"
   },
   "DanhMucChiNhanh": {
     "maChiNhanh": "Mã chi nhánh",
@@ -406,5 +407,14 @@
     "taxCode": "Mã Thuế",
     "taxName": "Tên Thuế",
     "taxPercent": "Phần trăm"
+  },
+  "Filter": {
+    "fromDate": "Từ ngày",
+    "toDate": "Đến ngày",
+    "query": "Nạp dữ liệu"
+  },
+  "UserWithByRole": {
+    "userName": "Tên đăng nhập",
+    "fullName": "Họ và tên"
   }
 }

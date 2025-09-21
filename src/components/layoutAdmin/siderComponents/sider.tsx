@@ -10,6 +10,7 @@ import React, {
   useRef,
   useState,
   useEffect,
+  useCallback,
 } from "react";
 import {
   FaArrowCircleUp,
@@ -152,6 +153,8 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
   const [activeGroupKey, setActiveGroupKey] = useState<string>("");
   const [activeCategoryIndex, setActiveCategoryIndex] = useState<number>(-1);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [isManualGroupSelection, setIsManualGroupSelection] =
+    useState<boolean>(false);
   const pathname = usePathname();
 
   const { categoriesData, moduleData } = createCategoriesData({
@@ -160,10 +163,9 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
     categoriesData: { [key: string]: CategoryData[] };
     moduleData: { [key: string]: ModuleData };
   };
-  console.log({ categoriesData, moduleData });
 
   // Function to get active group key and category index based on current URL
-  const getActiveStateFromUrl = (): {
+  const getActiveStateFromUrl = useCallback((): {
     groupKey: string;
     categoryIndex: number;
   } => {
@@ -187,7 +189,7 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
     }
 
     return { groupKey: "", categoryIndex: -1 };
-  };
+  }, [pathname, categoriesData]);
 
   // Set active group and category based on current URL or default to first group (only on initial load)
   useLayoutEffect(() => {
@@ -202,18 +204,24 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
       }
       setIsInitialized(true);
     }
-  }, [moduleData, categoriesData, isInitialized]);
+  }, [moduleData, categoriesData, isInitialized, getActiveStateFromUrl]);
 
-  // Update active states when pathname changes
+  // Update active states when pathname changes - only when not manually selecting group
   useEffect(() => {
-    if (Object.keys(categoriesData).length > 0) {
+    if (Object.keys(categoriesData).length > 0 && !isManualGroupSelection) {
       const { groupKey, categoryIndex } = getActiveStateFromUrl();
       if (groupKey) {
+        // Only sync with URL if user is not manually browsing different groups
         setActiveGroupKey(groupKey);
         setActiveCategoryIndex(categoryIndex);
       }
     }
-  }, [pathname, categoriesData]);
+  }, [pathname, categoriesData, getActiveStateFromUrl, isManualGroupSelection]);
+
+  // Reset manual selection flag when URL actually changes (real navigation)
+  useEffect(() => {
+    setIsManualGroupSelection(false);
+  }, [pathname]);
 
   const canvasRefs = useRef<Array<HTMLCanvasElement | null>>([]);
 
@@ -353,7 +361,16 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
                   activeGroupKey === groupKey ? "active" : ""
                 }`}
                 style={{ "--item-index": groupIndex } as React.CSSProperties}
-                onClick={() => setActiveGroupKey(groupKey)}
+                onClick={() => {
+                  // Set manual selection flag to prevent auto sync with URL
+                  setIsManualGroupSelection(true);
+                  setActiveGroupKey(groupKey);
+                  // Always reset activeCategoryIndex when switching to a different group
+                  // Only show the menu list, don't auto-select any category
+                  if (activeGroupKey !== groupKey) {
+                    setActiveCategoryIndex(-1);
+                  }
+                }}
               >
                 {toRomanNumeral(groupIndex + 1)}.
                 {uppercase(moduleData[groupKey].title)}

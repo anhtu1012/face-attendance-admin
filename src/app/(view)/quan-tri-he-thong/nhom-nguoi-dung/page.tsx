@@ -31,7 +31,7 @@ function Page() {
   const t = useTranslations("NhomNguoiDung");
   const gridRef = useRef<AgGridReact>({} as AgGridReact);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(20);
   const [loading, setLoading] = useState(false);
   const [rowData, setRowData] = useState<NhomNguoiDungItem[]>([]);
   const [quickSearchText, setQuickSearchText] = useState<string | undefined>(

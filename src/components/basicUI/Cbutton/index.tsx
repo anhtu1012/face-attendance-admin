@@ -1,6 +1,6 @@
 import type { ButtonProps } from "antd";
 import { Button } from "antd";
-import React from "react";
+import React, { useState } from "react";
 
 interface CustomButtonProps extends ButtonProps {
   origin?: {
@@ -23,46 +23,39 @@ const Cbutton: React.FC<CustomButtonProps> = ({
   className,
   disabled,
 }) => {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <Button
-      className={className}
-      size={size}
-      disabled={disabled}
-      type={type}
-      onClick={onClick}
-      icon={icon}
-      style={{
-        color: origin?.color || "white",
-        backgroundColor: origin?.bgcolor || "#5DC9EF",
-        border: origin?.border || "none",
-        borderRadius: "4px",
-        height: "36px",
-        fontWeight: "bold",
-        ...style,
-        transition: "background-color 0.3s, color 0.3s", // Thêm hiệu ứng chuyển đổi
-      }}
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ display: "inline-block" }}
     >
-      <span
+      <Button
+        className={className}
+        size={size}
+        disabled={disabled}
+        type={type}
+        onClick={onClick}
+        icon={icon}
         style={{
-          color: "inherit", // Kế thừa màu chữ từ cha
-          display: "inline-block",
-          transition: "color 0.3s", // Thêm hiệu ứng chuyển đổi màu chữ
-        }}
-        onMouseEnter={(e) => {
-          (e.target as HTMLSpanElement).style.color =
-            origin?.hoverColor || "white"; // Màu chữ khi hover
-          (e.target as HTMLSpanElement).parentElement!.style.backgroundColor =
-            origin?.hoverBgColor || "#A6E2F7"; // Màu nền khi hover
-        }}
-        onMouseLeave={(e) => {
-          (e.target as HTMLSpanElement).style.color = origin?.color || "white"; // Màu chữ trở về mặc định
-          (e.target as HTMLSpanElement).parentElement!.style.backgroundColor =
-            origin?.bgcolor || "#5DC9EF"; // Màu nền trở về mặc định
+          color: hovered
+            ? origin?.hoverColor || "white"
+            : origin?.color || "white",
+          backgroundColor: hovered
+            ? origin?.hoverBgColor || "#A6E2F7"
+            : origin?.bgcolor || "#5DC9EF",
+          border: origin?.border || "none",
+          borderRadius: "4px",
+          height: "36px",
+          fontWeight: "bold",
+          ...style,
+          transition: "background-color 0.3s, color 0.3s", // Thêm hiệu ứng chuyển đổi
         }}
       >
         {children}
-      </span>
-    </Button>
+      </Button>
+    </div>
   );
 };
 
