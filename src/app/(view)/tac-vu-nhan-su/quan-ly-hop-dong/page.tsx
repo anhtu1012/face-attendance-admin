@@ -10,14 +10,15 @@ import { FilterRef } from "./_types/prop";
 import "./index.scss";
 import Loading from "../../../../components/Loading/Loading";
 import Filter from "./_components/Filter/Filter";
+import ContractFormView from "./_components/ContractFormView/ContractFormView";
 
-const ContractFormView = dynamic(
-  () => import("./_components/ContractFormView/ContractFormView"),
-  {
-    ssr: false,
-    loading: () => <Loading />,
-  }
-);
+// const ContractFormView = dynamic(
+//   () => import("./_components/ContractFormView/ContractFormView"),
+//   {
+//     ssr: false,
+//     loading: () => <Loading />,
+//   }
+// );
 const UserWithByRole = dynamic(
   () => import("./_components/UserWithByRole/UserWithByRole"),
   {
@@ -91,6 +92,7 @@ function Page() {
         </Row>
       }
       content2={
+        <div className="contract-content-main">
         <Row gutter={16}>
           {selected === "Bộ lọc" && (
             <Col span={24}>
@@ -103,6 +105,7 @@ function Page() {
             </Col>
           )}
         </Row>
+        </div>
       }
     />
   );
