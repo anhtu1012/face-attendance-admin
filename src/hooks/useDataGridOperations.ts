@@ -345,7 +345,6 @@ export function useDataGridOperations<T extends Record<string, any>>({
       t,
     ]
   );
-  console.log("duplicateIDs", duplicateIDs);
 
   // Save function - generic
   const createSaveHandler = useCallback(

@@ -30,7 +30,7 @@ class SelectServicesBase extends AxiosService {
   }
 
   //Ca làm
-  async getSelectShift(): Promise<SelectOptionsArray[]> {
+  async getSelectShift(): Promise<PaginatedSelectOptionsResponse> {
     return this.get(`${this.basePath}/dropdown-shift`);
   }
 

@@ -27,9 +27,12 @@ class NguoiDungServicesBase extends AxiosService {
     return this.getWithFilter(`${this.basePath}`, searchFilter);
   }
 
-  async createNguoiDung(payload: CreateNguoiDungRequest): Promise<any> {
+  createNguoiDung = async (data: CreateNguoiDungRequest): Promise<any> => {
+    const payload = {
+      payload: data,
+    };
     return this.post(`${this.additionalPath}`, payload);
-  }
+  };
 
   async updateNguoiDung(payload: UpdateNguoiDungRequest): Promise<any> {
     return this.put(`${this.additionalPath}`, payload);

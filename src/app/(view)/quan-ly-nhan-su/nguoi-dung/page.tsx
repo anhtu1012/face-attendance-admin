@@ -5,19 +5,19 @@ import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
 import { useDataGridOperations } from "@/hooks/useDataGridOperations";
 import { showError } from "@/hooks/useNotification";
+import { useSelectData } from "@/hooks/useSelectData";
+import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
 import NguoiDungServices from "@/services/admin/quan-tri-he-thong/nguoi-dung.service";
 import {
   getItemId,
   useHasItemFieldError,
   useItemErrorCellStyle,
 } from "@/utils/client/validationHelpers";
-import { useSelector } from "react-redux";
-import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
-import { formatFullDateTime } from "@/utils/dateTime";
 import { CellStyle, ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 
 function Page() {
   const mes = useTranslations("HandleNotion");
@@ -34,8 +34,7 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  console.log("itemErrorsFromRedux", itemErrorsFromRedux);
-
+  const { selectRole, selectGender } = useSelectData({ fetchRole: true });
   const handleFetchUser = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
       setLoading(true);
@@ -54,9 +53,10 @@ function Page() {
         );
         setRowData(response.data);
         setTotalItems(response.count);
-        setLoading(false);
       } catch (error: any) {
         showError(error.response?.data?.message || mes("fetchError"));
+      } finally {
+        setLoading(false);
       }
     },
     [currentPage, mes, pageSize]
@@ -78,6 +78,10 @@ function Page() {
         headerName: t("roleCode"),
         editable: true,
         width: 180,
+        context: {
+          typeColumn: "Select",
+          selectOptions: selectRole,
+        },
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
           return itemErrorCellStyle(itemId, "roleCode", params);
@@ -141,9 +145,8 @@ function Page() {
         headerName: t("birthDay"),
         editable: true,
         width: 190,
-        valueFormatter: (params) => {
-          const date = formatFullDateTime(params.value, true);
-          return date ? date : "";
+        context: {
+          typeColumn: "Date",
         },
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
@@ -155,11 +158,9 @@ function Page() {
         headerName: t("gender"),
         editable: true,
         width: 150,
-        valueGetter: (params) =>
-          params.data.gender === "M" ? "Male" : "Female",
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "gender", params);
+        context: {
+          typeColumn: "Select",
+          selectOptions: selectGender,
         },
       },
       {
@@ -186,7 +187,7 @@ function Page() {
         cellStyle: centerStyle,
       },
     ],
-    [centerStyle, t, itemErrorCellStyle]
+    [t, selectRole, selectGender, centerStyle, itemErrorCellStyle]
   );
 
   const handlePageChange = (page: number, size: number) => {
@@ -200,7 +201,7 @@ function Page() {
     createNewItem: (i) => ({
       unitKey: `${Date.now()}_${i}`,
       userName: "",
-      password: "",
+      password: "123",
       roleCode: "",
       firstName: "",
       lastName: "",
@@ -222,7 +223,7 @@ function Page() {
       { field: "roleCode", label: t("roleCode") },
       { field: "firstName", label: t("firstName") },
       { field: "lastName", label: t("lastName") },
-      { field: "email", label: t("email") },
+      { field: "email", label: "Email" },
       { field: "birthDay", label: t("birthDay") },
       { field: "gender", label: t("gender") },
       { field: "phone", label: t("phone") },
@@ -267,6 +268,12 @@ function Page() {
             gridRef={gridRef}
             total={totalItems}
             paginationPageSize={pageSize}
+            rowSelection={{
+              mode: "singleRow",
+              enableClickSelection: true,
+              checkboxes: false,
+            }}
+            onCellValueChanged={dataGrid.onCellValueChanged}
             paginationCurrentPage={currentPage}
             pagination={true}
             maxRowsVisible={10}

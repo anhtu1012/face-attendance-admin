@@ -10,8 +10,10 @@ import { AgGridReact } from "@ag-grid-community/react";
 import { InputSearchProps } from "../../InputSearch";
 import { ActionButtonsProps } from "@/components/action-button";
 export interface ExtendedColDef extends ColDef {
-  typeColumn?: "Select" | "Text" | "Number" | "Date" | "Time"; // Add Time type for time picker
-  selectOptions?: Array<{ value: any; label: string }>; // Options for Select type
+  context?: {
+    typeColumn?: "Select" | "Text" | "Number" | "Date" | "Time";
+    selectOptions?: Array<{ value: any; label: string }>;
+  };
 }
 export interface AgGridComponentProps {
   rowData: any[];
@@ -23,7 +25,11 @@ export interface AgGridComponentProps {
   gridRef: React.RefObject<AgGridReact>;
   maxRowsVisible?: number; // Prop to limit the number of visible rows
   columnFlex?: number; // New prop to allow users to define flex
-  rowSelection?: "single" | "multiple";
+  rowSelection?: {
+    mode: "singleRow" | "multiRow";
+    enableClickSelection?: boolean;
+    checkboxes?: boolean;
+  };
   rownumber?: boolean;
   gridOptions?: any;
   pinnedBottomRowData?: any[];
@@ -34,6 +40,8 @@ export interface AgGridComponentProps {
   loading?: boolean; // Prop để quản lý trạng thái loading
   enableFilter?: boolean;
   showSTT?: boolean; // Add new prop to control STT visibility
+  showToolColumn?: boolean; // Add new prop to control tool column visibility
+  toolColumnRenderer?: (params: any) => React.ReactNode; // Custom renderer for tool column
   pivotMode?: boolean;
   defaultColDef?: ColDef;
   onRowSelected?: (event: any) => void;

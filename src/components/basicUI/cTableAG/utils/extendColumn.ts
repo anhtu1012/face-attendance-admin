@@ -10,15 +10,15 @@ import AntdSelectCellEditor from "../components/CustomTableInput/AntdSelectCellE
 // Update the processColumnDefs function to handle Number type
 export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
   return columnDefs.map((colDef) => {
-    if (colDef.typeColumn === "Select" && colDef.selectOptions) {
+    if (colDef.context?.typeColumn === "Select" && colDef.context?.selectOptions) {
       return {
         ...colDef,
         cellEditor: AntdSelectCellEditor,
         cellEditorParams: {
-          values: colDef.selectOptions,
+          values: colDef.context.selectOptions,
         },
         valueFormatter: (params) => {
-          const found = colDef.selectOptions?.find(
+          const found = colDef.context?.selectOptions?.find(
             (item) => item.value === params.value
           );
           return found ? found.label : params.value;
@@ -27,7 +27,7 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
     }
 
     // Handle Number type columns
-    if (colDef.typeColumn === "Number") {
+    if (colDef.context?.typeColumn === "Number") {
       return {
         ...colDef,
         cellStyle: {
@@ -45,7 +45,7 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
         },
       };
     }
-    if (colDef.typeColumn === "Date") {
+    if (colDef.context?.typeColumn === "Date") {
       return {
         ...colDef,
         cellEditor: DatepickerCellEditor, // Custom date editor
@@ -61,7 +61,7 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
     }
 
     // Handle Time type columns - chỉ chọn giờ phút
-    if (colDef.typeColumn === "Time") {
+    if (colDef.context?.typeColumn === "Time") {
       return {
         ...colDef,
         cellEditor: TimeCellEditor, // Custom time editor

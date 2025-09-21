@@ -61,14 +61,18 @@ function Page() {
         field: "startTime",
         headerName: t("gioBatDau"),
         editable: true,
-        typeColumn: "Time",
+        context: {
+          typeColumn: "Time",
+        },
         width: 180,
       },
       {
         field: "endTime",
         headerName: t("gioKetThuc"),
         editable: true,
-        typeColumn: "Time",
+        context: {
+          typeColumn: "Time",
+        },
         width: 180,
       },
       {
@@ -76,7 +80,9 @@ function Page() {
         headerName: t("soGioLam"),
         editable: true,
         width: 180,
-        typeColumn: "Number",
+        context: {
+          typeColumn: "Number",
+        },
       },
       {
         field: "isActive",

@@ -407,5 +407,14 @@
     "taxCode": "Mã Thuế",
     "taxName": "Tên Thuế",
     "taxPercent": "Phần trăm"
+  },
+  "Filter": {
+    "fromDate": "Từ ngày",
+    "toDate": "Đến ngày",
+    "query": "Nạp dữ liệu"
+  },
+  "UserWithByRole": {
+    "userName": "Tên đăng nhập",
+    "fullName": "Họ và tên"
   }
 }

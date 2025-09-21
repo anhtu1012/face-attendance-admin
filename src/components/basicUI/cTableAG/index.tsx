@@ -38,11 +38,13 @@ const InputSearch = lazy(() => import("@/components/basicUI/InputSearch"));
 
 // Dynamic import for AG-Grid Enterprise modules (only load when needed)
 const loadEnterpriseModules = async () => {
-  const [{ ColumnsToolPanelModule }, { MenuModule }] = await Promise.all([
-    import("@ag-grid-enterprise/column-tool-panel"),
-    import("@ag-grid-enterprise/menu"),
-  ]);
-  return { ColumnsToolPanelModule, MenuModule };
+  const [{ ColumnsToolPanelModule }, { MenuModule }, { SideBarModule }] =
+    await Promise.all([
+      import("@ag-grid-enterprise/column-tool-panel"),
+      import("@ag-grid-enterprise/menu"),
+      import("@ag-grid-enterprise/side-bar"),
+    ]);
+  return { ColumnsToolPanelModule, MenuModule, SideBarModule };
 };
 
 // Register base module immediately
@@ -52,9 +54,13 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 let enterpriseModulesLoaded = false;
 const loadEnterpriseModulesIfNeeded = async () => {
   if (!enterpriseModulesLoaded) {
-    const { ColumnsToolPanelModule, MenuModule } =
+    const { ColumnsToolPanelModule, MenuModule, SideBarModule } =
       await loadEnterpriseModules();
-    ModuleRegistry.registerModules([ColumnsToolPanelModule, MenuModule]);
+    ModuleRegistry.registerModules([
+      ColumnsToolPanelModule,
+      MenuModule,
+      SideBarModule,
+    ]);
     enterpriseModulesLoaded = true;
   }
 };
@@ -73,7 +79,11 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   getRowStyle,
   maxRowsVisible = 11,
   columnFlex = 0,
-  rowSelection = "multiple",
+  rowSelection = {
+    mode: "multiRow",
+    enableClickSelection: true,
+    checkboxes: false,
+  },
   gridOptions = {},
   pinnedBottomRowData = [],
   headerHeight,
@@ -81,6 +91,8 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   loading = false,
   enableFilter = true,
   showSTT = true,
+  showToolColumn = false,
+  toolColumnRenderer,
   pivotMode = false,
   onGridReady,
   onColumnHeaderClicked,
@@ -147,6 +159,16 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   const [maxReachedPage, setMaxReachedPage] = useState(paginationCurrentPage); // Track highest page reached
   const [infiniteScrollDebounceTimer, setInfiniteScrollDebounceTimer] =
     useState<NodeJS.Timeout | null>(null);
+
+  // Normalize rowSelection to object format
+  const normalizedRowSelection = React.useMemo(() => {
+    if (typeof rowSelection === "object") {
+      return rowSelection;
+    }
+    // Fallback for old string format
+    const mode = rowSelection === "single" ? "singleRow" : "multiRow";
+    return { mode, enableClickSelection: true, checkboxes: false };
+  }, [rowSelection]);
 
   // Fill handle states - moved here to fix dependency order
   const [isDraggingFill, setIsDraggingFill] = useState(false);
@@ -722,6 +744,8 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     enableFilter,
     theme,
     showSTT,
+    showToolColumn,
+    toolColumnRenderer,
     currentPage,
     pageSize,
     onChangePage,
@@ -764,9 +788,9 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   useEffect(() => {
     if (gridRef.current?.api && !gridRef.current.api.isDestroyed?.()) {
       if (loading) {
-        gridRef.current.api.showLoadingOverlay();
+        gridRef.current.api.setGridOption("loading", true);
       } else {
-        gridRef.current.api.hideOverlay();
+        gridRef.current.api.setGridOption("loading", false);
       }
     }
   }, [loading, gridRef]);
@@ -1072,8 +1096,7 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
           // }}
           onCellMouseOver={wrappedHandleMouseOver}
           getRowStyle={getRowStyle}
-          suppressRowClickSelection={false}
-          rowSelection={rowSelection}
+          rowSelection={normalizedRowSelection as any}
           domLayout={domLayout as "normal" | "autoHeight" | "print"}
           rowHeight={40}
           headerHeight={headerHeight}
@@ -1097,10 +1120,10 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
             if (loading) {
               // Small delay to ensure grid is ready
               setTimeout(() => {
-                params.api.showLoadingOverlay();
+                params.api.setGridOption("loading", true);
               }, 50);
             } else {
-              params.api.hideOverlay();
+              params.api.setGridOption("loading", false);
             }
 
             // Store original row data for filtering (only if not already in filtered state)

@@ -210,7 +210,7 @@ function LayoutContent({
           }}
         >
           <Card
-            className="content1"
+            className="content1 card-layout"
             title={option?.cardTitle}
             headStyle={{
               background:
@@ -221,16 +221,13 @@ function LayoutContent({
               fontWeight: "bold",
               color: "white",
             }}
-            bodyStyle={{
-              padding: "24px 5px !important",
-            }}
             style={{
               flex: defaultLeft,
               backgroundColor: "#fff",
               height: "calc(100vh - 106px)",
-              // padding: "12px",
               borderRadius: "10px",
               overflowY: "auto",
+              position: "relative",
             }}
           >
             {content1}
