@@ -1,31 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import {
-  Button,
-  Modal,
-  Segmented,
-  FloatButton,
-  Space,
-  Typography,
-  Tooltip,
-} from "antd";
-import {
-  FullscreenExitOutlined,
-  EyeOutlined,
-  EditOutlined,
+  CloseOutlined,
   ColumnWidthOutlined,
+  EditOutlined,
+  EyeOutlined,
+  RedoOutlined,
   SaveOutlined,
   UndoOutlined,
-  RedoOutlined,
-  BoldOutlined,
-  ItalicOutlined,
-  UnderlineOutlined,
-  OrderedListOutlined,
-  UnorderedListOutlined,
-  CloseOutlined,
 } from "@ant-design/icons";
 import MDEditor from "@uiw/react-md-editor";
-import { useState, useEffect } from "react";
+import {
+  Button,
+  FloatButton,
+  Modal,
+  Segmented,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
+import { useEffect, useState } from "react";
 import "./FullscreenMarkdownEditor.scss";
 
 interface FullscreenMarkdownEditorProps {
@@ -72,7 +66,7 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
     if (undoStack.length > 1) {
       const current = undoStack[undoStack.length - 1];
       const previous = undoStack[undoStack.length - 2];
-      
+
       setRedoStack([...redoStack, current]);
       setUndoStack(undoStack.slice(0, -1));
       setFullscreenContent(previous);
@@ -84,7 +78,7 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
   const handleRedo = () => {
     if (redoStack.length > 0) {
       const next = redoStack[redoStack.length - 1];
-      
+
       setUndoStack([...undoStack, next]);
       setRedoStack(redoStack.slice(0, -1));
       setFullscreenContent(next);
@@ -94,16 +88,23 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
 
   // Quick formatting functions
   const insertMarkdown = (before: string, after = "") => {
-    const textarea = document.querySelector('.fullscreen-markdown-modal .w-md-editor-text') as HTMLTextAreaElement;
+    const textarea = document.querySelector(
+      ".fullscreen-markdown-modal .w-md-editor-text"
+    ) as HTMLTextAreaElement;
     if (textarea) {
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       const selectedText = textarea.value.substring(start, end);
-      const newText = textarea.value.substring(0, start) + before + selectedText + after + textarea.value.substring(end);
-      
+      const newText =
+        textarea.value.substring(0, start) +
+        before +
+        selectedText +
+        after +
+        textarea.value.substring(end);
+
       setFullscreenContent(newText);
       saveToUndoStack(newText);
-      
+
       // Restore cursor position
       setTimeout(() => {
         textarea.focus();
@@ -111,14 +112,6 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
       }, 10);
     }
   };
-
-  const quickActions = [
-    { key: 'bold', icon: <BoldOutlined />, action: () => insertMarkdown('**', '**'), tooltip: 'In đậm (Ctrl+B)' },
-    { key: 'italic', icon: <ItalicOutlined />, action: () => insertMarkdown('*', '*'), tooltip: 'In nghiêng (Ctrl+I)' },
-    { key: 'underline', icon: <UnderlineOutlined />, action: () => insertMarkdown('<u>', '</u>'), tooltip: 'Gạch chân' },
-    { key: 'ul', icon: <UnorderedListOutlined />, action: () => insertMarkdown('\n- ', ''), tooltip: 'Danh sách không thứ tự' },
-    { key: 'ol', icon: <OrderedListOutlined />, action: () => insertMarkdown('\n1. ', ''), tooltip: 'Danh sách có thứ tự' },
-  ];
 
   const handleSave = () => {
     onSave(fullscreenContent);
@@ -128,10 +121,10 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
   const handleClose = () => {
     if (hasUnsavedChanges) {
       Modal.confirm({
-        title: '🚨 Bạn có thay đổi chưa lưu!',
-        content: 'Bạn có muốn lưu thay đổi trước khi thoát không?',
-        okText: '💾 Lưu và thoát',
-        cancelText: '🗑️ Bỏ qua thay đổi',
+        title: "🚨 Bạn có thay đổi chưa lưu!",
+        content: "Bạn có muốn lưu thay đổi trước khi thoát không?",
+        okText: "💾 Lưu và thoát",
+        cancelText: "🗑️ Bỏ qua thay đổi",
         onOk: () => {
           handleSave();
           onClose();
@@ -167,18 +160,32 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
           <div className="header-left">
             <div className="title-section">
               <Title level={4} style={{ margin: 0, color: "#fff" }}>
-                 Chỉnh sửa nội dung hợp đồng
+                Chỉnh sửa nội dung hợp đồng
               </Title>
               <div className="stats-section">
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "12px" }}>
-                   {fullscreenContent?.length || 0} ký tự
+                <Text
+                  style={{ color: "rgba(255,255,255,0.8)", fontSize: "12px" }}
+                >
+                  {fullscreenContent?.length || 0} ký tự
                 </Text>
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "12px", marginLeft: 8 }}>
-                   {fullscreenContent?.split('\n').length || 0} dòng
+                <Text
+                  style={{
+                    color: "rgba(255,255,255,0.8)",
+                    fontSize: "12px",
+                    marginLeft: 8,
+                  }}
+                >
+                  {fullscreenContent?.split("\n").length || 0} dòng
                 </Text>
                 {hasUnsavedChanges && (
-                  <Text style={{ color: "#fff3cd", fontSize: "12px", marginLeft: 8 }}>
-                     Chưa lưu
+                  <Text
+                    style={{
+                      color: "#fff3cd",
+                      fontSize: "12px",
+                      marginLeft: 8,
+                    }}
+                  >
+                    Chưa lưu
                   </Text>
                 )}
               </div>
@@ -232,7 +239,9 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
                   type="primary"
                   icon={<SaveOutlined />}
                   onClick={handleSave}
-                  className={`header-btn save-btn ${hasUnsavedChanges ? 'has-changes' : ''}`}
+                  className={`header-btn save-btn ${
+                    hasUnsavedChanges ? "has-changes" : ""
+                  }`}
                 >
                   Lưu thay đổi
                 </Button>
@@ -249,7 +258,6 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
           </div>
         </div>
 
-      
         {/* Enhanced Markdown Editor */}
         <div className="fullscreen-editor-content">
           <MDEditor
@@ -264,7 +272,8 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
             visibleDragbar={false}
             height="calc(100vh - 160px)"
             textareaProps={{
-              placeholder: "✨ Bắt đầu viết nội dung hợp đồng của bạn...\n\n💡 Sử dụng các nút định dạng nhanh ở trên hoặc:\n• # Tiêu đề chính\n• ## Tiêu đề phụ\n• **In đậm**\n• *In nghiêng*\n• - Danh sách\n• > Trích dẫn\n\n🚀 Nhấn Ctrl+S để lưu nhanh!",
+              placeholder:
+                "✨ Bắt đầu viết nội dung hợp đồng của bạn...\n\n💡 Sử dụng các nút định dạng nhanh ở trên hoặc:\n• # Tiêu đề chính\n• ## Tiêu đề phụ\n• **In đậm**\n• *In nghiêng*\n• - Danh sách\n• > Trích dẫn\n\n🚀 Nhấn Ctrl+S để lưu nhanh!",
               style: {
                 fontSize: 16,
                 lineHeight: 1.8,
@@ -274,25 +283,25 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
                 // Keyboard shortcuts
                 if (e.ctrlKey || e.metaKey) {
                   switch (e.key) {
-                    case 's':
+                    case "s":
                       e.preventDefault();
                       handleSave();
                       break;
-                    case 'z':
+                    case "z":
                       e.preventDefault();
                       handleUndo();
                       break;
-                    case 'y':
+                    case "y":
                       e.preventDefault();
                       handleRedo();
                       break;
-                    case 'b':
+                    case "b":
                       e.preventDefault();
-                      insertMarkdown('**', '**');
+                      insertMarkdown("**", "**");
                       break;
-                    case 'i':
+                    case "i":
                       e.preventDefault();
-                      insertMarkdown('*', '*');
+                      insertMarkdown("*", "*");
                       break;
                   }
                 }
@@ -313,7 +322,7 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
             icon={<SaveOutlined />}
             tooltip="Lưu thay đổi (Ctrl+S)"
             onClick={handleSave}
-            className={hasUnsavedChanges ? 'fab-urgent' : ''}
+            className={hasUnsavedChanges ? "fab-urgent" : ""}
           />
           <FloatButton
             icon={<UndoOutlined />}
@@ -329,10 +338,13 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
 
         {/* Progress indicator */}
         <div className="progress-indicator">
-          <div 
-            className="progress-bar" 
-            style={{ 
-              width: `${Math.min((fullscreenContent?.length || 0) / 1000 * 100, 100)}%` 
+          <div
+            className="progress-bar"
+            style={{
+              width: `${Math.min(
+                ((fullscreenContent?.length || 0) / 1000) * 100,
+                100
+              )}%`,
             }}
           />
         </div>
