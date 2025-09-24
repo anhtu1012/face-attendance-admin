@@ -13,6 +13,14 @@ export interface ExtendedColDef extends ColDef {
   context?: {
     typeColumn?: "Select" | "Text" | "Number" | "Date" | "Time";
     selectOptions?: Array<{ value: any; label: string }>;
+    // API integration for Select columns
+    onSearchAPI?: (
+      searchText: string
+    ) => Promise<Array<{ value: any; label: string }>>;
+    apiDebounceTime?: number; // Debounce time for API calls (default: 500ms)
+    minSearchLength?: number; // Minimum characters to trigger API call (default: 1)
+    loadingInitialOptions?: boolean; // Whether to show loading when mounting
+    onSelect?: (selectedOption: any) => void; // Callback when an option is selected
   };
 }
 export interface AgGridComponentProps {

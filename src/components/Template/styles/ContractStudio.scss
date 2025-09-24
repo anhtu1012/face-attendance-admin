@@ -1,0 +1,133 @@
+// Base styles
+.contract-studio {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, $slate-900 0%, $slate-800 100%);
+  color: white;
+
+  .container {
+    max-width: 1536px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  // Header styles
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid $slate-700;
+
+    .title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      letter-spacing: -0.025em;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+
+  // Button styles
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &.btn-primary {
+      background-color: $primary-color;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: $primary-hover;
+      }
+    }
+
+    &.btn-secondary {
+      background-color: $secondary-color;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: $secondary-hover;
+      }
+    }
+
+    &.btn-success {
+      background-color: $success-color;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: $success-hover;
+      }
+    }
+
+    &.btn-slate {
+      background-color: $slate-700;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: $slate-600;
+      }
+    }
+
+    &.btn-danger {
+      background-color: $danger-color;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: $danger-hover;
+      }
+    }
+  }
+
+  // Grid layouts
+  .grid-2 {
+    display: grid;
+    gap: 2rem;
+    height: 100%;
+
+    @media (min-width: 1024px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .grid-2-1 {
+    display: grid;
+    gap: 2rem;
+    height: 100%;
+
+    @media (min-width: 1024px) {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  // Hidden input
+  .hidden {
+    display: none;
+  }
+
+  // Main content area
+  main {
+    flex-grow: 1;
+  }
+}

@@ -43,13 +43,9 @@ function Page() {
           { key: "limit", type: "=", value: limit },
           { key: "offset", type: "=", value: (page - 1) * limit },
         ];
-        const params: any = {};
-        if (quickSearch && quickSearch.trim() !== "") {
-          params.quickSearch = quickSearch;
-        }
         const response = await NguoiDungServices.getNguoiDung(
           searchFilter,
-          params
+          quickSearch
         );
         setRowData(response.data);
         setTotalItems(response.count);

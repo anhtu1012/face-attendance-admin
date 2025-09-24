@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 // Lazy imports for better code splitting
-import usePasteHandler from "@/utils/client/usePasteHandler";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { ModuleRegistry } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
@@ -16,13 +15,9 @@ import { BsFiletypeXlsx } from "react-icons/bs";
 import { FiUpload } from "react-icons/fi";
 import { CustomTooltip } from "./components/CustomTooltip";
 import FilterArrayModal from "./components/FilterArrayModal";
-import { useAutoScroll } from "./hooks/useAutoScroll";
-import { useClipboard } from "./hooks/useClipboard";
 import { useColumnDefinitions } from "./hooks/useColumnDefinitions";
-import { useFillHandle } from "./hooks/useFillHandle";
 import { useGridConfiguration } from "./hooks/useGridConfiguration";
 import { useInfiniteScroll } from "./hooks/useInfiniteScroll";
-import { useMouseHandlers } from "./hooks/useMouseHandlers";
 import { usePagination } from "./hooks/usePagination";
 import { useTableFilter } from "./hooks/useTableFilter";
 import "./index.scss";
@@ -116,8 +111,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   onChangePage,
   onQuicksearch,
   total,
-  onFillChanges,
-  // Infinite scroll props
   enableInfiniteScroll = false,
   onLoadMore,
   hasMore = false,
@@ -125,10 +118,8 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
 }) => {
   const t = useTranslations("AgGridComponent");
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
-  const [isDraggingCells, setIsDraggingCells] = useState(false); // Thêm state để track cell dragging
-  // Use table filter hook
+
   const {
     showFilterModal,
     selectedFilterColumns,
@@ -136,7 +127,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     originalRowData,
     setOriginalRowData,
     filteredData,
-    setFilteredData,
     isFiltered,
     searchText,
     setSearchText,
@@ -170,13 +160,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     return { mode, enableClickSelection: true, checkboxes: false };
   }, [rowSelection]);
 
-  // Fill handle states - moved here to fix dependency order
-  const [isDraggingFill, setIsDraggingFill] = useState(false);
-  const [startCell, setStartCell] = useState<{
-    rowIndex: number;
-    colField: string;
-  } | null>(null);
-
   // Use infinite scroll hook
   const { handleInfiniteScroll } = useInfiniteScroll({
     enableInfiniteScroll,
@@ -188,8 +171,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     total,
     pageSize,
     isSelecting,
-    isDraggingCells,
-    isDraggingFill,
     isLoadingMore,
     setIsLoadingMore,
     maxReachedPage,
@@ -264,107 +245,8 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     enableInfiniteScroll,
     isLoadingMore,
     isSelecting,
-  ]); // THÊM isSelecting dependency
-
-  // Multi-selection fill support
-  const [multiSelectionBounds, setMultiSelectionBounds] = useState<{
-    startRow: number;
-    endRow: number;
-    startColIndex: number;
-    endColIndex: number;
-  } | null>(null);
-  const [multiSelectionPattern, setMultiSelectionPattern] = useState<
-    any[][] | null
-  >(null);
-
-  // Refs để track state real-time trong intervals
-  const isDraggingFillRef = useRef(false);
+  ]);
   const isSelectingRef = useRef(false);
-
-  // Auto-scroll hook
-  const {
-    autoScrollInterval,
-    stopAutoScroll,
-    handleAutoScrollByMousePosition,
-  } = useAutoScroll({
-    gridWrapperRef: gridWrapperRef as React.RefObject<HTMLDivElement>,
-    isDraggingFill,
-    isSelecting,
-    isDraggingFillRef,
-    isSelectingRef,
-  });
-
-  // showFillHandle is now handled by the useFillHandle hook
-
-  // handleFillDrag is now handled by fill handle hook
-
-  // Mouse handlers hook - temporarily commented out due to complexity
-  // Will apply after resolving dependencies
-  // const mouseHandlers = useMouseHandlers({...});
-
-  // Fill handle hook - will be added after dependencies are resolved
-
-  // Initialize usePasteHandler để xử lý paste và fill operations
-  const { handleFillChanges: pasteHandlerFillChanges } = usePasteHandler(
-    () => (isFiltered ? filteredData : rowData),
-    (newData) => {
-      if (isFiltered) {
-        setFilteredData(newData);
-      }
-      // Note: Không cần setRowData vì rowData là prop từ parent
-    },
-    gridRef,
-    () => {}, // onValuesChanged sẽ được xử lý bởi onFillChanges prop
-    onFillChanges // Kết nối với onFillChanges prop
-  );
-
-  const getColumnOrder = useCallback(() => {
-    return columnDefs
-      .map((col) => col.field)
-      .filter((field): field is string => !!field);
-  }, [columnDefs]);
-
-  // Use fill handle hook
-  const {
-    fillHandleVisible: hookFillHandleVisible,
-    fillHandlePosition: hookFillHandlePosition,
-    fillSourceCell: hookFillSourceCell,
-    fillSourceCellInfo: hookFillSourceCellInfo,
-    fillTargetCells: hookFillTargetCells,
-    showFillHandle: hookShowFillHandle,
-    handleFillMouseDown: hookHandleFillMouseDown,
-    handleFillMouseUp: hookHandleFillMouseUp,
-    calculateFillTargetCells: hookCalculateFillTargetCells,
-    setFillHandleVisible: hookSetFillHandleVisible,
-    setFillSourceCell: hookSetFillSourceCell,
-    setFillSourceCellInfo: hookSetFillSourceCellInfo,
-  } = useFillHandle({
-    selectedCells,
-    setSelectedCells,
-    gridWrapperRef: gridWrapperRef as React.RefObject<HTMLDivElement>,
-    gridRef: gridRef as React.RefObject<{
-      api: { refreshCells: (params: unknown) => void };
-    }>,
-    rowData,
-    filteredData,
-    isFiltered,
-    setFilteredData,
-    columnDefs: columnDefs, // Will be replaced with extendedColumnDefs later
-    multiSelectionBounds,
-    multiSelectionPattern,
-    setMultiSelectionPattern,
-    isDraggingFill,
-    setIsDraggingFill,
-    isDraggingFillRef,
-    isSelecting,
-    setIsSelecting,
-    isSelectingRef,
-    setStartCell,
-    pasteHandlerFillChanges,
-    stopAutoScroll,
-    handleAutoScrollByMousePosition,
-    getColumnOrder,
-  });
 
   // Update total rows and store original row data when rowData prop changes
   useEffect(() => {
@@ -395,139 +277,12 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     }
   }, [rowData, isFiltered, originalRowData.length]);
 
-  // Fill handle position updates are now handled by the useFillHandle hook
-
-  // Fill handle visibility and positioning are now handled by the useFillHandle hook
-
-  // Filter functions are now handled by useTableFilter hook
-
-  // Use mouse handlers hook
-  const {
-    handleMouseDown: hookHandleMouseDown,
-    handleMouseOver: hookHandleMouseOver,
-    handleMouseUp: hookHandleMouseUp,
-    handleClickOutside: hookHandleClickOutside,
-  } = useMouseHandlers({
-    isSelecting,
-    setIsSelecting,
-    isDraggingFill,
-    isDraggingCells,
-    setIsDraggingCells,
-    startCell,
-    setStartCell,
-    selectedCells,
-    setSelectedCells,
-    setMultiSelectionBounds,
-    setMultiSelectionPattern,
-    columnDefs: columnDefs, // Will be updated with extendedColumnDefs later
-    gridWrapperRef: gridWrapperRef as React.RefObject<HTMLDivElement>,
-    gridRef: gridRef as React.RefObject<{
-      api: { refreshCells: (params: unknown) => void };
-    }>,
-    showFillHandle: (event: any) => {
-      if (event.rowIndex !== null && event.colDef?.field) {
-        const cellEvent = {
-          rowIndex: event.rowIndex,
-          colDef: { field: event.colDef.field },
-          event: event.event,
-          data: event.data,
-        };
-        hookShowFillHandle(cellEvent);
-      }
-    }, // Inline wrapper function
-    handleFillDrag: () => {}, // Placeholder function - actual drag handled by useFillHandle
-    isDraggingFillRef,
-    isSelectingRef,
-    isLoadingMore,
-    setFillHandleVisible: hookSetFillHandleVisible,
-    setFillSourceCell: hookSetFillSourceCell,
-    setFillSourceCellInfo: hookSetFillSourceCellInfo,
-    stopAutoScroll,
-  });
-
-  // Mouse event handlers are now handled by useMouseHandlers hook
-  // Create wrapper functions to convert AG-Grid events to hook's CellEvent format
-  const wrappedHandleMouseDown = useCallback(
-    (event: any) => {
-      if (event.rowIndex !== null && event.colDef?.field) {
-        const cellEvent = {
-          rowIndex: event.rowIndex,
-          colDef: { field: event.colDef.field },
-          event: event.event,
-          data: event.data,
-        };
-        hookHandleMouseDown(cellEvent);
-      }
-    },
-    [hookHandleMouseDown]
-  );
-
-  const wrappedHandleMouseOver = useCallback(
-    (event: any) => {
-      if (event.rowIndex !== null && event.colDef?.field) {
-        const cellEvent = {
-          rowIndex: event.rowIndex,
-          colDef: { field: event.colDef.field },
-          event: event.event,
-          data: event.data,
-        };
-        hookHandleMouseOver(cellEvent);
-      }
-    },
-    [hookHandleMouseOver]
-  );
-
-  const wrappedShowFillHandle = useCallback(
-    (event: any) => {
-      if (event.rowIndex !== null && event.colDef?.field) {
-        const cellEvent = {
-          rowIndex: event.rowIndex,
-          colDef: { field: event.colDef.field },
-          event: event.event,
-          data: event.data,
-        };
-        hookShowFillHandle(cellEvent);
-      }
-    },
-    [hookShowFillHandle]
-  );
-
-  // Fill handle mouse down is now handled by the useFillHandle hook
-
-  // Fill target cells calculation is now handled by the useFillHandle hook
-
-  // Global mouse movement is now handled by the useFillHandle hook
-
-  // Fill drag handling is now managed by the useFillHandle hook
-
-  // Fill mouse up logic is now handled by the useFillHandle hook
-
-  // Use clipboard hook for handling copy operations
-  const { handleKeyDown } = useClipboard({
-    gridRef,
-    selectedCells,
-  });
   const handleImportClick = () => {
     // Close the dropdown after a short delay to allow the click event to complete
     setTimeout(() => {
       setImportDropdownOpen(false);
     }, 300);
   };
-
-  // Hàm xử lý khi scroll để cập nhật vị trí fill handle
-  const handleScroll = useCallback(() => {
-    if (
-      hookFillHandleVisible &&
-      !isDraggingFill &&
-      !isSelecting &&
-      selectedCells.size === 0
-    ) {
-      hookSetFillSourceCell(null);
-    }
-  }, [hookFillHandleVisible, isDraggingFill, isSelecting, selectedCells.size]);
-
-  // Infinite scroll handling is now managed by useInfiniteScroll hook
-
   // Auto-reset mechanism để tránh bị stuck trong selection state
   useEffect(() => {
     let resetTimeout: NodeJS.Timeout;
@@ -542,8 +297,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
         if (gridWrapperRef.current) {
           gridWrapperRef.current.removeAttribute("data-selecting");
         }
-
-        setStartCell(null);
       }, 5000);
     }
 
@@ -554,162 +307,13 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     };
   }, [isSelecting]);
 
-  // Clear fill handle when selectedCells becomes empty
-  useEffect(() => {
-    if (selectedCells.size === 0 && hookFillHandleVisible) {
-      hookSetFillHandleVisible(false);
-      hookSetFillSourceCell(null);
-      hookSetFillSourceCellInfo(null);
-    }
-  }, [
-    selectedCells.size,
-    hookSetFillHandleVisible,
-    hookSetFillSourceCell,
-    hookSetFillSourceCellInfo,
-  ]); // Removed hookFillHandleVisible to prevent infinite loop
-
-  // Clear fill handle when clicking outside or on different cell
-  useEffect(() => {
-    if (
-      selectedCells.size > 0 &&
-      !hookFillHandleVisible &&
-      hookFillSourceCellInfo
-    ) {
-      // If we have selected cells but no visible fill handle, show it
-      hookSetFillHandleVisible(true);
-    }
-  }, [selectedCells.size, hookFillSourceCellInfo, hookSetFillHandleVisible]); // Removed hookFillHandleVisible to prevent infinite loop
-
   // Refresh AG Grid cells when selectedCells changes to update CSS classes
   useEffect(() => {
     if (gridRef.current?.api && !gridRef.current.api.isDestroyed?.()) {
       // Force refresh all cells to update selection styling
       gridRef.current.api.refreshCells({ force: true });
     }
-  }, [selectedCells, gridRef]);
-
-  useEffect(() => {
-    const documentMouseUpHandler = (event: MouseEvent) => {
-      // console.log("Document mouseup detected", {
-      //   isSelecting: isSelectingRef.current,
-      //   isDraggingFill: isDraggingFillRef.current,
-      // });
-
-      // KHÔNG force reset khi có enableInfiniteScroll để tránh conflict với row selection
-      if (enableInfiniteScroll) {
-        // console.log(
-        //   "Skipping document mouseup reset - infinite scroll enabled"
-        // );
-        return;
-      }
-
-      // Chỉ force reset khi click outside grid và không phải đang drag fill
-      const target = event.target as HTMLElement;
-      const isInsideGrid =
-        gridWrapperRef.current?.contains(target) ||
-        target?.closest?.(".ag-grid") ||
-        target?.closest?.(".ag-root-wrapper");
-
-      if (
-        isSelectingRef.current &&
-        !isDraggingFillRef.current &&
-        !isInsideGrid
-      ) {
-        // console.log(
-        //   "Force resetting selection state on document mouseup - outside grid"
-        // );
-        setTimeout(() => {
-          setIsSelecting(false);
-          isSelectingRef.current = false;
-
-          if (gridWrapperRef.current) {
-            gridWrapperRef.current.removeAttribute("data-selecting");
-          }
-
-          setStartCell(null);
-        }, 50);
-      }
-    };
-
-    // Thêm global mouse move handler cho fill handle dragging
-    const handleGlobalMouseMove = (event: MouseEvent) => {
-      if (isDraggingFill) {
-        console.log("Global mouse move during fill drag", {
-          clientX: event.clientX,
-          clientY: event.clientY,
-        });
-        event.preventDefault();
-        hookCalculateFillTargetCells(event.clientX, event.clientY);
-      }
-    };
-
-    // Thêm global mouse up handler cho fill handle
-    const handleGlobalMouseUp = (event: MouseEvent) => {
-      if (isDraggingFill) {
-        console.log("Global mouse up during fill drag", {
-          clientX: event.clientX,
-          clientY: event.clientY,
-        });
-        event.preventDefault();
-        hookHandleFillMouseUp();
-      }
-    };
-
-    document.addEventListener("mousedown", hookHandleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("mouseup", hookHandleMouseUp);
-    document.addEventListener("mousemove", handleGlobalMouseMove);
-    document.addEventListener("mouseup", handleGlobalMouseUp, {
-      capture: true,
-    });
-
-    // Thêm backup mouseup listener
-    document.addEventListener("mouseup", documentMouseUpHandler, {
-      capture: true,
-    });
-
-    // Thêm backup mouseup listener
-    document.addEventListener("mouseup", documentMouseUpHandler, {
-      capture: true,
-    });
-
-    // Thêm scroll listener
-    const gridElement = gridWrapperRef.current;
-    if (gridElement) {
-      gridElement.addEventListener("scroll", handleScroll);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", hookHandleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("mouseup", hookHandleMouseUp);
-      document.removeEventListener("mousemove", handleGlobalMouseMove);
-      document.removeEventListener("mouseup", handleGlobalMouseUp, {
-        capture: true,
-      });
-      document.removeEventListener("mouseup", documentMouseUpHandler, {
-        capture: true,
-      });
-
-      if (gridElement) {
-        gridElement.removeEventListener("scroll", handleScroll);
-      }
-
-      // Cleanup auto-scroll interval khi component unmount
-      if (autoScrollInterval) {
-        clearInterval(autoScrollInterval);
-      }
-    };
-  }, [
-    selectedCells,
-    handleKeyDown,
-    isDraggingFill,
-    hookFillSourceCell,
-    hookFillTargetCells,
-    handleScroll,
-    autoScrollInterval,
-    enableInfiniteScroll, // THÊM: để check infinite scroll state
-  ]);
+  }, [gridRef]);
 
   // useEffect cho infinite scroll
   useEffect(() => {
@@ -738,8 +342,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   // Use column definitions hook
   const { defaultColDef, extendedColumnDefs } = useColumnDefinitions({
     columnDefs,
-    selectedCells,
-    fillTargetCells: hookFillTargetCells,
     columnFlex,
     enableFilter,
     theme,
@@ -750,6 +352,8 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     pageSize,
     onChangePage,
     isFiltered,
+    selectedCells: new Set<string>(), // Add appropriate value or state for selectedCells
+    fillTargetCells: new Set<string>(), // Add appropriate value or state for fillTargetCells
   });
 
   // Giữ onFilterChanged để refresh STT khi filter thay đổi
@@ -785,83 +389,38 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   gridOptions.suppressRowTransform = true;
 
   // Add useEffect to handle loading state changes
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (gridRef.current?.api && !gridRef.current.api.isDestroyed?.()) {
       if (loading) {
         gridRef.current.api.setGridOption("loading", true);
+        // Set timeout to force hide loading after 10 seconds
+        loadingTimeoutRef.current = setTimeout(() => {
+          if (gridRef.current?.api && !gridRef.current.api.isDestroyed?.()) {
+            gridRef.current.api.setGridOption("loading", false);
+            console.warn(
+              "Loading timeout reached in AgGridComponent, forcing hide loading overlay"
+            );
+          }
+        }, 10000);
       } else {
         gridRef.current.api.setGridOption("loading", false);
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+          loadingTimeoutRef.current = null;
+        }
       }
     }
   }, [loading, gridRef]);
 
-  // Custom selection changed handler that preserves scroll position
-  const handleSelectionChanged = useCallback(() => {
-    // console.log("🔵 handleSelectionChanged triggered:", {
-    //   isDraggingFill,
-    //   isDraggingCells,
-    //   isSelecting,
-    //   enableInfiniteScroll,
-    //   isLoadingMore,
-    // });
-
-    // Chỉ block khi đang drag fill hoặc đang actively drag cells
-    // Không block khi chỉ có isSelecting = true (single click)
-    if (isDraggingFill || isDraggingCells) {
-      // console.log("⛔ Blocking selection changed due to drag operation");
-      return;
-    }
-
-    if (gridRef.current?.api && !gridRef.current.api.isDestroyed?.()) {
-      // const selectedRows = gridRef.current.api.getSelectedRows();
-      // console.log("✅ Selection changed - selected rows:", selectedRows.length);
-
-      const viewport = gridRef.current.api.getVerticalPixelRange();
-
-      // Chỉ gọi callback của parent khi không tương tác để tránh refresh data
-      // THÊM: KHÔNG gọi parent callback khi enableInfiniteScroll để tránh data refresh conflict
-      if (onSelectionChanged && !enableInfiniteScroll) {
-        // console.log("🟢 Calling parent onSelectionChanged");
-
-        // Delay callback để AG Grid hoàn thành selection process trước
-        setTimeout(() => {
-          onSelectionChanged();
-        }, 10);
-      } else if (enableInfiniteScroll) {
-        // console.log(
-        //   "🚫 Skipping parent onSelectionChanged - infinite scroll enabled"
-        // );
-      } // SỬA: Không gọi ensureIndexVisible khi infinite scroll đang hoạt động
-      // để tránh conflict giữa selection và infinite loading
-      if (viewport && !enableInfiniteScroll && !isLoadingMore) {
-        setTimeout(() => {
-          if (gridRef.current?.api && !gridRef.current.api.isDestroyed?.()) {
-            gridRef.current.api.ensureIndexVisible(
-              Math.floor(viewport.top / 40),
-              "top"
-            );
-          }
-        }, 10);
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
       }
-    }
-
-    if (
-      selectedCells.size > 0 &&
-      !hookFillHandleVisible &&
-      hookFillSourceCellInfo
-    ) {
-      hookSetFillHandleVisible(true);
-    }
-  }, [
-    onSelectionChanged,
-    selectedCells,
-    hookFillHandleVisible,
-    hookFillSourceCellInfo,
-    isDraggingFill,
-    isDraggingCells, // Thêm isDraggingCells vào dependencies
-    enableInfiniteScroll, // THÊM: Check infinite scroll state
-    isLoadingMore, // THÊM: Check loading state
-  ]);
+    };
+  }, []);
 
   // Add scroll position preservation for grid updates
   useEffect(() => {
@@ -971,14 +530,33 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
         onRowClicked(event);
       }
     },
-    [
-      onRowClicked,
-      enableInfiniteScroll,
-      isSelecting,
-      isDraggingCells,
-      isDraggingFill,
-    ]
+    [onRowClicked, enableInfiniteScroll, isSelecting]
   );
+
+  // Handle selection changed event
+  const handleSelectionChanged = useCallback(() => {
+    if (onSelectionChanged && gridRef.current?.api) {
+      try {
+        // Get selected rows for internal logging
+        const selectedRows = gridRef.current.api.getSelectedRows();
+
+        // Log for debugging
+        console.log("Selection changed:", {
+          count: selectedRows.length,
+          rows: selectedRows,
+        });
+
+        // Call the callback (without parameters as per interface)
+        onSelectionChanged();
+      } catch (error) {
+        console.error("Error in handleSelectionChanged:", error);
+        // Still call the callback even if there's an error
+        if (onSelectionChanged) {
+          onSelectionChanged();
+        }
+      }
+    }
+  }, [onSelectionChanged, gridRef]);
 
   return (
     <div>
@@ -1055,7 +633,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
 
       <div
         ref={gridWrapperRef}
-        onMouseUp={hookHandleMouseUp}
         style={{
           position: "relative",
           height: `${gridHeight}px`,
@@ -1073,6 +650,7 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
           ref={gridRef}
           rowData={pagedData}
           onRowSelected={onRowSelected}
+          onSelectionChanged={handleSelectionChanged}
           columnDefs={extendedColumnDefs}
           defaultColDef={defaultColDef}
           editType={"fullRow"}
@@ -1080,21 +658,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
           onRowDoubleClicked={onRowDoubleClicked}
           onCellValueChanged={onCellValueChanged}
           onCellEditingStarted={onCellEditingStarted}
-          onSelectionChanged={handleSelectionChanged}
-          onCellMouseDown={wrappedHandleMouseDown}
-          onCellClicked={wrappedShowFillHandle}
-          // onCellFocused disabled - using onCellClicked instead to avoid conflicts
-          // onCellFocused={(event) => {
-          //   console.log("onCellFocused called", { rowIndex: event.rowIndex, colField: event.colDef?.field, isSelecting, isDraggingFill });
-          //   // Chỉ hiển thị fill handle khi focus nếu không đang trong trạng thái selection hoặc drag
-          //   if (!isSelecting && !isDraggingFill) {
-          //     // Delay để tránh conflict với mouse events
-          //     setTimeout(() => {
-          //       wrappedShowFillHandle(event);
-          //     }, 50);
-          //   }
-          // }}
-          onCellMouseOver={wrappedHandleMouseOver}
           getRowStyle={getRowStyle}
           rowSelection={normalizedRowSelection as any}
           domLayout={domLayout as "normal" | "autoHeight" | "print"}
@@ -1183,76 +746,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
             />
             Đang tải thêm dữ liệu...
           </div>
-        )}
-
-        {/* Fill Handle */}
-        {(() => {
-          return (
-            hookFillHandleVisible &&
-            hookFillHandlePosition.top !== undefined &&
-            hookFillHandlePosition.left !== undefined
-          );
-        })() && (
-          <div
-            key={`${hookFillHandlePosition.top}-${hookFillHandlePosition.left}`} // Force re-render khi vị trí thay đổi
-            className={`fill-handle ${
-              autoScrollInterval ? "auto-scrolling" : ""
-            }`}
-            style={{
-              position: "absolute",
-              top: `${hookFillHandlePosition.top}px`,
-              left: `${hookFillHandlePosition.left}px`,
-              zIndex: 1001,
-              cursor: "crosshair",
-              transform: "translate3d(0, 0, 0)",
-              willChange: "transform",
-              // Add visible styling
-              width: "8px",
-              height: "8px",
-              backgroundColor: "#1890ff",
-              border: "2px solid #ffffff",
-              borderRadius: "50%",
-              boxShadow: "0 0 4px rgba(0,0,0,0.3)",
-            }}
-            onMouseDown={(e) => {
-              console.log("Fill handle mouse down", {
-                clientX: e.clientX,
-                clientY: e.clientY,
-              });
-              e.preventDefault();
-              e.stopPropagation();
-              hookHandleFillMouseDown(e);
-            }}
-            onMouseMove={(e) => {
-              console.log("Fill handle mouse move", {
-                clientX: e.clientX,
-                clientY: e.clientY,
-                isDraggingFill,
-              });
-              e.preventDefault();
-              e.stopPropagation();
-              // Handle mouse move during drag
-              if (isDraggingFill) {
-                hookCalculateFillTargetCells(e.clientX, e.clientY);
-              }
-            }}
-            onMouseUp={(e) => {
-              console.log("Fill handle mouse up", {
-                clientX: e.clientX,
-                clientY: e.clientY,
-              });
-              e.preventDefault();
-              e.stopPropagation();
-              hookHandleFillMouseUp();
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!hookFillHandleVisible) {
-                hookSetFillHandleVisible(true);
-              }
-            }}
-          />
         )}
       </div>
 

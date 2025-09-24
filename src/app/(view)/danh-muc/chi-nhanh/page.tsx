@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
@@ -18,6 +19,7 @@ import {
 import { useSelector } from "react-redux";
 import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
 import DanhMucChiNhanhServices from "@/services/danh-muc/chi-nhanh/chiNhanh.service";
+import { GoongService } from "@/services/goong/goong.service";
 
 const defaultPageSize = 20;
 
@@ -27,7 +29,7 @@ function Page() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItem, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(defaultPageSize);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [rowData, setRowData] = useState<Branch[]>([]);
   const gridRef = useRef<AgGridReact>({} as AgGridReact);
   const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
@@ -36,13 +38,36 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  console.log("itemErrorsFromRedux", itemErrorsFromRedux);
+  const [addressOptions] = useState<any>([]);
+
+  // API function for address autocomplete
+  const handleAddressSearch = useCallback(async (searchText: string) => {
+    if (searchText.trim() === "") {
+      return [];
+    }
+
+    try {
+      const result = await GoongService.getAutoComplete(searchText);
+      console.log({ result });
+      const panel = result.predictions.map((pre: any) => ({
+        value: pre.place_id,
+        label: pre.description,
+        ...pre,
+      }));
+      return panel;
+    } catch (err) {
+      console.error("Error fetching address suggestions", err);
+      return [];
+    }
+  }, []);
+  // Custom cell value changed logic
 
   // Define columnDefs first before dataGrid hook
   const columnDefs: ColDef[] = useMemo(
     () => [
       {
         field: "branchName",
+        headerClass: "required",
         headerName: t("tenChiNhanh"),
         editable: true,
         width: 180,
@@ -52,39 +77,53 @@ function Page() {
         },
       },
       {
-        field: "addressLine",
-        headerName: t("diaChi"),
+        field: "placeId",
+        headerClass: "required",
+        headerName: t("placeId"),
         editable: true,
         width: 200,
+        context: {
+          typeColumn: "Select",
+          selectOptions: addressOptions,
+          onSearchAPI: handleAddressSearch,
+          apiDebounceTime: 500,
+          minSearchLength: 2,
+          loadingInitialOptions: false,
+        },
       },
       {
-        field: "placeId",
-        headerName: t("maViTri"),
-        editable: true,
+        field: "addressLine",
+        headerName: t("diaChi"),
+        editable: false,
+        width: 500,
+      },
+      {
+        field: "district",
+        headerName: t("district"),
+        editable: false,
         width: 150,
       },
       {
         field: "city",
         headerName: t("thanhPho"),
-        editable: true,
+        editable: false,
         width: 150,
       },
       {
         field: "lat",
         headerName: t("viDo"),
-        editable: true,
-        width: 120,
+        editable: false,
+        width: 250,
       },
       {
         field: "long",
         headerName: t("kinhDo"),
-        editable: true,
-        width: 120,
+        editable: false,
+        width: 250,
       },
     ],
-    [itemErrorCellStyle, t]
+    [addressOptions, handleAddressSearch, itemErrorCellStyle, t]
   );
-
   const fetchData = useCallback(
     async (
       currentPage: number,
@@ -113,7 +152,7 @@ function Page() {
         setLoading(false);
       }
     },
-    [setLoading, setRowData, setTotalItems]
+    []
   );
 
   const dataGrid = useDataGridOperations<Branch>({
@@ -124,6 +163,7 @@ function Page() {
       updatedAt: new Date().toISOString(),
       branchName: "",
       addressLine: "",
+      district: "",
       placeId: "",
       city: "",
       lat: 0,
@@ -135,8 +175,10 @@ function Page() {
     setRowData,
     requiredFields: [
       { field: "branchName", label: t("tenChiNhanh") },
-      { field: "addressLine", label: t("diaChi") },
-      { field: "city", label: t("thanhPho") },
+      {
+        field: "placeId",
+        label: t("placeId"),
+      },
     ],
     t,
     // Quicksearch parameters
@@ -148,8 +190,62 @@ function Page() {
   });
   useEffect(() => {
     fetchData(1, defaultPageSize, "");
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const handleCellValueChanged = useCallback(
+    async (event: any) => {
+      const customLogic = async (event: any) => {
+        const { newValue, data } = event;
+        const fieldName = event.colDef.field;
+        console.log({ newValue, data, fieldName });
 
+        // Custom logic cho addressLine - khi chọn địa chỉ thì update place details
+        if (fieldName === "placeId" && event.oldValue !== newValue) {
+          console.log({ addressLine: newValue, data });
+          try {
+            const placeDetail: any = await GoongService.getPlaceDetail(
+              newValue
+            );
+            console.log({ placeDetail });
+
+            // Update the row data with place details
+            const updatedRowData = {
+              ...data,
+              addressLine: placeDetail?.result?.formatted_address || "",
+              district: placeDetail?.result?.compound.district || "",
+              city: placeDetail?.result?.compound.province || "",
+              lat: placeDetail?.result?.geometry?.location?.lat || 0,
+              long: placeDetail?.result?.geometry?.location?.lng || 0,
+            };
+
+            // Update the rowData state
+            setRowData((prevData) =>
+              prevData.map((item) =>
+                item.unitKey === data.unitKey ? updatedRowData : item
+              )
+            );
+
+            // Update related fields in the hook
+            dataGrid.updateRelatedFields(getItemId(data), {
+              addressLine: updatedRowData.addressLine,
+              district: updatedRowData.district,
+              city: updatedRowData.city,
+              lat: updatedRowData.lat,
+              long: updatedRowData.long,
+            });
+
+            console.log("Updated row data:", updatedRowData);
+          } catch (error) {
+            console.error("Error fetching place details:", error);
+          }
+        }
+      };
+      // Call the default dataGrid onCellValueChanged
+      dataGrid.onCellValueChanged(event);
+      await customLogic(event);
+    },
+    [dataGrid]
+  );
   // Create save handler (chờ API service được implement)
   const handleSave = dataGrid.createSaveHandler(
     DanhMucChiNhanhServices.createDanhMucChiNhanh,
@@ -173,12 +269,18 @@ function Page() {
       content1={
         <AgGridComponentWrapper
           showSearch={true}
+          rownumber={true}
           rowData={dataGrid.rowData}
           loading={loading}
           columnDefs={columnDefs}
           gridRef={gridRef}
           total={totalItem}
-          onCellValueChanged={dataGrid.onCellValueChanged}
+          rowSelection={{
+            mode: "singleRow",
+            enableClickSelection: true,
+            checkboxes: false,
+          }}
+          onCellValueChanged={handleCellValueChanged}
           onSelectionChanged={dataGrid.onSelectionChanged}
           pagination={true}
           paginationPageSize={pageSize}
@@ -189,7 +291,7 @@ function Page() {
             fetchData(currentPage, pageSize, quickSearchText);
           }}
           maxRowsVisible={13}
-          columnFlex={1}
+          columnFlex={0}
           onQuicksearch={dataGrid.handleQuicksearch}
           showActionButtons={true}
           actionButtonsProps={{

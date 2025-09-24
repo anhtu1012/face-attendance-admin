@@ -349,7 +349,9 @@
     "vuilongNhapKinhDo": "Please enter longitude!",
     "nhapKinhDo": "Enter longitude (e.g. 105.8542)",
     "vuilongNhapMaDoanhNghiep": "Please enter company code!",
-    "nhapMaDoanhNghiep": "Enter company code"
+    "nhapMaDoanhNghiep": "Enter company code",
+    "placeId": "Enter address",
+    "district": "District"
   },
   "DuyetNghiPhep": {
     "maDon": "Request ID",
@@ -443,5 +445,21 @@
   "UserWithByRole": {
     "userName": "User Name",
     "fullName": "Full Name"
+  },
+  "TableContract": {
+    "contractNumber": "Contract Number",
+    "titleContractName": "Title Contract Name",
+    "contractType": "Contract Type",
+    "fullNameUser": "Full Name User",
+    "fullNameManager": "Full Name Manager",
+    "branchNames": "Branch Names",
+    "startDate": "End Date",
+    "duration": "Duration",
+    "status": "Status",
+    "endDate": "End Date"
+  },
+  "UserComponent": {
+    "userName": "userName",
+    "firstName": "Full Name"
   }
 }

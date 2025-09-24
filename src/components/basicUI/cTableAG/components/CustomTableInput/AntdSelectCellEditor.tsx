@@ -21,6 +21,14 @@ interface AntdSelectCellEditorProps extends ICellEditorParams {
   allowAddOption?: boolean;
   openOutside?: boolean; // Controls if dropdown opens automatically (default: false)
   isLoading?: boolean; // Added isLoading prop to control loading state
+  // API integration props
+  onSearchAPI?: (
+    searchText: string
+  ) => Promise<Array<{ value: any; label: string }>>;
+  apiDebounceTime?: number; // Debounce time for API calls
+  minSearchLength?: number; // Minimum characters to trigger API call
+  loadingInitialOptions?: boolean; // Whether to show loading when mounting
+  onSelect?: (selectedOption: any) => void; // Callback when an option is selected
 }
 interface BoardCastChannelNew {
   quickSearch: string; // Define the type of your bookingAssignItems here
@@ -38,7 +46,10 @@ const AntdSelectCellEditor = forwardRef(
     const [loading, setLoading] = useState<boolean>(props.isLoading || false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [searchInput, setSearchInput] = useState<string>("");
-    const debouncedSearchInput = useDebounce(searchInput, 1000);
+    const debouncedSearchInput = useDebounce(
+      searchInput,
+      props.apiDebounceTime || 500
+    );
     const selectRef = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const boardCastChannelAssign =
@@ -66,7 +77,6 @@ const AntdSelectCellEditor = forwardRef(
             return {
               label: item.label || String(item.value),
               value: String(item.value),
-              // Add a unique key based on value and index
               key: `${item.value}_${index}`,
             };
           }
@@ -103,9 +113,87 @@ const AntdSelectCellEditor = forwardRef(
       }
     }, [props.isLoading]);
 
+    // Handle API search integration
+    useEffect(() => {
+      const handleAPISearch = async () => {
+        // Skip API call if no onSearchAPI function is provided
+        if (!props.onSearchAPI) return;
+
+        // Skip if search input is less than minimum length
+        const minLength = props.minSearchLength || 1;
+        if (searchInput.length < minLength) {
+          // Reset to original options if search is too short
+          if (searchInput.length === 0) {
+            setOptions(normalizeOptions(props.values));
+            setLoading(false);
+          }
+          return;
+        }
+
+        try {
+          setLoading(true);
+          const apiResults = await props.onSearchAPI(searchInput);
+          const normalizedResults = normalizeOptions(apiResults);
+          setOptions(normalizedResults);
+        } catch (error) {
+          console.error("API search error:", error);
+          // Fallback to original options on error
+          setOptions(normalizeOptions(props.values));
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      handleAPISearch();
+    }, [
+      debouncedSearchInput,
+      props.onSearchAPI,
+      props.minSearchLength,
+      props.values,
+      normalizeOptions,
+    ]);
+
+    // Initialize with API call if loadingInitialOptions is true
+    useEffect(() => {
+      const initializeWithAPI = async () => {
+        if (props.loadingInitialOptions && props.onSearchAPI) {
+          try {
+            setLoading(true);
+            const initialResults = await props.onSearchAPI("");
+            const normalizedResults = normalizeOptions(initialResults);
+            setOptions(normalizedResults);
+            setOriginalOptions(normalizedResults);
+          } catch (error) {
+            console.error("Initial API load error:", error);
+            // Fallback to provided values
+            const normalizedOptions = normalizeOptions(props.values);
+            setOptions(normalizedOptions);
+            setOriginalOptions(normalizedOptions);
+          } finally {
+            setLoading(false);
+          }
+        }
+      };
+
+      initializeWithAPI();
+    }, [
+      props.loadingInitialOptions,
+      props.onSearchAPI,
+      props.values,
+      normalizeOptions,
+    ]);
+
     // Handle change event
     const handleChange = (newValue: string) => {
       setValue(newValue);
+
+      // Find the selected option
+      const selectedOption = (options ?? []).find(
+        (option) => option.value === newValue
+      );
+      if (props.onSelect && selectedOption) {
+        props.onSelect(selectedOption);
+      }
 
       if (props.onValueChange) {
         const validatedValue = props.onValueChange(newValue, props.value);
@@ -123,6 +211,14 @@ const AntdSelectCellEditor = forwardRef(
     // Handle search filtering
     const handleSearch = (input: string) => {
       setSearchInput(input);
+
+      // If API integration is available, let the useEffect handle the API call
+      if (props.onSearchAPI) {
+        setLoading(true);
+        return;
+      }
+
+      // Original local filtering logic (when no API integration)
       setLoading(true);
 
       // If onScroll is not provided, we can filter locally
@@ -167,8 +263,11 @@ const AntdSelectCellEditor = forwardRef(
       handleSendMessageBoardCastNew({ quickSearch: input });
     };
 
-    // Process the search when debouncedSearchInput changes
+    // Process the search when debouncedSearchInput changes (legacy support for onScroll)
     useEffect(() => {
+      // Skip this effect if API integration is available
+      if (props.onSearchAPI) return;
+
       // Only process when debouncedSearchInput changes
       // Skip this effect if no onScroll is provided
       if (!props.onScroll) return;
@@ -193,6 +292,7 @@ const AntdSelectCellEditor = forwardRef(
       debouncedSearchInput,
       props.values,
       props.onScroll,
+      props.onSearchAPI,
       handleSendMessageBoardCastNew,
       normalizeOptions,
     ]);

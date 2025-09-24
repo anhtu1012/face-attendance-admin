@@ -1,24 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import Cbutton from "@/components/basicUI/Cbutton";
+import CInputLabel from "@/components/basicUI/CInputLabel";
 import CRangePicker from "@/components/basicUI/CrangePicker";
 import Cselect from "@/components/Cselect";
-import { showWarning } from "@/hooks/useNotification";
-import { FilterOperationType } from "@chax-at/prisma-filter-common";
 import { Col, Form, Row } from "antd";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { FilterProps, FilterRef, FormValues } from "../../_types/prop";
 import "./index.scss";
-import { FilterProps, FilterRef } from "../../_types/prop";
+import { useSelectData } from "@/hooks/useSelectData";
 // Add ref type
 
 const Filter = forwardRef<FilterRef, FilterProps>(
-  ({ disabled = false }, ref) => {
+  ({ disabled = false, onSubmit }, ref) => {
     const t = useTranslations("Filter");
-    const [form] = Form.useForm();
-    const [loading, setLoading] = useState(false);
+    const [form] = Form.useForm<FormValues>();
+    const { selectRole } = useSelectData({ fetchRole: true });
     const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(
       dayjs().startOf("day")
     );
@@ -27,43 +27,9 @@ const Filter = forwardRef<FilterRef, FilterProps>(
     );
 
     // Handle form submission
-    const handleFinish = async (values: any) => {
-      try {
-        setLoading(true);
-        const searchFilter: any = [];
-        const { role } = values;
-        if (role) {
-          searchFilter.push({
-            key: "role",
-            type: FilterOperationType.Eq,
-            value: role,
-          });
-        }
-        // Add date range filter
-        if (startDate && endDate) {
-          searchFilter.push({
-            key: "fromDate",
-            type: FilterOperationType.Eq,
-            value: startDate.format("YYYY-MM-DD HH:mm:ss"),
-          });
-          searchFilter.push({
-            key: "toDate",
-            type: FilterOperationType.Eq,
-            value: endDate.format("YYYY-MM-DD HH:mm:ss"),
-          });
-        }
-      } catch (error: any) {
-        console.error("Error fetching container data:", error);
-        showWarning(
-          error.response?.data?.message ||
-            error.message ||
-            "Có lỗi xảy ra khi tìm kiếm dữ liệu!"
-        );
-      } finally {
-        setLoading(false);
-      }
+    const handleFinish = async () => {
+      onSubmit?.();
     };
-
     // Expose form methods through ref
     useImperativeHandle(ref, () => ({
       submitForm: () => {
@@ -102,13 +68,14 @@ const Filter = forwardRef<FilterRef, FilterProps>(
           initialValues={{
             filterDateRange: [dayjs().startOf("day"), dayjs().endOf("day")],
           }}
+          style={{ padding: "15px 20px" }}
         >
           {/* Layout */}
           <Row gutter={16} className="fiter-form-row">
             {/* Col 1 */}
             <Col span={24}>
               {/* Col 2 */}
-              <Row gutter={6}>
+              <Row gutter={[6, 6]}>
                 <>
                   <Col span={24}>
                     <Form.Item name="filterDateRange" style={{ width: "100%" }}>
@@ -135,7 +102,49 @@ const Filter = forwardRef<FilterRef, FilterProps>(
                   <Col span={24}>
                     <Form.Item name="role">
                       <Cselect
-                        label="Role"
+                        label="Vai trò"
+                        allowClear
+                        options={selectRole}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item name="position">
+                      <Cselect
+                        label="Chức vụ"
+                        allowClear
+                        defaultValue="nh"
+                        options={[
+                          { label: "Nhân viên", value: "nh" },
+                          { label: "Quản lý", value: "ql" },
+                          { label: "Giám đốc", value: "gd" },
+                        ]}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item name="userName">
+                      <CInputLabel label="Tên nhân viên" allowClear />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item name="contractType">
+                      <Cselect
+                        label="Loại hợp đồng"
+                        allowClear
+                        defaultValue="nh"
+                        options={[
+                          { label: "Nhân viên", value: "nh" },
+                          { label: "Quản lý", value: "ql" },
+                          { label: "Giám đốc", value: "gd" },
+                        ]}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item name="status">
+                      <Cselect
+                        label="Trang thái"
                         allowClear
                         defaultValue="nh"
                         options={[
@@ -172,8 +181,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(
                     className="loading-icon"
                   />
                 }
-                htmlType="submit"
-                loading={loading}
+                onClick={() => form.submit()}
               >
                 {t("query")}
               </Cbutton>

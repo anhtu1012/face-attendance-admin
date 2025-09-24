@@ -1,0 +1,187 @@
+import { z } from "zod";
+
+// Contract Status Enum using Zod
+export const ContractStatusEnum = z.enum([
+  "ACTIVE",
+  "INACTIVE",
+  "EXPIRED",
+  "PENDING",
+]);
+
+export type ContractStatus = z.infer<typeof ContractStatusEnum>;
+
+// Contract Item Schema
+export const UserContractItemSchema = z.object({
+  id: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  userContractCode: z.string(),
+  userId: z.string(),
+  managedById: z.string(),
+  titleContractId: z.string(),
+  allowanceId: z.number(),
+  positionId: z.string(),
+  contractNumber: z.string(),
+  description: z.string(),
+  contractType: z.string(),
+  baseSalary: z.number(),
+  startDate: z.string(),
+  endDate: z.string(),
+  duration: z.number(),
+  contractPdf: z.string(),
+  status: ContractStatusEnum,
+  branchCodes: z.array(z.string()),
+  branchNames: z.array(z.string()),
+  fullNameUser: z.string(),
+  fullNameManager: z.string(),
+  titleContractName: z.string(),
+  allowanceName: z.string(),
+  positionName: z.string(),
+  contentMd: z.string(),
+  contentHtml: z.string(),
+  userSignature: z.string(),
+  directorSignature: z.string(),
+  otpVerified: z.boolean(),
+  otpVerifiedAt: z.string(),
+});
+
+export type UserContractItem = z.infer<typeof UserContractItemSchema>;
+
+// File type for browser environment
+const FileSchema = z.instanceof(File);
+
+// Create Contract Schema for API (without file)
+export const CreateContractSchema = z.object({
+  userContractCode: z.string().min(1, "User contract code is required"),
+  userId: z.string().min(1, "User ID is required"),
+  managedById: z.string().min(1, "Managed by ID is required"),
+  titleContractId: z.string().min(1, "Title contract ID is required"),
+  allowanceId: z.number().min(1, "Allowance ID is required"),
+  positionId: z.string().min(1, "Position ID is required"),
+  contractNumber: z.string().min(1, "Contract number is required"),
+  description: z.string(),
+  contractType: z.string().min(1, "Contract type is required"),
+  baseSalary: z.number().min(0, "Base salary must be non-negative"),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+  duration: z.number(),
+  contractPdf: z.string().optional(),
+  status: ContractStatusEnum,
+  branchCodes: z.array(z.string()),
+  fullNameUser: z.string().optional(),
+  fullNameManager: z.string().optional(),
+  titleContractName: z.string().optional(),
+  allowanceName: z.string().optional(),
+  positionName: z.string().optional(),
+  contentMd: z.string().optional(),
+  contentHtml: z.string().optional(),
+  userSignature: z.string().optional(),
+  directorSignature: z.string().optional(),
+  otpVerified: z.boolean().optional(),
+  otpVerifiedAt: z.string().optional(),
+});
+
+// Create Contract Form Schema (with file for form handling)
+export const CreateContractFormSchema = z.object({
+  userContractCode: z.string().min(1, "User contract code is required"),
+  userId: z.string().min(1, "User ID is required"),
+  managedById: z.string().min(1, "Managed by ID is required"),
+  titleContractId: z.string().min(1, "Title contract ID is required"),
+  allowanceId: z.number().min(1, "Allowance ID is required"),
+  positionId: z.string().min(1, "Position ID is required"),
+  contractNumber: z.string().min(1, "Contract number is required"),
+  description: z.string(),
+  contractType: z.string().min(1, "Contract type is required"),
+  baseSalary: z.number().min(0, "Base salary must be non-negative"),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+  duration: z.number(),
+  contractPdf: FileSchema.optional(),
+  status: ContractStatusEnum,
+  branchCodes: z.array(z.string()),
+  fullNameUser: z.string().optional(),
+  fullNameManager: z.string().optional(),
+  titleContractName: z.string().optional(),
+  allowanceName: z.string().optional(),
+  positionName: z.string().optional(),
+  contentMd: z.string().optional(),
+  contentHtml: z.string().optional(),
+  userSignature: z.string().optional(),
+  directorSignature: z.string().optional(),
+  otpVerified: z.boolean().optional(),
+  otpVerifiedAt: z.string().optional(),
+});
+
+// Update Contract Schema for API (without file)
+export const UpdateContractSchema = z.object({
+  userContractCode: z
+    .string()
+    .min(1, "User contract code is required")
+    .optional(),
+  userId: z.string().min(1, "User ID is required").optional(),
+  managedById: z.string().min(1, "Managed by ID is required").optional(),
+  titleContractId: z
+    .string()
+    .min(1, "Title contract ID is required")
+    .optional(),
+  allowanceId: z.number().min(1, "Allowance ID is required").optional(),
+  positionId: z.string().min(1, "Position ID is required").optional(),
+  contractNumber: z.string().min(1, "Contract number is required").optional(),
+  description: z.string().optional(),
+  contractType: z.string().min(1, "Contract type is required").optional(),
+  baseSalary: z.number().min(0, "Base salary must be non-negative").optional(),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  duration: z.number().optional(),
+  contractPdf: z.string().optional(),
+  status: ContractStatusEnum.optional(),
+  branchCodes: z.array(z.string()).optional(),
+  fullNameUser: z.string().optional(),
+  fullNameManager: z.string().optional(),
+  titleContractName: z.string().optional(),
+  allowanceName: z.string().optional(),
+  positionName: z.string().optional(),
+  contentMd: z.string().optional(),
+  contentHtml: z.string().optional(),
+  userSignature: z.string().optional(),
+  directorSignature: z.string().optional(),
+  otpVerified: z.boolean().optional(),
+  otpVerifiedAt: z.string().optional(),
+});
+
+// Update Contract Form Schema (with file for form handling)
+export const UpdateContractFormSchema = z.object({
+  userContractCode: z
+    .string()
+    .min(1, "User contract code is required")
+    .optional(),
+  userId: z.string().min(1, "User ID is required").optional(),
+  managedById: z.string().min(1, "Managed by ID is required").optional(),
+  titleContractId: z
+    .string()
+    .min(1, "Title contract ID is required")
+    .optional(),
+  allowanceId: z.number().min(1, "Allowance ID is required").optional(),
+  positionId: z.string().min(1, "Position ID is required").optional(),
+  contractNumber: z.string().min(1, "Contract number is required").optional(),
+  description: z.string().optional(),
+  contractType: z.string().min(1, "Contract type is required").optional(),
+  baseSalary: z.number().min(0, "Base salary must be non-negative").optional(),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  duration: z.number().optional(),
+  contractPdf: FileSchema.optional(),
+  status: ContractStatusEnum.optional(),
+  branchCodes: z.array(z.string()).optional(),
+  fullNameUser: z.string().optional(),
+  fullNameManager: z.string().optional(),
+  titleContractName: z.string().optional(),
+  allowanceName: z.string().optional(),
+  positionName: z.string().optional(),
+  contentMd: z.string().optional(),
+  contentHtml: z.string().optional(),
+  userSignature: z.string().optional(),
+  directorSignature: z.string().optional(),
+  otpVerified: z.boolean().optional(),
+  otpVerifiedAt: z.string().optional(),
+});

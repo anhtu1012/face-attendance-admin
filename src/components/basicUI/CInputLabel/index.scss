@@ -5,6 +5,7 @@
 .input-with-label {
   position: relative;
   width: 100%; // Đảm bảo chiều rộng của input linh động
+  height: 36px;
 
   .input-wrapper {
     position: relative;
@@ -15,7 +16,7 @@
     padding: 12px;
     border-radius: 4px;
     outline: none; // Bỏ outline mặc định của input
-    height: 30px !important;
+    height: 36px !important;
   }
 
   .label {

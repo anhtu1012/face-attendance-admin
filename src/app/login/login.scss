@@ -5,225 +5,223 @@
   height: 100vh;
   width: 100%;
   background-color: $background-color;
-}
-
-.login-left {
-  flex: 1;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: $background-color;
-}
-
-.login-right {
-  flex: 1;
-  background-color: #384fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-}
-
-.image-container {
-  width: 70vw;
-  max-width: 70%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: -80px;
-}
-
-.background-image {
-  object-fit: contain !important;
-  max-width: 100% !important;
-  height: auto !important;
-}
-
-.login-title {
-  font-size: 32px !important;
-  font-weight: 600 !important;
-  margin-bottom: 8px !important;
-  color: $text-color !important;
-}
-
-.login-subtitle {
-  margin-bottom: 40px;
-  color: $text-color-secondary;
-}
-
-.login-form {
-  width: 100%;
-  max-width: 450px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin: 0 auto;
-}
-
-.login-form-button {
-  height: 50px !important;
-  background-color: #384fff !important;
-  border-color: #384fff !important;
-  font-weight: 500;
-  margin-top: 24px;
-  border-radius: 10px !important;
-}
-
-.login-form-button:hover {
-  background-color: #2a3fd8 !important;
-  border-color: #2a3fd8 !important;
-}
-
-.login-divider {
-  margin: 24px 0;
-  color: #999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-links {
-  margin-top: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: $text-color;
-}
-
-.login-checkbox {
-  display: flex;
-  align-items: center;
-  color: $text-color;
-
-  .ant-checkbox-wrapper {
-    color: $text-color;
-  }
-}
-
-.ant-input,
-.ant-input-password {
-  height: 50px !important;
-  border-radius: 10px !important;
-  background-color: $background-color !important;
-  border-color: $border-color !important;
-  color: $text-color !important;
-}
-
-.ant-input-affix-wrapper {
-  height: 50px !important;
-  border-radius: 10px !important;
-  padding: 0 11px;
-  background-color: $background-color !important;
-  border-color: $border-color !important;
-
-  .ant-input {
-    background-color: transparent !important;
+  .login-left {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: $background-color;
   }
 
-  .anticon {
-    color: $text-color-secondary;
+  .login-right {
+    flex: 1;
+    background-color: #384fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
   }
-}
 
-.ant-input-affix-wrapper > input.ant-input {
-  height: 48px !important;
-}
+  .image-container {
+    width: 70vw;
+    max-width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -80px;
+  }
 
-.ant-form-item {
-  margin-bottom: 20px;
-}
+  .background-image {
+    object-fit: contain !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
 
-.ant-form-item-label {
-  font-weight: 500;
-
-  > label {
+  .login-title {
+    font-size: 32px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
     color: $text-color !important;
   }
-}
 
-.login-forgot {
-  color: #384fff;
+  .login-subtitle {
+    margin-bottom: 40px;
+    color: $text-color-secondary;
+  }
+
+  .login-form {
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0 auto;
+  }
+
+  .login-form-button {
+    height: 50px !important;
+    background-color: #384fff !important;
+    border-color: #384fff !important;
+    font-weight: 500;
+    margin-top: 24px;
+    border-radius: 10px !important;
+  }
+
+  .login-form-button:hover {
+    background-color: #2a3fd8 !important;
+    border-color: #2a3fd8 !important;
+  }
+
+  .login-divider {
+    margin: 24px 0;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-links {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: $text-color;
+  }
+
+  .login-checkbox {
+    display: flex;
+    align-items: center;
+    color: $text-color;
+
+    .ant-checkbox-wrapper {
+      color: $text-color;
+    }
+  }
+
+  .ant-input,
+  .ant-input-password {
+    height: 50px !important;
+    border-radius: 10px !important;
+    background-color: $background-color !important;
+    border-color: $border-color !important;
+    color: $text-color !important;
+  }
+
+  .ant-input-affix-wrapper {
+    height: 50px !important;
+    border-radius: 10px !important;
+    padding: 0 11px;
+    background-color: $background-color !important;
+    border-color: $border-color !important;
+
+    .ant-input {
+      background-color: transparent !important;
+    }
+
+    .anticon {
+      color: $text-color-secondary;
+    }
+  }
+
+  .ant-input-affix-wrapper > input.ant-input {
+    height: 48px !important;
+  }
+
+  .ant-form-item {
+    margin-bottom: 20px;
+  }
+
+  .ant-form-item-label {
+    font-weight: 500;
+
+    > label {
+      color: $text-color !important;
+    }
+  }
+
+  .login-forgot {
+    color: #384fff;
+  }
 }
 
 // Dark mode styles
 html.dark {
   .login-container {
     background-color: $background-color-dark;
-  }
+    .login-left {
+      background-color: $background-color-dark;
+    }
 
-  .login-left {
-    background-color: $background-color-dark;
-  }
+    .login-title {
+      color: $text-color-dark !important;
+    }
 
-  .login-title {
-    color: $text-color-dark !important;
-  }
+    .login-subtitle {
+      color: $text-color-secondary-dark;
+    }
 
-  .login-subtitle {
-    color: $text-color-secondary-dark;
-  }
-
-  .login-links {
-    color: $text-color-dark;
-  }
-
-  .login-checkbox {
-    color: $text-color-dark;
-
-    .ant-checkbox-wrapper {
+    .login-links {
       color: $text-color-dark;
     }
 
-    .ant-checkbox-inner {
-      background-color: $background-color-dark-light;
-      border-color: $border-color-dark;
+    .login-checkbox {
+      color: $text-color-dark;
+
+      .ant-checkbox-wrapper {
+        color: $text-color-dark;
+      }
+
+      .ant-checkbox-inner {
+        background-color: $background-color-dark-light;
+        border-color: $border-color-dark;
+      }
+
+      .ant-checkbox-checked .ant-checkbox-inner {
+        background-color: #384fff;
+        border-color: #384fff;
+      }
     }
 
-    .ant-checkbox-checked .ant-checkbox-inner {
-      background-color: #384fff;
-      border-color: #384fff;
+    .ant-input,
+    .ant-input-password {
+      background-color: $background-color-dark-light !important;
+      border-color: $border-color-dark !important;
+      color: $text-color-dark !important;
+
+      &::placeholder {
+        color: $text-color-secondary-dark;
+      }
     }
-  }
 
-  .ant-input,
-  .ant-input-password {
-    background-color: $background-color-dark-light !important;
-    border-color: $border-color-dark !important;
-    color: $text-color-dark !important;
+    .ant-input-affix-wrapper {
+      background-color: $background-color-dark-light !important;
+      border-color: $border-color-dark !important;
 
-    &::placeholder {
-      color: $text-color-secondary-dark;
+      .anticon {
+        color: $text-color-secondary-dark;
+      }
     }
-  }
 
-  .ant-input-affix-wrapper {
-    background-color: $background-color-dark-light !important;
-    border-color: $border-color-dark !important;
-
-    .anticon {
-      color: $text-color-secondary-dark;
+    .ant-form-item-label > label {
+      color: $text-color-dark !important;
     }
-  }
 
-  .ant-form-item-label > label {
-    color: $text-color-dark !important;
-  }
+    // Keep the login button color the same for recognition
+    .login-form-button {
+      background-color: #384fff !important;
+      border-color: #384fff !important;
 
-  // Keep the login button color the same for recognition
-  .login-form-button {
-    background-color: #384fff !important;
-    border-color: #384fff !important;
-
-    &:hover {
-      background-color: #2a3fd8 !important;
-      border-color: #2a3fd8 !important;
+      &:hover {
+        background-color: #2a3fd8 !important;
+        border-color: #2a3fd8 !important;
+      }
     }
-  }
 
-  .login-forgot {
-    color: #5c7cff; // Slightly lighter blue for better visibility in dark mode
+    .login-forgot {
+      color: #5c7cff; // Slightly lighter blue for better visibility in dark mode
+    }
   }
 }

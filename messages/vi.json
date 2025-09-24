@@ -322,7 +322,9 @@
     "vuilongNhapKinhDo": "Vui lòng nhập kinh độ!",
     "nhapKinhDo": "Nhập kinh độ (VD: 105.8542)",
     "vuilongNhapMaDoanhNghiep": "Vui lòng nhập mã doanh nghiệp!",
-    "nhapMaDoanhNghiep": "Nhập mã doanh nghiệp"
+    "nhapMaDoanhNghiep": "Nhập mã doanh nghiệp",
+    "placeId": "Nhập địa chỉ",
+    "district": "Phường/Quận"
   },
   "DuyetNghiPhep": {
     "maDon": "Mã đơn",
@@ -416,5 +418,21 @@
   "UserWithByRole": {
     "userName": "Tên đăng nhập",
     "fullName": "Họ và tên"
+  },
+  "TableContract": {
+    "contractNumber": "Số hợp đồng",
+    "titleContractName": "Tên hợp đồng",
+    "contractType": "Loại hợp đồng",
+    "fullNameUser": "Tên nhân viên",
+    "fullNameManager": "Tên quản lý",
+    "branchNames": "Chi nhánh",
+    "startDate": "Ngày bắt đầu",
+    "duration": "Thời gian",
+    "status": "Trạng thái",
+    "endDate": "Ngày kết thúc"
+  },
+  "UserComponent": {
+    "userName": "Tên đăng nhập",
+    "firstName": "Họ và tên"
   }
 }
