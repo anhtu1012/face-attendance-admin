@@ -35,53 +35,6 @@ export const useGridConfiguration = ({
   // Row height (synchronized with AgGridReact prop)
   const rowHeight = 40;
 
-  // Calculate grid height based on current displayed data
-  const gridHeight = useMemo(() => {
-    const dataLen = pagedData.length;
-
-    // Header height (default ~45px with Quartz theme if not specified)
-    const headerPx = typeof headerHeight === "number" ? headerHeight : 45;
-
-    if (dataLen === 0) {
-      // Header + placeholder body
-      return headerPx + rowHeight * 9;
-    }
-
-    // Calculate visible rows based on maxRowsVisible
-    const visibleRows = Math.min(
-      dataLen,
-      Math.max(1, Math.floor(maxRowsVisible))
-    );
-
-    // Body height (rows)
-    const bodyHeight = Math.max(rowHeight, visibleRows * rowHeight);
-
-    // Total height = header + body
-    return headerPx + bodyHeight;
-  }, [pagedData.length, maxRowsVisible, rowHeight, headerHeight]);
-
-  // Enhanced grid options
-  const gridOptions = useMemo(() => {
-    const options = {
-      ...baseGridOptions,
-      components: {
-        ...(typeof baseGridOptions.components === "object" &&
-        baseGridOptions.components !== null
-          ? baseGridOptions.components
-          : {}),
-        CustomTooltip: CustomTooltip,
-        ErrorCellRenderer: ErrorCellRenderer,
-      },
-      tooltipShowDelay: 0,
-      tooltipMouseTrack: true,
-      suppressScrollOnNewData: true,
-      suppressAnimationFrame: true,
-      suppressRowTransform: true,
-    };
-
-    return options;
-  }, [baseGridOptions]);
-
   // Loading overlay template
   const overlayLoadingTemplate = useMemo(
     () => `
@@ -148,6 +101,55 @@ export const useGridConfiguration = ({
     () => `<span style="font-size: 16px; color: #666;">${t("Nodata")}</span>`,
     [t]
   );
+
+  // Calculate grid height based on current displayed data
+  const gridHeight = useMemo(() => {
+    const dataLen = pagedData.length;
+
+    // Header height (default ~45px with Quartz theme if not specified)
+    const headerPx = typeof headerHeight === "number" ? headerHeight : 45;
+
+    if (dataLen === 0) {
+      // Header + placeholder body
+      return headerPx + rowHeight * 9;
+    }
+
+    // Calculate visible rows based on maxRowsVisible
+    const visibleRows = Math.min(
+      dataLen,
+      Math.max(1, Math.floor(maxRowsVisible))
+    );
+
+    // Body height (rows)
+    const bodyHeight = Math.max(rowHeight, visibleRows * rowHeight);
+
+    // Total height = header + body
+    return headerPx + bodyHeight;
+  }, [pagedData.length, maxRowsVisible, rowHeight, headerHeight]);
+
+  // Enhanced grid options
+  const gridOptions = useMemo(() => {
+    const options = {
+      ...baseGridOptions,
+      overlayLoadingTemplate,
+      overlayNoRowsTemplate,
+      components: {
+        ...(typeof baseGridOptions.components === "object" &&
+        baseGridOptions.components !== null
+          ? baseGridOptions.components
+          : {}),
+        CustomTooltip: CustomTooltip,
+        ErrorCellRenderer: ErrorCellRenderer,
+      },
+      tooltipShowDelay: 0,
+      tooltipMouseTrack: true,
+      suppressScrollOnNewData: true,
+      suppressAnimationFrame: true,
+      suppressRowTransform: true,
+    };
+
+    return options;
+  }, [baseGridOptions, overlayLoadingTemplate, overlayNoRowsTemplate]);
 
   // Filter changed handler for STT refresh
   const onFilterChanged = useCallback(() => {

@@ -635,6 +635,44 @@ export function useDataGridOperations<T extends Record<string, any>>({
     ]
   );
 
+  // Function to update related fields for an item
+  const updateRelatedFields = useCallback(
+    (itemId: string, updates: Record<string, any>) => {
+      const item = rowData.find((row) => getItemId(row) === itemId);
+      if (!item) return;
+
+      // Update changedValues if item has id (existing record)
+      if (item.id) {
+        setChangedValues((prev) => {
+          const existingIndex = prev.findIndex((cv) => cv.id === item.id);
+          if (existingIndex !== -1) {
+            const updated = [...prev];
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              data: { ...updated[existingIndex].data, ...updates },
+            };
+            return updated;
+          } else {
+            return [...prev, { id: item.id, data: updates }];
+          }
+        });
+      }
+
+      // Update editedRows
+      setEditedRows((prev) => {
+        const existingIndex = prev.findIndex((er) => getItemId(er) === itemId);
+        if (existingIndex !== -1) {
+          const updated = [...prev];
+          updated[existingIndex] = { ...updated[existingIndex], ...updates };
+          return updated;
+        } else {
+          return [...prev, { ...item, ...updates }];
+        }
+      });
+    },
+    [rowData, getItemId, setChangedValues, setEditedRows]
+  );
+
   return {
     // State
     isClient,
@@ -666,5 +704,6 @@ export function useDataGridOperations<T extends Record<string, any>>({
 
     // Additional functions
     handleQuicksearch: configHandleQuicksearch || handleQuicksearch,
+    updateRelatedFields,
   };
 }

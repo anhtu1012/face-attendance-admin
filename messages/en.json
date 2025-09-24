@@ -349,7 +349,9 @@
     "vuilongNhapKinhDo": "Please enter longitude!",
     "nhapKinhDo": "Enter longitude (e.g. 105.8542)",
     "vuilongNhapMaDoanhNghiep": "Please enter company code!",
-    "nhapMaDoanhNghiep": "Enter company code"
+    "nhapMaDoanhNghiep": "Enter company code",
+    "placeId": "Enter address",
+    "district": "District"
   },
   "DuyetNghiPhep": {
     "maDon": "Request ID",

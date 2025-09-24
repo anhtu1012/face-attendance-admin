@@ -322,7 +322,9 @@
     "vuilongNhapKinhDo": "Vui lòng nhập kinh độ!",
     "nhapKinhDo": "Nhập kinh độ (VD: 105.8542)",
     "vuilongNhapMaDoanhNghiep": "Vui lòng nhập mã doanh nghiệp!",
-    "nhapMaDoanhNghiep": "Nhập mã doanh nghiệp"
+    "nhapMaDoanhNghiep": "Nhập mã doanh nghiệp",
+    "placeId": "Nhập địa chỉ",
+    "district": "Phường/Quận"
   },
   "DuyetNghiPhep": {
     "maDon": "Mã đơn",

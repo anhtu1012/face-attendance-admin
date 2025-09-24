@@ -10,12 +10,20 @@ import AntdSelectCellEditor from "../components/CustomTableInput/AntdSelectCellE
 // Update the processColumnDefs function to handle Number type
 export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
   return columnDefs.map((colDef) => {
-    if (colDef.context?.typeColumn === "Select" && colDef.context?.selectOptions) {
+    if (
+      colDef.context?.typeColumn === "Select" &&
+      colDef.context?.selectOptions
+    ) {
       return {
         ...colDef,
         cellEditor: AntdSelectCellEditor,
         cellEditorParams: {
           values: colDef.context.selectOptions,
+          // Pass API integration props
+          onSearchAPI: colDef.context.onSearchAPI,
+          apiDebounceTime: colDef.context.apiDebounceTime || 500,
+          minSearchLength: colDef.context.minSearchLength || 1,
+          loadingInitialOptions: colDef.context.loadingInitialOptions || false,
         },
         valueFormatter: (params) => {
           const found = colDef.context?.selectOptions?.find(

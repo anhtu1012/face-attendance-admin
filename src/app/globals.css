@@ -39,6 +39,11 @@ body::-webkit-scrollbar {
   width: 100px;
   border: 1px solid #5dc9ef;
 }
+.required .ag-header-cell-label::after {
+  content: " *";
+  color: red;
+  margin-left: 4px;
+}
 
 #newRowsCountt:focus {
   border-color: #3a9fc7;

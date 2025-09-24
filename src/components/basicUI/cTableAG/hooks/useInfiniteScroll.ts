@@ -10,9 +10,6 @@ interface UseInfiniteScrollProps {
   total?: number;
   pageSize: number;
   isSelecting: boolean;
-  isDraggingCells: boolean;
-  isDraggingFill: boolean;
-  // Additional state management props
   isLoadingMore: boolean;
   setIsLoadingMore: (value: boolean) => void;
   maxReachedPage: number;
@@ -31,8 +28,6 @@ export const useInfiniteScroll = ({
   total,
   pageSize,
   isSelecting,
-  isDraggingCells,
-  isDraggingFill,
   isLoadingMore,
   setIsLoadingMore,
   maxReachedPage,
@@ -74,7 +69,7 @@ export const useInfiniteScroll = ({
     }
 
     // Không trigger infinite scroll khi đang trong cell/row selection operations
-    if (isSelecting || isDraggingCells || isDraggingFill) {
+    if (isSelecting) {
       return;
     }
 
@@ -124,8 +119,6 @@ export const useInfiniteScroll = ({
     maxReachedPage,
     gridRef,
     isSelecting,
-    isDraggingCells,
-    isDraggingFill,
     infiniteScrollDebounceTimer,
     gridWrapperRef,
     setInfiniteScrollDebounceTimer,
