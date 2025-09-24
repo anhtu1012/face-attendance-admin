@@ -20,6 +20,7 @@ type MySelectProps = Pick<
   | "maxTagPlaceholder"
 > & {
   label?: string;
+  required?: boolean;
 };
 
 const Cselect: React.FC<MySelectProps> = ({
@@ -37,6 +38,7 @@ const Cselect: React.FC<MySelectProps> = ({
   label,
   maxTagCount,
   maxTagPlaceholder,
+  required,
 }) => {
   const [isLabelFloating, setIsLabelFloating] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -51,7 +53,12 @@ const Cselect: React.FC<MySelectProps> = ({
         isLabelFloating || defaultValue || isFocused ? "focused" : ""
       } ${disabled ? "disabled" : ""}`}
     >
-      {label && <label className="floating-label">{label}</label>}
+      {label && (
+        <label className="floating-label">
+          {label}
+          {required && <span style={{ color: "red" }}>*</span>}
+        </label>
+      )}
       <Select
         allowClear={allowClear}
         defaultValue={defaultValue}

@@ -1,0 +1,171 @@
+// PDF Preview styles
+.pdf-preview {
+  background-color: white;
+  color: black;
+  padding: 3rem;
+  font-family: serif;
+  font-size: 13pt;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.pdf-company-info {
+  text-align: center;
+  width: 40%;
+}
+
+.pdf-company-name {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.pdf-divider {
+  width: 5rem;
+  height: 1px;
+  background-color: black;
+  margin: 0.25rem auto;
+}
+
+.pdf-ref-number {
+  font-size: 0.875rem;
+}
+
+.pdf-republic-info {
+  text-align: center;
+  width: 60%;
+}
+
+.pdf-republic-title {
+  font-weight: bold;
+}
+
+.pdf-date {
+  text-align: right;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.pdf-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+}
+
+.pdf-preamble {
+  margin-bottom: 1.5rem;
+}
+
+.pdf-preamble p {
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.pdf-parties {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.pdf-party {
+  margin-bottom: 1rem;
+}
+
+.pdf-party-title {
+  font-weight: bold;
+}
+
+.pdf-party-details {
+  padding-left: 2rem;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pdf-info-row {
+  display: flex;
+}
+
+.pdf-info-label {
+  width: 10rem;
+  flex-shrink: 0;
+}
+
+.pdf-info-separator {
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+}
+
+.pdf-info-value {
+  flex-shrink: 0;
+}
+
+.pdf-bold-value {
+  font-weight: bold;
+}
+
+.pdf-agreement {
+  margin-bottom: 1.5rem;
+}
+
+.pdf-content {
+  // Prose styles for markdown
+  .prose {
+    max-width: none;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  }
+}
+
+.pdf-signatures {
+  margin-top: 5rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.pdf-signature-block {
+  text-align: center;
+  width: 40%;
+}
+
+.pdf-signature-title {
+  font-weight: bold;
+}
+
+.pdf-signature-note {
+  font-style: italic;
+  font-size: 0.875rem;
+  margin-bottom: 4rem;
+}
+
+.pdf-signature-image {
+  height: 4rem;
+  width: auto;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.pdf-signature-name {
+  font-weight: bold;
+}

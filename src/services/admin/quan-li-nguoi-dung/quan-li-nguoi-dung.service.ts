@@ -15,7 +15,11 @@ class QlNguoiDungServicesBase extends AxiosService {
     searchFilter: FilterQueryStringTypeItem[] = [],
     params?: any
   ): Promise<UserResponseGetItem> {
-    return this.getWithFilter(`/v1/business/get-user-by-management`, searchFilter, params);
+    return this.getWithFilter(
+      `/v1/business/get-user-by-management`,
+      searchFilter,
+      params
+    );
   }
 
   async getUserByCode(userCode: string): Promise<any> {
@@ -36,7 +40,11 @@ class QlNguoiDungServicesBase extends AxiosService {
     searchFilter: FilterQueryStringTypeItem[] = [],
     params?: any
   ): Promise<any> {
-    return this.getWithFilter(`/v1/business/user-by-management`, searchFilter, params)
+    return this.getWithFilter(
+      `/v1/business/user-by-management`,
+      searchFilter,
+      params
+    );
   }
 }
 

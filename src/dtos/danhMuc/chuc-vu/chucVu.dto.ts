@@ -4,7 +4,7 @@ export const PositionSchema = z.object({
   id: z.string().or(z.bigint()).optional(), // Support both string and BigInt
   unitKey: z.string().optional(),
   positionName: z.string(),
-  roleCode: z.string(),
+  roleId: z.string(),
   description: z.string().optional(),
   overtimeSalary: z.string().or(z.number()).nullable().optional(),
   lateFine: z.string().or(z.number()).nullable().optional(),

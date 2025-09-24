@@ -17,6 +17,7 @@ type MyRangePickerProps = Pick<
   | "showTime"
   | "className"
   | "defaultValue"
+  | "allowClear"
 > & {
   label?: string | [string, string];
 };
@@ -40,6 +41,7 @@ const CRangePicker: React.FC<MyRangePickerProps> = ({
   showTime = { format: "HH:mm:ss" },
   defaultValue,
   label,
+  allowClear = false,
 }) => {
   const [isLabelFloating, setIsLabelFloating] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -84,6 +86,7 @@ const CRangePicker: React.FC<MyRangePickerProps> = ({
           showTime={showTime}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          allowClear={allowClear}
         />
         {isArrayLabel && (
           <>

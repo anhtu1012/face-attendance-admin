@@ -209,29 +209,30 @@ function LayoutContent({
             gap: "12px",
           }}
         >
-          <Card
-            className="content1 card-layout"
-            title={option?.cardTitle}
-            headStyle={{
-              background:
-                "linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229))",
-              textAlign: "center",
-              textTransform: "uppercase",
-              fontSize: "16px",
-              fontWeight: "bold",
-              color: "white",
-            }}
-            style={{
-              flex: defaultLeft,
-              backgroundColor: "#fff",
-              height: "calc(100vh - 106px)",
-              borderRadius: "10px",
-              overflowY: "auto",
-              position: "relative",
-            }}
-          >
-            {content1}
-          </Card>
+          <div className="content1" style={{ flex: defaultLeft }}>
+            <Card
+              className="card-layout"
+              title={option?.cardTitle}
+              headStyle={{
+                background:
+                  "linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229))",
+                textAlign: "center",
+                textTransform: "uppercase",
+                fontSize: "16px",
+                fontWeight: "bold",
+                color: "white",
+              }}
+              style={{
+                backgroundColor: "#fff",
+                height: "calc(100vh - 106px)",
+                borderRadius: "10px",
+                overflowY: "auto",
+                position: "relative",
+              }}
+            >
+              {content1}
+            </Card>
+          </div>
           <div
             className="content2"
             style={{

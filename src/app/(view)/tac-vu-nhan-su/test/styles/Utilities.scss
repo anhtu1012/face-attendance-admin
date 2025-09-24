@@ -1,0 +1,21 @@
+// Utility classes
+.text-center {
+  text-align: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+// Full width document for signing
+.document-full {
+  grid-column: 1 / -1;
+}

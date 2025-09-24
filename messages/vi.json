@@ -418,5 +418,16 @@
   "UserWithByRole": {
     "userName": "Tên đăng nhập",
     "fullName": "Họ và tên"
+  },
+  "TableContract": {
+    "contractNumber": "Số hợp đồng",
+    "titleContractName": "Tên hợp đồng",
+    "contractType": "Loại hợp đồng",
+    "fullNameUser": "Tên nhân viên",
+    "fullNameManager": "Tên quản lý",
+    "branchNames": "Chi nhánh",
+    "startDate": "Ngày bắt đầu",
+    "duration": "Thời gian",
+    "status": "Trạng thái"
   }
 }

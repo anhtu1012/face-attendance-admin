@@ -2,15 +2,16 @@
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { useSelectData } from "@/hooks/useSelectData";
 import { Col, Row } from "antd";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { FaPlusCircle } from "react-icons/fa";
 import { IoFilterCircle } from "react-icons/io5";
 import dynamic from "next/dynamic";
-import { FilterRef } from "./_types/prop";
+import { FilterRef, TableContractRef } from "./_types/prop";
 import "./index.scss";
 import Loading from "../../../../components/Loading/Loading";
 import Filter from "./_components/Filter/Filter";
 import ContractFormView from "./_components/ContractFormView/ContractFormView";
+import TableContract from "./_components/TableContract";
 
 // const ContractFormView = dynamic(
 //   () => import("./_components/ContractFormView/ContractFormView"),
@@ -28,8 +29,15 @@ const UserWithByRole = dynamic(
 );
 function Page() {
   const filterRef = useRef<FilterRef>(null);
+  const tableRef = useRef<TableContractRef>(null);
   const [selected, setSelected] = useState("Bộ lọc");
   const { selectRole } = useSelectData({ fetchRole: true });
+
+  useEffect(() => {
+    if (selected === "Bộ lọc") {
+      tableRef.current?.refetch();
+    }
+  }, [selected]);
   return (
     <LayoutContent
       layoutType={5}
@@ -83,7 +91,12 @@ function Page() {
               </div>
             )}
           </Col>
-          {selected === "Bộ lọc" && <Filter ref={filterRef} />}
+          {selected === "Bộ lọc" && (
+            <Filter
+              ref={filterRef}
+              onSubmit={() => tableRef.current?.refetch()}
+            />
+          )}
           {selected === "Tạo hợp đồng" && (
             <Col span={24}>
               <UserWithByRole roleCode={selectRole} />
@@ -93,18 +106,18 @@ function Page() {
       }
       content2={
         <div className="contract-content-main">
-        <Row gutter={16}>
-          {selected === "Bộ lọc" && (
-            <Col span={24}>
-              <>Bộ lọc</>
-            </Col>
-          )}
-          {selected === "Tạo hợp đồng" && (
-            <Col span={24}>
-              <ContractFormView />
-            </Col>
-          )}
-        </Row>
+          <Row gutter={16}>
+            {selected === "Bộ lọc" && (
+              <Col span={24}>
+                <TableContract ref={tableRef} filterRef={filterRef} />
+              </Col>
+            )}
+            {selected === "Tạo hợp đồng" && (
+              <Col span={24}>
+                <ContractFormView />
+              </Col>
+            )}
+          </Row>
         </div>
       }
     />

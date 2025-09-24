@@ -18,6 +18,7 @@ import {
 import { useSelector } from "react-redux";
 import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
 import DanhMucChucVuServices from "@/services/danh-muc/chuc-vu/chucVu.service";
+import { useSelectData } from "@/hooks/useSelectData";
 
 const defaultPageSize = 20;
 
@@ -36,8 +37,7 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  console.log("itemErrorsFromRedux", itemErrorsFromRedux);
-
+  const { selectRole } = useSelectData({ fetchRole: true });
   // Define columnDefs first before dataGrid hook
   const columnDefs: ColDef[] = useMemo(
     () => [
@@ -52,10 +52,14 @@ function Page() {
         },
       },
       {
-        field: "roleCode",
+        field: "roleId",
         headerName: t("quyenChucVu"),
         editable: true,
         width: 150,
+        context: {
+          typeColumn: "Select",
+          selectOptions: selectRole,
+        },
       },
       {
         field: "description",
@@ -68,15 +72,17 @@ function Page() {
         headerName: t("luongTangCa"),
         editable: true,
         width: 150,
+        context: { typeColumn: "Number" },
       },
       {
         field: "lateFine",
         headerName: t("phiDiMuon"),
         editable: true,
         width: 150,
+        context: { typeColumn: "Number" },
       },
     ],
-    [itemErrorCellStyle, t]
+    [itemErrorCellStyle, selectRole, t]
   );
 
   const fetchData = useCallback(
@@ -119,7 +125,7 @@ function Page() {
       createdBy: "",
       updatedBy: "",
       positionName: "",
-      roleCode: "",
+      roleId: "",
       description: "",
       overtimeSalary: 0,
       lateFine: 0,
@@ -130,7 +136,7 @@ function Page() {
     setRowData,
     requiredFields: [
       { field: "positionName", label: t("tenChucVu") },
-      { field: "roleCode", label: t("quyenChucVu") },
+      { field: "roleId", label: t("quyenChucVu") },
     ],
     t,
     // Quicksearch parameters
@@ -181,6 +187,11 @@ function Page() {
             setCurrentPage(currentPage);
             setPageSize(pageSize);
             fetchData(currentPage, pageSize, quickSearchText);
+          }}
+          rowSelection={{
+            mode: "singleRow",
+            enableClickSelection: true,
+            checkboxes: false,
           }}
           maxRowsVisible={13}
           columnFlex={1}

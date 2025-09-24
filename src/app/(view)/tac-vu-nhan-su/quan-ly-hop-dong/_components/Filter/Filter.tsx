@@ -11,13 +11,14 @@ import { useTranslations } from "next-intl";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import "./index.scss";
-import { FilterProps, FilterRef } from "../../_types/prop";
+import { FilterProps, FilterRef, FormValues } from "../../_types/prop";
+import CInputLabel from "@/components/basicUI/CInputLabel";
 // Add ref type
 
 const Filter = forwardRef<FilterRef, FilterProps>(
-  ({ disabled = false }, ref) => {
+  ({ disabled = false, onSubmit }, ref) => {
     const t = useTranslations("Filter");
-    const [form] = Form.useForm();
+    const [form] = Form.useForm<FormValues>();
     const [loading, setLoading] = useState(false);
     const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(
       dayjs().startOf("day")
@@ -52,6 +53,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(
             value: endDate.format("YYYY-MM-DD HH:mm:ss"),
           });
         }
+        onSubmit?.();
       } catch (error: any) {
         console.error("Error fetching container data:", error);
         showWarning(
@@ -135,7 +137,54 @@ const Filter = forwardRef<FilterRef, FilterProps>(
                   <Col span={24}>
                     <Form.Item name="role">
                       <Cselect
-                        label="Role"
+                        label="Vai trò"
+                        allowClear
+                        defaultValue="nh"
+                        options={[
+                          { label: "Nhân viên", value: "nh" },
+                          { label: "Quản lý", value: "ql" },
+                          { label: "Giám đốc", value: "gd" },
+                        ]}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item name="position">
+                      <Cselect
+                        label="Chức vụ"
+                        allowClear
+                        defaultValue="nh"
+                        options={[
+                          { label: "Nhân viên", value: "nh" },
+                          { label: "Quản lý", value: "ql" },
+                          { label: "Giám đốc", value: "gd" },
+                        ]}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item name="userName">
+                      <CInputLabel label="Tên nhân viên" allowClear />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item name="contractType">
+                      <Cselect
+                        label="Loại hợp đồng"
+                        allowClear
+                        defaultValue="nh"
+                        options={[
+                          { label: "Nhân viên", value: "nh" },
+                          { label: "Quản lý", value: "ql" },
+                          { label: "Giám đốc", value: "gd" },
+                        ]}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item name="status">
+                      <Cselect
+                        label="Trang thái"
                         allowClear
                         defaultValue="nh"
                         options={[

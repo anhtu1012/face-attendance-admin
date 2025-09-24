@@ -1,0 +1,116 @@
+// Signature styles
+.signature-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.signature-trigger {
+  background-color: rgba($slate-800, 0.5);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  transition: all 0.2s;
+
+  .signature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $primary-color;
+  }
+
+  .signature-display {
+    position: relative;
+    width: 100%;
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+
+    &:hover .clear-btn {
+      opacity: 1;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    .clear-btn {
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+      opacity: 0;
+      background-color: rgba($danger-color, 0.9);
+      color: white;
+      padding: 0.25rem;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: $danger-hover;
+      }
+    }
+  }
+
+  .signature-placeholder {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    border: 2px dashed $slate-600;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: $primary-color;
+    }
+
+    .placeholder-text {
+      color: $slate-400;
+    }
+  }
+}
+
+.signature-block {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #9ca3af;
+  width: 40%;
+  text-align: center;
+
+  img {
+    height: 4rem;
+    width: auto;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: $slate-800;
+    font-weight: 600;
+  }
+}
+
+.signature-section {
+  margin-top: 5rem;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 826px;
+  color: black;
+  background-color: white;
+  padding: 3rem;
+}
