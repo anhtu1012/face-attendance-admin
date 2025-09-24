@@ -52,25 +52,25 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           field: "titleContractName",
           headerName: t("titleContractName"),
           editable: false,
-          width: 150,
+          width: 200,
         },
         {
           field: "contractType",
           headerName: t("contractType"),
           editable: false,
-          width: 250,
+          width: 150,
         },
         {
           field: "fullNameUser",
           headerName: t("fullNameUser"),
           editable: false,
-          width: 250,
+          width: 150,
         },
         {
           field: "fullNameManager",
           headerName: t("fullNameManager"),
           editable: false,
-          width: 250,
+          width: 150,
         },
         {
           field: "branchNames",
@@ -89,7 +89,7 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
         },
         {
           field: "endDate",
-          headerName: t("startDate"),
+          headerName: t("endDate"),
           editable: false,
           width: 250,
           context: {
@@ -100,7 +100,7 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           field: "duration",
           headerName: t("duration"),
           editable: false,
-          width: 250,
+          width: 150,
           valueFormatter: (params) => {
             if (params.value && typeof params.value === "number") {
               const minutes = params.value;
@@ -128,7 +128,7 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           field: "status",
           headerName: t("status"),
           editable: false,
-          width: 250,
+          width: 150,
         },
       ],
       [t]

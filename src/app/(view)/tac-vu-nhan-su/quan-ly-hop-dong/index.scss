@@ -1,9 +1,9 @@
-
 .icon-wrapper {
   position: relative;
   display: inline-block;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 10;
 
   &:hover {
     transform: translateY(-5px);

@@ -13,18 +13,15 @@ class NguoiDungServicesBase extends AxiosService {
 
   async getNguoiDung(
     searchFilter: FilterQueryStringTypeItem[] = [],
-    params?: any
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
   ): Promise<NguoiDungResponseGetItem> {
-    if (params && Object.keys(params).length > 0) {
-      const queryParams = new URLSearchParams();
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, String(value));
-        }
-      });
-      return this.getWithParams(`${this.basePath}`, queryParams);
-    }
-    return this.getWithFilter(`${this.basePath}`, searchFilter);
+    return this.getWithFilter(
+      `${this.basePath}`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
   }
 
   createNguoiDung = async (data: CreateNguoiDungRequest): Promise<any> => {

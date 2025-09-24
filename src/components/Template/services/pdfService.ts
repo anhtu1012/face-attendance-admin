@@ -1,36 +1,6 @@
-// This assumes jsPDF, html2canvas, and PDFLib are loaded from CDN and available on the window object.
-declare const jspdf: {
-  jsPDF: new (options: { orientation: string; unit: string; format: string }) => {
-    internal: { pageSize: { getWidth: () => number; getHeight: () => number } };
-    addImage: (imgData: string, format: string, x: number, y: number, width: number, height: number) => void;
-    save: (filename: string) => void;
-  };
-};
-declare const html2canvas: (element: HTMLElement, options: {
-  scale: number;
-  useCORS: boolean;
-  logging: boolean;
-  backgroundColor: string;
-}) => Promise<{
-  width: number;
-  height: number;
-  toDataURL: (format: string) => string;
-}>;
-declare const PDFLib: {
-  PDFDocument: {
-    load: (bytes: ArrayBuffer) => Promise<{
-      getPages: () => Array<{
-        getSize: () => { width: number };
-        drawImage: (image: unknown, options: { x: number; y: number; width: number; height: number }) => void;
-      }>;
-      embedPng: (bytes: ArrayBuffer) => Promise<{
-        height: number;
-        scale: (ratio: number) => { width: number; height: number };
-      }>;
-      save: () => Promise<Uint8Array>;
-    }>;
-  };
-};
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { PDFDocument } from "pdf-lib";
 
 export const generatePdfFromHtml = async (
   element: HTMLElement,
@@ -60,7 +30,7 @@ export const generatePdfFromHtml = async (
   element.style.width = originalWidth;
 
   const imgData = canvas.toDataURL("image/png");
-  const pdf = new jspdf.jsPDF({
+  const pdf = new jsPDF({
     orientation: "portrait",
     unit: "px",
     format: "a4", // Standard A4 size
@@ -102,8 +72,6 @@ export const addSignaturesToPdf = async (
   signatureA: string | null,
   signatureB: string | null
 ): Promise<void> => {
-  const { PDFDocument } = PDFLib;
-
   const existingPdfBytes = await pdfFile.arrayBuffer();
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
 

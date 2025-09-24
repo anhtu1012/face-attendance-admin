@@ -26,9 +26,11 @@ export interface TableContractRef {
   refetch: () => void;
 }
 
-export interface UserWithByRoleProps {
-  roleCode: { label: string; value: string }[];
+import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
+
+export interface UserComponentPropsProps {
   shouldFetch?: boolean;
+  onUserSelect?: (user: NguoiDungItem) => void;
 }
 
 export interface TableContractProps {

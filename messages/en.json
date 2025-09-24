@@ -455,6 +455,11 @@
     "branchNames": "Branch Names",
     "startDate": "End Date",
     "duration": "Duration",
-    "status": "Status"
+    "status": "Status",
+    "endDate": "End Date"
+  },
+  "UserComponent": {
+    "userName": "userName",
+    "firstName": "Full Name"
   }
 }

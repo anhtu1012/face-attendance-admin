@@ -1,12 +1,11 @@
 "use client";
 
-import React, { forwardRef, useMemo } from "react";
+import React, { forwardRef, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { marked } from "marked";
 import { ContractData, Signatures } from "../types";
-
-declare const marked: {
-  parse(markdown: string): string;
-};
+import "../styles/PdfPreview.scss";
+import dayjs from "dayjs";
 
 interface PdfPreviewProps {
   data: ContractData;
@@ -30,15 +29,25 @@ const InfoRow: React.FC<{
 
 export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
   ({ data, markdown, signatures }, ref) => {
-    const parsedMarkdown = useMemo(() => {
-      if (typeof marked === "undefined" || typeof marked.parse !== "function") {
-        return `<pre>${markdown}</pre>`;
-      }
-      try {
-        return marked.parse(markdown);
-      } catch (error) {
-        console.error("Error parsing markdown:", error);
-        return `<p style="color: red;">Error parsing markdown content.</p>`;
+    const [parsedMarkdown, setParsedMarkdown] = useState<string>("");
+
+    useEffect(() => {
+      const parseMarkdown = async () => {
+        try {
+          const result = await marked.parse(markdown);
+          setParsedMarkdown(result);
+        } catch (error) {
+          console.error("Error parsing markdown:", error);
+          setParsedMarkdown(
+            `<p style="color: red;">Error parsing markdown content.</p>`
+          );
+        }
+      };
+
+      if (markdown) {
+        parseMarkdown();
+      } else {
+        setParsedMarkdown("");
       }
     }, [markdown]);
 
@@ -83,7 +92,7 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
         <div className="pdf-preamble">
           <p>
             <em>
-              - Căn cứ Bộ luật Dân sự của nước Cộng hòa Xã h��i Chủ nghĩa Việt
+              - Căn cứ Bộ luật Dân sự của nước Cộng hòa Xã hội Chủ nghĩa Việt
               Nam số 91/2015/QH15 ngày 24/11/2015 và các văn bản hướng dẫn thi
               hành;
             </em>
@@ -132,7 +141,7 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
                 <p className="pdf-info-label">Sinh ngày</p>
                 <p className="pdf-info-separator">:</p>
                 <p className="pdf-info-value" style={{ width: "50%" }}>
-                  {new Date(data.partyB.dob).toLocaleDateString("en-GB")}
+                  {dayjs(data.partyB.dob).format("DD/MM/YYYY")}
                 </p>
                 <p
                   className="pdf-info-label"

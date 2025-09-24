@@ -428,6 +428,11 @@
     "branchNames": "Chi nhánh",
     "startDate": "Ngày bắt đầu",
     "duration": "Thời gian",
-    "status": "Trạng thái"
+    "status": "Trạng thái",
+    "endDate": "Ngày kết thúc"
+  },
+  "UserComponent": {
+    "userName": "Tên đăng nhập",
+    "firstName": "Họ và tên"
   }
 }

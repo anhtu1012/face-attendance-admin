@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useCallback, useRef } from "react";
-import { PartyAInfo } from "./components/PartyAInfo";
-import { PartyBForm } from "./components/PartyBForm";
-import { MarkdownEditor } from "./components/MarkdownEditor";
-import { PdfPreview } from "./components/PdfPreview";
-import { SignaturePad } from "./components/SignaturePad";
-import { PdfViewer } from "./components/PdfViewer";
-import { AiModal } from "./components/AiModal";
+import { PartyAInfo } from "../../../../components/Template/components/PartyAInfo";
+import { PartyBForm } from "../../../../components/Template/components/PartyBForm";
+import { MarkdownEditor } from "../../../../components/Template/components/MarkdownEditor";
+import { PdfPreview } from "../../../../components/Template/components/PdfPreview";
+import { SignaturePad } from "../../../../components/Template/components/SignaturePad";
+import { PdfViewer } from "../../../../components/Template/components/PdfViewer";
+import { AiModal } from "../../../../components/Template/components/AiModal";
 import {
   SignatureIcon,
   DownloadIcon,
@@ -15,11 +15,18 @@ import {
   CloseIcon,
   PenIcon,
   UploadIcon,
-} from "./components/IconComponents";
-import "./styles/main.scss";
+} from "../../../../components/Template/components/IconComponents";
 import Image from "next/image";
-import { ContractData, PartyA, PartyB, Signatures } from "./types";
-import { addSignaturesToPdf, generatePdfFromHtml } from "./services/pdfService";
+import {
+  ContractData,
+  PartyA,
+  PartyB,
+  Signatures,
+} from "../../../../components/Template/types";
+import {
+  addSignaturesToPdf,
+  generatePdfFromHtml,
+} from "../../../../components/Template/services/pdfService";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 
 const partyAData: PartyA = {
