@@ -526,7 +526,7 @@ function Page() {
       }
 
       const finalPayload = {
-        groupCode: selectedRoleId ? [selectedRoleId] : [],
+        roleId: selectedRoleId ? [selectedRoleId] : [],
         permissions,
       };
       const response = await PhanQuyenServices.savePhanQuyen(finalPayload);
