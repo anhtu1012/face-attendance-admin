@@ -50,6 +50,34 @@ $button-gradient-dark-end: #041a35;
 @mixin themed() {
   // Light mode (default)
   #{if(&, "&", "")} {
+    --primary-color: #{$primary-color};
+    --primary-color-light: #{$primary-color-light};
+    --primary-color-dark: #{$primary-color-dark};
+
+    --secondary-color: #{$secondary-color};
+    --secondary-color-light: #{$secondary-color-light};
+    --secondary-color-dark: #{$secondary-color-dark};
+
+    --text-color: #{$text-color};
+    --text-color-secondary: #{$text-color-secondary};
+    --heading-color: #{$heading-color};
+
+    --background-color: #{$background-color};
+    --background-color-light: #{$background-color-light};
+
+    --border-color: #{$border-color};
+
+    --success-color: #{$success-color};
+    --warning-color: #{$warning-color};
+    --error-color: #{$error-color};
+    --info-color: #{$info-color};
+
+    // Add sider variables for light mode
+    --sider-item-bg: #{$sider-item-bg};
+    --sider-item-hover: #{$sider-item-hover};
+    --sider-active-end: #{$sider-active-start};
+    --sider-text-color: #{$sider-text-color};
+
     @content;
   }
 
@@ -82,5 +110,7 @@ $button-gradient-dark-end: #041a35;
     --sider-item-hover: #{$sider-item-hover-dark};
     --sider-active-end: #{$sider-active-end-dark};
     --sider-text-color: #{$sider-text-color-dark};
+
+    @content;
   }
 }

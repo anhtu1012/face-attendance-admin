@@ -71,7 +71,7 @@ function Page() {
         layoutType={5}
         option={{
           floatButton: true,
-          sizeAdjust: selected === "Bộ lọc" ? [3, 7] : [5, 5],
+          sizeAdjust: selected === "Bộ lọc" ? [3, 7] : [4, 6],
           cardTitle: selected === "Bộ lọc" ? "Bộ lọc - Quản lý hợp đồng" : "",
         }}
         content1={
