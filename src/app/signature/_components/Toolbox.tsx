@@ -1,6 +1,7 @@
-import React from 'react';
-import { ActiveTool, StagedItem } from '../types';
-import { PenLineIcon, TypeIcon, UndoIcon, RotateCcwIcon } from './icons';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
+import { ActiveTool, StagedItem } from "../types";
+import { PenLineIcon, TypeIcon, UndoIcon, RotateCcwIcon } from "./icons";
 
 interface ToolboxProps {
   activeTool: ActiveTool;

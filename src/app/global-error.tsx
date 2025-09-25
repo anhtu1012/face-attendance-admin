@@ -1,10 +1,9 @@
 "use client";
- 
+
 import { useEffect, useState } from "react";
 import "../components/PageTransition/index.scss";
 
 export default function GlobalError({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -31,7 +30,7 @@ export default function GlobalError({
       <body>
         <div className="page-transition">
           <div className="page-transition-content">
-            <div 
+            <div
               className="running-man-container"
               style={{ "--progress": progress } as React.CSSProperties}
             >
@@ -47,14 +46,18 @@ export default function GlobalError({
               </div>
             </div>
             <div className="page-transition-progress-container">
-              <div 
-                className="page-transition-progress-bar" 
+              <div
+                className="page-transition-progress-bar"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
             <div className="brand-text">HUMAN & MONEY</div>
-            <h2 className="page-transition-text error-text">Something went wrong!</h2>
-            <button onClick={() => reset()} className="retry-button">Try again</button>
+            <h2 className="page-transition-text error-text">
+              Something went wrong!
+            </h2>
+            <button onClick={() => reset()} className="retry-button">
+              Try again
+            </button>
           </div>
         </div>
       </body>

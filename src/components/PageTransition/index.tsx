@@ -10,12 +10,10 @@ const PageTransition = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
     setLoading(true);
     setProgress(0);
-    
-    interval = setInterval(() => {
+
+    const interval = setInterval(() => {
       setProgress((prevProgress) => {
         if (prevProgress >= 100) {
           clearInterval(interval);
@@ -27,7 +25,7 @@ const PageTransition = () => {
         return prevProgress + 1;
       });
     }, 20);
-    
+
     return () => {
       clearInterval(interval);
     };
@@ -38,7 +36,7 @@ const PageTransition = () => {
   return (
     <div className="page-transition">
       <div className="page-transition-content">
-        <div 
+        <div
           className=""
           style={{ "--progress": progress } as React.CSSProperties}
         >
@@ -54,8 +52,8 @@ const PageTransition = () => {
           </div>
         </div>
         <div className="page-transition-progress-container">
-          <div 
-            className="page-transition-progress-bar" 
+          <div
+            className="page-transition-progress-bar"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
