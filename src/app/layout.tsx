@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AntdThemeProvider from "./AntdThemeProvider";
 import { ReduxProvider } from "./StoreProvider";
 import NotificationHolder from "@/hooks/NotificationHolder";
+import PageTransition from "@/components/PageTransition";
 // import BubbleCursor from "@/components/BubbleCursor";
 
 export default async function RootLayout({
@@ -27,6 +28,7 @@ export default async function RootLayout({
               <AntdThemeProvider>
                 <AntdRegistry>
                   <NotificationHolder />
+                  <PageTransition />
                   {children}
                 </AntdRegistry>
               </AntdThemeProvider>
