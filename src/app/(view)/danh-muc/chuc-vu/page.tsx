@@ -148,7 +148,7 @@ function Page() {
   });
   useEffect(() => {
     fetchData(1, defaultPageSize, "");
-  }, [fetchData]);
+  }, []);
 
   // Create save handler (chờ API service được implement)
   const handleSave = dataGrid.createSaveHandler(

@@ -8,11 +8,11 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface UserAccountProps {
-  roleCode?: string;
+  roleId?: string;
   shouldFetch?: boolean;
 }
 
-function UserAccount({ roleCode, shouldFetch = false }: UserAccountProps) {
+function UserAccount({ roleId, shouldFetch = false }: UserAccountProps) {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("PhanQuyen");
   const gridRef = useRef<AgGridReact>({} as any);
@@ -21,7 +21,7 @@ function UserAccount({ roleCode, shouldFetch = false }: UserAccountProps) {
   const [rowData, setRowData] = useState<any[]>([]);
 
   const handleFetchUserAccount = useCallback(async () => {
-    if (!roleCode) {
+    if (!roleId) {
       setRowData([]);
       setTotalItems(0);
       return;
@@ -30,7 +30,7 @@ function UserAccount({ roleCode, shouldFetch = false }: UserAccountProps) {
     try {
       const searchFilter: any = [];
       const params: any = {
-        roleCode: roleCode,
+        roleId: roleId,
       };
       const response = await PhanQuyenServices.getTaiKhoanNhomVaiTro(
         searchFilter,
@@ -43,7 +43,7 @@ function UserAccount({ roleCode, shouldFetch = false }: UserAccountProps) {
       showError(error.response?.data?.message || mes("fetchError"));
       setLoading(false);
     }
-  }, [mes, roleCode]);
+  }, [mes, roleId]);
 
   const columnDefs: ColDef[] = useMemo(
     () => [

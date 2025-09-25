@@ -40,21 +40,7 @@ export const contractTemplates = [
     description: "Template cơ bản cho hợp đồng lao động",
     content: `# HỢP ĐỒNG LAO ĐỘNG
 
-## I. THÔNG TIN CÁC BÊN
-
-### 1. Bên A - Công ty:
-- **Tên công ty**: [Tên công ty]
-- **Địa chỉ**: [Địa chỉ công ty]
-- **Mã số thuế**: [Mã số thuế]
-- **Người đại diện**: [Họ tên người đại diện]
-
-### 2. Bên B - Người lao động:
-- **Họ và tên**: [Họ tên nhân viên]
-- **CCCD/CMND**: [Số CCCD]
-- **Địa chỉ thường trú**: [Địa chỉ]
-- **Số điện thoại**: [Số điện thoại]
-
-## II. NỘI DUNG CÔNG VIỆC
+## NỘI DUNG CÔNG VIỆC
 
 ### Vị trí làm việc
 - **Chức danh**: [Chức danh công việc]
@@ -66,13 +52,13 @@ export const contractTemplates = [
 - Tuân thủ nội quy, quy chế của công ty
 - Báo cáo kết quả công việc định kỳ
 
-## III. THỜI GIAN LÀM VIỆC
+## THỜI GIAN LÀM VIỆC
 
 - **Thời gian**: 8 giờ/ngày, 5 ngày/tuần
 - **Giờ làm việc**: 08:00 - 17:00 (nghỉ trưa 12:00-13:00)
 - **Ngày nghỉ**: Thứ 7, Chủ nhật và các ngày lễ theo quy định
 
-## IV. LƯƠNG VÀ PHÚC LỢI
+## LƯƠNG VÀ PHÚC LỢI
 
 ### Mức lương
 - **Lương cơ bản**: [Mức lương] VNĐ/tháng
@@ -84,7 +70,7 @@ export const contractTemplates = [
 - Nghỉ phép năm: 12 ngày/năm
 - Khám sức khỏe định kỳ
 
-## V. QUYỀN VÀ NGHĨA VỤ
+## QUYỀN VÀ NGHĨA VỤ
 
 ### Quyền của người lao động
 - Được hưởng đầy đủ các chế độ theo hợp đồng
@@ -96,7 +82,7 @@ export const contractTemplates = [
 - Tuân thủ nội quy, quy chế công ty
 - Bảo mật thông tin công ty
 
-## VI. ĐIỀU KHOẢN CHUNG
+## ĐIỀU KHOẢN CHUNG
 
 - Hợp đồng có hiệu lực từ ngày ký
 - Mọi tranh chấp được giải quyết thông qua thương lượng
@@ -114,30 +100,7 @@ export const contractTemplates = [
     description: "Template chi tiết với đầy đủ điều khoản",
     content: `# HỢP ĐỒNG LAO ĐỘNG CHI TIẾT
 
-## 📋 I. THÔNG TIN CHUNG
-
-### 🏢 Bên thuê lao động (Bên A)
-| Thông tin | Chi tiết |
-|-----------|----------|
-| **Tên công ty** | [Tên đầy đủ công ty] |
-| **Địa chỉ** | [Địa chỉ trụ sở chính] |
-| **Mã số thuế** | [Mã số thuế] |
-| **Điện thoại** | [Số điện thoại] |
-| **Email** | [Email công ty] |
-| **Người đại diện** | [Họ tên - Chức vụ] |
-
-### 👤 Bên cung cấp lao động (Bên B)
-| Thông tin | Chi tiết |
-|-----------|----------|
-| **Họ và tên** | [Họ tên đầy đủ] |
-| **Ngày sinh** | [DD/MM/YYYY] |
-| **CCCD/CMND** | [Số CCCD] - Cấp ngày: [DD/MM/YYYY] |
-| **Nơi cấp** | [Cơ quan cấp] |
-| **Địa chỉ thường trú** | [Địa chỉ đầy đủ] |
-| **Điện thoại** | [Số điện thoại] |
-| **Email** | [Email cá nhân] |
-
-## 💼 II. NỘI DUNG CÔNG VIỆC
+## NỘI DUNG CÔNG VIỆC
 
 ### Thông tin vị trí
 - **Chức danh**: [Tên chức danh cụ thể]
@@ -147,12 +110,12 @@ export const contractTemplates = [
 - **Địa điểm**: [Chi nhánh/Văn phòng làm việc]
 
 ### Mô tả chi tiết công việc
-#### 🎯 Mục tiêu chính
+#### Mục tiêu chính
 - Đạt được các KPI được giao hàng tháng/quý
 - Đóng góp vào sự phát triển của team và công ty
 - Nâng cao chất lượng sản phẩm/dịch vụ
 
-#### 📝 Nhiệm vụ cụ thể
+#### Nhiệm vụ cụ thể
 1. **Nhiệm vụ hàng ngày**:
    - Thực hiện các công việc được giao theo kế hoạch
    - Tham gia các cuộc họp team/dự án
@@ -168,7 +131,7 @@ export const contractTemplates = [
    - Đề xuất cải tiến quy trình
    - Tuân thủ các quy định về bảo mật
 
-## ⏰ III. THỜI GIAN LÀM VIỆC
+## THỜI GIAN LÀM VIỆC
 
 ### Lịch làm việc tiêu chuẩn
 - **Số giờ**: 40 giờ/tuần (8 giờ/ngày × 5 ngày)
@@ -186,9 +149,9 @@ export const contractTemplates = [
 - Nghỉ Tết Nguyên đán: 7-10 ngày
 - Nghỉ phép năm: 12-15 ngày (tùy theo thâm niên)
 
-## 💰 IV. LƯƠNG VÀ PHÚC LỢI
+## LƯƠNG VÀ PHÚC LỢI
 
-### 💵 Cơ cấu lương
+### Cơ cấu lương
 | Khoản mục | Mức tiền | Ghi chú |
 |-----------|----------|---------|
 | **Lương cơ bản** | [Số tiền] VNĐ | Cố định hàng tháng |
@@ -196,32 +159,32 @@ export const contractTemplates = [
 | **Phụ cấp xăng xe** | 500,000 VNĐ | Hỗ trợ đi lại |
 | **Phụ cấp điện thoại** | 200,000 VNĐ | Hỗ trợ liên lạc công việc |
 
-### 🎁 Thưởng và bonus
+### Thưởng và bonus
 - **Thưởng tháng 13**: 1 tháng lương cơ bản
 - **Thưởng hiệu suất**: 10-30% lương cơ bản (theo KPI)
 - **Thưởng dự án**: Theo quy định riêng
 - **Thưởng lễ/tết**: Theo chính sách công ty
 
-### 🏥 Bảo hiểm và phúc lợi
+### Bảo hiểm và phúc lợi
 #### Bảo hiểm bắt buộc
-- ✅ BHXH: 17.5% (Công ty: 10.5%, NV: 8%)
-- ✅ BHYT: 4.5% (Công ty: 3%, NV: 1.5%)
-- ✅ BHTN: 2% (Công ty: 1%, NV: 1%)
+- BHXH: 17.5% (Công ty: 10.5%, NV: 8%)
+- BHYT: 4.5% (Công ty: 3%, NV: 1.5%)
+- BHTN: 2% (Công ty: 1%, NV: 1%)
 
 #### Bảo hiểm bổ sung
-- 🏥 **Bảo hiểm sức khỏe**: Bao gồm cả gia đình
-- 🦷 **Bảo hiểm nha khoa**: 5,000,000 VNĐ/năm
-- 💊 **Gói khám sức khỏe**: Định kỳ 6 tháng/lần
+- **Bảo hiểm sức khỏe**: Bao gồm cả gia đình
+- **Bảo hiểm nha khoa**: 5,000,000 VNĐ/năm
+- **Gói khám sức khỏe**: Định kỳ 6 tháng/lần
 
 #### Phúc lợi khác
-- 🎂 **Sinh nhật**: Quà sinh nhật + 1 ngày nghỉ
-- 👶 **Thai sản**: Hỗ trợ thêm 2 tháng lương
-- 🏖️ **Du lịch**: Team building 2 lần/năm
-- 📚 **Đào tạo**: Ngân sách 10,000,000 VNĐ/năm
+- **Sinh nhật**: Quà sinh nhật + 1 ngày nghỉ
+- **Thai sản**: Hỗ trợ thêm 2 tháng lương
+- **Du lịch**: Team building 2 lần/năm
+- **Đào tạo**: Ngân sách 10,000,000 VNĐ/năm
 
-## ⚖️ V. QUYỀN VÀ NGHĨA VỤ
+## QUYỀN VÀ NGHĨA VỤ
 
-### 👍 Quyền lợi của người lao động
+### Quyền lợi của người lao động
 1. **Về công việc**:
    - Được làm việc trong môi trường an toàn, văn minh
    - Được cung cấp đầy đủ trang thiết bị làm việc
@@ -237,7 +200,7 @@ export const contractTemplates = [
    - Được hưởng các khoản thưởng theo quy định
    - Được tăng lương định kỳ
 
-### 📋 Nghĩa vụ của người lao động
+### Nghĩa vụ của người lao động
 1. **Về chuyên môn**:
    - Thực hiện công việc đúng tiêu chuẩn chất lượng
    - Tuân thủ quy trình, hướng dẫn kỹ thuật
@@ -253,24 +216,24 @@ export const contractTemplates = [
    - Không tiết lộ bí mật kinh doanh
    - Không cạnh tranh không lành mạnh
 
-## 📜 VI. ĐIỀU KHOẢN ĐẶC BIỆT
+## ĐIỀU KHOẢN ĐẶC BIỆT
 
-### 🔒 Điều khoản bảo mật
+### Điều khoản bảo mật
 - Thời hạn bảo mật: 2 năm sau khi chấm dứt hợp đồng
 - Phạm vi bảo mật: Tất cả thông tin liên quan đến công ty
 - Vi phạm: Bồi thường thiệt hại theo quy định pháp luật
 
-### 🚫 Điều khoản cạnh tranh
+### Điều khoản cạnh tranh
 - Không được làm việc cho đối thủ cạnh tranh trong 12 tháng
 - Không được thành lập công ty cùng lĩnh vực trong 18 tháng
 - Bồi thường: 6 tháng lương nếu vi phạm
 
-### 🔄 Điều khoản thay đổi
+### Điều khoản thay đổi
 - Mọi thay đổi phải được thỏa thuận bằng văn bản
 - Có chữ ký của cả hai bên
 - Lập thành phụ lục đính kèm hợp đồng
 
-## 🏁 VII. CHẤM DỨT HỢP ĐỒNG
+## CHẤM DỨT HỢP ĐỒNG
 
 ### Các trường hợp chấm dứt
 1. **Hết thời hạn hợp đồng**
@@ -284,21 +247,8 @@ export const contractTemplates = [
 - Thanh toán các khoản còn lại trong 7 ngày
 
 ---
-
-## ✍️ CHỮ KÝ XÁC NHẬN
-
-*Hợp đồng được lập tại: [Địa điểm]*  
-*Ngày: [DD/MM/YYYY]*
-
-| **BÊN A - CÔNG TY** | **BÊN B - NGƯỜI LAO ĐỘNG** |
-|:-------------------:|:---------------------------:|
-| [Họ tên người đại diện] | [Họ tên nhân viên] |
-| Chức vụ: [Chức vụ] | |
-| *(Ký tên, đóng dấu)* | *(Ký tên)* |
-
----
-*📞 Hotline hỗ trợ: [Số điện thoại]*  
-*📧 Email: [Email liên hệ]*`,
+*Hotline hỗ trợ: [Số điện thoại]*  
+*Email: [Email liên hệ]*`,
   },
   {
     id: "probation",
@@ -306,25 +256,13 @@ export const contractTemplates = [
     description: "Template cho giai đoạn thử việc",
     content: `# HỢP ĐỒNG THỬ VIỆC
 
-## 🔍 I. THÔNG TIN CHUNG
-
-### Thông tin công ty
-- **Công ty**: [Tên công ty]
-- **Người đại diện**: [Họ tên - Chức vụ]
-- **Địa chỉ**: [Địa chỉ công ty]
-
-### Thông tin ứng viên
-- **Họ tên**: [Họ tên ứng viên]
-- **Vị trí ứng tuyển**: [Tên vị trí]
-- **Thời gian thử việc**: [Số] tháng
-
-## 📋 II. MỤC TIÊU THỬ VIỆC
+## MỤC TIÊU THỬ VIỆC
 
 ### Mục tiêu cho ứng viên
-- ✅ Làm quen với môi trường làm việc
-- ✅ Nắm vững quy trình, công cụ làm việc
-- ✅ Hoàn thành các task được giao
-- ✅ Thể hiện khả năng làm việc nhóm
+- Làm quen với môi trường làm việc
+- Nắm vững quy trình, công cụ làm việc
+- Hoàn thành các task được giao
+- Thể hiện khả năng làm việc nhóm
 
 ### Tiêu chí đánh giá
 1. **Chuyên môn** (40%):
@@ -342,27 +280,27 @@ export const contractTemplates = [
    - Hỗ trợ đồng nghiệp
    - Hòa nhập với team
 
-## 📅 III. KẾ HOẠCH THỬ VIỆC
+## KẾ HOẠCH THỬ VIỆC
 
 ### Tuần 1-2: Làm quen
-- 📚 Tìm hiểu về công ty, sản phẩm
-- 👥 Gặp gỡ team members
-- 🛠️ Setup môi trường làm việc
-- 📖 Đọc tài liệu hướng dẫn
+- Tìm hiểu về công ty, sản phẩm
+- Gặp gỡ team members
+- Setup môi trường làm việc
+- Đọc tài liệu hướng dẫn
 
 ### Tuần 3-6: Thực hành
-- 💼 Tham gia dự án thực tế
-- 🎯 Hoàn thành task đầu tiên
-- 📊 Báo cáo tiến độ hàng tuần
-- 🤝 Làm việc với mentor
+- Tham gia dự án thực tế
+- Hoàn thành task đầu tiên
+- Báo cáo tiến độ hàng tuần
+- Làm việc với mentor
 
 ### Tuần 7-8: Đánh giá
-- 📝 Self-assessment
-- 👨‍💼 Feedback từ manager
-- 🎭 Peer review từ đồng nghiệp
-- 📈 Đánh giá tổng thể
+- Self-assessment
+- Feedback từ manager
+- Peer review từ đồng nghiệp
+- Đánh giá tổng thể
 
-## 💰 IV. CHỈ ĐỘ THỬ VIỆC
+## CHỈ ĐỘ THỬ VIỆC
 
 ### Lương thử việc
 - **Mức lương**: 85% lương chính thức
@@ -370,41 +308,41 @@ export const contractTemplates = [
 - **Phụ cấp**: Ăn trưa + Xăng xe
 
 ### Quyền lợi
-- ✅ Được hướng dẫn bởi mentor
-- ✅ Tham gia training nội bộ
-- ✅ Sử dụng đầy đủ trang thiết bị
-- ✅ Nghỉ phép 1 ngày/tháng
+- Được hướng dẫn bởi mentor
+- Tham gia training nội bộ
+- Sử dụng đầy đủ trang thiết bị
+- Nghỉ phép 1 ngày/tháng
 
-## 📊 V. QUY TRÌNH ĐÁNH GIÁ
+## QUY TRÌNH ĐÁNH GIÁ
 
 ### Milestone đánh giá
 - **Tuần 2**: Check-in đầu tiên
 - **Tuần 4**: Mid-review
-- **Tuần 6**: Pre-final review  
+- **Tuần 6**: Pre-final review
 - **Tuần 8**: Final evaluation
 
 ### Kết quả có thể
-1. **✅ Pass**: Ký hợp đồng chính thức
-2. **⏳ Extend**: Gia hạn thử việc (tối đa 1 tháng)
-3. **❌ Not pass**: Kết thúc hợp đồng
+1. **Pass**: Ký hợp đồng chính thức
+2. **Extend**: Gia hạn thử việc (tối đa 1 tháng)
+3. **Not pass**: Kết thúc hợp đồng
 
 ### Feedback process
-- 📝 **Weekly 1-1**: Với manager trực tiếp
-- 📊 **Bi-weekly report**: Tự đánh giá tiến độ
-- 🎯 **Goal setting**: Điều chỉnh mục tiêu nếu cần
+- **Weekly 1-1**: Với manager trực tiếp
+- **Bi-weekly report**: Tự đánh giá tiến độ
+- **Goal setting**: Điều chỉnh mục tiêu nếu cần
 
-## 🎯 VI. KỲ VỌNG VÀ MỤC TIÊU
+## KỲ VỌNG VÀ MỤC TIÊU
 
 ### Từ công ty
 > *"Chúng tôi kỳ vọng bạn sẽ nhanh chóng hòa nhập và đóng góp tích cực vào team. Đây là cơ hội để cả hai bên hiểu rõ nhau hơn."*
 
 ### Từ ứng viên
-- 💪 Chủ động học hỏi và thích ứng
-- 🤔 Đặt câu hỏi khi cần thiết
-- 📈 Cải thiện liên tục
-- 🤝 Xây dựng mối quan hệ tốt
+- Chủ động học hỏi và thích ứng
+- Đặt câu hỏi khi cần thiết
+- Cải thiện liên tục
+- Xây dựng mối quan hệ tốt
 
-## 📞 VII. LIÊN HỆ HỖ TRỢ
+## LIÊN HỆ HỖ TRỢ
 
 ### Mentor
 - **Tên**: [Tên mentor]
@@ -419,7 +357,7 @@ export const contractTemplates = [
 
 ---
 
-## ✍️ XÁC NHẬN
+## XÁC NHẬN
 
 *Ngày bắt đầu thử việc: [DD/MM/YYYY]*  
 *Ngày kết thúc dự kiến: [DD/MM/YYYY]*
@@ -428,7 +366,7 @@ export const contractTemplates = [
 *(Ký tên, đóng dấu)*        *(Ký tên)*
 
 ---
-*🍀 Chúc bạn thành công trong thời gian thử việc!*`,
+*Chúc bạn thành công trong thời gian thử việc!*`,
   },
   {
     id: "internship",
@@ -436,22 +374,7 @@ export const contractTemplates = [
     description: "Template dành cho sinh viên thực tập",
     content: `# HỢP ĐỒNG THỰC TÂP SINH
 
-## 🎓 I. THÔNG TIN CHUNG
-
-### 🏢 Công ty tiếp nhận
-- **Tên công ty**: [Tên công ty]
-- **Lĩnh vực**: [Lĩnh vực hoạt động]
-- **Địa chỉ**: [Địa chỉ công ty]
-- **Người phụ trách**: [Tên mentor]
-
-### 👨‍🎓 Thông tin thực tập sinh
-- **Họ tên**: [Họ tên sinh viên]
-- **Trường**: [Tên trường đại học]
-- **Ngành học**: [Tên ngành]
-- **Khóa**: [Khóa học]
-- **MSV**: [Mã số sinh viên]
-
-## 🎯 II. MỤC TIÊU THỰC TÂP
+## MỤC TIÊU THỰC TÂP
 
 ### Mục tiêu học tập
 1. **Kiến thức thực tế**:
@@ -469,27 +392,27 @@ export const contractTemplates = [
    - Xây dựng network nghề nghiệp
    - Chuẩn bị cho việc làm sau tốt nghiệp
 
-## 📚 III. CHƯƠNG TRÌNH THỰC TÂP
+## CHƯƠNG TRÌNH THỰC TÂP
 
 ### Phase 1: Orientation (Tuần 1)
-- 🏢 **Company tour**: Tham quan công ty
-- 👥 **Meet the team**: Gặp gỡ đồng nghiệp
-- 📋 **Onboarding**: Tìm hiểu quy trình, tools
-- 🎯 **Goal setting**: Thiết lập mục tiêu cá nhân
+- Company tour: Tham quan công ty
+- Meet the team: Gặp gỡ đồng nghiệp
+- Onboarding: Tìm hiểu quy trình, tools
+- Goal setting: Thiết lập mục tiêu cá nhân
 
 ### Phase 2: Learning (Tuần 2-8)
-- 📖 **Training sessions**: Các buổi đào tạo
-- 💼 **Shadow work**: Theo dõi mentor làm việc
-- 🛠️ **Hands-on practice**: Thực hành với dự án thật
-- 📊 **Weekly review**: Đánh giá tiến độ hàng tuần
+- Training sessions: Các buổi đào tạo
+- Shadow work: Theo dõi mentor làm việc
+- Hands-on practice: Thực hành với dự án thật
+- Weekly review: Đánh giá tiến độ hàng tuần
 
 ### Phase 3: Contributing (Tuần 9-12)
-- 🚀 **Real projects**: Tham gia dự án thực tế
-- 🎭 **Independent work**: Làm việc độc lập
-- 🤝 **Collaboration**: Hợp tác với teams khác
-- 📈 **Impact measurement**: Đo lường đóng góp
+- Real projects: Tham gia dự án thực tế
+- Independent work: Làm việc độc lập
+- Collaboration: Hợp tác với teams khác
+- Impact measurement: Đo lường đóng góp
 
-## 💰 IV. CHẾ ĐỘ HỖ TRỢ
+## CHẾ ĐỘ HỖ TRỢ
 
 ### Hỗ trợ tài chính
 - **Trợ cấp**: [Số tiền] VNĐ/tháng
@@ -497,12 +420,12 @@ export const contractTemplates = [
 - **Đi lại**: Hỗ trợ 50% chi phí
 
 ### Hỗ trợ học tập
-- 💻 **Thiết bị**: Laptop, màn hình, phụ kiện
-- 📚 **Tài liệu**: Sách, khóa học online
-- 🎓 **Mentoring**: 1-1 với senior developer
-- 🏆 **Certificate**: Chứng nhận hoàn thành
+- **Thiết bị**: Laptop, màn hình, phụ kiện
+- **Tài liệu**: Sách, khóa học online
+- **Mentoring**: 1-1 với senior developer
+- **Certificate**: Chứng nhận hoàn thành
 
-## 👨‍🏫 V. MENTOR VÀ HỖ TRỢ
+## MENTOR VÀ HỖ TRỢ
 
 ### Mentor chính
 - **Tên**: [Tên mentor]
@@ -515,7 +438,7 @@ export const contractTemplates = [
 - **Vai trò**: Hỗ trợ hòa nhập, giải đáp thắc mắc
 - **Liên lạc**: Slack, email hàng ngày
 
-## 📊 VI. ĐÁNH GIÁ VÀ FEEDBACK
+## ĐÁNH GIÁ VÀ FEEDBACK
 
 ### Tiêu chí đánh giá
 1. **Technical Skills** (40%):
@@ -541,21 +464,21 @@ export const contractTemplates = [
 - **Week 10**: Pre-final review
 - **Week 12**: Final assessment + recommendations
 
-## 🎁 VII. CƠ HỘI PHÁT TRIỂN
+## CƠ HỘI PHÁT TRIỂN
 
 ### Trong thời gian thực tập
-- 🎪 **Tech talks**: Tham dự các buổi chia sẻ
-- 🏃‍♂️ **Hackathons**: Tham gia các cuộc thi
-- 🌐 **Conferences**: Tham dự sự kiện ngành
-- 📝 **Blog writing**: Viết blog về trải nghiệm
+- Tech talks: Tham dự các buổi chia sẻ
+- Hackathons: Tham gia các cuộc thi
+- Conferences: Tham dự sự kiện ngành
+- Blog writing: Viết blog về trải nghiệm
 
 ### Sau thực tập
-- 💼 **Job offer**: Cơ hội trở thành full-time
-- 📜 **Recommendation letter**: Thư giới thiệu
-- 🤝 **Network**: Kết nối với alumni network
-- 🎯 **Career guidance**: Tư vấn định hướng nghề nghiệp
+- Job offer: Cơ hội trở thành full-time
+- Recommendation letter: Thư giới thiệu
+- Network: Kết nối với alumni network
+- Career guidance: Tư vấn định hướng nghề nghiệp
 
-## 📋 VIII. QUY ĐỊNH VÀ LƯU Ý
+## QUY ĐỊNH VÀ LƯU Ý
 
 ### Thời gian làm việc
 - **Giờ làm việc**: 08:30 - 17:30 (Thứ 2 - Thứ 6)
@@ -563,34 +486,34 @@ export const contractTemplates = [
 - **Flexible**: Có thể điều chỉnh theo lịch học
 
 ### Dress code & Behavior
-- 👔 **Trang phục**: Smart casual
-- 💬 **Giao tiếp**: Lịch sự, chuyên nghiệp
-- 📱 **Điện thoại**: Chế độ im lặng trong meeting
-- 🚭 **Hút thuốc**: Chỉ ở khu vực quy định
+- Trang phục: Smart casual
+- Giao tiếp: Lịch sự, chuyên nghiệp
+- Điện thoại: Chế độ im lặng trong meeting
+- Hút thuốc: Chỉ ở khu vực quy định
 
 ### Bảo mật thông tin
-- 🔒 **NDA**: Ký cam kết bảo mật
-- 💾 **Data**: Không copy dữ liệu công ty
-- 📸 **Photos**: Xin phép trước khi chụp ảnh
-- 💬 **Social media**: Không post thông tin nhạy cảm
+- NDA: Ký cam kết bảo mật
+- Data: Không copy dữ liệu công ty
+- Photos: Xin phép trước khi chụp ảnh
+- Social media: Không post thông tin nhạy cảm
 
-## 🎉 IX. HOẠT ĐỘNG VUI CHƠI
+## HOẠT ĐỘNG VUI CHƠI
 
 ### Team building
-- 🍕 **Team lunch**: Mỗi thứ 6
-- 🎮 **Game time**: 30 phút mỗi chiều
-- 🎊 **Company events**: Sinh nhật, lễ hội
-- ⚽ **Sports**: Bóng đá, cầu lông cuối tuần
+- Team lunch: Mỗi thứ 6
+- Game time: 30 phút mỗi chiều
+- Company events: Sinh nhật, lễ hội
+- Sports: Bóng đá, cầu lông cuối tuần
 
 ### Learning events
-- 📚 **Book club**: Đọc sách kỹ thuật
-- 🎤 **Lightning talks**: Chia sẻ kiến thức
-- 🏆 **Demo day**: Present dự án cuối khóa
-- 🎓 **Graduation ceremony**: Lễ tốt nghiệp thực tập
+- Book club: Đọc sách kỹ thuật
+- Lightning talks: Chia sẻ kiến thức
+- Demo day: Present dự án cuối khóa
+- Graduation ceremony: Lễ tốt nghiệp thực tập
 
 ---
 
-## ✍️ KÝ KẾT
+## KÝ KẾT
 
 *Thời gian thực tập: [DD/MM/YYYY] - [DD/MM/YYYY]*  
 *Địa điểm: [Địa chỉ văn phòng]*
@@ -601,8 +524,8 @@ Chức vụ: [Chức vụ]            Trường: [Tên trường]
 *(Ký tên, đóng dấu)*           *(Ký tên)*
 
 ---
-*🌟 Chào mừng bạn đến với gia đình [Tên công ty]!*  
-*📧 Liên hệ: [Email] | 📞 Hotline: [SĐT]*`,
+*Chào mừng bạn đến với gia đình [Tên công ty]!*  
+*Liên hệ: [Email] | Hotline: [SĐT]*`,
   },
   {
     id: "consultant",
@@ -610,26 +533,7 @@ Chức vụ: [Chức vụ]            Trường: [Tên trường]
     description: "Template cho dịch vụ tư vấn/freelance",
     content: `# HỢP ĐỒNG DỊCH VỤ TƯ VẤN
 
-## 🤝 I. THÔNG TIN CÁC BÊN
-
-### 🏢 Bên A - Khách hàng
-- **Tên tổ chức**: [Tên công ty/tổ chức]
-- **Người đại diện**: [Họ tên - Chức vụ]
-- **Địa chỉ**: [Địa chỉ đầy đủ]
-- **Mã số thuế**: [Mã số thuế]
-- **Điện thoại**: [Số điện thoại]
-- **Email**: [Email liên hệ]
-
-### 👨‍💼 Bên B - Tư vấn viên
-- **Họ tên**: [Họ tên tư vấn viên]
-- **Chuyên môn**: [Lĩnh vực chuyên môn]
-- **Kinh nghiệm**: [Số năm] năm
-- **Địa chỉ**: [Địa chỉ cá nhân]
-- **CCCD**: [Số CCCD]
-- **Điện thoại**: [Số điện thoại]
-- **Email**: [Email cá nhân]
-
-## 🎯 II. PHẠM VI DỊCH VỤ
+## PHẠM VI DỊCH VỤ
 
 ### Mô tả dự án
 **Tên dự án**: [Tên dự án tư vấn]  
@@ -637,30 +541,30 @@ Chức vụ: [Chức vụ]            Trường: [Tên trường]
 
 ### Chi tiết công việc
 #### Phase 1: Phân tích hiện trạng (Tuần 1-2)
-- 🔍 **Research**: Nghiên cứu thị trường, đối thủ
-- 📊 **Analysis**: Phân tích dữ liệu hiện tại
-- 🎯 **Assessment**: Đánh giá điểm mạnh/yếu
-- 📝 **Report**: Báo cáo hiện trạng
+- Research: Nghiên cứu thị trường, đối thủ
+- Analysis: Phân tích dữ liệu hiện tại
+- Assessment: Đánh giá điểm mạnh/yếu
+- Report: Báo cáo hiện trạng
 
 #### Phase 2: Xây dựng chiến lược (Tuần 3-4)  
-- 💡 **Strategy**: Đề xuất chiến lược
-- 📋 **Planning**: Lập kế hoạch thực hiện
-- 🎨 **Design**: Thiết kế giải pháp
-- 💰 **Budget**: Ước tính ngân sách
+- Strategy: Đề xuất chiến lược
+- Planning: Lập kế hoạch thực hiện
+- Design: Thiết kế giải pháp
+- Budget: Ước tính ngân sách
 
 #### Phase 3: Triển khai hỗ trợ (Tuần 5-8)
-- 🚀 **Implementation**: Hỗ trợ triển khai
-- 📈 **Monitoring**: Theo dõi tiến độ
-- 🔧 **Adjustment**: Điều chỉnh khi cần
-- 📊 **Reporting**: Báo cáo định kỳ
+- Implementation: Hỗ trợ triển khai
+- Monitoring: Theo dõi tiến độ
+- Adjustment: Điều chỉnh khi cần
+- Reporting: Báo cáo định kỳ
 
 #### Phase 4: Bàn giao và đào tạo (Tuần 9-10)
-- 📚 **Documentation**: Tài liệu hướng dẫn
-- 🎓 **Training**: Đào tạo team nội bộ
-- 🤝 **Handover**: Bàn giao hoàn chỉnh
-- 📞 **Support**: Hỗ trợ sau bàn giao
+- Documentation: Tài liệu hướng dẫn
+- Training: Đào tạo team nội bộ
+- Handover: Bàn giao hoàn chỉnh
+- Support: Hỗ trợ sau bàn giao
 
-## 📅 III. TIMELINE VÀ MILESTONE
+## TIMELINE VÀ MILESTONE
 
 ### Lịch trình tổng thể
 | Giai đoạn | Thời gian | Deliverable | Thanh toán |
@@ -671,12 +575,12 @@ Chức vụ: [Chức vụ]            Trường: [Tên trường]
 | **Phase 4** | Tuần 9-10 | Bàn giao hoàn chỉnh | 15% |
 
 ### Key milestones
-- 📊 **Week 2**: Presentation báo cáo hiện trạng
-- 🎯 **Week 4**: Approval chiến lược
-- 🚀 **Week 6**: Mid-implementation review
-- 🏁 **Week 10**: Final delivery & sign-off
+- Week 2: Presentation báo cáo hiện trạng
+- Week 4: Approval chiến lược
+- Week 6: Mid-implementation review
+- Week 10: Final delivery & sign-off
 
-## 💰 IV. CHI PHÍ VÀ THANH TOÁN
+## CHI PHÍ VÀ THANH TOÁN
 
 ### Cơ cấu chi phí
 - **Tổng giá trị hợp đồng**: [Số tiền] VNĐ
@@ -691,12 +595,12 @@ Chức vụ: [Chức vụ]            Trường: [Tên trường]
 4. **Tài khoản**: [Thông tin tài khoản]
 
 ### Chi phí phát sinh
-- ✈️ **Đi lại**: Hoàn lại 100% (có hóa đơn)
-- 🏨 **Lưu trú**: Theo thực tế (tối đa 2,000,000 VNĐ/đêm)
-- 🍽️ **Ăn uống**: 500,000 VNĐ/ngày
-- 📞 **Liên lạc**: Theo hóa đơn thực tế
+- Đi lại: Hoàn lại 100% (có hóa đơn)
+- Lưu trú: Theo thực tế (tối đa 2,000,000 VNĐ/đêm)
+- Ăn uống: 500,000 VNĐ/ngày
+- Liên lạc: Theo hóa đơn thực tế
 
-## 📋 V. DELIVERABLES
+## DELIVERABLES
 
 ### Báo cáo và tài liệu
 1. **Báo cáo phân tích hiện trạng**:
@@ -718,59 +622,59 @@ Chức vụ: [Chức vụ]            Trường: [Tên trường]
    - FAQ
 
 ### Định dạng bàn giao
-- 📄 **Format**: PDF + PowerPoint + Word
-- 💾 **Digital**: Google Drive/Dropbox link
-- 📦 **Physical**: 3 bộ in màu (nếu yêu cầu)
-- 🎥 **Video**: Recording các buổi training
+- Format: PDF + PowerPoint + Word
+- Digital: Google Drive/Dropbox link
+- Physical: 3 bộ in màu (nếu yêu cầu)
+- Video: Recording các buổi training
 
-## 🤝 VI. TRÁCH NHIỆM CÁC BÊN
+## TRÁCH NHIỆM CÁC BÊN
 
 ### Trách nhiệm của Khách hàng
-- 📊 **Cung cấp data**: Đầy đủ, chính xác, kịp thời
-- 👥 **Phối hợp**: Cử người liên lạc chính
-- 🏢 **Hỗ trợ**: Văn phòng làm việc, thiết bị
-- ⏰ **Timeline**: Phản hồi trong 48h
+- Cung cấp data: Đầy đủ, chính xác, kịp thời
+- Phối hợp: Cử người liên lạc chính
+- Hỗ trợ: Văn phòng làm việc, thiết bị
+- Timeline: Phản hồi trong 48h
 
 ### Trách nhiệm của Tư vấn viên
-- 🎯 **Chất lượng**: Đảm bảo chất lượng deliverables
-- ⏰ **Tiến độ**: Tuân thủ timeline đã thỏa thuận
-- 🔒 **Bảo mật**: Bảo vệ thông tin khách hàng
-- 📞 **Communication**: Báo cáo tiến độ định kỳ
+- Chất lượng: Đảm bảo chất lượng deliverables
+- Tiến độ: Tuân thủ timeline đã thỏa thuận
+- Bảo mật: Bảo vệ thông tin khách hàng
+- Communication: Báo cáo tiến độ định kỳ
 
-## 🔒 VII. BẢO MẬT VÀ SỞ HỮU TRÍ TUỆ
+## BẢO MẬT VÀ SỞ HỮU TRÍ TUỆ
 
 ### Điều khoản bảo mật
-- 🤐 **NDA**: Có hiệu lực trong 3 năm
-- 📊 **Data**: Không sử dụng cho mục đích khác
-- 🗑️ **Deletion**: Xóa data sau 6 tháng
-- 👥 **Third party**: Không chia sẻ cho bên thứ ba
+- NDA: Có hiệu lực trong 3 năm
+- Data: Không sử dụng cho mục đích khác
+- Deletion: Xóa data sau 6 tháng
+- Third party: Không chia sẻ cho bên thứ ba
 
 ### Quyền sở hữu
-- 📝 **Deliverables**: Thuộc về khách hàng
-- 🧠 **Methodology**: Thuộc về tư vấn viên  
-- 💡 **Insights**: Chia sẻ cho cả hai bên
-- 📚 **Templates**: Có thể tái sử dụng (không tên)
+- Deliverables: Thuộc về khách hàng
+- Methodology: Thuộc về tư vấn viên  
+- Insights: Chia sẻ cho cả hai bên
+- Templates: Có thể tái sử dụng (không tên)
 
-## ⚖️ VIII. ĐIỀU KHOẢN PHÁP LÝ
+## ĐIỀU KHOẢN PHÁP LÝ
 
 ### Thay đổi phạm vi
-- 📝 **Change request**: Phải có văn bản
-- 💰 **Additional cost**: Tính theo giờ (2,000,000 VNĐ/ngày)
-- ⏰ **Timeline impact**: Điều chỉnh deadline
-- ✍️ **Approval**: Cần chữ ký cả hai bên
+- Change request: Phải có văn bản
+- Additional cost: Tính theo giờ (2,000,000 VNĐ/ngày)
+- Timeline impact: Điều chỉnh deadline
+- Approval: Cần chữ ký cả hai bên
 
 ### Chấm dứt hợp đồng
-- 📋 **Mutual agreement**: Thỏa thuận chung
-- ⚠️ **Breach**: Vi phạm nghiêm trọng
-- 📅 **Notice period**: Báo trước 15 ngày
-- 💰 **Settlement**: Thanh toán công việc đã làm
+- Mutual agreement: Thỏa thuận chung
+- Breach: Vi phạm nghiêm trọng
+- Notice period: Báo trước 15 ngày
+- Settlement: Thanh toán công việc đã làm
 
 ### Giải quyết tranh chấp
 1. **Thương lượng trực tiếp** (30 ngày)
 2. **Hòa giải** qua trung gian (30 ngày)
 3. **Trọng tài** tại [Địa điểm] (quyết định cuối cùng)
 
-## 📞 IX. LIÊN HỆ VÀ QUẢN LÝ DỰ ÁN
+## LIÊN HỆ VÀ QUẢN LÝ DỰ ÁN
 
 ### Project Manager (Khách hàng)
 - **Tên**: [Tên PM]
@@ -785,14 +689,14 @@ Chức vụ: [Chức vụ]            Trường: [Tên trường]
 - **Skype/Teams**: [ID]
 
 ### Communication protocol
-- 📧 **Email**: Báo cáo hàng tuần (Thứ 6)
-- 📞 **Call**: Weekly sync-up (Thứ 3, 2PM)
-- 💬 **Slack/Teams**: Daily communication
-- 📊 **Dashboard**: Real-time progress tracking
+- Email: Báo cáo hàng tuần (Thứ 6)
+- Call: Weekly sync-up (Thứ 3, 2PM)
+- Slack/Teams: Daily communication
+- Dashboard: Real-time progress tracking
 
 ---
 
-## ✍️ XÁC NHẬN HỢP ĐỒNG
+## XÁC NHẬN HỢP ĐỒNG
 
 *Hợp đồng có hiệu lực từ: [DD/MM/YYYY]*  
 *Địa điểm ký: [Thành phố]*
@@ -804,7 +708,7 @@ Chức vụ: [Chức vụ]            Trường: [Tên trường]
 | *(Ký tên, đóng dấu)* | *(Ký tên)* |
 
 ---
-*🎯 Chúc dự án thành công!*  
-*📧 Support: [Email] | 📞 Hotline: [SĐT]*`,
+*Chúc dự án thành công!*  
+*Support: [Email] | Hotline: [SĐT]*`,
   },
 ];
