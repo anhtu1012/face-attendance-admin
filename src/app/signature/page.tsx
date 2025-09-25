@@ -1,52 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { saveAs } from "file-saver";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import React, { useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 import SignaturePad from "signature_pad";
-import {
-  CheckCircleIcon,
-  DownloadIcon,
-  PenLineIcon,
-  RotateCcwIcon,
-  Trash2Icon,
-  TypeIcon,
-  UndoIcon,
-  UploadCloudIcon,
-} from "./_components/icons";
+
+// Import components
+import FileUploader from "./_components/FileUploader";
+import LoadingSpinner from "./_components/LoadingSpinner";
+import OTPModal from "./_components/OTPModal";
+import PDFViewer from "./_components/PDFViewer";
+import PrintableDocument from "./_components/PrintableDocument";
+import SuccessScreen from "./_components/SuccessScreen";
+import Toolbox from "./_components/Toolbox";
+import { DownloadIcon, PrintIcon } from "./_components/icons";
+
+// Import types
+import { ActiveTool, PageData, PdfElement, StagedItem } from "./types";
+
+// Import coordinate converter
+import { normalizeCoordinates } from "./utils/coordinateConverter";
+
+// Import styles
 import "./signature.scss";
-
-// Extend Window interface to include pdfjsLib
-declare global {
-  interface Window {
-    pdfjsLib: any;
-  }
-}
-
-// --- TYPE DEFINITIONS ---
-interface PageData {
-  canvas: HTMLCanvasElement;
-  viewport: any; // Use any instead of PageViewport to avoid import issues
-}
-
-interface PdfElement {
-  id: string;
-  type: "signature" | "text";
-  pageIndex: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  // Signature-specific
-  dataUrl?: string;
-  // Text-specific
-  text?: string;
-  fontSize?: number;
-  color?: string;
-}
-
-type StagedItem = Omit<PdfElement, "id" | "pageIndex" | "x" | "y">;
-type ActiveTool = "signature" | "text";
 
 // --- MAIN APP COMPONENT ---
 const Signature: React.FC = () => {
@@ -82,6 +57,36 @@ const Signature: React.FC = () => {
   const signatureCanvasRef = useRef<HTMLCanvasElement>(null);
   const pdfViewerRef = useRef<HTMLDivElement>(null);
   const stagedItemRef = useRef<HTMLDivElement>(null);
+  const printableRef = useRef<HTMLDivElement>(null);
+
+  // --- PRINT FUNCTIONALITY ---
+  const handlePrint = useReactToPrint({
+    contentRef: printableRef,
+    documentTitle: pdfFile
+      ? pdfFile.name.replace(/\.pdf$/i, "") + "-signed"
+      : "signed-document",
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      @media print {
+        body { 
+          -webkit-print-color-adjust: exact;
+          margin: 0;
+          padding: 0;
+        }
+        * {
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+      }
+    `,
+    onAfterPrint: () => {
+      console.log("Document printed successfully");
+    },
+  });
 
   // --- EFFECTS ---
   // Initialize or re-initialize signature pad when the active tool is 'signature'
@@ -105,19 +110,24 @@ const Signature: React.FC = () => {
           ? "rgb(255, 255, 255)"
           : "rgb(241, 245, 249)";
 
-      // Create new signature pad instance
+      // Create new signature pad instance with mobile support
       signaturePadRef.current = new SignaturePad(canvas, {
         backgroundColor:
           signatureBackground === "transparent" ? undefined : backgroundStyle,
         penColor: penColor,
         minWidth: 0.5,
         maxWidth: 2.5,
+        throttle: 16, // Reduce lag on mobile
+        minDistance: 5, // Minimum distance between points
+        // Enable touch events for mobile
+        velocityFilterWeight: 0.7,
+        // dotSize: calculated automatically
       });
 
       // Clear any existing signature
       signaturePadRef.current.clear();
     }
-  }, [activeTool, pdfFile, penColor, signatureBackground]); // Rerun when a new PDF is loaded or penColor changes
+  }, [activeTool, pdfFile, penColor, signatureBackground]);
 
   // Update pen color on the signature pad instance
   useEffect(() => {
@@ -126,18 +136,17 @@ const Signature: React.FC = () => {
     }
   }, [penColor]);
 
-  // Persist elements when PDF pages change (to prevent losing signatures during search/zoom)
+  // Persist elements when PDF pages change
   useEffect(() => {
     if (pdfPages.length > 0 && elements.length > 0) {
-      // Force re-render of elements by triggering a small state update
       const timer = setTimeout(() => {
         setElements((prev) => [...prev]);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [pdfPages.length, elements.length]); // Include both dependencies
+  }, [pdfPages.length, elements.length]);
 
-  // Store elements in sessionStorage to prevent loss during navigation/refresh
+  // Store elements in sessionStorage
   useEffect(() => {
     if (elements.length > 0) {
       sessionStorage.setItem(
@@ -147,7 +156,7 @@ const Signature: React.FC = () => {
     }
   }, [elements]);
 
-  // Restore elements from sessionStorage when component mounts
+  // Restore elements from sessionStorage
   useEffect(() => {
     const savedElements = sessionStorage.getItem("pdf-signature-elements");
     if (savedElements) {
@@ -160,7 +169,7 @@ const Signature: React.FC = () => {
         console.error("Error restoring elements:", error);
       }
     }
-  }, [elements.length]); // Depend on elements length to avoid setting when already populated
+  }, [elements.length]);
 
   // Storage functions
   const storeElements = (elements: PdfElement[]) => {
@@ -172,7 +181,6 @@ const Signature: React.FC = () => {
     }
   };
 
-  // Clear sessionStorage when resetting
   const clearStoredElements = () => {
     sessionStorage.removeItem("pdf-signature-elements");
   };
@@ -194,23 +202,19 @@ const Signature: React.FC = () => {
 
   const renderPdf = async (file: File) => {
     try {
-      // Use CDN approach to avoid webpack issues with pdfjs-dist
       if (typeof window !== "undefined") {
-        // Load PDF.js from CDN if not already loaded
         if (!window.pdfjsLib) {
           const script = document.createElement("script");
           script.src =
             "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
           document.head.appendChild(script);
 
-          // Wait for script to load
           await new Promise((resolve, reject) => {
             script.onload = resolve;
             script.onerror = reject;
           });
         }
 
-        // Set worker
         if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
           window.pdfjsLib.GlobalWorkerOptions.workerSrc =
             "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -223,8 +227,7 @@ const Signature: React.FC = () => {
 
         for (let i = 1; i <= pdfDoc.numPages; i++) {
           const pdfPage = await pdfDoc.getPage(i);
-          // Use consistent scale for accurate coordinate mapping
-          const scale = 1.5; // Increased scale for better quality while maintaining accuracy
+          const scale = 1.5;
           const viewport = pdfPage.getViewport({ scale: scale });
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d");
@@ -238,13 +241,11 @@ const Signature: React.FC = () => {
             });
             await renderTask.promise;
 
-            // Store the original PDF dimensions for accurate coordinate conversion
             const originalViewport = pdfPage.getViewport({ scale: 1.0 });
             pages.push({
               canvas,
               viewport: {
                 ...viewport,
-                // Store original dimensions for coordinate calculation
                 originalWidth: originalViewport.width,
                 originalHeight: originalViewport.height,
                 scale: scale,
@@ -280,7 +281,7 @@ const Signature: React.FC = () => {
         type: "text",
         text: textInput,
         fontSize: 24,
-        width: 200, // Adjust width based on text length if desired
+        width: 200,
         height: 30,
         color: "black",
       });
@@ -303,20 +304,13 @@ const Signature: React.FC = () => {
   };
 
   const handleRedrawFromPlaced = (elementId: string) => {
-    // Remove element from the list
     setElements((prev) => prev.filter((el) => el.id !== elementId));
-
-    // Clear any staged item
     setStagedItem(null);
-
-    // Set tool to signature for re-signing
     setActiveTool("signature");
 
-    // Clear and reinitialize signature pad
     setTimeout(() => {
       if (signaturePadRef.current) {
         signaturePadRef.current.clear();
-        // Force re-initialization of signature pad
         if (signatureCanvasRef.current) {
           const canvas = signatureCanvasRef.current;
           const ratio = Math.max(window.devicePixelRatio || 1, 1);
@@ -339,6 +333,11 @@ const Signature: React.FC = () => {
                 ? undefined
                 : backgroundStyle,
             penColor: penColor,
+            minWidth: 0.5,
+            maxWidth: 2.5,
+            throttle: 16,
+            minDistance: 5,
+            velocityFilterWeight: 0.7,
           });
         }
       }
@@ -346,12 +345,9 @@ const Signature: React.FC = () => {
   };
 
   const deleteElement = (id: string) => {
-    console.log("Deleting element with id:", id); // Debug log
     setElements((prev) => {
       const updatedElements = prev.filter((el) => el.id !== id);
-      console.log("Elements before delete:", prev.length); // Debug log
-      console.log("Elements after delete:", updatedElements.length); // Debug log
-      storeElements(updatedElements); // Cập nhật sessionStorage sau khi xóa
+      storeElements(updatedElements);
       return updatedElements;
     });
   };
@@ -368,10 +364,12 @@ const Signature: React.FC = () => {
     if (!isDragging || !pdfViewerRef.current) return;
     const viewerRect = pdfViewerRef.current.getBoundingClientRect();
     const scrollTop = pdfViewerRef.current.scrollTop;
-    const cursorX = e.clientX - viewerRect.left;
+    const scrollLeft = pdfViewerRef.current.scrollLeft;
+
+    // Calculate cursor position with scroll offset
+    const cursorX = e.clientX - viewerRect.left + scrollLeft;
     const cursorY = e.clientY - viewerRect.top + scrollTop;
 
-    // Allow free positioning - don't constrain to viewer bounds
     setTempDragPos({
       left: cursorX - dragOffset.x,
       top: cursorY - dragOffset.y,
@@ -386,64 +384,177 @@ const Signature: React.FC = () => {
 
     const viewerRect = pdfViewerRef.current.getBoundingClientRect();
     const scrollTop = pdfViewerRef.current.scrollTop;
-    const dropX = e.clientX - viewerRect.left;
+    const scrollLeft = pdfViewerRef.current.scrollLeft;
+
+    // Calculate drop position relative to the viewer container
+    const dropX = e.clientX - viewerRect.left + scrollLeft;
     const dropY = e.clientY - viewerRect.top + scrollTop;
 
-    // Use exact drop position without constraints
     const finalLeft = dropX - dragOffset.x;
     const finalTop = dropY - dragOffset.y;
 
-    // Simple page calculation - find which page the Y position falls into
-    let cumulativeHeight = 0;
+    // Calculate which page the element should be placed on using DOM elements
     let targetPageIndex = 0;
     let relativeY = finalTop;
+    let relativeX = finalLeft;
 
-    for (let i = 0; i < pdfPages.length; i++) {
-      const page = pdfPages[i];
-      const pageHeight = page.canvas.height;
-      const pageMargin = 20; // margin between pages
+    console.log("Drop position calculation:", {
+      finalTop,
+      finalLeft,
+      scrollTop: pdfViewerRef.current?.scrollTop,
+      scrollLeft: pdfViewerRef.current?.scrollLeft,
+      viewerRect,
+      dragOffset,
+    });
 
-      if (
-        finalTop >= cumulativeHeight &&
-        finalTop < cumulativeHeight + pageHeight
-      ) {
-        targetPageIndex = i;
-        relativeY = finalTop - cumulativeHeight;
-        break;
+    // Sử dụng DOM elements để tìm trang chính xác
+    const pageElements = pdfViewerRef.current?.querySelectorAll(".page");
+    if (pageElements) {
+      let found = false;
+
+      // Trước tiên, kiểm tra xem điểm thả có nằm trong phạm vi của trang nào không
+      for (let i = 0; i < pageElements.length && !found; i++) {
+        const pageElement = pageElements[i] as HTMLElement;
+
+        // Tính toán vị trí trang tương đối với viewer và scroll
+        const pageTop = pageElement.offsetTop;
+        const pageBottom = pageTop + pageElement.offsetHeight;
+        const pageLeft = pageElement.offsetLeft;
+        const pageRight = pageLeft + pageElement.offsetWidth;
+
+        console.log(`Page ${i} DOM:`, {
+          pageTop,
+          pageBottom,
+          pageLeft,
+          pageRight,
+          pageHeight: pageElement.offsetHeight,
+          pageWidth: pageElement.offsetWidth,
+          finalTop,
+          finalLeft,
+          isInThisPage:
+            finalTop >= pageTop &&
+            finalTop < pageBottom &&
+            finalLeft >= pageLeft &&
+            finalLeft < pageRight,
+        });
+
+        // Kiểm tra xem điểm thả có nằm trong phạm vi của trang hiện tại không
+        if (
+          finalTop >= pageTop &&
+          finalTop < pageBottom &&
+          finalLeft >= pageLeft &&
+          finalLeft < pageRight
+        ) {
+          targetPageIndex = i;
+          relativeY = finalTop - pageTop;
+          relativeX = finalLeft - pageLeft;
+          found = true;
+          console.log(
+            `Element placed on page ${i}, relativeY: ${relativeY}, relativeX: ${relativeX}`
+          );
+        }
       }
 
-      cumulativeHeight += pageHeight + pageMargin;
-    }
+      // Nếu không tìm thấy trang phù hợp, tìm trang gần nhất với điểm thả
+      if (!found && pageElements.length > 0) {
+        // Tìm trang gần nhất với điểm thả dựa trên khoảng cách
+        let closestPage = 0;
+        let minDistance = Number.MAX_VALUE;
 
-    // If position is beyond all pages, place on last page
-    if (
-      targetPageIndex === 0 &&
-      finalTop >= cumulativeHeight &&
-      pdfPages.length > 0
-    ) {
-      targetPageIndex = pdfPages.length - 1;
-      // Calculate position on last page
-      let lastPageStart = 0;
-      for (let i = 0; i < pdfPages.length - 1; i++) {
-        lastPageStart += pdfPages[i].canvas.height + 20;
+        for (let i = 0; i < pageElements.length; i++) {
+          const pageElement = pageElements[i] as HTMLElement;
+          const pageTop = pageElement.offsetTop;
+          const pageLeft = pageElement.offsetLeft;
+          const pageBottom = pageTop + pageElement.offsetHeight;
+          const pageRight = pageLeft + pageElement.offsetWidth;
+
+          // Tính khoảng cách từ điểm thả đến trang
+          let dx = 0;
+          let dy = 0;
+
+          if (finalLeft < pageLeft) dx = pageLeft - finalLeft;
+          else if (finalLeft > pageRight) dx = finalLeft - pageRight;
+
+          if (finalTop < pageTop) dy = pageTop - finalTop;
+          else if (finalTop > pageBottom) dy = finalTop - pageBottom;
+
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestPage = i;
+          }
+        }
+
+        targetPageIndex = closestPage;
+        const closestPageElement = pageElements[targetPageIndex] as HTMLElement;
+
+        // Đặt phần tử vào trong trang gần nhất, đảm bảo nó nằm trong giới hạn của trang
+        relativeY = Math.max(
+          0,
+          Math.min(
+            finalTop - closestPageElement.offsetTop,
+            closestPageElement.offsetHeight - (stagedItem?.height || 0)
+          )
+        );
+        relativeX = Math.max(
+          0,
+          Math.min(
+            finalLeft - closestPageElement.offsetLeft,
+            closestPageElement.offsetWidth - (stagedItem?.width || 0)
+          )
+        );
+
+        console.log(
+          `Element placed on closest page ${targetPageIndex}, relativeY: ${relativeY}, relativeX: ${relativeX}, distance: ${minDistance}`
+        );
       }
-      relativeY = finalTop - lastPageStart;
     }
 
-    // Add element at exact position without adjustments
-    const newElement = {
+    // Ensure position is within page bounds
+    if (targetPageIndex < pdfPages.length) {
+      const pageCanvas = pdfPages[targetPageIndex].canvas;
+      const maxY = pageCanvas.height - stagedItem.height;
+      const maxX = pageCanvas.width - stagedItem.width;
+      relativeY = Math.max(0, Math.min(relativeY, maxY));
+      relativeX = Math.max(0, Math.min(relativeX, maxX));
+    }
+
+    // Get current page canvas for normalization
+    const currentPageCanvas = pdfPages[targetPageIndex]?.canvas;
+    const canvasWidth = currentPageCanvas?.width || 1;
+    const canvasHeight = currentPageCanvas?.height || 1;
+
+    // Normalize coordinates for consistent positioning
+    const normalizedCoords = normalizeCoordinates(
+      {
+        x: relativeX,
+        y: relativeY,
+        width: stagedItem.width,
+        height: stagedItem.height,
+      },
+      { width: canvasWidth, height: canvasHeight }
+    );
+
+    // Add element with both absolute and normalized coordinates
+    const newElement: PdfElement = {
       ...stagedItem,
       id: `${Date.now()}-${Math.random()}`,
       pageIndex: targetPageIndex,
-      x: finalLeft,
-      y: relativeY,
+      x: relativeX, // Use calculated relative position within page
+      y: relativeY, // Use calculated relative position within page
+      // Store normalized coordinates for consistency
+      normalizedX: normalizedCoords.x,
+      normalizedY: normalizedCoords.y,
+      normalizedWidth: normalizedCoords.width,
+      normalizedHeight: normalizedCoords.height,
+      // Store reference canvas dimensions
+      canvasWidth: canvasWidth,
+      canvasHeight: canvasHeight,
     };
-
-    console.log("Adding new element:", newElement);
 
     setElements((prev) => {
       const updated = [...prev, newElement];
-      console.log("Updated elements:", updated);
       storeElements(updated);
       return updated;
     });
@@ -451,128 +562,6 @@ const Signature: React.FC = () => {
     setStagedItem(null);
     if (activeTool === "signature") signaturePadRef.current?.clear();
   };
-
-  // --- FINALIZATION ---
-  const handleDownload = async () => {
-    if (!pdfFile) {
-      return;
-    }
-
-    if (elements.length === 0) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const existingPdfBytes = await pdfFile.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(existingPdfBytes);
-      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const pages = pdfDoc.getPages();
-
-      let processedElements = 0;
-
-      for (const element of elements) {
-        if (
-          element.pageIndex >= pages.length ||
-          element.pageIndex >= pdfPages.length
-        ) {
-          continue;
-        }
-
-        const targetPage = pages[element.pageIndex];
-        const pageData = pdfPages[element.pageIndex];
-
-        // Get actual PDF page dimensions
-        const pdfWidth = targetPage.getWidth();
-        const pdfHeight = targetPage.getHeight();
-
-        // Calculate actual displayed canvas dimensions
-        const displayedWidth = pageData.canvas.width;
-        const displayedHeight = pageData.canvas.height;
-
-        // Calculate scale factors from displayed canvas to PDF
-        const scaleX = pdfWidth / displayedWidth;
-        const scaleY = pdfHeight / displayedHeight;
-
-        // Convert coordinates from canvas space to PDF space
-        const elX = Math.max(0, element.x * scaleX);
-
-        // PDF coordinate system has origin at bottom-left, canvas at top-left
-        // So we need to flip Y coordinate correctly
-        const canvasY = element.y;
-        const pdfY = pdfHeight - canvasY * scaleY - element.height * scaleY;
-        const elY = Math.max(0, pdfY);
-
-        if (element.type === "signature" && element.dataUrl) {
-          try {
-            const response = await fetch(element.dataUrl);
-            if (!response.ok) {
-              throw new Error(
-                `Failed to fetch signature data: ${response.statusText}`
-              );
-            }
-
-            const pngImageBytes = await response.arrayBuffer();
-
-            const pngImage = await pdfDoc.embedPng(pngImageBytes);
-
-            targetPage.drawImage(pngImage, {
-              x: elX,
-              y: elY,
-              width: Math.max(1, element.width * scaleX),
-              height: Math.max(1, element.height * scaleY),
-            });
-
-            processedElements++;
-          } catch (imgError) {
-            console.error("Error processing signature image:", imgError);
-          }
-        } else if (element.type === "text" && element.text) {
-          try {
-            const colorMap = {
-              black: rgb(0, 0, 0),
-              blue: rgb(0, 0.3, 0.7),
-              red: rgb(0.8, 0, 0),
-            };
-
-            targetPage.drawText(element.text, {
-              x: elX,
-              y: elY,
-              font: helveticaFont,
-              size: Math.max(1, (element.fontSize || 24) * scaleY),
-              color:
-                colorMap[element.color as keyof typeof colorMap] ||
-                rgb(0, 0, 0),
-            });
-
-            processedElements++;
-          } catch (textError) {
-            console.error("Error processing text:", textError);
-          }
-        } else {
-          console.warn("Skipping element - missing data:", element);
-        }
-      }
-
-      if (processedElements === 0) {
-        return;
-      }
-
-      console.log("Saving PDF...");
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
-
-      const filename = `${pdfFile.name.replace(/\.pdf$/i, "")}-signed.pdf`;
-      saveAs(blob, filename);
-
-      setIsSigned(true);
-    } catch (error) {
-      console.error("Error generating signed PDF:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const resetState = () => {
     setPdfFile(null);
     setPdfPages([]);
@@ -580,13 +569,12 @@ const Signature: React.FC = () => {
     setElements([]);
     setIsSigned(false);
     setActiveTool("signature");
-    clearStoredElements(); // Clear stored elements when resetting
+    clearStoredElements();
   };
 
   // --- OTP HANDLERS ---
   const handleVerifySignature = () => {
     setShowOTPModal(true);
-    // Auto focus first input after modal renders
     setTimeout(() => {
       const firstInput = document.querySelector(
         'input[data-index="0"]'
@@ -603,11 +591,9 @@ const Signature: React.FC = () => {
 
     setIsVerifying(true);
 
-    // Simulate OTP verification - replace with actual API call
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Mock verification success
       if (otpValue === "123456") {
         alert("Xác thực thành công!");
         setShowOTPModal(false);
@@ -630,7 +616,6 @@ const Signature: React.FC = () => {
 
   const handleResendOTP = async () => {
     try {
-      // Simulate API call to resend OTP
       await new Promise((resolve) => setTimeout(resolve, 1000));
       alert("Mã OTP đã được gửi lại!");
     } catch (err) {
@@ -661,119 +646,19 @@ const Signature: React.FC = () => {
             <SuccessScreen onReset={resetState} />
           ) : (
             <main className="main-grid">
-              <div
-                className="pdf-viewer"
-                ref={pdfViewerRef}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleDrop}
-                onMouseLeave={() => isDragging && setIsDragging(false)}
-              >
-                {pdfPages.map((page, index) => (
-                  <div
-                    key={`page-${index}`}
-                    className="page"
-                    id={`page-${index}`}
-                  >
-                    <canvas
-                      key={`canvas-${index}-${pdfFile?.name}`}
-                      ref={(node) => {
-                        if (node && page.canvas) {
-                          const context = node.getContext("2d");
-                          if (context) {
-                            // Clear canvas first
-                            context.clearRect(0, 0, node.width, node.height);
-                            // Draw PDF page
-                            context.drawImage(page.canvas, 0, 0);
-                          }
-                        }
-                      }}
-                      width={page.canvas.width}
-                      height={page.canvas.height}
-                    />
-                    {elements
-                      .filter((el) => el.pageIndex === index)
-                      .map((el) => (
-                        <div
-                          key={el.id}
-                          className="element"
-                          style={{
-                            left: el.x,
-                            top: el.y,
-                            width: el.width,
-                            height: el.height,
-                          }}
-                        >
-                          {el.type === "signature" ? (
-                            <>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={el.dataUrl} alt="Signature" />
-                            </>
-                          ) : (
-                            <span
-                              style={{
-                                fontSize: el.fontSize,
-                                color: el.color,
-                              }}
-                            >
-                              {el.text}
-                            </span>
-                          )}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation(); // Tránh event bubbling
-                              deleteElement(el.id);
-                            }}
-                            className="delete-button"
-                          >
-                            <Trash2Icon className="w-3 h-3" />
-                          </button>
-                          {el.type === "signature" && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation(); // Tránh event bubbling
-                                handleRedrawFromPlaced(el.id);
-                              }}
-                              className="redraw-button"
-                              title="Ký lại"
-                            >
-                              <RotateCcwIcon className="w-3 h-3" />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                  </div>
-                ))}
-                {isDragging && tempDragPos && stagedItem && (
-                  <div
-                    className="dragging-preview"
-                    style={{
-                      left: tempDragPos.left,
-                      top: tempDragPos.top,
-                      width: stagedItem.width,
-                      height: stagedItem.height,
-                    }}
-                  >
-                    {stagedItem.type === "signature" ? (
-                      <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={stagedItem.dataUrl}
-                          alt="Dragging Signature"
-                        />
-                      </>
-                    ) : (
-                      <span
-                        style={{
-                          fontSize: stagedItem.fontSize,
-                          color: stagedItem.color,
-                        }}
-                      >
-                        {stagedItem.text}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
+              <PDFViewer
+                pdfPages={pdfPages}
+                elements={elements}
+                stagedItem={stagedItem}
+                isDragging={isDragging}
+                tempDragPos={tempDragPos}
+                pdfFile={pdfFile}
+                pdfViewerRef={pdfViewerRef}
+                handleMouseMove={handleMouseMove}
+                handleDrop={handleDrop}
+                deleteElement={deleteElement}
+                handleRedrawFromPlaced={handleRedrawFromPlaced}
+              />
 
               <div>
                 <Toolbox
@@ -802,10 +687,12 @@ const Signature: React.FC = () => {
                     </h2>
                     <p>
                       Your elements have been placed ({elements.length}{" "}
-                      elements). Click below to download the signed PDF.
+                      elements). Choose your preferred action below.
                     </p>
-                    <button onClick={handleDownload}>
-                      Download Signed PDF
+
+                    <button onClick={handlePrint} className="print-button">
+                      <PrintIcon className="print-icon" />
+                      Print Document (A4)
                     </button>
                     <button
                       onClick={handleVerifySignature}
@@ -821,376 +708,27 @@ const Signature: React.FC = () => {
         </div>
       </div>
 
-      {/* OTP Modal */}
-      {showOTPModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Xác thực chữ ký</h3>
-              <button onClick={handleCloseOTPModal} className="close-button">
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="otp-icon">
-                <div className="security-icon">🔒</div>
-              </div>
-              <h4>Xác thực bảo mật</h4>
-              <p>
-                Chúng tôi đã gửi mã OTP 6 chữ số đến thiết bị của bạn. Vui lòng
-                nhập mã để xác thực chữ ký:
-              </p>
-
-              <div className="otp-input-container">
-                {[0, 1, 2, 3, 4, 5].map((index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    value={otpValue[index] || ""}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, "");
-                      if (value.length <= 1) {
-                        const newOtp = otpValue.split("");
-                        newOtp[index] = value;
-                        const finalOtp = newOtp.join("").slice(0, 6);
-                        setOtpValue(finalOtp);
-
-                        // Auto focus next input
-                        if (value && index < 5) {
-                          const nextInput = document.querySelector(
-                            `input[data-index="${index + 1}"]`
-                          ) as HTMLInputElement;
-                          nextInput?.focus();
-                        }
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (
-                        e.key === "Backspace" &&
-                        !otpValue[index] &&
-                        index > 0
-                      ) {
-                        const prevInput = document.querySelector(
-                          `input[data-index="${index - 1}"]`
-                        ) as HTMLInputElement;
-                        prevInput?.focus();
-                      }
-                    }}
-                    onPaste={(e) => {
-                      e.preventDefault();
-                      const pasteData = e.clipboardData
-                        .getData("text")
-                        .replace(/\D/g, "")
-                        .slice(0, 6);
-                      setOtpValue(pasteData);
-
-                      // Focus the last filled input or first empty one
-                      const targetIndex = Math.min(pasteData.length - 1, 5);
-                      const targetInput = document.querySelector(
-                        `input[data-index="${targetIndex}"]`
-                      ) as HTMLInputElement;
-                      targetInput?.focus();
-                    }}
-                    className="otp-digit"
-                    maxLength={1}
-                    data-index={index}
-                    disabled={isVerifying}
-                  />
-                ))}
-              </div>
-
-              <div className="otp-info">
-                <small>
-                  Không nhận được mã?{" "}
-                  <button
-                    type="button"
-                    className="resend-link"
-                    onClick={handleResendOTP}
-                  >
-                    Gửi lại
-                  </button>
-                </small>
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  onClick={handleCloseOTPModal}
-                  className="cancel-button"
-                  disabled={isVerifying}
-                >
-                  Hủy
-                </button>
-                <button
-                  onClick={handleOTPSubmit}
-                  className="submit-button"
-                  disabled={isVerifying || otpValue.length !== 6}
-                >
-                  {isVerifying ? (
-                    <>
-                      <span className="loading-spinner"></span>
-                      Đang xác thực...
-                    </>
-                  ) : (
-                    <>
-                      <span className="verify-icon">✓</span>
-                      Xác thực
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-// --- SUB-COMPONENTS ---
-
-const Toolbox: React.FC<any> = ({
-  activeTool,
-  setActiveTool,
-  signatureCanvasRef,
-  signaturePadRef,
-  penColor,
-  setPenColor,
-  handleConfirmSignature,
-  textInput,
-  setTextInput,
-  handleCreateText,
-  stagedItem,
-  stagedItemRef,
-  handleDragStart,
-  handleRedraw,
-  handleUndoLastElement,
-}) => {
-  return (
-    <div className="toolbox">
-      <div className="tool-buttons">
-        <ToolButton
-          icon={<PenLineIcon />}
-          label="Signature"
-          isActive={activeTool === "signature"}
-          onClick={() => setActiveTool("signature")}
-        />
-        <ToolButton
-          icon={<TypeIcon />}
-          label="Text"
-          isActive={activeTool === "text"}
-          onClick={() => setActiveTool("text")}
+      {/* Hidden Printable Component */}
+      <div style={{ display: "none" }}>
+        <PrintableDocument
+          ref={printableRef}
+          pdfPages={pdfPages}
+          elements={elements}
+          fileName={pdfFile?.name}
         />
       </div>
 
-      {stagedItem ? (
-        <div className="staged-item">
-          <p>Your item is ready to be placed.</p>
-          <div
-            ref={stagedItemRef}
-            onMouseDown={handleDragStart}
-            className="item-preview"
-          >
-            {stagedItem.type === "signature" ? (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={stagedItem.dataUrl}
-                  alt="Your Signature"
-                  style={{ width: stagedItem.width, height: stagedItem.height }}
-                />
-              </>
-            ) : (
-              <span
-                style={{
-                  fontSize: stagedItem.fontSize,
-                  color: stagedItem.color,
-                }}
-              >
-                {stagedItem.text}
-              </span>
-            )}
-            <p>Drag me onto the document!</p>
-          </div>
-          <button onClick={handleRedraw}>Cancel</button>
-        </div>
-      ) : activeTool === "signature" ? (
-        <div className="signature-tool">
-          <div className="canvas-container">
-            <canvas ref={signatureCanvasRef}></canvas>
-          </div>
-          <div className="controls">
-            <div className="color-buttons">
-              <ColorButton
-                color="black"
-                selectedColor={penColor}
-                onClick={() => setPenColor("black")}
-              />
-              <ColorButton
-                color="blue"
-                selectedColor={penColor}
-                onClick={() => setPenColor("blue")}
-              />
-              <ColorButton
-                color="red"
-                selectedColor={penColor}
-                onClick={() => setPenColor("red")}
-              />
-            </div>
-            <div className="action-controls">
-              <button
-                onClick={() => signaturePadRef.current?.undo()}
-                title="Hoàn tác"
-                className="undo-button"
-              >
-                <UndoIcon />
-              </button>
-              <button
-                onClick={handleUndoLastElement}
-                title="Xóa chữ ký cuối"
-                className="undo-element-button"
-              >
-                <RotateCcwIcon />
-              </button>
-            </div>
-          </div>
-          <div className="action-buttons">
-            <button
-              onClick={() => signaturePadRef.current?.clear()}
-              className="clear"
-            >
-              Clear
-            </button>
-            <button onClick={handleConfirmSignature} className="confirm">
-              Confirm Signature
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="text-tool">
-          <label htmlFor="text-input">Text to add:</label>
-          <input
-            id="text-input"
-            type="text"
-            value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
-          />
-          <button onClick={handleCreateText}>Create Text Item</button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ToolButton: React.FC<{
-  icon: React.ReactNode;
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-}> = ({ icon, label, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    className={isActive ? "tool-button active" : "tool-button"}
-  >
-    <div className="icon">{icon}</div>
-    <span>{label}</span>
-  </button>
-);
-
-const ColorButton: React.FC<{
-  color: string;
-  selectedColor: string;
-  onClick: () => void;
-}> = ({ color, selectedColor, onClick }) => (
-  <button
-    onClick={onClick}
-    className={
-      selectedColor === color ? "color-button selected" : "color-button"
-    }
-    style={{ backgroundColor: color }}
-    title={color}
-  />
-);
-
-const LoadingSpinner = () => (
-  <div className="loading-spinner">
-    <div className="spinner"></div>
-    <p>Processing your document...</p>
-  </div>
-);
-
-const SuccessScreen: React.FC<{ onReset: () => void }> = ({ onReset }) => (
-  <div className="success-screen">
-    <CheckCircleIcon className="icon" />
-    <h2>Document Finalized Successfully!</h2>
-    <p>Your signed PDF has been downloaded.</p>
-    <button onClick={onReset}>Sign Another Document</button>
-  </div>
-);
-
-const FileUploader: React.FC<{
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ onFileChange }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const syntheticEvent = {
-        target: { files: e.dataTransfer.files },
-      } as React.ChangeEvent<HTMLInputElement>;
-      onFileChange(syntheticEvent);
-      e.dataTransfer.clearData();
-    }
-  };
-
-  const handleLabelClick = (e: React.MouseEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    fileInputRef.current?.click();
-  };
-
-  return (
-    <div className="file-uploader">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="application/pdf"
-        onChange={onFileChange}
-        style={{ display: "none" }}
+      {/* OTP Modal */}
+      <OTPModal
+        showOTPModal={showOTPModal}
+        otpValue={otpValue}
+        setOtpValue={setOtpValue}
+        isVerifying={isVerifying}
+        handleOTPSubmit={handleOTPSubmit}
+        handleCloseOTPModal={handleCloseOTPModal}
+        handleResendOTP={handleResendOTP}
       />
-      <label
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onClick={handleLabelClick}
-        className={isDragging ? "dragging" : ""}
-      >
-        <div>
-          <UploadCloudIcon className={isDragging ? "icon dragging" : "icon"} />
-          <span>
-            <span className="highlight">Click to upload</span> or drag and drop
-          </span>
-          <p>PDF (max. 10MB)</p>
-        </div>
-      </label>
-    </div>
+    </>
   );
 };
 

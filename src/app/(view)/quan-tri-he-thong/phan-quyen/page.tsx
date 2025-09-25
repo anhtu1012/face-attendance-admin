@@ -31,7 +31,7 @@ function Page() {
   const [editedRows, setEditedRows] = useState<{ [key: string]: TreeNode }>({});
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [displayData, setDisplayData] = useState<TreeNode[]>([]);
-  const [selectedRoleCode, setSelectedRoleCode] = useState<string>("");
+  const [selectedRoleId, setSelectedRoleId] = useState<string>("");
   const [shouldFetchUserAccount, setShouldFetchUserAccount] =
     useState<boolean>(false);
   const [allPermissionsSelected, setAllPermissionsSelected] =
@@ -82,7 +82,7 @@ function Page() {
     async (
       page = currentPage,
       limit = pageSize,
-      roleCode: string,
+      roleId: string,
       quickSearch?: string
     ) => {
       setLoading(true);
@@ -92,7 +92,7 @@ function Page() {
           { key: "offset", type: "=", value: (page - 1) * limit },
         ];
         const params: any = {
-          roleCode,
+          roleId,
         };
         if (quickSearch && quickSearch.trim() !== "") {
           params.quickSearch = quickSearch;
@@ -126,17 +126,17 @@ function Page() {
   );
 
   const handleRoleChange = useCallback(
-    (roleCode: string) => {
-      setSelectedRoleCode(roleCode);
+    (roleId: string) => {
+      setSelectedRoleId(roleId);
       // Reset về trang đầu khi thay đổi role
       setCurrentPage(1);
       // Trigger fetch cho cả UserAccount và Permission
       setShouldFetchUserAccount(true);
-      if (roleCode === "") {
+      if (roleId === "") {
         setDisplayData([]);
         return;
       }
-      handleFetchPermission(1, pageSize, roleCode);
+      handleFetchPermission(1, pageSize, roleId);
 
       // Reset shouldFetchUserAccount sau một khoảng thời gian ngắn
       setTimeout(() => setShouldFetchUserAccount(false), 100);
@@ -464,7 +464,7 @@ function Page() {
   const handlePageChange = (page: number, size: number) => {
     setCurrentPage(page);
     setPageSize(size);
-    handleFetchPermission(page, size, selectedRoleCode);
+    handleFetchPermission(page, size, selectedRoleId);
   };
 
   const onCellValueChanged = useCallback((params: any) => {
@@ -526,7 +526,7 @@ function Page() {
       }
 
       const finalPayload = {
-        groupCode: selectedRoleCode ? [selectedRoleCode] : [],
+        groupCode: selectedRoleId ? [selectedRoleId] : [],
         permissions,
       };
       const response = await PhanQuyenServices.savePhanQuyen(finalPayload);
@@ -538,7 +538,7 @@ function Page() {
             : response.message;
         showSuccess(message || mes("saveSuccess"));
         setEditedRows({});
-        await handleFetchPermission(currentPage, pageSize, selectedRoleCode);
+        await handleFetchPermission(currentPage, pageSize, selectedRoleId);
       }
     } catch (error: any) {
       showError(error.response?.data?.message || mes("saveError"));
@@ -548,7 +548,7 @@ function Page() {
   }, [
     editedRows,
     t,
-    selectedRoleCode,
+    selectedRoleId,
     mes,
     handleFetchPermission,
     currentPage,
@@ -566,7 +566,7 @@ function Page() {
         layoutType={5}
         content1={
           <UserAccount
-            roleCode={selectedRoleCode}
+            roleId={selectedRoleId}
             shouldFetch={shouldFetchUserAccount}
           />
         }
