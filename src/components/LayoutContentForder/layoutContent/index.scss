@@ -13,6 +13,10 @@ html.dark {
   }
 }
 
+.card-layout::-webkit-scrollbar {
+  display: none !important;
+}
+
 [class*="layoutType"] .content1.hideContent,
 [class*="layoutType"] .content2.hideContent,
 [class*="layoutType"] .content3.hideContent,
@@ -506,4 +510,29 @@ html.dark {
     z-index: 1001 !important;
     pointer-events: auto !important;
   }
+}
+
+// Custom scrollbar for content1
+.content1::-webkit-scrollbar {
+  display: none !important;
+}
+
+// Custom scrollbar for content2
+.content2::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.content2::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+  border-radius: 4px !important;
+}
+
+.content2::-webkit-scrollbar-thumb {
+  background: rgb(195, 195, 196) !important;
+  border-radius: 4px !important;
+}
+
+.content2::-webkit-scrollbar-thumb:hover {
+  background: rgb(195, 195, 196) !important;
 }

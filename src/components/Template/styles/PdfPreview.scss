@@ -2,16 +2,16 @@
 .pdf-preview {
   background-color: white;
   color: black;
-  padding: 3rem;
+  padding: 2rem;
   font-family: serif;
-  font-size: 13pt;
+  font-size: 11pt;
   width: 210mm;
   min-height: 297mm;
   margin: 0 auto;
+  box-sizing: border-box;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
-
 .pdf-header {
   display: flex;
   justify-content: space-between;
@@ -27,6 +27,7 @@
 .pdf-company-name {
   font-weight: bold;
   text-transform: uppercase;
+  text-align: center !important;
 }
 
 .pdf-divider {
@@ -38,6 +39,7 @@
 
 .pdf-ref-number {
   font-size: 0.875rem;
+  text-align: center !important;
 }
 
 .pdf-republic-info {
@@ -47,19 +49,20 @@
 
 .pdf-republic-title {
   font-weight: bold;
+  text-align: center !important;
 }
 
 .pdf-date {
-  text-align: right;
+  text-align: right !important;
   font-style: italic;
   margin-bottom: 2rem;
 }
 
 .pdf-title {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.5rem !important;
+  font-weight: bold !important;
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2rem !important;
   text-transform: uppercase;
 }
 
@@ -100,7 +103,7 @@
 }
 
 .pdf-info-label {
-  width: 10rem;
+  width: 8rem;
   flex-shrink: 0;
 }
 
@@ -122,6 +125,8 @@
 }
 
 .pdf-content {
+  margin-bottom: 2rem;
+
   // Prose styles for markdown
   .prose {
     max-width: none;
@@ -134,7 +139,149 @@
     h6 {
       font-weight: bold;
       text-transform: uppercase;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      page-break-after: avoid;
     }
+
+    p {
+      margin-bottom: 0.75rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    // Lists styling
+    ul,
+    ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+
+      li {
+        margin-bottom: 0.25rem;
+        line-height: 1.4;
+      }
+    }
+
+    // Table styling for markdown tables
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.9em;
+
+      th,
+      td {
+        border: 1px solid #333;
+        padding: 0.5rem;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background-color: #f5f5f5;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+    }
+
+    // Strong and emphasis
+    strong,
+    b {
+      font-weight: bold;
+    }
+
+    em,
+    i {
+      font-style: italic;
+    }
+
+    // Blockquotes
+    blockquote {
+      border-left: 3px solid #ddd;
+      padding-left: 1rem;
+      margin: 1rem 0;
+      font-style: italic;
+      color: #666;
+    }
+  }
+
+  // Direct markdown content (without prose wrapper)
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin-bottom: 0.75rem;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  ul,
+  ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.25rem;
+      line-height: 1.4;
+    }
+  }
+
+  // Table styling for direct markdown tables
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.9em;
+
+    th,
+    td {
+      border: 1px solid #333;
+      padding: 0.5rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  }
+
+  strong,
+  b {
+    font-weight: bold;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  blockquote {
+    border-left: 3px solid #ddd;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: #666;
   }
 }
 
@@ -151,12 +298,14 @@
 
 .pdf-signature-title {
   font-weight: bold;
+  text-align: center !important;
 }
 
 .pdf-signature-note {
   font-style: italic;
   font-size: 0.875rem;
-  margin-bottom: 4rem;
+  text-align: center !important;
+  margin-bottom: 4rem !important;
 }
 
 .pdf-signature-image {
@@ -168,4 +317,7 @@
 
 .pdf-signature-name {
   font-weight: bold;
+  text-align: center !important;
 }
+
+@import "./PdfPreview.print.scss";

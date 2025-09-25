@@ -1,6 +1,13 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { PDFDocument } from "pdf-lib";
+import {
+  applyPdfOptimizedStyles,
+  removePdfOptimizedStyles,
+  optimizeContentForPdf,
+  getA4Dimensions,
+  resetAncestorTransforms,
+} from "../utils/pdfOptimization";
 
 export const generatePdfFromHtml = async (
   element: HTMLElement,
@@ -11,60 +18,115 @@ export const generatePdfFromHtml = async (
     return;
   }
 
-  // Use a temporary class to ensure consistent rendering for PDF generation
-  element.classList.add("pdf-render-mode");
+  // Save original styles
+  const originalStyles = {
+    width: element.style.width,
+    height: element.style.height,
+    transform: element.style.transform,
+    position: element.style.position,
+    overflow: element.style.overflow,
+    padding: element.style.padding,
+    margin: element.style.margin,
+    fontSize: element.style.fontSize,
+  };
 
-  const originalWidth = element.style.width;
-  // Set a fixed width for consistent rendering during PDF generation
-  element.style.width = "210mm";
+  // Apply PDF-optimized styles
+  applyPdfOptimizedStyles(element, {
+    fontSize: "10pt",
+    padding: "15mm 10mm",
+    margin: "0",
+    lineHeight: "1.4",
+  });
+
+  // Optimize content within the element
+  optimizeContentForPdf(element);
+
+  // Reset ancestor transforms and get cleanup function
+  const cleanupTransforms = resetAncestorTransforms(element);
+
+  // Wait for styles to be applied
+  await new Promise((resolve) => setTimeout(resolve, 150));
+
+  const a4Dims = getA4Dimensions();
 
   const canvas = await html2canvas(element, {
-    scale: 2, // Higher scale for better quality
+    scale: 2, // High DPI for better quality
     useCORS: true,
     logging: false,
     backgroundColor: "#ffffff",
+    width: a4Dims.widthPx,
+    height: undefined, // Let height be auto-calculated
+    windowWidth: a4Dims.widthPx,
+    scrollX: 0,
+    scrollY: 0,
+    allowTaint: true,
+    removeContainer: false,
   });
 
-  // Restore original styles
-  element.classList.remove("pdf-render-mode");
-  element.style.width = originalWidth;
+  // Cleanup: restore transforms and original styles
+  cleanupTransforms();
+  removePdfOptimizedStyles(element, originalStyles);
 
-  const imgData = canvas.toDataURL("image/png");
+  // Create PDF with A4 dimensions
   const pdf = new jsPDF({
     orientation: "portrait",
-    unit: "px",
-    format: "a4", // Standard A4 size
+    unit: "pt",
+    format: "a4",
   });
 
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
+  // Calculate scaling to fit A4 width
+  const scale = Math.min(a4Dims.widthPt / canvas.width, 1);
+  const scaledWidth = canvas.width * scale;
+  const scaledHeight = canvas.height * scale;
 
-  const canvasWidth = canvas.width;
-  const canvasHeight = canvas.height;
+  // Calculate number of pages needed
+  const numPages = Math.ceil(scaledHeight / a4Dims.heightPt);
 
-  const ratio = canvasWidth / canvasHeight;
-  const pdfRatio = pdfWidth / pdfHeight;
+  for (let i = 0; i < numPages; i++) {
+    const pageCanvas = document.createElement("canvas");
+    const pageHeight = Math.min(
+      a4Dims.heightPt / scale,
+      canvas.height - (i * a4Dims.heightPt) / scale
+    );
 
-  let finalWidth, finalHeight;
+    pageCanvas.width = canvas.width;
+    pageCanvas.height = pageHeight;
+    const ctx = pageCanvas.getContext("2d")!;
 
-  // Fit image to page
-  if (ratio > pdfRatio) {
-    finalWidth = pdfWidth;
-    finalHeight = pdfWidth / ratio;
-  } else {
-    finalHeight = pdfHeight;
-    finalWidth = pdfHeight * ratio;
+    // Fill with white background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+
+    const sourceY = i * (a4Dims.heightPt / scale);
+
+    ctx.drawImage(
+      canvas,
+      0,
+      sourceY,
+      canvas.width,
+      pageHeight,
+      0,
+      0,
+      canvas.width,
+      pageHeight
+    );
+
+    const pageImgData = pageCanvas.toDataURL("image/png");
+
+    if (i > 0) {
+      pdf.addPage();
+    }
+
+    pdf.addImage(pageImgData, "PNG", 0, 0, scaledWidth, pageHeight * scale);
   }
 
-  const x = (pdfWidth - finalWidth) / 2;
-  const y = 0; // Align to top
-
-  pdf.addImage(imgData, "PNG", x, y, finalWidth, finalHeight);
-
   // Sanitize filename
-  const safeFileName =
-    fileName.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".pdf";
-  pdf.save(safeFileName);
+  const safeFileName = fileName.replace(/[^a-z0-9.-]/gi, "_").toLowerCase();
+  if (!safeFileName.endsWith(".pdf")) {
+    pdf.save(safeFileName + ".pdf");
+  } else {
+    pdf.save(safeFileName);
+  }
 };
 
 export const addSignaturesToPdf = async (

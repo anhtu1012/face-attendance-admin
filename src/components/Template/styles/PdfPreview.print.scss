@@ -1,0 +1,465 @@
+// PDF Print Styles - Tối ưu cho in khổ A4
+@media print, (max-width: 210mm) {
+  .pdf-preview {
+    // Reset cơ bản cho print
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+
+    // Kích thước A4 chính xác (tương tự file gốc nhưng tối ưu cho in)
+    width: 210mm !important;
+    min-height: 297mm !important;
+    max-width: 210mm !important;
+
+    // Padding tối ưu cho in (nhỏ hơn để fit nhiều content hơn)
+    padding: 12mm 10mm !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+
+    // Font family và size tương tự file gốc nhưng tối ưu
+    font-family: serif !important;
+    font-size: 9pt !important; // Nhỏ hơn 11pt gốc để fit A4
+    line-height: 1.3 !important; // Tighter line height
+
+    // Đảm bảo không có shadow, border khi in
+    box-shadow: none !important;
+    border: none !important;
+
+    // Background và color tương tự file gốc
+    background-color: white !important;
+    color: black !important;
+
+    // Không scale để giữ nguyên kích thước
+    transform: none !important;
+  }
+
+  // CSS class đặc biệt cho chế độ render PDF
+  .pdf-preview.pdf-render-mode {
+    // Kích thước cố định cho canvas render
+    width: 210mm !important;
+    min-height: 297mm !important;
+    max-width: 210mm !important;
+
+    // Reset transform và positioning
+    transform: none !important;
+    position: static !important;
+
+    // Padding tối ưu cho render
+    padding: 12mm 10mm !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+
+    // Đảm bảo font render tốt
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+
+    // Override các style có thể gây conflict
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    // Font và spacing tối ưu
+    font-family: serif !important;
+    font-size: 9pt !important;
+    line-height: 1.3 !important;
+  }
+
+  // Header styles (tương tự gốc nhưng compact hơn)
+  .pdf-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    margin-bottom: 6mm !important; // Nhỏ hơn 1rem gốc
+    page-break-inside: avoid;
+  }
+
+  .pdf-company-info {
+    text-align: center !important;
+    width: 40% !important;
+
+    .pdf-company-name {
+      font-weight: bold !important;
+      text-transform: uppercase !important;
+      font-size: 9pt !important; // Nhỏ hơn để fit
+      margin-bottom: 1mm !important;
+      p {
+        text-align: center !important;
+      }
+    }
+
+    .pdf-ref-number {
+      font-size: 8pt !important; // Tương đương 0.875rem gốc nhưng nhỏ hơn
+      p {
+        text-align: center !important;
+      }
+    }
+  }
+
+  .pdf-republic-info {
+    text-align: center !important;
+    width: 60% !important;
+
+    .pdf-republic-title {
+      font-weight: bold !important;
+      font-size: 8pt !important;
+      margin-bottom: 1mm !important;
+      p {
+        text-align: center !important;
+      }
+    }
+  }
+
+  .pdf-divider {
+    width: 20mm !important; // Tương đương 5rem gốc
+    height: 0.5pt !important;
+    background-color: black !important;
+    margin: 1mm auto !important; // Tương đương 0.25rem gốc
+  }
+
+  // Date và Title (tương tự gốc nhưng compact)
+  .pdf-date {
+    text-align: right !important;
+    font-style: italic !important;
+    font-size: 8pt !important;
+    margin-bottom: 8mm !important; // Tương đương 2rem gốc
+  }
+
+  .pdf-title {
+    font-size: 12pt !important; // Nhỏ hơn 1.5rem gốc để fit A4
+    font-weight: bold !important;
+    text-align: center !important;
+    margin-bottom: 8mm !important; // Tương đương 2rem gốc
+    margin-top: 4mm !important;
+    text-transform: uppercase !important;
+    page-break-inside: avoid;
+  }
+
+  // Preamble (tương tự gốc)
+  .pdf-preamble {
+    margin-bottom: 6mm !important; // Tương đương 1.5rem gốc
+    page-break-inside: avoid;
+
+    p {
+      font-size: 8pt !important;
+      line-height: 1.2 !important;
+      margin-bottom: 2mm !important; // Tương đương 0.5rem gốc
+      font-style: italic !important;
+    }
+  }
+
+  // Parties section (tương tự gốc nhưng compact)
+  .pdf-parties {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4mm !important; // Tương đương 1rem gốc
+    margin-bottom: 8mm !important; // Tương đương 2rem gốc
+    page-break-inside: avoid;
+  }
+
+  .pdf-party {
+    margin-bottom: 4mm !important; // Tương đương 1rem gốc
+    page-break-inside: avoid;
+
+    &:last-child {
+      margin-bottom: 6mm !important;
+    }
+  }
+
+  .pdf-party-title {
+    font-weight: bold !important;
+    font-size: 9pt !important;
+    margin-bottom: 2mm !important;
+  }
+
+  // Party details (tương tự gốc nhưng compact)
+  .pdf-party-details {
+    padding-left: 8mm !important; // Tương đương 2rem gốc
+    margin-top: 2mm !important; // Tương đương 0.5rem gốc
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1mm !important; // Tương đương 0.25rem gốc
+
+    // Info rows (tương tự gốc nhưng compact)
+    .pdf-info-row {
+      display: flex !important;
+      margin-bottom: 1mm !important;
+
+      .pdf-info-label {
+        width: 40mm !important; // Tương đương 10rem gốc nhưng nhỏ hơn
+        flex-shrink: 0 !important;
+        font-size: 8pt !important;
+      }
+
+      .pdf-info-separator {
+        flex-shrink: 0 !important;
+        margin-right: 2mm !important; // Tương đương 0.5rem gốc
+        font-size: 8pt !important;
+      }
+
+      .pdf-info-value {
+        flex: 1 !important; // Thay vì flex-shrink: 0
+        font-size: 8pt !important;
+        word-wrap: break-word !important;
+      }
+    }
+  }
+
+  .pdf-bold-value {
+    font-weight: bold !important;
+  }
+
+  // Agreement (tương tự gốc)
+  .pdf-agreement {
+    margin-bottom: 6mm !important; // Tương đương 1.5rem gốc
+    font-size: 9pt !important;
+    page-break-inside: avoid;
+  }
+
+  // Content chính (tham khảo từ gốc nhưng compact hơn)
+  .pdf-content {
+    font-size: 9pt !important;
+    line-height: 1.3 !important;
+    margin-bottom: 8mm !important; // Tương đương 2rem gốc
+
+    // Prose styles tương tự gốc
+    .prose {
+      max-width: none !important;
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        font-size: 10pt !important;
+        margin-top: 6mm !important; // Tương đương 1.5rem gốc
+        margin-bottom: 3mm !important; // Tương đương 0.75rem gốc
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+
+      p {
+        font-size: 9pt !important;
+        line-height: 1.3 !important;
+        margin-bottom: 3mm !important; // Tương đương 0.75rem gốc
+        text-align: center !important;
+      }
+
+      // Lists styling (giống gốc)
+      ul,
+      ol {
+        margin-bottom: 4mm !important; // Tương đương 1rem gốc
+        padding-left: 6mm !important; // Tương đương 1.5rem gốc
+
+        li {
+          font-size: 9pt !important;
+          line-height: 1.3 !important;
+          margin-bottom: 1mm !important; // Tương đương 0.25rem gốc
+        }
+      }
+
+      // Table styling for markdown tables (giống gốc)
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 6mm !important; // Tương đương 1.5rem gốc
+        font-size: 8pt !important; // Tương đương 0.9em gốc
+
+        th,
+        td {
+          border: 0.5pt solid #333 !important;
+          padding: 2mm !important; // Tương đương 0.5rem gốc
+          text-align: left !important;
+          vertical-align: top !important;
+        }
+
+        th {
+          background-color: #f5f5f5 !important;
+          font-weight: bold !important;
+          text-align: center !important;
+        }
+
+        tbody tr:nth-child(even) {
+          background-color: #f9f9f9 !important;
+        }
+      }
+
+      // Strong and emphasis (giống gốc)
+      strong,
+      b {
+        font-weight: bold !important;
+      }
+
+      em,
+      i {
+        font-style: italic !important;
+      }
+
+      // Blockquotes (giống gốc)
+      blockquote {
+        border-left: 1.5pt solid #ddd !important;
+        padding-left: 4mm !important; // Tương đương 1rem gốc
+        margin: 4mm 0 !important; // Tương đương 1rem gốc
+        font-style: italic !important;
+        color: #666 !important;
+      }
+    }
+
+    // Direct markdown content (without prose wrapper) - giống gốc
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-weight: bold !important;
+      text-transform: uppercase !important;
+      font-size: 10pt !important;
+      margin-top: 6mm !important; // Tương đương 1.5rem gốc
+      margin-bottom: 3mm !important; // Tương đương 0.75rem gốc
+      page-break-after: avoid;
+      page-break-inside: avoid;
+    }
+
+    p {
+      font-size: 9pt !important;
+      line-height: 1.3 !important;
+      margin-bottom: 3mm !important; // Tương đương 0.75rem gốc
+      text-align: center !important;
+    }
+
+    ul,
+    ol {
+      margin-bottom: 4mm !important; // Tương đương 1rem gốc
+      padding-left: 6mm !important; // Tương đương 1.5rem gốc
+
+      li {
+        font-size: 9pt !important;
+        line-height: 1.3 !important;
+        margin-bottom: 1mm !important; // Tương đương 0.25rem gốc
+      }
+    }
+
+    // Table styling for direct markdown tables (giống gốc)
+    table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin-bottom: 6mm !important; // Tương đương 1.5rem gốc
+      font-size: 8pt !important; // Tương đương 0.9em gốc
+
+      th,
+      td {
+        border: 0.5pt solid #333 !important;
+        padding: 2mm !important; // Tương đương 0.5rem gốc
+        text-align: left !important;
+        vertical-align: top !important;
+      }
+
+      th {
+        background-color: #f5f5f5 !important;
+        font-weight: bold !important;
+        text-align: center !important;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #f9f9f9 !important;
+      }
+    }
+
+    strong,
+    b {
+      font-weight: bold !important;
+    }
+
+    em,
+    i {
+      font-style: italic !important;
+    }
+
+    blockquote {
+      border-left: 1.5pt solid #ddd !important;
+      padding-left: 4mm !important; // Tương đương 1rem gốc
+      margin: 4mm 0 !important; // Tương đương 1rem gốc
+      font-style: italic !important;
+      color: #666 !important;
+    }
+  }
+
+  // Tables nếu có (di chuyển vào trong .pdf-content để tương thích với gốc)
+  // Đã di chuyển vào .pdf-content section ở trên
+
+  // Strong text và Italic text (di chuyển vào .pdf-content)
+  // Đã di chuyển vào .pdf-content section ở trên
+}
+
+// Signatures (tương tự gốc nhưng compact) - di chuyển vào trong media query
+@media print, (max-width: 210mm) {
+  .pdf-signatures {
+    margin-top: 20mm !important; // Tương đương 5rem gốc
+    display: flex !important;
+    justify-content: space-around !important; // Giống gốc
+    page-break-inside: avoid;
+    page-break-before: avoid;
+  }
+
+  .pdf-signature-block {
+    text-align: center !important;
+    width: 40% !important; // Giống gốc
+
+    .pdf-signature-title {
+      font-weight: bold !important;
+      font-size: 9pt !important;
+      margin-bottom: 1mm !important;
+    }
+
+    .pdf-signature-note {
+      font-style: italic !important;
+      font-size: 7pt !important; // Tương đương 0.875rem gốc
+      margin-bottom: 15mm !important; // Tương đương 4rem gốc
+    }
+
+    .pdf-signature-image {
+      height: 15mm !important; // Tương đương 4rem gốc
+      width: auto !important;
+      margin-bottom: 2mm !important; // Tương đương 0.5rem gốc
+      display: inline-block !important;
+    }
+
+    .pdf-signature-name {
+      font-weight: bold !important;
+      font-size: 9pt !important;
+    }
+  }
+
+  // Tránh page break không mong muốn
+  .pdf-party,
+  .pdf-signature-block,
+  .pdf-agreement {
+    page-break-inside: avoid;
+  }
+
+  // Ensure colors are preserved when printing
+  .pdf-preview * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+// CSS class đặc biệt cho chế độ render PDF
+.pdf-render-mode {
+  // Đảm bảo content không bị crop
+  * {
+    box-sizing: border-box !important;
+  }
+
+  // Tối ưu cho các element con
+  .pdf-content {
+    p,
+    div,
+    span {
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+    }
+  }
+}

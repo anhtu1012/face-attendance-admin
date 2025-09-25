@@ -49,7 +49,7 @@ function ContractFormView({
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("basic-time");
-  const [currentStep, setCurrentStep] = useState(0);
+  // const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
     if (selectedUser) {
@@ -165,28 +165,28 @@ function ContractFormView({
     }
   };
 
-  const steps = [
-    {
-      title: "Thông tin cơ bản",
-      icon: <FileTextOutlined />,
-      description: "Tiêu đề và trạng thái",
-    },
-    {
-      title: "Thời gian",
-      icon: <ClockCircleOutlined />,
-      description: "Ngày bắt đầu và kết thúc",
-    },
-    {
-      title: "Thông tin công việc",
-      icon: <UserOutlined />,
-      description: "Chi nhánh và chức vụ",
-    },
-    {
-      title: "Nội dung hợp đồng",
-      icon: <EditOutlined />,
-      description: "Mô tả chi tiết",
-    },
-  ];
+  // const steps = [
+  //   {
+  //     title: "Thông tin cơ bản",
+  //     icon: <FileTextOutlined />,
+  //     description: "Tiêu đề và trạng thái",
+  //   },
+  //   {
+  //     title: "Thời gian",
+  //     icon: <ClockCircleOutlined />,
+  //     description: "Ngày bắt đầu và kết thúc",
+  //   },
+  //   {
+  //     title: "Thông tin công việc",
+  //     icon: <UserOutlined />,
+  //     description: "Chi nhánh và chức vụ",
+  //   },
+  //   {
+  //     title: "Nội dung hợp đồng",
+  //     icon: <EditOutlined />,
+  //     description: "Mô tả chi tiết",
+  //   },
+  // ];
 
   return (
     <div className="contract-content-main">
@@ -580,6 +580,14 @@ function ContractFormView({
             <div className="navigation-buttons">
               <Button
                 size="large"
+                onClick={onExportPdf}
+                disabled={!onExportPdf}
+                icon={<FileTextOutlined />}
+              >
+                Xuất PDF
+              </Button>
+              {/* <Button
+                size="large"
                 onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                 disabled={currentStep === 0}
               >
@@ -599,21 +607,14 @@ function ContractFormView({
                 disabled={currentStep === steps.length - 1}
               >
                 Tiếp tục
-              </Button>
+              </Button> */}
             </div>
 
             <div className="action-buttons">
               <Button size="large" onClick={handleFormReset} disabled={loading}>
                 Hủy bỏ
               </Button>
-              <Button
-                size="large"
-                onClick={onExportPdf}
-                disabled={!onExportPdf}
-                icon={<FileTextOutlined />}
-              >
-                Xuất PDF
-              </Button>
+
               <Button
                 type="primary"
                 size="large"
