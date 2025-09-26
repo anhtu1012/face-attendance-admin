@@ -23,23 +23,22 @@ export default function Loading() {
   return (
     <div className="page-transition">
       <div className="page-transition-content">
-      <div 
-            className="running-man-container"
-            style={{ "--progress": progress } as React.CSSProperties}
-          >
-            <div className="running">
-              <div className="outer">
-                <div className="body">
-                  <div className="arm behind"></div>
-                  <div className="arm front"></div>
-                  <div className="leg behind"></div>
-                  <div className="leg front"></div>
-                </div>
+        <div 
+          className="running-man-container"
+          style={{ "--progress": progress } as React.CSSProperties}
+        >
+          <div className="running">
+            <div className="outer">
+              <div className="body">
+                <div className="arm behind"></div>
+                <div className="arm front"></div>
+                <div className="leg behind"></div>
+                <div className="leg front"></div>
               </div>
             </div>
           </div>
+        </div>
         <div className="page-transition-progress-container">
-          
           <div 
             className="page-transition-progress-bar" 
             style={{ width: `${progress}%` }}
