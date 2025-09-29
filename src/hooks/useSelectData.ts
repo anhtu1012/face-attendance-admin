@@ -22,6 +22,17 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
       value: "F",
     },
   ]);
+  const [selectCandidate] = useState<SelectOption[]>([
+    { label: "Liên hệ", value: "Applied" },
+    { label: "Phỏng vấn", value: "Interview" },
+    { label: "Rớt PV", value: "Failed" },
+    { label: "Hẹn lại", value: "Reschedule" },
+    { label: "Nhận việc", value: "Offer" },
+    { label: "Hợp đồng", value: "Hired" },
+    { label: "Hủy hẹn PV", value: "RejectedPV" },
+    { label: "Hủy hẹn NV", value: "RejectedNV" },
+    { label: "Chưa phù hợp", value: "NotSuitable" },
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,5 +52,5 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     fetchData();
   }, [mergedOptions.fetchRole, mergedOptions.fetchShift]);
 
-  return { selectRole, selectShift, selectGender };
+  return { selectRole, selectShift, selectGender, selectCandidate };
 };

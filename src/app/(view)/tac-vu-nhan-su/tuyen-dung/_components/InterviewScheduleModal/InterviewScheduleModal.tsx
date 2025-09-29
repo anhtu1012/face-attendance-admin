@@ -9,9 +9,7 @@ import {
   message,
   Modal,
   Select,
-  Space,
   TimePicker,
-  Typography,
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useState } from "react";
@@ -28,7 +26,6 @@ import InvitationTemplate from "./InvitationTemplate";
 import { generateInvitationHTML } from "./invitationTemplateHTML";
 import "./InterviewScheduleModal.scss";
 
-const { Text } = Typography;
 const { TextArea } = Input;
 
 interface InterviewScheduleModalProps {
@@ -263,6 +260,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
         }
         open={open}
         onCancel={handleClose}
+        centered={false}
         footer={[
           <Button key="close" onClick={handleClose}>
             Đóng
@@ -296,227 +294,265 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       }
       open={open}
       onCancel={handleClose}
-      footer={null}
-      width={1000}
+      centered={false}
+      footer={[
+        <Button key="cancel" onClick={handleClose} size="large">
+          Hủy
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          loading={loading}
+          size="large"
+          className="submit-btn"
+          onClick={() => form.submit()}
+        >
+          {loading ? "Đang tạo lịch..." : "Tạo lịch phỏng vấn"}
+        </Button>,
+      ]}
+      width={1400}
       className="interview-schedule-modal"
     >
       <div className="modal-content">
         {candidateData && (
           <Card className="candidate-card" size="small">
             <div className="candidate-info-header">
-              <div className="candidate-avatar">
-                <FaUser />
-              </div>
               <div className="candidate-info">
-                <h3 className="candidate-name">
-                  {candidateData.lastName} {candidateData.firstName}
-                </h3>
-                <div className="candidate-title">Ứng viên phỏng vấn</div>
+                <div className="candidate-avatar">
+                  <FaUser />
+                </div>
+                <div className="candidate-name-section">
+                  <h3 className="candidate-name">
+                    {candidateData.lastName} {candidateData.firstName}
+                  </h3>
+                  <div className="candidate-title">Ứng viên phỏng vấn</div>
+                </div>
               </div>
-            </div>
-            <div className="candidate-details">
-              <div className="candidate-detail-item">
-                <FaEnvelope className="detail-icon" />
-                <span className="detail-text">{candidateData.email}</span>
-              </div>
-              <div className="candidate-detail-item">
-                <FaPhone className="detail-icon" />
-                <span className="detail-text">{candidateData.phone}</span>
+              <div className="candidate-details">
+                <div className="candidate-detail-item">
+                  <FaEnvelope className="detail-icon" />
+                  <span className="detail-text">{candidateData.email}</span>
+                </div>
+                <div className="candidate-detail-item">
+                  <FaPhone className="detail-icon" />
+                  <span className="detail-text">{candidateData.phone}</span>
+                </div>
               </div>
             </div>
           </Card>
         )}
 
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          className="interview-form"
-        >
-          <div className="form-row">
-            <div className="form-col-6">
-              <Form.Item
-                name="date"
-                label="Ngày phỏng vấn"
-                rules={[
-                  { required: true, message: "Vui lòng chọn ngày phỏng vấn!" },
-                ]}
-              >
-                <DatePicker
-                  placeholder="Chọn ngày"
-                  style={{ width: "100%" }}
-                  format="DD/MM/YYYY"
-                  disabledDate={disabledDate}
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-            <div className="form-col-3">
-              <Form.Item
-                name="startTime"
-                label="Giờ bắt đầu"
-                rules={[
-                  { required: true, message: "Vui lòng chọn giờ bắt đầu!" },
-                ]}
-              >
-                <TimePicker
-                  placeholder="Giờ bắt đầu"
-                  style={{ width: "100%" }}
-                  format="HH:mm"
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-            <div className="form-col-3">
-              <Form.Item
-                name="endTime"
-                label="Giờ kết thúc"
-                rules={[
-                  { required: true, message: "Vui lòng chọn giờ kết thúc!" },
-                ]}
-              >
-                <TimePicker
-                  placeholder="Giờ kết thúc"
-                  style={{ width: "100%" }}
-                  format="HH:mm"
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-          </div>
+        <div className="form-container">
+          <div className="form-section">
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
+              className="interview-form"
+            >
+              <div className="form-section-title">
+                <FaCalendarAlt />
+                Thông tin thời gian
+              </div>
 
-          <Form.Item
-            name="interviewType"
-            label="Hình thức phỏng vấn"
-            rules={[
-              { required: true, message: "Vui lòng chọn hình thức phỏng vấn!" },
-            ]}
-            initialValue="offline"
-          >
-            <Select
-              placeholder="Chọn hình thức phỏng vấn"
-              size="large"
-              onChange={handleInterviewTypeChange}
-              options={[
-                { value: "offline", label: "Phỏng vấn trực tiếp tại công ty" },
-                { value: "online", label: "Phỏng vấn trực tuyến" },
-              ]}
-            />
-          </Form.Item>
+              <div className="form-row">
+                <div className="form-col-6">
+                  <Form.Item
+                    name="date"
+                    label="Ngày phỏng vấn"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng chọn ngày phỏng vấn!",
+                      },
+                    ]}
+                  >
+                    <DatePicker
+                      placeholder="Chọn ngày"
+                      style={{ width: "100%" }}
+                      format="DD/MM/YYYY"
+                      disabledDate={disabledDate}
+                      size="large"
+                    />
+                  </Form.Item>
+                </div>
+                <div className="form-col-3">
+                  <Form.Item
+                    name="startTime"
+                    label="Giờ bắt đầu"
+                    rules={[
+                      { required: true, message: "Vui lòng chọn giờ bắt đầu!" },
+                    ]}
+                  >
+                    <TimePicker
+                      placeholder="Giờ bắt đầu"
+                      style={{ width: "100%" }}
+                      format="HH:mm"
+                      size="large"
+                    />
+                  </Form.Item>
+                </div>
+                <div className="form-col-3">
+                  <Form.Item
+                    name="endTime"
+                    label="Giờ kết thúc"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng chọn giờ kết thúc!",
+                      },
+                    ]}
+                  >
+                    <TimePicker
+                      placeholder="Giờ kết thúc"
+                      style={{ width: "100%" }}
+                      format="HH:mm"
+                      size="large"
+                    />
+                  </Form.Item>
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-col-6">
+                  <Form.Item
+                    name="interviewType"
+                    label="Hình thức phỏng vấn"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng chọn hình thức phỏng vấn!",
+                      },
+                    ]}
+                    initialValue="offline"
+                  >
+                    <Select
+                      placeholder="Chọn hình thức phỏng vấn"
+                      size="large"
+                      onChange={handleInterviewTypeChange}
+                      options={[
+                        {
+                          value: "offline",
+                          label: "Phỏng vấn trực tiếp tại công ty",
+                        },
+                        { value: "online", label: "Phỏng vấn trực tuyến" },
+                      ]}
+                    />
+                  </Form.Item>
+                </div>
+              </div>
+              {interviewType === "online" && (
+                <Form.Item
+                  name="meetingLink"
+                  label="Link meeting"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập link meeting!" },
+                    { type: "url", message: "Link không hợp lệ!" },
+                  ]}
+                >
+                  <Input
+                    placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                    size="large"
+                  />
+                </Form.Item>
+              )}
+
+              <div className="form-section-title">
+                <FaUser />
+                Thông tin người phỏng vấn
+              </div>
+
+              <div className="form-row">
+                <div className="form-col-6">
+                  <Form.Item
+                    name="interviewer"
+                    label="Người phỏng vấn"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng chọn người phỏng vấn!",
+                      },
+                    ]}
+                  >
+                    <Select
+                      placeholder="Chọn người phỏng vấn"
+                      size="large"
+                      onChange={handleInterviewerChange}
+                      options={interviewers}
+                    />
+                  </Form.Item>
+                </div>
+                <div className="form-col-6">
+                  <Form.Item
+                    name="interviewerEmail"
+                    label="Email người phỏng vấn"
+                    rules={[
+                      { required: true, message: "Email không được để trống!" },
+                      { type: "email", message: "Email không hợp lệ!" },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Email người phỏng vấn"
+                      size="large"
+                      readOnly
+                    />
+                  </Form.Item>
+                </div>
+              </div>
+
+              <Form.Item name="notes" label="Ghi chú">
+                <TextArea
+                  rows={4}
+                  placeholder="Ghi chú thêm về buổi phỏng vấn (không bắt buộc)"
+                />
+              </Form.Item>
+            </Form>
+          </div>
 
           {interviewType === "offline" && (
-            <Card className="location-info" size="small">
-              <div className="location-item">
-                <MdLocationOn className="location-icon" />
-                <Text>
-                  <strong>{companyLocation.name}</strong>
-                </Text>
-              </div>
-              <div className="location-item">
-                <Text>{companyLocation.address}</Text>
+            <div className="map-section">
+              <div className="map-header">
+                <MdLocationOn />
+                Địa điểm phỏng vấn
               </div>
 
-              <div className="map-container">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.096857648785!2d105.78405031442596!3d21.02880539313429!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab4cd5c3cfb3%3A0x1c98063b23b5a7b1!2zSMOgIE7hu5lp!5e0!3m2!1svi!2s!4v1677837562541!5m2!1svi!2s"
-                  title="Location Map"
-                  width="100%"
-                  height="200"
-                  style={{ border: 0, borderRadius: "8px", marginTop: "12px" }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
+              <Card className="location-info" size="small">
+                <div className="location-item">
+                  <MdLocationOn className="location-icon" />
+                  <div className="location-text">
+                    <strong>{companyLocation.name}</strong>
+                  </div>
+                </div>
+                <div className="location-item">
+                  <div className="location-text">{companyLocation.address}</div>
+                </div>
 
-              <Button
-                type="link"
-                size="small"
-                icon={<FaMapMarked />}
-                href={companyLocation.mapUrl}
-                target="_blank"
-                style={{ marginTop: "8px" }}
-              >
-                Xem trên Google Maps
-              </Button>
-            </Card>
-          )}
+                <div className="map-container">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.096857648785!2d105.78405031442596!3d21.02880539313429!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab4cd5c3cfb3%3A0x1c98063b23b5a7b1!2zSMOgIE7hu5lp!5e0!3m2!1svi!2s!4v1677837562541!5m2!1svi!2s"
+                    title="Location Map"
+                    width="100%"
+                    height="300"
+                    style={{ border: 0, borderRadius: "12px" }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
 
-          {interviewType === "online" && (
-            <Form.Item
-              name="meetingLink"
-              label="Link meeting"
-              rules={[
-                { required: true, message: "Vui lòng nhập link meeting!" },
-                { type: "url", message: "Link không hợp lệ!" },
-              ]}
-            >
-              <Input
-                placeholder="https://meet.google.com/xxx-xxxx-xxx"
-                size="large"
-              />
-            </Form.Item>
-          )}
-
-          <div className="form-row">
-            <div className="form-col-6">
-              <Form.Item
-                name="interviewer"
-                label="Người phỏng vấn"
-                rules={[
-                  { required: true, message: "Vui lòng chọn người phỏng vấn!" },
-                ]}
-              >
-                <Select
-                  placeholder="Chọn người phỏng vấn"
-                  size="large"
-                  onChange={handleInterviewerChange}
-                  options={interviewers}
-                />
-              </Form.Item>
+                <div className="map-actions">
+                  <Button
+                    className="map-button"
+                    icon={<FaMapMarked />}
+                    href={companyLocation.mapUrl}
+                    target="_blank"
+                  >
+                    Xem trên Google Maps
+                  </Button>
+                </div>
+              </Card>
             </div>
-            <div className="form-col-6">
-              <Form.Item
-                name="interviewerEmail"
-                label="Email người phỏng vấn"
-                rules={[
-                  { required: true, message: "Email không được để trống!" },
-                  { type: "email", message: "Email không hợp lệ!" },
-                ]}
-              >
-                <Input
-                  placeholder="Email người phỏng vấn"
-                  size="large"
-                  readOnly
-                />
-              </Form.Item>
-            </div>
-          </div>
-
-          <Form.Item name="notes" label="Ghi chú">
-            <TextArea
-              rows={3}
-              placeholder="Ghi chú thêm về buổi phỏng vấn (không bắt buộc)"
-            />
-          </Form.Item>
-
-          <div className="form-actions">
-            <Space>
-              <Button onClick={handleClose} size="large">
-                Hủy
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                size="large"
-                className="submit-btn"
-              >
-                {loading ? "Đang tạo lịch..." : "Tạo lịch phỏng vấn"}
-              </Button>
-            </Space>
-          </div>
-        </Form>
+          )}
+        </div>
       </div>
     </Modal>
   );

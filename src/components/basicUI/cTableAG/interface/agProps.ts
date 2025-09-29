@@ -50,6 +50,8 @@ export interface AgGridComponentProps {
   showSTT?: boolean; // Add new prop to control STT visibility
   showToolColumn?: boolean; // Add new prop to control tool column visibility
   toolColumnRenderer?: (params: any) => React.ReactNode; // Custom renderer for tool column
+  toolColumnWidth?: number; // Width of the tool column (default: 80)
+  toolColumnHeaderName?: string; // Header name for the tool column (default: "")
   pivotMode?: boolean;
   defaultColDef?: ColDef;
   onRowSelected?: (event: any) => void;

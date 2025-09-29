@@ -15,7 +15,7 @@ import {
 } from "@/utils/client/validationHelpers";
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
-import { Segmented, message } from "antd";
+import { Segmented, message, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -25,8 +25,8 @@ import ListJob from "./_components/ListJob/ListJob";
 import JobCreationModal from "./_components/JobCreationModal/JobCreationModal";
 import SuccessModal from "./_components/SuccessModal/SuccessModal";
 import InterviewScheduleModal from "./_components/InterviewScheduleModal/InterviewScheduleModal";
+import JobOfferModal from "./_components/JobOfferModal/JobOfferModal";
 import { FaPlusCircle } from "react-icons/fa";
-import Cbutton from "@/components/basicUI/Cbutton";
 
 function Page() {
   const mes = useTranslations("HandleNotion");
@@ -44,16 +44,19 @@ function Page() {
   const [modalOpen, setModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
+  const [jobOfferModalOpen, setJobOfferModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] =
     useState<TuyenDungItem | null>(null);
   const [contractLink, setContractLink] = useState<string>("");
   const segmentedOptions = useMemo(
     () => [
-      { label: "Cần liên hệ", value: "Applied" },
-      { label: "Hẹn phỏng vấn", value: "Interview" },
-      { label: "Hẹn nhận việc", value: "Offer" },
-      { label: "Làm hợp đồng", value: "Hired" },
+      { label: "Liên hệ", value: "Applied" },
+      { label: "Phỏng vấn", value: "Interview" },
+      { label: "Nhận việc", value: "Offer" },
+      { label: "Hợp đồng", value: "Hired" },
       { label: "Hủy hẹn", value: "Rejected" },
+      { label: "Chưa phù hợp", value: "NotSuitable" },
+      { label: "Hoàn thành", value: "Done" },
     ],
     []
   );
@@ -159,6 +162,30 @@ function Page() {
   const columnDefs: ColDef[] = useMemo(
     () => [
       {
+        field: "status",
+        headerName: t("isActive"),
+        editable: false,
+        width: 120,
+        filter: false,
+        context: {
+          typeColumn: "Tag",
+          selectOptions: segmentedOptions,
+        },
+        cellRendererParams: {
+          colorMap: {
+            Applied: "#ff9800",
+            Interview: "#2196f3",
+            Offer: "#4caf50",
+            Hired: "#9c27b0",
+            Rejected: "#f44336",
+            "On Hold": "#607d8b",
+            Withdrawn: "#795548",
+            Shortlisted: "#00bcd4",
+            Finalist: "#e91e63",
+          },
+        },
+      },
+      {
         field: "lastName",
         headerName: t("lastName"),
         editable: true,
@@ -233,29 +260,6 @@ function Page() {
         editable: true,
         width: 150,
       },
-      {
-        field: "status",
-        headerName: t("isActive"),
-        editable: false,
-        width: 150,
-        context: {
-          typeColumn: "Tag",
-          selectOptions: segmentedOptions,
-        },
-        cellRendererParams: {
-          colorMap: {
-            Applied: "#ff9800",
-            Interview: "#2196f3",
-            Offer: "#4caf50",
-            Hired: "#9c27b0",
-            Rejected: "#f44336",
-            "On Hold": "#607d8b",
-            Withdrawn: "#795548",
-            Shortlisted: "#00bcd4",
-            Finalist: "#e91e63",
-          },
-        },
-      },
     ],
     [t, selectGender, itemErrorCellStyle, segmentedOptions]
   );
@@ -287,10 +291,9 @@ function Page() {
   };
 
   // Interview modal handlers
-  const handleOpenInterviewModal = () => {
-    const selectedRows = gridRef.current?.api?.getSelectedRows();
-    if (selectedRows && selectedRows.length > 0) {
-      setSelectedCandidate(selectedRows[0]);
+  const handleOpenInterviewModal = (_params: any) => {
+    if (_params) {
+      setSelectedCandidate(_params.data);
       setInterviewModalOpen(true);
     } else {
       message.warning("Vui lòng chọn ứng viên để tạo lịch phỏng vấn!");
@@ -299,6 +302,21 @@ function Page() {
 
   const handleCloseInterviewModal = () => {
     setInterviewModalOpen(false);
+    setSelectedCandidate(null);
+  };
+
+  // Job offer modal handlers
+  const handleOpenJobOfferModal = (_params: any) => {
+    if (_params) {
+      setSelectedCandidate(_params.data);
+      setJobOfferModalOpen(true);
+    } else {
+      message.warning("Vui lòng chọn ứng viên để tạo lịch hẹn nhận việc!");
+    }
+  };
+
+  const handleCloseJobOfferModal = () => {
+    setJobOfferModalOpen(false);
     setSelectedCandidate(null);
   };
 
@@ -351,16 +369,31 @@ function Page() {
     () => handleFetchUser(currentPage, pageSize, quickSearchText)
   );
 
-  const buttonProps =
-    selectedStatus === "Interview"
-      ? {
-          return: (
-            <>
-              <Cbutton onClick={handleOpenInterviewModal}>Tạo lịch hẹn</Cbutton>
-            </>
-          ),
-        }
-      : undefined;
+  const buttonProps = (_params: any) => {
+    if (selectedStatus === "Interview") {
+      return (
+        <Tooltip title="Tạo lịch hẹn">
+          <FaPlusCircle
+            className="tool-icon interview-icon"
+            size={30}
+            onClick={() => handleOpenInterviewModal(_params)}
+          />
+        </Tooltip>
+      );
+    } else if (selectedStatus === "Offer") {
+      return (
+        <Tooltip title="Hẹn nhận việc">
+          <FaPlusCircle
+            className="tool-icon offer-icon"
+            size={30}
+            onClick={() => handleOpenJobOfferModal(_params)}
+          />
+        </Tooltip>
+      );
+    } else {
+      return null;
+    }
+  };
 
   if (!dataGrid.isClient) {
     return null;
@@ -428,6 +461,8 @@ function Page() {
               onChangePage={handlePageChange}
               onQuicksearch={dataGrid.handleQuicksearch}
               columnFlex={0}
+              showToolColumn={true}
+              toolColumnRenderer={buttonProps}
               showActionButtons={true}
               actionButtonsProps={{
                 onSave: handleSave,
@@ -438,7 +473,6 @@ function Page() {
                 onModalOk: dataGrid.handleModalOk,
                 hasDuplicates: dataGrid.duplicateIDs.length > 0,
                 hasErrors: dataGrid.hasValidationErrors,
-                buttonProps: buttonProps,
               }}
             />
           </>
@@ -463,6 +497,23 @@ function Page() {
       <InterviewScheduleModal
         open={interviewModalOpen}
         onClose={handleCloseInterviewModal}
+        candidateData={
+          selectedCandidate
+            ? {
+                id: selectedCandidate.id || "",
+                firstName: selectedCandidate.firstName || "",
+                lastName: selectedCandidate.lastName || "",
+                email: selectedCandidate.email || "",
+                phone: selectedCandidate.phone || "",
+              }
+            : undefined
+        }
+      />
+
+      {/* Job Offer Modal */}
+      <JobOfferModal
+        open={jobOfferModalOpen}
+        onClose={handleCloseJobOfferModal}
         candidateData={
           selectedCandidate
             ? {

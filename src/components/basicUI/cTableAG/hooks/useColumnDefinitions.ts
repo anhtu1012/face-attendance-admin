@@ -9,6 +9,8 @@ interface UseColumnDefinitionsProps {
   showSTT: boolean;
   showToolColumn?: boolean;
   toolColumnRenderer?: (params: any) => React.ReactNode;
+  toolColumnWidth?: number;
+  toolColumnHeaderName?: string;
   currentPage: number;
   pageSize: number;
   onChangePage?: (page: number, pageSize: number) => void;
@@ -25,6 +27,8 @@ export const useColumnDefinitions = ({
   showSTT,
   showToolColumn = false,
   toolColumnRenderer,
+  toolColumnWidth = 80,
+  toolColumnHeaderName = "",
   currentPage,
   pageSize,
   onChangePage,
@@ -102,10 +106,10 @@ export const useColumnDefinitions = ({
     // Add Tool column if enabled
     if (showToolColumn && toolColumnRenderer) {
       const toolColumn: ColDef = {
-        headerName: "",
+        headerName: toolColumnHeaderName,
         field: "__tool",
         cellRenderer: toolColumnRenderer,
-        width: 80,
+        width: toolColumnWidth,
         pinned: "right",
         lockPosition: true,
         editable: false,
@@ -235,6 +239,8 @@ export const useColumnDefinitions = ({
     showSTT,
     showToolColumn,
     toolColumnRenderer,
+    toolColumnWidth,
+    toolColumnHeaderName,
     currentPage,
     pageSize,
     onChangePage,

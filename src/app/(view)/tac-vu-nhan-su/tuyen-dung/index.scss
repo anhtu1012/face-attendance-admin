@@ -19,7 +19,7 @@
       font-weight: 500;
       transition: all 0.3s ease;
       background: rgba(255, 255, 255, 0.1);
-      min-width: 200px;
+      min-width: 150px;
 
       &.ant-segmented-item-selected {
         background: linear-gradient(
@@ -50,6 +50,44 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     border-radius: 6px;
     color: #fff;
+  }
+
+  // Tablet styles (768px to 1023px)
+  @media (max-width: 1523px) {
+    .ant-segmented-group {
+      .ant-segmented-item {
+        min-width: 110px;
+      }
+    }
+  }
+
+  // Mobile styles (up to 767px)
+  @media (max-width: 767px) {
+    margin-bottom: 12px;
+
+    .ant-segmented-group {
+      flex-direction: column;
+      padding: 8px;
+
+      .ant-segmented-item {
+        min-width: 100px;
+        width: 100%;
+        margin-bottom: 4px;
+        font-size: 13px;
+        padding: 10px 16px;
+        text-align: center;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .ant-segmented-thumb {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
   }
 }
 
@@ -114,5 +152,32 @@
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  // Tool column icons
+  .tool-icon {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    padding: 4px;
+
+    &.interview-icon {
+      color: #1890ff;
+    }
+
+    &.offer-icon {
+      color: #52c41a;
+    }
+
+    &:hover {
+      transform: scale(1.2) translateY(-2px);
+      background: linear-gradient(
+        to right,
+        rgb(13, 71, 161),
+        rgb(30, 136, 229)
+      );
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+    }
   }
 }

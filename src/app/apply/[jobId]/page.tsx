@@ -1,40 +1,41 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import {
+  Badge,
+  Button,
+  Card,
+  DatePicker,
+  Divider,
   Form,
   Input,
-  DatePicker,
-  Select,
-  Button,
   message,
+  Select,
+  Tabs,
   Upload,
   UploadFile,
-  Card,
-  Badge,
-  Divider,
 } from "antd";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import {
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaFileAlt,
   FaBriefcase,
-  FaMoneyBillWave,
-  FaClock,
   FaBuilding,
-  FaUsers,
-  FaStar,
-  FaEye,
+  FaCalendarAlt,
   FaCheck,
+  FaClock,
   FaCloudUploadAlt,
+  FaEnvelope,
+  FaEye,
+  FaFileAlt,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaPhone,
+  FaStar,
+  FaUser,
+  FaUsers,
 } from "react-icons/fa";
 import { MdEmail, MdPhone } from "react-icons/md";
 import "./JobApplicationPage.scss";
-import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 
 interface JobApplicationFormData {
   fullName: string;
@@ -44,6 +45,15 @@ interface JobApplicationFormData {
   address: string;
   file: File | null; // CV file
   gender: string;
+  experienceYears: string; // Số năm kinh nghiệm
+  workExperiences: {
+    company: string;
+    position: string;
+    startDate: Date;
+    endDate: Date | null;
+    description: string;
+  }[]; // Kinh nghiệm làm việc
+  skills: string[]; // Kỹ năng
 }
 
 interface JobDetail {
@@ -184,6 +194,35 @@ const JobApplicationPage: React.FC = () => {
     { value: "M", label: "Nam" },
     { value: "F", label: "Nữ" },
     { value: "Other", label: "Khác" },
+  ];
+
+  const skillsOptions = [
+    { value: "React", label: "React" },
+    { value: "TypeScript", label: "TypeScript" },
+    { value: "Next.js", label: "Next.js" },
+    { value: "Node.js", label: "Node.js" },
+    { value: "Python", label: "Python" },
+    { value: "Java", label: "Java" },
+    { value: "JavaScript", label: "JavaScript" },
+    { value: "HTML", label: "HTML" },
+    { value: "CSS", label: "CSS" },
+    { value: "SCSS", label: "SCSS" },
+    { value: "Git", label: "Git" },
+    { value: "SQL", label: "SQL" },
+    { value: "MongoDB", label: "MongoDB" },
+  ];
+
+  const experienceYearsOptions = [
+    { value: "1", label: "1 năm" },
+    { value: "2", label: "2 năm" },
+    { value: "3", label: "3 năm" },
+    { value: "4", label: "4 năm" },
+    { value: "5", label: "5 năm" },
+    { value: "6", label: "6 năm" },
+    { value: "7", label: "7 năm" },
+    { value: "8", label: "8 năm" },
+    { value: "9", label: "9 năm" },
+    { value: "10+", label: "10+ năm" },
   ];
 
   const uploadProps = {
@@ -336,160 +375,217 @@ const JobApplicationPage: React.FC = () => {
                   className="application-form"
                   requiredMark="optional"
                 >
-                  <div className="form-row">
-                    <div className="form-col-12">
-                      <Form.Item
-                        name="fullName"
-                        label="Họ và tên"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Vui lòng nhập họ và tên!",
-                          },
-                          {
-                            min: 2,
-                            message: "Họ tên phải có ít nhất 2 ký tự!",
-                          },
-                        ]}
-                      >
-                        <Input
-                          prefix={<FaUser />}
-                          placeholder="VD: Nguyễn Văn An"
-                          className="custom-input"
-                          size="large"
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
+                  <Tabs
+                    defaultActiveKey="1"
+                    items={[
+                      {
+                        key: "1",
+                        label: "Thông tin",
+                        children: (
+                          <>
+                            <div className="form-row">
+                              <div className="form-col-12">
+                                <Form.Item
+                                  name="fullName"
+                                  label="Họ và tên"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Vui lòng nhập họ và tên!",
+                                    },
+                                    {
+                                      min: 2,
+                                      message:
+                                        "Họ tên phải có ít nhất 2 ký tự!",
+                                    },
+                                  ]}
+                                >
+                                  <Input
+                                    prefix={<FaUser />}
+                                    placeholder="VD: Nguyễn Văn An"
+                                    className="custom-input"
+                                    size="large"
+                                  />
+                                </Form.Item>
+                              </div>
+                            </div>
 
-                  <div className="form-row">
-                    <div className="form-col-6">
-                      <Form.Item
-                        name="email"
-                        label="Email"
-                        rules={[
-                          { required: true, message: "Vui lòng nhập email!" },
-                          { type: "email", message: "Email không hợp lệ!" },
-                        ]}
-                      >
-                        <Input
-                          prefix={<FaEnvelope />}
-                          placeholder="example@gmail.com"
-                          className="custom-input"
-                          size="large"
-                        />
-                      </Form.Item>
-                    </div>
-                    <div className="form-col-6">
-                      <Form.Item
-                        name="phone"
-                        label="Số điện thoại"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Vui lòng nhập số điện thoại!",
-                          },
-                          {
-                            pattern: /^[0-9+\-\s()]+$/,
-                            message: "Số điện thoại không hợp lệ!",
-                          },
-                        ]}
-                      >
-                        <Input
-                          prefix={<FaPhone />}
-                          placeholder="0912-345-678"
-                          className="custom-input"
-                          size="large"
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
+                            <div className="form-row">
+                              <div className="form-col-6">
+                                <Form.Item
+                                  name="email"
+                                  label="Email"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Vui lòng nhập email!",
+                                    },
+                                    {
+                                      type: "email",
+                                      message: "Email không hợp lệ!",
+                                    },
+                                  ]}
+                                >
+                                  <Input
+                                    prefix={<FaEnvelope />}
+                                    placeholder="example@gmail.com"
+                                    className="custom-input"
+                                    size="large"
+                                  />
+                                </Form.Item>
+                              </div>
+                              <div className="form-col-6">
+                                <Form.Item
+                                  name="phone"
+                                  label="Số điện thoại"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Vui lòng nhập số điện thoại!",
+                                    },
+                                    {
+                                      pattern: /^[0-9+\-\s()]+$/,
+                                      message: "Số điện thoại không hợp lệ!",
+                                    },
+                                  ]}
+                                >
+                                  <Input
+                                    prefix={<FaPhone />}
+                                    placeholder="0912-345-678"
+                                    className="custom-input"
+                                    size="large"
+                                  />
+                                </Form.Item>
+                              </div>
+                            </div>
 
-                  <div className="form-row">
-                    <div className="form-col-6">
-                      <Form.Item
-                        name="birthDay"
-                        label="Ngày sinh"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Vui lòng chọn ngày sinh!",
-                          },
-                        ]}
-                      >
-                        <DatePicker
-                          placeholder="Chọn ngày sinh"
-                          className="custom-datepicker"
-                          style={{ width: "100%" }}
-                          size="large"
-                          format="DD/MM/YYYY"
-                        />
-                      </Form.Item>
-                    </div>
-                    <div className="form-col-6">
-                      <Form.Item
-                        name="gender"
-                        label="Giới tính"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Vui lòng chọn giới tính!",
-                          },
-                        ]}
-                      >
-                        <Select
-                          placeholder="Chọn giới tính"
-                          options={genderOptions}
-                          className="custom-select"
-                          size="large"
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
+                            <div className="form-row">
+                              <div className="form-col-6">
+                                <Form.Item
+                                  name="birthDay"
+                                  label="Ngày sinh"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Vui lòng chọn ngày sinh!",
+                                    },
+                                  ]}
+                                >
+                                  <DatePicker
+                                    placeholder="Chọn ngày sinh"
+                                    className="custom-datepicker"
+                                    style={{ width: "100%" }}
+                                    size="large"
+                                    format="DD/MM/YYYY"
+                                  />
+                                </Form.Item>
+                              </div>
+                              <div className="form-col-6">
+                                <Form.Item
+                                  name="gender"
+                                  label="Giới tính"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Vui lòng chọn giới tính!",
+                                    },
+                                  ]}
+                                >
+                                  <Select
+                                    placeholder="Chọn giới tính"
+                                    options={genderOptions}
+                                    className="custom-select"
+                                    size="large"
+                                  />
+                                </Form.Item>
+                              </div>
+                            </div>
+                          </>
+                        ),
+                      },
+                      {
+                        key: "2",
+                        label: "Kinh nghiệm",
+                        children: (
+                          <>
+                            <div className="form-row">
+                              <div className="form-col-6">
+                                <Form.Item
+                                  name="experienceYears"
+                                  label="Số năm kinh nghiệm"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message:
+                                        "Vui lòng chọn số năm kinh nghiệm!",
+                                    },
+                                  ]}
+                                >
+                                  <Select
+                                    placeholder="Chọn hoặc nhập số năm kinh nghiệm"
+                                    options={experienceYearsOptions}
+                                    className="custom-select"
+                                    size="large"
+                                  />
+                                </Form.Item>
+                              </div>
+                              <div className="form-col-6">
+                                <Form.Item
+                                  name="skills"
+                                  label="Kỹ năng"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Vui lòng chọn kỹ năng!",
+                                    },
+                                  ]}
+                                >
+                                  <Select
+                                    mode="tags"
+                                    placeholder="Chọn hoặc nhập kỹ năng của bạn"
+                                    options={skillsOptions}
+                                    className="custom-select"
+                                    size="large"
+                                  />
+                                </Form.Item>
+                              </div>
+                            </div>
 
-                  {/* <div className="form-row">
-                    <div className="form-col-12">
-                      <Form.Item
-                        name="address"
-                        label="Địa chỉ"
-                        rules={[
-                          { required: true, message: "Vui lòng nhập địa chỉ!" },
-                        ]}
-                      >
-                        <Input
-                          prefix={<FaMapMarkerAlt />}
-                          placeholder="VD: 123 Đường ABC, Quận XYZ, TP.HCM"
-                          className="custom-input"
-                          size="large"
-                        />
-                      </Form.Item>
-                    </div>
-                  </div> */}
-
-                  <div className="form-row">
-                    <div className="form-col-12">
-                      <Form.Item
-                        name="file"
-                        label="Upload CV"
-                        rules={[
-                          { required: true, message: "Vui lòng upload CV!" },
-                        ]}
-                      >
-                        <Upload.Dragger {...uploadProps} className="cv-upload">
-                          <div className="upload-content">
-                            <FaCloudUploadAlt className="upload-icon" />
-                            <p className="upload-text">
-                              Kéo thả file CV vào đây hoặc{" "}
-                              <span>click để chọn file</span>
-                            </p>
-                            <p className="upload-hint">
-                              Hỗ trợ: PDF, DOC, DOCX (tối đa 5MB)
-                            </p>
-                          </div>
-                        </Upload.Dragger>
-                      </Form.Item>
-                    </div>
-                  </div>
+                            <div className="form-row">
+                              <div className="form-col-12">
+                                <Form.Item
+                                  name="file"
+                                  label="Upload CV"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Vui lòng upload CV!",
+                                    },
+                                  ]}
+                                >
+                                  <Upload.Dragger
+                                    {...uploadProps}
+                                    className="cv-upload"
+                                  >
+                                    <div className="upload-content">
+                                      <FaCloudUploadAlt className="upload-icon" />
+                                      <p className="upload-text">
+                                        Kéo thả file CV vào đây hoặc{" "}
+                                        <span>click để chọn file</span>
+                                      </p>
+                                      <p className="upload-hint">
+                                        Hỗ trợ: PDF, DOC, DOCX (tối đa 5MB)
+                                      </p>
+                                    </div>
+                                  </Upload.Dragger>
+                                </Form.Item>
+                              </div>
+                            </div>
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
 
                   <div className="form-actions">
                     <Button
