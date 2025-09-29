@@ -719,13 +719,18 @@ function Page() {
               gridRef={gridRef}
               total={totalItems}
               pagination={true}
+              rowSelection={{
+                mode: "singleRow",
+                enableClickSelection: true,
+                checkboxes: false,
+              }}
               paginationPageSize={pageSize}
               paginationCurrentPage={currentPage}
               maxRowsVisible={30}
               onChangePage={handlePageChange}
               onSelectionChanged={onSelectionChanged}
               onCellValueChanged={onCellValueChanged}
-              columnFlex={1}
+              columnFlex={0}
               showActionButtons={true}
               actionButtonsProps={{
                 hideAdd: true,

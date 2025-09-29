@@ -6,6 +6,7 @@ import {
   TimeCellEditor,
 } from "../components/CustomTableInput/EditorDateTable";
 import AntdSelectCellEditor from "../components/CustomTableInput/AntdSelectCellEditor";
+import TagCellRenderer from "../components/CustomTableInput/TagCellRenderer";
 
 // Update the processColumnDefs function to handle Number type
 export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
@@ -80,6 +81,34 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
           // Hiển thị format HH:mm
           return params.value || "";
         },
+      };
+    }
+    if (colDef.context?.typeColumn === "Tag") {
+      const options =
+        colDef.context?.selectOptions ||
+        Object.keys(colDef.cellRendererParams?.colorMap || {}).map((key) => ({
+          value: key,
+          label: key,
+        }));
+      return {
+        ...colDef,
+        cellRenderer: TagCellRenderer,
+        cellRendererParams: {
+          ...colDef.cellRendererParams,
+          selectOptions: options,
+        },
+        valueFormatter: (params) => {
+          const found = options.find((item) => item.value === params.value);
+          return found ? found.label : params.value;
+        },
+        ...(colDef.editable
+          ? {
+              cellEditor: AntdSelectCellEditor,
+              cellEditorParams: {
+                values: options,
+              },
+            }
+          : {}),
       };
     }
 

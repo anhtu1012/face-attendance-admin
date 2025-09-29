@@ -75,6 +75,11 @@ function UserAccount({ roleId, shouldFetch = false }: UserAccountProps) {
         idSearch: "filter-text-box",
       }}
       loading={loading}
+      rowSelection={{
+        mode: "singleRow",
+        enableClickSelection: true,
+        checkboxes: false,
+      }}
       rowData={rowData}
       columnDefs={columnDefs}
       gridRef={gridRef}

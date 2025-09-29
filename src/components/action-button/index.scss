@@ -1,6 +1,12 @@
 .btn-add:hover {
-  background-color: #5dc9ef !important;
+  transform: translateY(-2px);
+  background: linear-gradient(
+    to right,
+    rgb(13, 71, 161),
+    rgb(30, 136, 229)
+  ) !important;
   color: white !important;
+  box-shadow: 0 8px 20px rgba(13, 71, 161, 0.3);
 }
 
 .btn-save:hover {

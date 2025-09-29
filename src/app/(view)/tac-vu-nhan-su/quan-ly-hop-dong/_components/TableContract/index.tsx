@@ -129,6 +129,9 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           headerName: t("status"),
           editable: false,
           width: 150,
+          context: {
+            typeColumn: "Tag",
+          },
         },
       ],
       [t]

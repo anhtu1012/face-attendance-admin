@@ -207,7 +207,6 @@ function Page() {
               newValue
             );
             console.log({ placeDetail });
-
             // Update the row data with place details
             const updatedRowData = {
               ...data,
@@ -221,7 +220,7 @@ function Page() {
             // Update the rowData state
             setRowData((prevData) =>
               prevData.map((item) =>
-                item.unitKey === data.unitKey ? updatedRowData : item
+                getItemId(item) === getItemId(data) ? updatedRowData : item
               )
             );
 
@@ -230,8 +229,8 @@ function Page() {
               addressLine: updatedRowData.addressLine,
               district: updatedRowData.district,
               city: updatedRowData.city,
-              lat: updatedRowData.lat,
-              long: updatedRowData.long,
+              lat: String(updatedRowData.lat),
+              long: String(updatedRowData.long),
             });
 
             console.log("Updated row data:", updatedRowData);

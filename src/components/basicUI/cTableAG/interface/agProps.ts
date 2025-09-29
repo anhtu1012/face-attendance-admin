@@ -11,7 +11,7 @@ import { InputSearchProps } from "../../InputSearch";
 import { ActionButtonsProps } from "@/components/action-button";
 export interface ExtendedColDef extends ColDef {
   context?: {
-    typeColumn?: "Select" | "Text" | "Number" | "Date" | "Time";
+    typeColumn?: "Select" | "Text" | "Number" | "Date" | "Time" | "Tag";
     selectOptions?: Array<{ value: any; label: string }>;
     // API integration for Select columns
     onSearchAPI?: (

@@ -113,6 +113,8 @@ function Page() {
 
         // Flatten để hiển thị
         const flattenedData = flattenTreeData(convertedTreeData);
+        console.log("flattenedData", flattenedData);
+
         setDisplayData(flattenedData);
 
         setTotalItems(response.length);
@@ -577,6 +579,11 @@ function Page() {
               id: "filter-text-box",
               idSearch: "filter-text-box",
             }}
+            rowSelection={{
+              mode: "singleRow",
+              enableClickSelection: true,
+              checkboxes: false,
+            }}
             loading={loading}
             rowData={displayData}
             columnDefs={columnDefs}
@@ -589,7 +596,7 @@ function Page() {
             onChangePage={handlePageChange}
             onSelectionChanged={onSelectionChanged}
             onCellValueChanged={onCellValueChanged}
-            columnFlex={1}
+            columnFlex={0}
             showActionButtons={true}
             actionButtonsProps={{
               hideAdd: true,
