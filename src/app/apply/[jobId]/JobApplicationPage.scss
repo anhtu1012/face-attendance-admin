@@ -1,0 +1,766 @@
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e1e1e1;
+    border-top: 4px solid rgb(13, 71, 161);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  text-align: center;
+
+  h2 {
+    color: #ff4d4f;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+}
+
+// Job Application Page Main Container
+.job-application-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  // Company Header
+  .company-header {
+    background: linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229));
+    color: white;
+    padding: 1rem 1rem;
+    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.3);
+    height: 80px;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+      height: auto;
+      padding: 1rem 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem 0.25rem;
+    }
+
+    .company-header-content {
+      width: 100vw;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      padding: 0 4rem;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        height: auto;
+        padding: 0 1rem;
+        width: 100%;
+      }
+
+      @media (min-width: 769px) and (max-width: 1024px) {
+        gap: 1rem;
+        padding: 0 2rem;
+      }
+
+      .company-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .company-logo {
+          flex-shrink: 0;
+
+          .company-icon {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+
+            @media (max-width: 768px) {
+              font-size: 1.5rem;
+              padding: 0.4rem;
+            }
+          }
+        }
+
+        .company-name {
+          font-size: 1.3rem;
+          font-weight: 800;
+          margin: 0 0 0.5rem 0;
+          color: white;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          letter-spacing: 0.5px;
+
+          @media (max-width: 768px) {
+            font-size: 1.2rem;
+            margin: 0;
+            text-align: center;
+          }
+
+          h1 {
+            margin: 0;
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+            text-shadow: inherit;
+            letter-spacing: inherit;
+          }
+        }
+      }
+
+      .company-contact {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+
+        @media (max-width: 768px) {
+          display: flex !important;
+          flex-direction: column;
+          gap: 0.5rem;
+          margin-bottom: 0;
+          width: 100%;
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+          gap: 0.75rem;
+        }
+
+        .contact-top {
+          display: flex !important;
+          gap: 1rem !important;
+
+          @media (max-width: 768px) {
+            justify-content: center;
+            align-items: center;
+          }
+
+          @media (min-width: 769px) and (max-width: 1024px) {
+            gap: 0.75rem !important;
+          }
+        }
+
+        .contact-bottom {
+          @media (max-width: 768px) {
+            text-align: center;
+          }
+        }
+
+        .contact-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          @media (max-width: 768px) {
+            justify-content: center;
+            gap: 0.4rem;
+          }
+
+          .contact-icon {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            min-width: 14px;
+
+            @media (max-width: 768px) {
+              font-size: 0.8rem;
+              min-width: 12px;
+            }
+
+            @media (min-width: 769px) and (max-width: 1024px) {
+              font-size: 0.85rem;
+              min-width: 14px;
+            }
+          }
+
+          span {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+            font-weight: 400;
+            line-height: 1.2;
+
+            @media (max-width: 768px) {
+              font-size: 0.8rem;
+            }
+
+            @media (min-width: 769px) and (max-width: 1024px) {
+              font-size: 0.82rem;
+            }
+          }
+
+          &.address-text {
+            @media (max-width: 768px) {
+              justify-content: center;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .application-content {
+    padding: 1rem 1rem;
+  }
+}
+
+// Left Side - Application Form
+.application-form-section {
+  .application-form-card {
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: none;
+    overflow: hidden;
+
+    .ant-card-body {
+      padding: 0;
+    }
+
+    .form-header {
+      background: linear-gradient(
+        to right,
+        rgb(13, 71, 161),
+        rgb(30, 136, 229)
+      );
+      padding: 1rem;
+      color: white;
+      text-align: center;
+
+      h2 {
+        color: white;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        svg {
+          font-size: 1.5rem;
+        }
+      }
+
+      p {
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        font-size: 1rem;
+      }
+    }
+
+    .application-form {
+      padding: 2rem;
+
+      .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0;
+
+        .form-col-6 {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .form-col-12 {
+          width: 100%;
+        }
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+          gap: 0;
+        }
+      }
+
+      .ant-form-item {
+        margin-bottom: 1.5rem;
+
+        .ant-form-item-label > label {
+          color: #333;
+          font-weight: 600;
+          font-size: 0.95rem;
+        }
+      }
+
+      .custom-input {
+        border-radius: 12px;
+        border: 2px solid #e8e8e8;
+        transition: all 0.3s ease;
+
+        &:hover,
+        &:focus {
+          border-color: rgb(30, 136, 229);
+          box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.1);
+        }
+
+        .anticon {
+          color: rgb(30, 136, 229);
+        }
+      }
+
+      .custom-datepicker {
+        border-radius: 12px;
+        border: 2px solid #e8e8e8;
+        transition: all 0.3s ease;
+
+        &:hover,
+        &.ant-picker-focused {
+          border-color: rgb(30, 136, 229);
+          box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.1);
+        }
+      }
+
+      .custom-select {
+        .ant-select-selector {
+          border-radius: 12px !important;
+          border: 2px solid #e8e8e8 !important;
+          transition: all 0.3s ease;
+        }
+
+        &:hover .ant-select-selector,
+        &.ant-select-focused .ant-select-selector {
+          border-color: rgb(30, 136, 229) !important;
+          box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.1) !important;
+        }
+      }
+
+      .cv-upload {
+        border: 2px dashed #d9d9d9;
+        border-radius: 12px;
+        background: #fafafa;
+        transition: all 0.3s ease;
+        min-height: 50px;
+
+        &:hover {
+          border-color: rgb(30, 136, 229);
+          background: rgba(30, 136, 229, 0.05);
+        }
+
+        .upload-content {
+          padding: 1rem;
+          text-align: center;
+
+          .upload-icon {
+            font-size: 2rem;
+            color: rgb(30, 136, 229);
+            margin-bottom: 0.5rem;
+          }
+
+          .upload-text {
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 0.25rem;
+
+            span {
+              color: rgb(30, 136, 229);
+              font-weight: 600;
+            }
+          }
+
+          .upload-hint {
+            font-size: 0.8rem;
+            color: #999;
+            margin: 0;
+          }
+        }
+
+        .ant-upload-list {
+          margin-top: 0.5rem;
+          padding: 0 1rem;
+
+          .ant-upload-list-item {
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            margin-top: 0.5rem;
+
+            .ant-upload-list-item-name {
+              font-size: 0.85rem;
+              color: rgb(30, 136, 229);
+              font-weight: 500;
+            }
+
+            .ant-upload-list-item-info {
+              padding: 0.5rem;
+            }
+
+            .ant-upload-list-item-actions {
+              margin-left: 0.5rem;
+
+              .anticon {
+                color: rgb(30, 136, 229);
+                font-size: 0.9rem;
+
+                &:hover {
+                  color: rgb(13, 71, 161);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        margin-top: 2rem;
+
+        .submit-btn {
+          background: linear-gradient(
+            to right,
+            rgb(13, 71, 161),
+            rgb(30, 136, 229)
+          );
+          border: none;
+          border-radius: 12px;
+          height: 50px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          box-shadow: 0 6px 20px rgba(30, 136, 229, 0.3);
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(30, 136, 229, 0.4);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Right Side - Job Details
+.job-details-section {
+  .job-details-card {
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: none;
+    height: fit-content;
+
+    .ant-card-body {
+      padding: 2rem;
+    }
+
+    .job-header {
+      margin-bottom: 1.5rem;
+
+      .job-title-section {
+        .job-title {
+          color: #333;
+          font-size: 2rem;
+          font-weight: 700;
+          margin: 0 0 1rem 0;
+          line-height: 1.2;
+        }
+
+        .job-meta {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+
+          .status-badge {
+            font-weight: 600;
+
+            .ant-badge-status-dot {
+              width: 8px;
+              height: 8px;
+            }
+          }
+
+          .company-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 500;
+
+            svg {
+              color: rgb(30, 136, 229);
+            }
+          }
+        }
+      }
+    }
+
+    .job-quick-info {
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .info-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem;
+          background: rgba(30, 136, 229, 0.05);
+          border-radius: 12px;
+          border-left: 4px solid rgb(30, 136, 229);
+
+          .info-icon {
+            color: rgb(30, 136, 229);
+            font-size: 1.3rem;
+            flex-shrink: 0;
+          }
+
+          .info-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+
+            .info-label {
+              font-size: 0.85rem;
+              color: #666;
+              font-weight: 500;
+            }
+
+            .info-value {
+              font-size: 1rem;
+              color: #333;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
+
+    .ant-divider {
+      border-color: #e8e8e8;
+      margin: 2rem 0;
+    }
+
+    h3 {
+      color: #333;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      svg {
+        color: rgb(30, 136, 229);
+      }
+    }
+
+    .job-description,
+    .job-responsibilities,
+    .job-requirements,
+    .job-benefits {
+      margin-bottom: 2rem;
+
+      .content {
+        color: #555;
+        line-height: 1.7;
+        font-size: 1rem;
+
+        p {
+          margin-bottom: 1rem;
+        }
+
+        ul {
+          margin: 1rem 0;
+          padding-left: 1.5rem;
+
+          li {
+            margin-bottom: 0.5rem;
+            color: #555;
+          }
+        }
+
+        strong {
+          color: #333;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .job-statistics {
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+
+        .stat-item {
+          text-align: center;
+          padding: 1.5rem;
+          background: linear-gradient(
+            135deg,
+            rgba(30, 136, 229, 0.05) 0%,
+            rgba(13, 71, 161, 0.05) 100%
+          );
+          border-radius: 12px;
+          border: 1px solid rgba(30, 136, 229, 0.1);
+
+          .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgb(13, 71, 161);
+            margin-bottom: 0.5rem;
+          }
+
+          .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    .recruiter-contact {
+      .contact-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        border: 1px solid #e8e8e8;
+
+        .contact-avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: linear-gradient(
+            to right,
+            rgb(13, 71, 161),
+            rgb(30, 136, 229)
+          );
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          svg {
+            color: white;
+            font-size: 1.5rem;
+          }
+        }
+
+        .contact-info {
+          flex: 1;
+
+          h4 {
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+          }
+
+          > p {
+            color: #666;
+            font-size: 0.95rem;
+            margin: 0 0 1rem 0;
+            font-weight: 500;
+          }
+
+          .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .contact-item {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              font-size: 0.9rem;
+
+              svg {
+                color: rgb(30, 136, 229);
+                font-size: 1rem;
+              }
+
+              span {
+                color: #555;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .application-form-section {
+    .application-form-card {
+      .form-header {
+        padding: 1.5rem;
+
+        h2 {
+          font-size: 1.5rem;
+        }
+      }
+
+      .application-form {
+        padding: 1.5rem;
+      }
+    }
+  }
+
+  .job-details-section {
+    .job-details-card {
+      .ant-card-body {
+        padding: 1.5rem;
+      }
+
+      .job-header {
+        .job-title-section {
+          .job-title {
+            font-size: 1.6rem;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,118 @@
+// Import modal styles
+// @import "./_components/JobSelectionModal/JobSelectionModal.scss";
+@import "./_components/JobCreationModal/JobCreationModal.scss";
+@import "./_components/SuccessModal/SuccessModal.scss";
+@import "./_components/JobDetailModal/JobDetailModal.scss";
+
+.status-segmented {
+  margin-bottom: 16px;
+  text-align: center;
+
+  .ant-segmented-group {
+    background: white;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    .ant-segmented-item {
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.1);
+      min-width: 200px;
+
+      &.ant-segmented-item-selected {
+        background: linear-gradient(
+          to right,
+          rgb(13, 71, 161),
+          rgb(30, 136, 229)
+        );
+        color: #fff;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        &:hover {
+          background: linear-gradient(
+            to right,
+            rgb(13, 71, 161),
+            rgb(30, 136, 229)
+          );
+        }
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+  .ant-segmented-thumb {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    color: #fff;
+  }
+}
+
+.header-add-button {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 10;
+
+  &:hover {
+    transform: translateY(-5px) scale(1.05);
+
+    svg {
+      box-shadow: 0 0 40px rgba(227, 141, 48, 1),
+        0 0 120px rgba(227, 141, 48, 0.6), 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+    }
+  }
+
+  &:active {
+    transform: translateY(-3px) scale(1.02);
+  }
+
+  .icon-title {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 10;
+    margin-bottom: 8px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  &:hover .icon-title {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// Page container enhancements
+.tuyen-dung-page {
+  .layout-content {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+}

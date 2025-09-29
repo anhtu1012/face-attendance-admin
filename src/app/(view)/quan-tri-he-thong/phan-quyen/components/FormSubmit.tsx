@@ -6,7 +6,7 @@ import { TiTick } from "react-icons/ti";
 import "./index.scss";
 
 interface FormSubmitProps {
-  onRoleChange: (roleCode: string) => void;
+  onRoleChange: (roleId: string) => void;
   onAllPermissionToggle: () => void;
   allPermissionsSelected: boolean;
 }
@@ -19,13 +19,13 @@ function FormSubmit({
   const [form] = Form.useForm();
   const t = useTranslations("PhanQuyen");
 
-  const handleSelectRole = (roleCode: string) => {
-    form.setFieldValue("roleCode", roleCode);
+  const handleSelectRole = (roleId: string) => {
+    form.setFieldValue("roleId", roleId);
   };
 
   const onFinish = () => {
-    const roleCode = form.getFieldValue("roleCode");
-    onRoleChange(roleCode || "");
+    const roleId = form.getFieldValue("roleId");
+    onRoleChange(roleId || "");
   };
 
   return (
@@ -38,7 +38,7 @@ function FormSubmit({
       <div className="permission-form-container">
         <Row gutter={12} className="row-container">
           <Col span={4} className="gutter-row">
-            <Form.Item name="roleCode">
+            <Form.Item name="roleId">
               <CRoleSelect
                 onSelectRole={handleSelectRole}
                 label={t("pickAccountGroup")}

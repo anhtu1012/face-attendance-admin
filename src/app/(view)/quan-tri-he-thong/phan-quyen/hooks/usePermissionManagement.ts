@@ -319,7 +319,7 @@ export const usePermissionManagement = () => {
       }
 
       const finalPayload = {
-        groupCode: selectedRoleCode ? [selectedRoleCode] : [],
+        roleId: selectedRoleCode ? [selectedRoleCode] : [],
         permissions,
       };
 

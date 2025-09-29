@@ -50,17 +50,12 @@ export const generatePdfFromHtml = async (
   const a4Dims = getA4Dimensions();
 
   const canvas = await html2canvas(element, {
-    scale: 2, // High DPI for better quality
     useCORS: true,
     logging: false,
-    backgroundColor: "#ffffff",
+    background: "#ffffff",
     width: a4Dims.widthPx,
     height: undefined, // Let height be auto-calculated
-    windowWidth: a4Dims.widthPx,
-    scrollX: 0,
-    scrollY: 0,
     allowTaint: true,
-    removeContainer: false,
   });
 
   // Cleanup: restore transforms and original styles

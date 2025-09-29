@@ -9,7 +9,7 @@ export const PhanQuyenSchemaPayload = z.object({
 });
 
 export const savePhanQuyenSchema = z.object({
-  groupCode: z.string().array().min(2, "Mã vai trò là bắt buộc"),
+  roleId: z.string().array().min(2, "Mã vai trò là bắt buộc"),
   permissions: z.array(PhanQuyenSchemaPayload),
 });
 
