@@ -25,6 +25,7 @@ import {
 } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
 import InvitationTemplate from "./InvitationTemplate";
+import { generateInvitationHTML } from "./invitationTemplateHTML";
 import "./InterviewScheduleModal.scss";
 
 const { Text } = Typography;
@@ -207,108 +208,8 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       tempDiv.style.left = "-9999px";
       document.body.appendChild(tempDiv);
 
-      // Create invitation HTML content
-      tempDiv.innerHTML = `
-        <div style="max-width: 800px; margin: 0 auto; background: white; border: 1px solid #ddd;">
-          <div style="text-align: center; padding: 30px; border-bottom: 3px solid #1890ff;">
-            <div style="font-size: 24px; font-weight: bold; color: #1890ff; margin-bottom: 10px;">
-              THÔNG BÁO MỜI PHỎNG VẤN
-            </div>
-            <div style="font-size: 18px; color: #333; margin-bottom: 5px;">FaceAI Technology Solutions</div>
-            <div style="font-size: 14px; color: #666;">Ngày: ${new Date().toLocaleDateString(
-              "vi-VN"
-            )}</div>
-          </div>
-          
-          <div style="padding: 30px;">
-            <div style="margin-bottom: 20px;">
-              <div style="font-weight: bold; margin-bottom: 5px;">Kính gửi:</div>
-              <div style="font-size: 18px; color: #1890ff;">${
-                interviewDetails.candidate.lastName
-              } ${interviewDetails.candidate.firstName}</div>
-            </div>
-            
-            <div style="margin-bottom: 30px; line-height: 1.6;">
-              Công ty FaceAI Technology Solutions trân trọng thông báo về lịch phỏng vấn. 
-              Chúng tôi rất mong được gặp gỡ và trao đổi với Anh/Chị về cơ hội nghề nghiệp tại công ty.
-            </div>
-            
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <div style="font-weight: bold; font-size: 16px; color: #1890ff; margin-bottom: 15px;">
-                📅 THÔNG TIN PHỎNG VẤN
-              </div>
-              
-              <div style="margin-bottom: 10px;">
-                <strong>Thời gian:</strong> ${interviewDetails.fullDateTime}
-              </div>
-              
-              ${
-                interviewDetails.interviewType === "offline" &&
-                interviewDetails.location
-                  ? `
-                <div style="margin-bottom: 10px;">
-                  <strong>Hình thức:</strong> Phỏng vấn trực tiếp
-                </div>
-                <div style="margin-bottom: 10px;">
-                  <strong>Địa điểm:</strong> ${interviewDetails.location.name}
-                </div>
-                <div style="margin-bottom: 10px;">
-                  <strong>Địa chỉ:</strong> ${interviewDetails.location.address}
-                </div>
-              `
-                  : `
-                <div style="margin-bottom: 10px;">
-                  <strong>Hình thức:</strong> Phỏng vấn trực tuyến
-                </div>
-                <div style="margin-bottom: 10px;">
-                  <strong>Link meeting:</strong> ${
-                    interviewDetails.meetingLink ||
-                    "Sẽ được gửi trước buổi phỏng vấn"
-                  }
-                </div>
-              `
-              }
-              
-              <div style="margin-bottom: 10px;">
-                <strong>Người phỏng vấn:</strong> ${
-                  interviewDetails.interviewer
-                }
-              </div>
-              <div style="margin-bottom: 10px;">
-                <strong>Email liên hệ:</strong> ${
-                  interviewDetails.interviewerEmail
-                }
-              </div>
-              
-              ${
-                interviewDetails.notes
-                  ? `
-                <div style="margin-bottom: 10px;">
-                  <strong>Ghi chú:</strong> ${interviewDetails.notes}
-                </div>
-              `
-                  : ""
-              }
-            </div>
-            
-            <div style="margin-bottom: 30px; line-height: 1.6;">
-              Vui lòng xác nhận tham dự và có mặt đúng giờ. Chúng tôi rất mong được gặp gỡ Anh/Chị!<br/>
-              Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ trực tiếp qua email hoặc số điện thoại bên dưới.
-            </div>
-            
-            <div style="text-align: center; border-top: 1px solid #ddd; padding-top: 20px;">
-              <div style="font-weight: bold; margin-bottom: 10px;">Trân trọng,</div>
-              <div style="font-weight: bold; color: #1890ff; margin-bottom: 15px;">Ban Nhân sự</div>
-              <div style="font-weight: bold; margin-bottom: 5px;">FaceAI Technology Solutions</div>
-              <div style="font-size: 14px; color: #666;">
-                Email: hr@faceai.vn<br/>
-                Phone: (028) 1234-5678<br/>
-                Website: www.faceai.vn
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
+      // Create invitation HTML content using the template
+      tempDiv.innerHTML = generateInvitationHTML(interviewDetails);
 
       // Use html2canvas to convert to image
       const canvas = await html2canvas(tempDiv, {
