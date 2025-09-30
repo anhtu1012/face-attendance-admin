@@ -9,6 +9,9 @@ import AntdThemeProvider from "./AntdThemeProvider";
 import { ReduxProvider } from "./StoreProvider";
 import NotificationHolder from "@/hooks/NotificationHolder";
 import PageTransition from "@/components/PageTransition";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import ConsentManager from "@/components/ConsentManager";
+import ConsentSettings from "@/components/ConsentSettings";
 // import BubbleCursor from "@/components/BubbleCursor";
 
 export default async function RootLayout({
@@ -27,9 +30,12 @@ export default async function RootLayout({
             <ReduxProvider>
               <AntdThemeProvider>
                 <AntdRegistry>
+                  <ConsentManager />
+                  <GoogleAnalytics />
                   <NotificationHolder />
                   <PageTransition />
                   {children}
+                  <ConsentSettings />
                 </AntdRegistry>
               </AntdThemeProvider>
               <ToastContainer />
