@@ -1,4 +1,4 @@
-import { RoleAdmin } from "@/models/enum";
+import { RoleAdmin } from "@/types/enum";
 
 export const getRoleBadgeStyle = (role: string) => {
   switch (role) {

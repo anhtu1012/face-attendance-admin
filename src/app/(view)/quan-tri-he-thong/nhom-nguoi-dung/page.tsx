@@ -41,7 +41,6 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  console.log("itemErrorsFromRedux", itemErrorsFromRedux);
 
   const fetchData = useCallback(
     async (

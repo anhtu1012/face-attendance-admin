@@ -16,7 +16,7 @@ import AgGridComponent from "@/components/basicUI/cTableAG";
 
 import { useTranslations } from "next-intl";
 import { showError, showSuccess } from "@/hooks/useNotification";
-import { MesError } from "@/models/error";
+import { MesError } from "@/types/error";
 
 export type ForeignKeyMapping = {
   field: string; // Field (dataIndex) cần tạo dropdown

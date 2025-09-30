@@ -36,7 +36,6 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  console.log("itemErrorsFromRedux", itemErrorsFromRedux);
 
   // Define columnDefs first before dataGrid hook
   const columnDefs: ColDef[] = useMemo(

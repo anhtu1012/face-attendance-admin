@@ -482,6 +482,25 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   // Use calculated page size options from pagination hook
   const pageSizeOptions = calculatedPageSizeOptions;
 
+  // Handle search parameters change
+  useEffect(() => {
+    firstQuicksearchRef.current += 1;
+    if (firstQuicksearchRef.current <= 2) {
+      return;
+    }
+
+    if (onQuicksearch) {
+      onQuicksearch(searchText, selectedFilterColumns, filterValues, pageSize);
+    }
+  }, [
+    selectedFilterColumns,
+    searchText,
+    filterValues,
+    onQuicksearch,
+    pageSize,
+  ]);
+
+  // Handle page reset when search parameters change (separate effect to avoid loops)
   useEffect(() => {
     firstQuicksearchRef.current += 1;
     if (firstQuicksearchRef.current <= 2) {
@@ -495,17 +514,7 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
         onChangePage(1, pageSize);
       }
     }
-
-    if (onQuicksearch) {
-      onQuicksearch(searchText, selectedFilterColumns, filterValues, pageSize);
-    }
-  }, [
-    selectedFilterColumns,
-    searchText,
-    filterValues,
-    onQuicksearch,
-    pageSize,
-  ]);
+  }, [selectedFilterColumns, searchText, filterValues]);
 
   // Wrapper function để debug row clicks
   const handleRowClickWithDebug = useCallback(
@@ -521,15 +530,6 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   const handleSelectionChanged = useCallback(() => {
     if (onSelectionChanged && gridRef.current?.api) {
       try {
-        // Get selected rows for internal logging
-        const selectedRows = gridRef.current.api.getSelectedRows();
-
-        // Log for debugging
-        console.log("Selection changed:", {
-          count: selectedRows.length,
-          rows: selectedRows,
-        });
-
         // Call the callback (without parameters as per interface)
         onSelectionChanged();
       } catch (error) {

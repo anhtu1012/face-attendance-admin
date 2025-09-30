@@ -98,10 +98,17 @@ const InputSearch: React.FC<InputSearchProps> = ({
     }
   };
   const onFilterTextBoxChanged = useCallback(() => {
-    gridRef?.current!.api.setGridOption(
-      "quickFilterText",
-      (document.getElementById(`${idSearch}`) as HTMLInputElement).value
-    );
+    if (gridRef?.current?.api) {
+      const inputElement = document.getElementById(
+        `${idSearch}`
+      ) as HTMLInputElement;
+      if (inputElement) {
+        gridRef.current.api.setGridOption(
+          "quickFilterText",
+          inputElement.value
+        );
+      }
+    }
   }, [idSearch, gridRef]);
 
   // Choose appropriate icon based on whether filter mode is enabled
