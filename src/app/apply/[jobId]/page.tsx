@@ -1,6 +1,7 @@
 "use client";
 
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
+import { trackEvent, trackUrlVisit } from "@/components/GoogleAnalytics";
 import {
   Badge,
   Button,
@@ -103,6 +104,16 @@ const JobApplicationPage: React.FC = () => {
   useEffect(() => {
     if (jobId) {
       fetchJobDetail(jobId);
+
+      // Track URL visit for this specific job application page
+      trackUrlVisit(`/apply/${jobId}`, {
+        page_type: "job_application",
+        job_id: jobId,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Track event for job page view
+      trackEvent("job_page_view", "job_application", `job_${jobId}`);
     }
   }, [jobId]);
 
@@ -175,8 +186,14 @@ const JobApplicationPage: React.FC = () => {
       console.log("Application data:", values);
       console.log("Job ID:", jobId);
 
+      // Track application submission start
+      trackEvent("application_start", "job_application", `job_${jobId}`);
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Track successful application submission
+      trackEvent("application_success", "job_application", `job_${jobId}`);
 
       message.success(
         "Ứng tuyển thành công! Chúng tôi sẽ liên hệ với bạn sớm."
@@ -184,6 +201,10 @@ const JobApplicationPage: React.FC = () => {
       form.resetFields();
     } catch (error) {
       console.error("Error submitting application:", error);
+
+      // Track failed application submission
+      trackEvent("application_error", "job_application", `job_${jobId}`);
+
       message.error("Có lỗi xảy ra khi ứng tuyển!");
     } finally {
       setLoading(false);
