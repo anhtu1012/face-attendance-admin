@@ -213,14 +213,16 @@ function LayoutContent({
             <Card
               className="card-layout"
               title={option?.cardTitle}
-              headStyle={{
-                background:
-                  "linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229))",
-                textAlign: "center",
-                textTransform: "uppercase",
-                fontSize: "16px",
-                fontWeight: "bold",
-                color: "white",
+              styles={{
+                header: {
+                  background:
+                    "linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229))",
+                  textAlign: "center",
+                  textTransform: "uppercase",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  color: "white",
+                },
               }}
               style={{
                 backgroundColor: "#fff",

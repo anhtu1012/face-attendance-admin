@@ -43,7 +43,7 @@ export interface AgGridComponentProps {
   pinnedBottomRowData?: any[];
   getRowStyle?: any;
   headerHeight?: any;
-  sideBar?: any;
+  // sideBar?: any; // Disabled - requires Enterprise license
   onGridReady?: (params: any) => void; // Thêm prop onGridReady
   loading?: boolean; // Prop để quản lý trạng thái loading
   enableFilter?: boolean;

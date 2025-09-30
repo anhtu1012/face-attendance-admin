@@ -11,9 +11,9 @@ import {
   InputNumber,
 } from "antd";
 import { FaCheck, FaBriefcase, FaInfoCircle, FaUsers } from "react-icons/fa";
-import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import "./JobCreationModal.scss";
+import QuillEditor from "./QuillEditor";
 
 interface JobCreationModalProps {
   open: boolean;
@@ -109,31 +109,6 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
     { value: "Marketing", label: "Marketing" },
     { value: "SEO", label: "SEO" },
     { value: "Project Management", label: "Quản lý dự án" },
-  ];
-
-  // Quill editor modules
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["blockquote", "code-block"],
-      ["link"],
-      ["clean"],
-    ],
-  };
-
-  const quillFormats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "bullet",
-    "blockquote",
-    "code-block",
-    "link",
   ];
 
   const handleSubmit = async (values: JobFormData) => {
@@ -491,12 +466,11 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                         },
                       ]}
                     >
-                      <ReactQuill
-                        theme="snow"
-                        modules={quillModules}
-                        formats={quillFormats}
+                      <QuillEditor
                         placeholder="Mô tả tổng quan về công việc, môi trường làm việc, cơ hội phát triển..."
-                        className="custom-quill"
+                        value=""
+                        onChange={() => {}}
+                        style={{ minHeight: "120px" }}
                       />
                     </Form.Item>
 
@@ -510,12 +484,11 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                         },
                       ]}
                     >
-                      <ReactQuill
-                        theme="snow"
-                        modules={quillModules}
-                        formats={quillFormats}
+                      <QuillEditor
                         placeholder="• Phát triển các tính năng frontend mới • Tối ưu hóa hiệu suất ứng dụng • Review code..."
-                        className="custom-quill"
+                        value=""
+                        onChange={() => {}}
+                        style={{ minHeight: "120px" }}
                       />
                     </Form.Item>
 
@@ -529,12 +502,11 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                         },
                       ]}
                     >
-                      <ReactQuill
-                        theme="snow"
-                        modules={quillModules}
-                        formats={quillFormats}
+                      <QuillEditor
                         placeholder="• Kinh nghiệm 3+ năm với React, TypeScript • Thành thạo Next.js..."
-                        className="custom-quill"
+                        value=""
+                        onChange={() => {}}
+                        style={{ minHeight: "120px" }}
                       />
                     </Form.Item>
 
@@ -545,12 +517,11 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                         { required: true, message: "Vui lòng nhập quyền lợi!" },
                       ]}
                     >
-                      <ReactQuill
-                        theme="snow"
-                        modules={quillModules}
-                        formats={quillFormats}
+                      <QuillEditor
                         placeholder="• Lương thưởng hấp dẫn • Bảo hiểm sức khỏe cao cấp..."
-                        className="custom-quill"
+                        value=""
+                        onChange={() => {}}
+                        style={{ minHeight: "120px" }}
                       />
                     </Form.Item>
                   </div>

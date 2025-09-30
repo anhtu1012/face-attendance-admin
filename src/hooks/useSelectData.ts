@@ -23,15 +23,16 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     },
   ]);
   const [selectCandidate] = useState<SelectOption[]>([
-    { label: "Liên hệ", value: "Applied" },
-    { label: "Phỏng vấn", value: "Interview" },
-    { label: "Rớt PV", value: "Failed" },
-    { label: "Hẹn lại", value: "Reschedule" },
-    { label: "Nhận việc", value: "Offer" },
-    { label: "Hợp đồng", value: "Hired" },
-    { label: "Hủy hẹn PV", value: "RejectedPV" },
-    { label: "Hủy hẹn NV", value: "RejectedNV" },
-    { label: "Chưa phù hợp", value: "NotSuitable" },
+    { label: "Liên hệ", value: "Applied" }, //1
+    { label: "Không LH Được", value: "Applied" }, //1
+    { label: "Phỏng vấn", value: "Interview" }, //2
+    { label: "Rớt PV", value: "Failed" }, //2
+    { label: "Hẹn lại", value: "Reschedule" }, //2
+    { label: "Nhận việc", value: "Offer" }, //3
+    { label: "Làm Hợp đồng", value: "Hired" }, //4
+    { label: "Từ chối PV", value: "RejectedPV" }, //5
+    { label: "Từ chối NV", value: "RejectedNV" }, //5
+    { label: "Chưa phù hợp", value: "NotSuitable" }, //6
   ]);
 
   useEffect(() => {

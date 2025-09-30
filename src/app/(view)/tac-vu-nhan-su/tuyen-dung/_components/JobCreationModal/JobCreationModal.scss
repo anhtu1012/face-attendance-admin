@@ -6,6 +6,18 @@
     box-shadow: 0 20px 60px rgba(21, 101, 192, 0.25);
   }
 
+  .quill-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    background: #f5f5f5;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    color: #666;
+    font-size: 14px;
+  }
+
   .ant-modal-header {
     border-bottom: none;
     padding: 32px 32px 16px;

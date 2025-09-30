@@ -1,10 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-// Lazy imports for better code splitting
+// Imports for AG Grid modules
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { ModuleRegistry } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
+// Enterprise modules removed to avoid license warnings
+// import { ColumnsToolPanelModule } from "@ag-grid-enterprise/column-tool-panel";
+// import { MenuModule } from "@ag-grid-enterprise/menu";
+// import { SideBarModule } from "@ag-grid-enterprise/side-bar";
 import { Pagination } from "antd";
 import Dropdown from "antd/es/dropdown/dropdown";
 import { Tooltip } from "antd/lib";
@@ -31,34 +35,14 @@ const ErrorCellRenderer = lazy(
 );
 const InputSearch = lazy(() => import("@/components/basicUI/InputSearch"));
 
-// Dynamic import for AG-Grid Enterprise modules (only load when needed)
-const loadEnterpriseModules = async () => {
-  const [{ ColumnsToolPanelModule }, { MenuModule }, { SideBarModule }] =
-    await Promise.all([
-      import("@ag-grid-enterprise/column-tool-panel"),
-      import("@ag-grid-enterprise/menu"),
-      import("@ag-grid-enterprise/side-bar"),
-    ]);
-  return { ColumnsToolPanelModule, MenuModule, SideBarModule };
-};
-
-// Register base module immediately
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
-
-// Load and register enterprise modules dynamically
-let enterpriseModulesLoaded = false;
-const loadEnterpriseModulesIfNeeded = async () => {
-  if (!enterpriseModulesLoaded) {
-    const { ColumnsToolPanelModule, MenuModule, SideBarModule } =
-      await loadEnterpriseModules();
-    ModuleRegistry.registerModules([
-      ColumnsToolPanelModule,
-      MenuModule,
-      SideBarModule,
-    ]);
-    enterpriseModulesLoaded = true;
-  }
-};
+// Register only Community modules to avoid Enterprise license warnings
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  // Enterprise modules removed:
+  // ColumnsToolPanelModule,
+  // MenuModule,
+  // SideBarModule,
+]);
 
 // Import ActionButtonsProps type for prop spreading
 
@@ -82,7 +66,7 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   gridOptions = {},
   pinnedBottomRowData = [],
   headerHeight,
-  sideBar = {},
+  // sideBar = {}, // Disabled - requires Enterprise license
   loading = false,
   enableFilter = true,
   showSTT = true,
@@ -199,15 +183,11 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     total,
   });
 
-  // Load AG-Grid styles and enterprise modules when needed
+  // Load AG-Grid styles when needed
   useEffect(() => {
     // Dynamically load AG-Grid CSS
     import("@/styles/ag-grid-styles");
-
-    if (sideBar && Object.keys(sideBar).length > 0) {
-      loadEnterpriseModulesIfNeeded();
-    }
-  }, [sideBar]);
+  }, []);
 
   // Sync internal state with props when they change
   useEffect(() => {
@@ -677,7 +657,7 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
           onFilterChanged={onFilterChanged}
           getRowClass={getRowClass}
           onRowClicked={handleRowClickWithDebug}
-          sideBar={sideBar}
+          // sideBar={sideBar} // Disabled - requires Enterprise license
           onColumnHeaderClicked={onColumnHeaderClicked}
           onGridReady={(params) => {
             // Configure tooltip parameters directly on the API for immediate effect

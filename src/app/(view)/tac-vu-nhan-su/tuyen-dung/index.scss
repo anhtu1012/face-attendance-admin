@@ -1,23 +1,28 @@
-// Import modal styles
-// @import "./_components/JobSelectionModal/JobSelectionModal.scss";
-@import "./_components/JobCreationModal/JobCreationModal.scss";
-@import "./_components/SuccessModal/SuccessModal.scss";
-@import "./_components/JobDetailModal/JobDetailModal.scss";
-
 .status-segmented {
   margin-bottom: 16px;
   text-align: center;
+
+  // Override Ant Design default transition
+  .ant-segmented {
+    transition: all 0.3s ease-in-out !important;
+
+    .ant-segmented-item-label {
+      transition: all 0.3s ease-in-out !important;
+    }
+  }
 
   .ant-segmented-group {
     background: white;
     border-radius: 12px;
     padding: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
 
     .ant-segmented-item {
       border-radius: 8px;
       font-weight: 500;
-      transition: all 0.3s ease;
+      transition: all 0.3s ease-in-out;
       background: rgba(255, 255, 255, 0.1);
       min-width: 150px;
 
@@ -45,8 +50,12 @@
     }
   }
   .ant-segmented-thumb {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229));
+    transition: all 0.3s ease-in-out !important;
+    background: linear-gradient(
+      to right,
+      rgb(13, 71, 161),
+      rgb(30, 136, 229)
+    ) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     border-radius: 6px;
     color: #fff;
@@ -167,6 +176,10 @@
 
     &.offer-icon {
       color: #52c41a;
+    }
+
+    &.report-icon {
+      color: #722ed1;
     }
 
     &:hover {

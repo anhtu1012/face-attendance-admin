@@ -21,12 +21,18 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import "./index.scss";
+import "./_components/JobCreationModal/JobCreationModal.scss";
+import "./_components/SuccessModal/SuccessModal.scss";
+import "./_components/JobDetailModal/JobDetailModal.scss";
+import "./_components/LeaderReportModal/LeaderReportModal.scss";
 import ListJob from "./_components/ListJob/ListJob";
 import JobCreationModal from "./_components/JobCreationModal/JobCreationModal";
 import SuccessModal from "./_components/SuccessModal/SuccessModal";
 import InterviewScheduleModal from "./_components/InterviewScheduleModal/InterviewScheduleModal";
 import JobOfferModal from "./_components/JobOfferModal/JobOfferModal";
+import LeaderReportModal from "./_components/LeaderReportModal/LeaderReportModal";
 import { FaPlusCircle } from "react-icons/fa";
+import { GoReport } from "react-icons/go";
 
 function Page() {
   const mes = useTranslations("HandleNotion");
@@ -45,6 +51,7 @@ function Page() {
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
   const [jobOfferModalOpen, setJobOfferModalOpen] = useState(false);
+  const [leaderReportModalOpen, setLeaderReportModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] =
     useState<TuyenDungItem | null>(null);
   const [contractLink, setContractLink] = useState<string>("");
@@ -320,6 +327,21 @@ function Page() {
     setSelectedCandidate(null);
   };
 
+  // Leader report modal handlers
+  const handleOpenLeaderReportModal = (_params: any) => {
+    if (_params) {
+      setSelectedCandidate(_params.data);
+      setLeaderReportModalOpen(true);
+    } else {
+      message.warning("Vui lòng chọn nhân viên để xem báo cáo!");
+    }
+  };
+
+  const handleCloseLeaderReportModal = () => {
+    setLeaderReportModalOpen(false);
+    setSelectedCandidate(null);
+  };
+
   const dataGrid = useDataGridOperations<TuyenDungItem>({
     gridRef,
     createNewItem: (i) => ({
@@ -387,6 +409,16 @@ function Page() {
             className="tool-icon offer-icon"
             size={30}
             onClick={() => handleOpenJobOfferModal(_params)}
+          />
+        </Tooltip>
+      );
+    } else if (selectedStatus === "Hired") {
+      return (
+        <Tooltip title="Xem báo cáo từ Leader">
+          <GoReport
+            className="tool-icon report-icon"
+            size={30}
+            onClick={() => handleOpenLeaderReportModal(_params)}
           />
         </Tooltip>
       );
@@ -465,6 +497,9 @@ function Page() {
               toolColumnRenderer={buttonProps}
               showActionButtons={true}
               actionButtonsProps={{
+                hideAdd: selectedStatus !== "Applied" ? true : false,
+                hideDelete: selectedStatus !== "Applied" ? true : false,
+                hideDivider: selectedStatus !== "Applied" ? true : false,
                 onSave: handleSave,
                 onDelete: handleDelete,
                 rowSelected: dataGrid.rowSelected,
@@ -514,6 +549,23 @@ function Page() {
       <JobOfferModal
         open={jobOfferModalOpen}
         onClose={handleCloseJobOfferModal}
+        candidateData={
+          selectedCandidate
+            ? {
+                id: selectedCandidate.id || "",
+                firstName: selectedCandidate.firstName || "",
+                lastName: selectedCandidate.lastName || "",
+                email: selectedCandidate.email || "",
+                phone: selectedCandidate.phone || "",
+              }
+            : undefined
+        }
+      />
+
+      {/* Leader Report Modal */}
+      <LeaderReportModal
+        open={leaderReportModalOpen}
+        onClose={handleCloseLeaderReportModal}
         candidateData={
           selectedCandidate
             ? {
