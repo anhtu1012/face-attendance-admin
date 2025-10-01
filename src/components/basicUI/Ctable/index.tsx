@@ -957,7 +957,7 @@ const Ctable = <T extends object>({
               </Tooltip>
               <Dropdown
                 menu={{ items: [] }}
-                dropdownRender={() => (
+                popupRender={() => (
                   <div className="dark-dropdown-content">
                     <div
                       style={{
@@ -1057,7 +1057,7 @@ const Ctable = <T extends object>({
               {importComponent && (
                 <Dropdown
                   menu={{ items: [] }}
-                  dropdownRender={() => (
+                  popupRender={() => (
                     <div
                       className={darkMode ? "dark-dropdown-content" : ""}
                       style={{

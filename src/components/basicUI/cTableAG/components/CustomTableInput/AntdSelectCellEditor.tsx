@@ -390,7 +390,7 @@ const AntdSelectCellEditor = forwardRef(
           virtual
           listHeight={256}
           popupMatchSelectWidth={false}
-          dropdownStyle={{ minWidth: "200px" }}
+          styles={{ popup: { root: { minWidth: "200px" } } }}
           dropdownAlign={{
             points:
               dropdownProps.verticalPlacement === "top"

@@ -70,9 +70,13 @@ export class AxiosService extends Authorization implements RepositoryPort {
     return response.data;
   }
 
-  async post<T, FromData>(url: string, data: FromData): Promise<T> {
+  async post<T, FromData>(
+    url: string,
+    data: FromData,
+    config?: { headers?: AxiosRequestHeaders } | any
+  ): Promise<T> {
     const http = await this._http();
-    const response = await http.post<T>(url, data);
+    const response = await http.post<T>(url, data, config);
     return response.data;
   }
 
