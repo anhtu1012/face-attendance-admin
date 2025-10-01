@@ -30,7 +30,7 @@ export const CompanyInfoSchema = z.object({
   identityIssuedPlace: z.string(),
   lat: z.string(),
   long: z.string(),
-  shift: z.array(ShiftSchema),
+  shifts: z.array(ShiftSchema),
   createdAt: z.string().or(z.date()).optional(),
   updatedAt: z.string().or(z.date()).optional(),
   createdBy: z.string().optional(),
