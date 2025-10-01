@@ -755,7 +755,7 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
           {importComponent && (
             <Dropdown
               menu={{ items: [] }}
-              dropdownRender={() => (
+              popupRender={() => (
                 <div
                   className="dark-dropdown-content"
                   style={{

@@ -11,6 +11,7 @@ import {
   WarningOutlined,
 } from "@ant-design/icons";
 import {
+  App,
   Avatar,
   Badge,
   Button,
@@ -20,7 +21,6 @@ import {
   Space,
   Spin,
   Typography,
-  message,
 } from "antd";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
@@ -48,6 +48,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const [loading, setLoading] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState(false);
   const socket = useSocket();
+  const { message } = App.useApp();
 
   // Get user data from Redux
   const authData = useSelector(selectAuthLogin);
@@ -374,7 +375,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   return (
     <Dropdown
-      dropdownRender={() => dropdownContent}
+      popupRender={() => dropdownContent}
       placement={placement}
       trigger={["click"]}
       open={visible}

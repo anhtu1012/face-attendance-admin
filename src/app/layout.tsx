@@ -6,12 +6,10 @@ import { ThemeProvider } from "next-themes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AntdThemeProvider from "./AntdThemeProvider";
+import AntdAppProvider from "./AntdAppProvider";
 import { ReduxProvider } from "./StoreProvider";
 import NotificationHolder from "@/hooks/NotificationHolder";
 import PageTransition from "@/components/PageTransition";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
-import ConsentManager from "@/components/ConsentManager";
-import ConsentSettings from "@/components/ConsentSettings";
 // import BubbleCursor from "@/components/BubbleCursor";
 
 export default async function RootLayout({
@@ -30,12 +28,11 @@ export default async function RootLayout({
             <ReduxProvider>
               <AntdThemeProvider>
                 <AntdRegistry>
-                  <ConsentManager />
-                  <GoogleAnalytics />
-                  <NotificationHolder />
-                  <PageTransition />
-                  {children}
-                  <ConsentSettings />
+                  <AntdAppProvider>
+                    <NotificationHolder />
+                    <PageTransition />
+                    {children}
+                  </AntdAppProvider>
                 </AntdRegistry>
               </AntdThemeProvider>
               <ToastContainer />
