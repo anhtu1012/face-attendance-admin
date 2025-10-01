@@ -97,8 +97,8 @@ function Page() {
         await DanhMucCompanyInfoServices.getRepresentCompanyInfo();
       setRepresent(resRepresent.data || []);
       const companyInfo = res.data[0];
-      const rawShifts = Array.isArray(companyInfo.shift)
-        ? companyInfo.shift
+      const rawShifts = Array.isArray(companyInfo.shifts)
+        ? companyInfo.shifts
         : [];
       const formattedShifts = rawShifts.map((shift) => ({
         shiftName: shift.shiftName,

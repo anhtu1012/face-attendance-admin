@@ -338,17 +338,17 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              {/* <Col span={8}>
                 <Form.Item label="Quận/Huyện" name="district">
                   <Input placeholder="Quận/Huyện" disabled size="large" />
                 </Form.Item>
-              </Col>
-              <Col span={8}>
+              </Col> */}
+              <Col span={12}>
                 <Form.Item label="Tỉnh/Thành phố" name="city">
                   <Input placeholder="Tỉnh/Thành phố" disabled size="large" />
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={12}>
                 <Form.Item
                   label="Quốc gia"
                   name="country"
@@ -356,7 +356,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
                     { required: true, message: "Vui lòng nhập quốc gia!" },
                   ]}
                 >
-                  <Input placeholder="Nhập quốc gia" size="large" />
+                  <Input placeholder="Nhập quốc gia" disabled size="large" />
                 </Form.Item>
               </Col>
             </Row>
@@ -432,10 +432,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item
-              label="Chức vụ"
-              name="position"
-            >
+            <Form.Item label="Chức vụ" name="position">
               <Input placeholder="Nhập chức vụ" disabled size="large" />
             </Form.Item>
           </Col>
@@ -443,21 +440,18 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item
-              label="CMND/CCCD/Hộ chiếu"
-              name="identityNumber"
-             
-            >
-              <Input placeholder="Nhập số CMND/CCCD/Hộ chiếu" disabled size="large" />
+            <Form.Item label="CMND/CCCD/Hộ chiếu" name="identityNumber">
+              <Input
+                placeholder="Nhập số CMND/CCCD/Hộ chiếu"
+                disabled
+                size="large"
+              />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item
-              label="Ngày cấp"
-              name="identityIssuedDate"
-            >
+            <Form.Item label="Ngày cấp" name="identityIssuedDate">
               <DatePicker
-              disabled
+                disabled
                 placeholder="Chọn ngày cấp"
                 size="large"
                 style={{ width: "100%" }}
@@ -466,11 +460,8 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item
-              label="Nơi cấp"
-              name="identityIssuedPlace"
-            >
-              <Input placeholder="Nhập nơi cấp" disabled  size="large" />
+            <Form.Item label="Nơi cấp" name="identityIssuedPlace">
+              <Input placeholder="Nhập nơi cấp" disabled size="large" />
             </Form.Item>
           </Col>
         </Row>
