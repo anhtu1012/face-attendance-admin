@@ -59,7 +59,7 @@ function Page() {
       };
       // Build multipart/form-data
       const formData = new FormData();
-      const logoUploadFile = values.logoURL as any;
+      const logoUploadFile = values.logoUrl as any;
       const logoOriginFile: File | undefined = logoUploadFile?.originFileObj;
       if (logoOriginFile) {
         formData.append("logoFile", logoOriginFile, logoOriginFile.name);

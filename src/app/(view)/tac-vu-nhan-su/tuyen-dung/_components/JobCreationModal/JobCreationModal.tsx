@@ -14,6 +14,7 @@ import { FaCheck, FaBriefcase, FaInfoCircle, FaUsers } from "react-icons/fa";
 import "react-quill-new/dist/quill.snow.css";
 import "./JobCreationModal.scss";
 import QuillEditor from "./QuillEditor";
+import { useSelectData } from "@/hooks/useSelectData";
 
 interface JobCreationModalProps {
   open: boolean;
@@ -28,7 +29,7 @@ interface JobFormData {
   position: string;
   company: string;
   location: string;
-  employmentType: string;
+  role: string;
 
   // Salary & Experience
   salaryMin: number;
@@ -61,6 +62,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { selectRole } = useSelectData({ fetchRole: true });
 
   const departmentOptions = [
     { value: "IT", label: "Công Nghệ Thông Tin" },
@@ -78,14 +80,6 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
     { value: "MIDDLE", label: "Middle (3-5 năm)" },
     { value: "SENIOR", label: "Senior (5+ năm)" },
     { value: "LEAD", label: "Lead/Manager (7+ năm)" },
-  ];
-
-  const employmentTypeOptions = [
-    { value: "FULL_TIME", label: "Toàn thời gian" },
-    { value: "PART_TIME", label: "Bán thời gian" },
-    { value: "CONTRACT", label: "Hợp đồng" },
-    { value: "INTERN", label: "Thực tập" },
-    { value: "REMOTE", label: "Làm việc từ xa" },
   ];
 
   const probationOptions = [
@@ -164,7 +158,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
           company: "FaceAI Technology Solutions",
           workingHours: "8:00 - 17:30 (T2-T6)",
           probationPeriod: "2_MONTHS",
-          employmentType: "FULL_TIME",
+          role: "5",
           recruiterPosition: "HR Manager",
         }}
       >
@@ -226,6 +220,24 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                     <div className="form-row">
                       <div className="form-col-4">
                         <Form.Item
+                          name="role"
+                          label="Vai trò"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng chọn vai trò!",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Chọn vai trò..."
+                            options={selectRole}
+                            className="custom-select"
+                          />
+                        </Form.Item>
+                      </div>
+                      <div className="form-col-4">
+                        <Form.Item
                           name="department"
                           label="Phòng ban"
                           rules={[
@@ -256,24 +268,6 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                           <Input
                             placeholder="VD: Hà Nội, TP.HCM, Remote..."
                             className="custom-input"
-                          />
-                        </Form.Item>
-                      </div>
-                      <div className="form-col-4">
-                        <Form.Item
-                          name="employmentType"
-                          label="Hình thức làm việc"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Vui lòng chọn hình thức!",
-                            },
-                          ]}
-                        >
-                          <Select
-                            placeholder="Chọn hình thức..."
-                            options={employmentTypeOptions}
-                            className="custom-select"
                           />
                         </Form.Item>
                       </div>

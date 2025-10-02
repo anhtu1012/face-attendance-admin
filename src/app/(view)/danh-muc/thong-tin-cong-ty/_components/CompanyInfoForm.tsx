@@ -13,7 +13,7 @@ import {
   Modal,
 } from "antd";
 import { FormInstance } from "antd/es/form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "../index.scss"; // Import styles
 import { LegalRepresentativeDto } from "@/types/dtoRepresent";
@@ -51,7 +51,28 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
   const [previewTitle, setPreviewTitle] = useState("");
   const { message } = App.useApp();
 
-  console.log("form", form.getFieldsValue());
+  // Use Form.useWatch to reactively watch logoUrl and update fileList in an effect
+  const watchedLogoUrl = Form.useWatch("logoUrl", form);
+
+  useEffect(() => {
+    if (watchedLogoUrl && typeof watchedLogoUrl === "string") {
+      const currentUrl = logoFileList[0]?.url;
+      if (currentUrl !== watchedLogoUrl) {
+        setLogoFileList([
+          {
+            uid: "-1",
+            name: "logo.jpg",
+            status: "done",
+            url: watchedLogoUrl,
+          },
+        ]);
+      }
+    } else if (!watchedLogoUrl && logoFileList.length > 0) {
+      setLogoFileList([]);
+    }
+    // Only run when watchedLogoUrl changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedLogoUrl]);
 
   const getBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -66,9 +87,9 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
     setLogoFileList(fileList);
     // Update form field with the file
     if (fileList.length > 0) {
-      form.setFieldsValue({ logoURL: fileList[0] });
+      form.setFieldsValue({ logoUrl: fileList[0] });
     } else {
-      form.setFieldsValue({ logoURL: null });
+      form.setFieldsValue({ logoUrl: null });
     }
   };
 
@@ -198,7 +219,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
           <Col span={3}>
             <Form.Item
               label="Logo công ty"
-              name="logoURL"
+              name="logoUrl"
               style={{ height: "100%" }}
             >
               <div
@@ -479,6 +500,8 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
         <Form.Item name="long" hidden>
           <Input />
         </Form.Item>
+
+        {/* logoUrl is watched via Form.useWatch and handled in useEffect above */}
 
         {/* Render children (e.g., ShiftManagementCard) inside the same Form */}
         {children}
