@@ -70,7 +70,7 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  const { selectGender } = useSelectData({ fetchRole: true });
+  const { selectGender } = useSelectData({});
   const handleFetchUser = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
       setLoading(true);

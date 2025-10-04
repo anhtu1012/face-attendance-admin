@@ -19,17 +19,19 @@ import {
 } from "react-icons/fa";
 import { MdEmail, MdPhone } from "react-icons/md";
 import "./JobDetailModal.scss";
+import dayjs from "dayjs";
 
 interface Job {
   id: number;
-  title: string;
-  position: string;
-  description: string;
+  jobTitle: string;
+  positionName: string;
+  jobDescription: string;
   status: string;
   createdAt: string;
-  salary?: string;
-  location?: string;
-  department?: string;
+  fromSalary?: string;
+  toSalary?: string;
+  address?: string;
+  requireExperience?: string;
 }
 
 interface JobDetailModalProps {
@@ -44,23 +46,24 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
   job,
 }) => {
   if (!job) return null;
-
+  const companyInfo = {
+    companyName: "FaceAI Technology Solutions",
+    workingHours: "8:00 - 17:30 (T2-T6)",
+  };
   // Mock detailed data
   const jobDetails = {
     ...job,
-    company: "FaceAI Technology Solutions",
-    employmentType: "Toàn thời gian",
-    experience: "3-5 năm",
-    deadline: "2024-03-15",
-    benefits:
-      "<ul><li>Lương thưởng hấp dẫn theo năng lực</li><li>Bảo hiểm sức khỏe cao cấp</li><li>Thưởng hiệu suất định kỳ</li><li>Du lịch hàng năm cùng công ty</li><li>Cơ hội thăng tiến rõ ràng</li><li>Môi trường làm việc hiện đại</li></ul>",
-    requirements:
-      "<ul><li>Kinh nghiệm 3+ năm với React, TypeScript</li><li>Thành thạo Next.js, Redux Toolkit</li><li>Hiểu biết về UI/UX principles</li><li>Kinh nghiệm với RESTful API</li><li>Khả năng làm việc nhóm tốt</li><li>Tiếng Anh giao tiếp cơ bản</li></ul>",
-    responsibilities:
-      "<ul><li>Phát triển các tính năng frontend mới</li><li>Tối ưu hóa hiệu suất ứng dụng</li><li>Review code và mentor junior developers</li><li>Tham gia vào quy trình CI/CD</li><li>Hợp tác với team Backend và Design</li></ul>",
+    requireExperience: "3-5 năm",
+    expirationDate: "2025-10-27T17:00:00.000Z",
+    jobBenefit:
+      '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Lương thưởng hấp dẫn theo năng lực</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Bảo hiểm sức khỏe cao cấp</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Thưởng hiệu suất định kỳ</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Du lịch hàng năm cùng công ty</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Cơ hội thăng tiến rõ ràng</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Môi trường làm việc hiện đại</li></ol><p><br></p>',
+    jobOverview:
+      '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Kinh nghiệm 3+ năm với React, TypeScript</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Thành thạo Next.js, Redux Toolkit</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Hiểu biết về UI/UX principles</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Kinh nghiệm với RESTful API</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Khả năng làm việc nhóm tốt</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Tiếng Anh giao tiếp cơ bản</li></ol><p><br></p>',
+    jobResponsibility:
+      '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Phát triển các tính năng frontend mới</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Tối ưu hóa hiệu suất ứng dụng</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Review code và mentor junior developers</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Tham gia vào quy trình CI/CD</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Hợp tác với team Backend và Design</li></ol><p><br></p>',
     recruiter: {
-      name: "Nguyễn Thị Lan Anh",
-      position: "HR Manager",
+      fullName: "Nguyễn Thị Lan Anh",
+      positionName: "HR Manager",
       email: "lananh.nguyen@faceai.vn",
       phone: "0912-345-678",
     },
@@ -69,10 +72,17 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
       applicants: 32,
       shortlisted: 8,
     },
-    skillsRequired: ["React", "TypeScript", "Next.js", "SCSS", "Git", "Agile"],
-    workingHours: "8:00 - 17:30 (T2-T6)",
-    probationPeriod: "2 tháng",
+    requireSkill: [
+      "UI/UX Design",
+      "Frontend",
+      "Mobile Development",
+      "DevOps",
+      "Backend",
+    ],
+    trialPeriod: "2 tháng",
   };
+
+  console.log("Job Details:", jobDetails);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -145,7 +155,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             </h4>
             <div
               className="content"
-              dangerouslySetInnerHTML={{ __html: jobDetails.responsibilities }}
+              dangerouslySetInnerHTML={{ __html: jobDetails.jobResponsibility }}
             />
           </div>
 
@@ -155,7 +165,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             </h4>
             <div
               className="content"
-              dangerouslySetInnerHTML={{ __html: jobDetails.requirements }}
+              dangerouslySetInnerHTML={{ __html: jobDetails.jobOverview }}
             />
           </div>
 
@@ -165,7 +175,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             </h4>
             <div
               className="content"
-              dangerouslySetInnerHTML={{ __html: jobDetails.benefits }}
+              dangerouslySetInnerHTML={{ __html: jobDetails.jobBenefit }}
             />
           </div>
         </div>
@@ -179,20 +189,20 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
           <div className="info-grid">
             <div className="info-item">
               <span className="info-label">Hình thức làm việc:</span>
-              <span className="info-value">{jobDetails.employmentType}</span>
+              <span className="info-value">Toàn thời gian</span>
             </div>
             <div className="info-item">
               <span className="info-label">Thời gian làm việc:</span>
-              <span className="info-value">{jobDetails.workingHours}</span>
+              <span className="info-value">{companyInfo.workingHours}</span>
             </div>
             <div className="info-item">
               <span className="info-label">Thời gian thử việc:</span>
-              <span className="info-value">{jobDetails.probationPeriod}</span>
+              <span className="info-value">{jobDetails.trialPeriod}</span>
             </div>
             <div className="info-item">
               <span className="info-label">Hạn nộp hồ sơ:</span>
               <span className="info-value highlight">
-                {jobDetails.deadline}
+                {dayjs(jobDetails.expirationDate).format("DD/MM/YYYY")}
               </span>
             </div>
           </div>
@@ -200,7 +210,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
           <div className="skills-section">
             <h4>Kỹ năng yêu cầu</h4>
             <div className="skills-tags">
-              {jobDetails.skillsRequired.map((skill, index) => (
+              {jobDetails.requireSkill.map((skill, index) => (
                 <Badge
                   key={index}
                   color="blue"
@@ -218,8 +228,8 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 <FaUsers />
               </div>
               <div className="recruiter-details">
-                <h5>{jobDetails.recruiter.name}</h5>
-                <p>{jobDetails.recruiter.position}</p>
+                <h5>{jobDetails.recruiter.email}</h5>
+                <p>{jobDetails.recruiter.fullName}</p>
                 <div className="contact-info">
                   <div className="contact-item">
                     <MdEmail />
@@ -406,7 +416,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
         <div className="job-detail-header">
           <div className="job-header-content">
             <div className="job-title-section">
-              <h1 className="job-title-detail">{job.title}</h1>
+              <h1 className="job-title-detail">{job.jobTitle}</h1>
               <div className="job-meta">
                 <Badge
                   color={getStatusColor(job.status)}
@@ -414,7 +424,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                   className="status-badge"
                 />
                 <span className="company-name">
-                  <FaBuilding /> {jobDetails.company}
+                  <FaBuilding /> {companyInfo.companyName}
                 </span>
               </div>
             </div>
@@ -448,7 +458,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               <FaMapMarkerAlt className="info-icon" />
               <div className="info-text">
                 <span className="info-label">Địa điểm</span>
-                <span className="info-value">{job.location}</span>
+                <span className="info-value">{job.address}</span>
               </div>
             </div>
 
@@ -456,7 +466,10 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               <FaMoneyBillWave className="info-icon" />
               <div className="info-text">
                 <span className="info-label">Mức lương</span>
-                <span className="info-value">{job.salary}</span>
+                <span className="info-value">
+                  {" "}
+                  {job.fromSalary}-{job.toSalary} Triệu VNĐ
+                </span>
               </div>
             </div>
 
@@ -464,7 +477,9 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               <FaClock className="info-icon" />
               <div className="info-text">
                 <span className="info-label">Kinh nghiệm</span>
-                <span className="info-value">{jobDetails.experience}</span>
+                <span className="info-value">
+                  {jobDetails.requireExperience}
+                </span>
               </div>
             </div>
 
@@ -472,7 +487,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               <FaCalendarAlt className="info-icon" />
               <div className="info-text">
                 <span className="info-label">Hạn nộp</span>
-                <span className="info-value">{jobDetails.deadline}</span>
+                <span className="info-value">{jobDetails.expirationDate}</span>
               </div>
             </div>
           </div>

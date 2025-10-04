@@ -5,13 +5,20 @@ import SelectServices from "@/services/select/select.service";
 type UseSelectDataOptions = {
   fetchRole?: boolean;
   fetchShift?: boolean;
+  fetchSkill?: boolean;
 };
 
 export const useSelectData = (options: UseSelectDataOptions = {}) => {
-  const defaultOptions = { fetchRole: false, fetchShift: false };
+  const defaultOptions = {
+    fetchRole: false,
+    fetchShift: false,
+    fetchSkill: false,
+  };
   const mergedOptions = { ...defaultOptions, ...options };
   const [selectRole, setSelectRole] = useState<SelectOption[]>([]);
   const [selectShift, setSelectShift] = useState<SelectOption[]>([]);
+  const [selectSkill, setSelectSkill] = useState<SelectOption[]>([]);
+
   const [selectGender] = useState<SelectOption[]>([
     {
       label: "Male",
@@ -46,12 +53,26 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
           const shift = await SelectServices.getSelectShift();
           setSelectShift(shift.data || []);
         }
+        if (mergedOptions.fetchSkill !== false) {
+          const skill = await SelectServices.getSelectSkill();
+          setSelectSkill(skill.data || []);
+        }
       } catch (error) {
         console.log(error);
       }
     };
     fetchData();
-  }, [mergedOptions.fetchRole, mergedOptions.fetchShift]);
+  }, [
+    mergedOptions.fetchRole,
+    mergedOptions.fetchShift,
+    mergedOptions.fetchSkill,
+  ]);
 
-  return { selectRole, selectShift, selectGender, selectCandidate };
+  return {
+    selectRole,
+    selectShift,
+    selectGender,
+    selectCandidate,
+    selectSkill,
+  };
 };
