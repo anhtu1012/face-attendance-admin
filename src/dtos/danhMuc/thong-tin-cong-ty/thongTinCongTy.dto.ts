@@ -9,7 +9,7 @@ export const ShiftSchema = z.object({
 export const CompanyInfoSchema = z.object({
   id: z.string().or(z.bigint()).optional(),
   unitKey: z.string().optional(),
-  logoURL: z.string().nullable().optional(),
+  logoUrl: z.string().nullable().optional(),
   taxCode: z.string(),
   shortName: z.string(),
   companyName: z.string(),
