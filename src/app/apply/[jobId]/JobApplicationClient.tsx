@@ -17,7 +17,7 @@ import {
   Upload,
   UploadFile,
 } from "antd";
-import UpstashServices from "@/services/upstash/upstash.service";
+// Use fetch directly for /api/views POSTs (credentials included)
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
@@ -201,19 +201,42 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
             if (!hasViewed) {
               // Use Upstash service wrapper which uses axios and sends cookies by default
               try {
-                const data = await UpstashServices.incrementViews(id);
-                if (data && data.views) {
-                  setJobDetail((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          statistics: { ...prev.statistics, views: data.views },
-                        }
-                      : prev
+                const resp = await fetch("/api/views", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  body: JSON.stringify({ jobId: id }),
+                });
+
+                if (resp.status === 501) {
+                  // Server indicates Upstash not configured; log and continue without failing UX
+                  console.warn("Upstash not configured on server (501)");
+                } else if (!resp.ok) {
+                  // Non-OK (including 404) — surface for debugging but don't break UX
+                  console.error(
+                    "Error incrementing views:",
+                    resp.status,
+                    await resp.text()
                   );
+                } else {
+                  const data = await resp.json();
+                  console.log("Increment views response:", data);
+                  if (data && typeof data.views === "number") {
+                    setJobDetail((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            statistics: {
+                              ...prev.statistics,
+                              views: data.views,
+                            },
+                          }
+                        : prev
+                    );
+                  }
                 }
               } catch (err) {
-                // ignore errors from incrementing views
+                // ignore errors from incrementing views but log for visibility
                 console.error("Error incrementing views:", err);
               }
 
