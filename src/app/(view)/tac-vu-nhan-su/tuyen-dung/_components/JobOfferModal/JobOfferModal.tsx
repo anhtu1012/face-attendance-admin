@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Card,
-  DatePicker,
-  Form,
-  Input,
-  message,
-  Modal,
-  TimePicker,
-} from "antd";
+import { Button, Card, DatePicker, Form, Input, Modal, TimePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useState } from "react";
 import {
@@ -25,6 +16,7 @@ import { MdLocationOn } from "react-icons/md";
 import JobOfferInvitation from "./JobOfferInvitation";
 import "./JobOfferModal.scss";
 import { generateJobOfferHTML } from "./jobOfferTemplateHTML";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 
 const { TextArea } = Input;
 
@@ -96,6 +88,8 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
   const [jobOfferDetails, setJobOfferDetails] =
     useState<JobOfferDetails | null>(null);
 
+  const messageApi = useAntdMessage();
+
   // Company location (only one location)
   const companyLocation: CompanyLocation = {
     id: "hq",
@@ -148,9 +142,9 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
       setJobOfferDetails(details);
       setShowInvitation(true);
 
-      message.success("Tạo lịch hẹn nhận việc thành công!");
+      messageApi.success("Tạo lịch hẹn nhận việc thành công!");
     } catch {
-      message.error("Có lỗi xảy ra khi tạo lịch hẹn nhận việc!");
+      messageApi.error("Có lỗi xảy ra khi tạo lịch hẹn nhận việc!");
     } finally {
       setLoading(false);
     }
@@ -194,7 +188,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
 
-          message.success("Đã tải ảnh thư mời nhận việc!");
+          messageApi.success("Đã tải ảnh thư mời nhận việc!");
         }
       }, "image/png");
 
@@ -202,7 +196,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
       document.body.removeChild(tempDiv);
     } catch (error) {
       console.error("Error generating invitation image:", error);
-      message.error("Có lỗi xảy ra khi tạo ảnh thư mời!");
+      messageApi.error("Có lỗi xảy ra khi tạo ảnh thư mời!");
     }
   };
 

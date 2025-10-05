@@ -3,7 +3,8 @@
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import DanhMucCompanyInfoServices from "@/services/danh-muc/thong-tin-cong-ty/thong-tin-cong-ty.service";
 import { ErrorResponse } from "@/types/error";
-import { App, Button, Form } from "antd";
+import { Button, Form } from "antd";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
 import CompanyInfoForm from "./_components/CompanyInfoForm";
@@ -18,7 +19,7 @@ import { LegalRepresentativeDto } from "@/types/dtoRepresent";
 function Page() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const { message } = App.useApp();
+  const messageApi = useAntdMessage();
   const [represent, setRepresent] = useState<LegalRepresentativeDto[]>([]);
 
   // Map handling
@@ -73,10 +74,10 @@ function Page() {
       await DanhMucCompanyInfoServices.createDanhMucCompanyInfoMultipart(
         formData
       );
-      message.success("Lưu thông tin công ty thành công!");
+  messageApi.success("Lưu thông tin công ty thành công!");
     } catch (error) {
-      console.error("Error saving company info:", error);
-      message.error("Lỗi khi lưu thông tin công ty");
+  console.error("Error saving company info:", error);
+  messageApi.error("Lỗi khi lưu thông tin công ty");
     } finally {
       setLoading(false);
     }
@@ -84,9 +85,9 @@ function Page() {
 
   // Handle form reset
   const handleReset = () => {
-    form.resetFields();
-    clearMap();
-    message.info("Đã đặt lại form");
+  form.resetFields();
+  clearMap();
+  messageApi.info("Đã đặt lại form");
   };
 
   // Load fake data for testing
@@ -126,7 +127,7 @@ function Page() {
 
   useEffect(() => {
     fetchDataCompany();
-  }, []);
+  }, [fetchDataCompany]);
   return (
     <LayoutContent
       layoutType={1}

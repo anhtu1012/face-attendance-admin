@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
+import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
 import {
   CreateJobRequest,
   UpdateJobRequest,
@@ -8,8 +9,7 @@ import {
 import { JobResponseGetItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.response.dto";
 
 class JobServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/sa/user";
-  protected readonly additionalPath = "/v1/sa/user/array";
+  protected readonly basePath = "/v1/recruitment";
 
   async getJob(
     searchFilter: FilterQueryStringTypeItem[] = [],
@@ -17,19 +17,24 @@ class JobServicesBase extends AxiosService {
     params?: Record<string, string | number | boolean>
   ): Promise<JobResponseGetItem> {
     return this.getWithFilter(
-      `${this.basePath}`,
+      `${this.basePath}/tuyen-dung/danh-sach-cong-viec`,
       searchFilter,
       quickSearchText,
       params
     );
   }
+  async getDetailJob(jobCode: string): Promise<JobDetail> {
+    return this.getWithFilter(
+      `${this.basePath}/tuyen-dung/danh-sach-cong-viec/chi-tiet/${jobCode}`
+    );
+  }
 
   createJob = async (data: CreateJobRequest): Promise<any> => {
-    return this.post(`${this.additionalPath}`, data);
+    return this.post(`${this.basePath}/tao-cong-viec`, data);
   };
 
   async updateJob(payload: UpdateJobRequest): Promise<any> {
-    return this.put(`${this.additionalPath}`, payload);
+    return this.put(`${this.basePath}`, payload);
   }
 
   async deleteJob(id: string): Promise<any> {

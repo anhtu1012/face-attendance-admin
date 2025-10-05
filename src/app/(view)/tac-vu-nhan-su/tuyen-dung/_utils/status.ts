@@ -1,4 +1,6 @@
-const getStatusClass = (status: string) => {
+import { JobStatus } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.dto";
+
+const getStatusClass = (status: JobStatus) => {
   switch (status.toLowerCase()) {
     case "open":
       return "active";
@@ -9,7 +11,18 @@ const getStatusClass = (status: string) => {
   }
 };
 
-const getStatusText = (status: string) => {
+const getStatusColor = (status: JobStatus) => {
+  switch (status.toLowerCase()) {
+    case "open":
+      return "#52c41a";
+    case "closed":
+      return "#f5222d";
+    default:
+      return "#d9d9d9";
+  }
+};
+
+const getStatusText = (status: JobStatus) => {
   switch (status.toLowerCase()) {
     case "open":
       return "Đang tuyển";
@@ -20,4 +33,4 @@ const getStatusText = (status: string) => {
   }
 };
 
-export { getStatusClass, getStatusText };
+export { getStatusClass, getStatusText, getStatusColor };

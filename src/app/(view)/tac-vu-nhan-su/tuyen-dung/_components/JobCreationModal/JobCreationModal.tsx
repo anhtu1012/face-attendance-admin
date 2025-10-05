@@ -6,10 +6,10 @@ import {
   DatePicker,
   Select,
   Button,
-  message,
   Tabs,
   InputNumber,
 } from "antd";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { FaCheck, FaBriefcase, FaInfoCircle, FaUsers } from "react-icons/fa";
 import "react-quill-new/dist/quill.snow.css";
 import "./JobCreationModal.scss";
@@ -39,6 +39,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
     fetchRole: true,
     fetchSkill: true,
   });
+  const messageApi = useAntdMessage();
   const { userProfile } = useSelector(selectAuthLogin);
   const [positionOptionsState, setPositionOptionsState] =
     useState<SelectOption[]>();
@@ -76,15 +77,15 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
       // Simulate API call
       const res = await JobServices.createJob(values);
       // Generate mock job link
-      const jobId = res?.data?.jobCode || "12345";
+      const jobId = res?.jobCode || "12345";
       const jobLink = `${window.location.origin}/apply/${jobId}`;
 
-      message.success("Tạo công việc thành công!");
+      messageApi.success("Tạo công việc thành công!");
       form.resetFields();
       onSuccess(jobLink);
     } catch (error: unknown) {
       console.error("Error creating job:", error);
-      message.error("Có lỗi xảy ra khi tạo công việc!");
+      messageApi.error("Có lỗi xảy ra khi tạo công việc!");
     } finally {
       setLoading(false);
     }

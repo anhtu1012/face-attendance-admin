@@ -11,7 +11,6 @@ import {
   Divider,
   Form,
   Input,
-  message,
   Select,
   Tabs,
   Upload,
@@ -41,6 +40,7 @@ import { MdEmail, MdPhone } from "react-icons/md";
 import "./JobApplicationPage.scss";
 import { useSelectData } from "@/hooks/useSelectData";
 import ApplyServices from "@/services/apply/apply.service";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 
 // Cookie TTL for dedupe (seconds). 24 hours = 86400 seconds
 const COOKIE_TTL_SECONDS = 24 * 60 * 60;
@@ -103,15 +103,16 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   initialViewed,
 }) => {
   const params = useParams();
-  const jobId = params.jobId as string;
+  const jobCode = params.jobCode as string;
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const messageApi = useAntdMessage();
   const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
   const [jobLoading, setJobLoading] = useState(true);
   const { selectSkill, selectGender } = useSelectData({ fetchSkill: true });
 
   useEffect(() => {
-    if (!jobId) return;
+    if (!jobCode) return;
 
     const load = async (id: string) => {
       setJobLoading(true);
@@ -119,7 +120,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         // Simulate API call - replace with actual API call
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // Mock job data based on jobId
+        // Mock job data based on jobCode
         const mockJobDetail: JobDetail = {
           id: id,
           title: "Senior Frontend Developer",
@@ -205,7 +206,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   credentials: "include",
-                  body: JSON.stringify({ jobId: id }),
+                  body: JSON.stringify({ jobCode: id }),
                 });
 
                 if (resp.status === 501) {
@@ -255,20 +256,20 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         }
       } catch (error) {
         console.error("Error fetching job detail:", error);
-        message.error("Không thể tải thông tin công việc!");
+        messageApi.error("Không thể tải thông tin công việc!");
       } finally {
         setJobLoading(false);
       }
     };
 
-    load(jobId);
-  }, [jobId, initialViewed, initialViews]);
+    load(jobCode);
+  }, [jobCode, initialViewed, initialViews, messageApi]);
 
   const handleSubmitApplication = async (values: JobApplicationFormData) => {
     setLoading(true);
     try {
       console.log("Application data:", values);
-      console.log("Job ID:", jobId);
+      console.log("Job ID:", jobCode);
       // Build multipart/form-data
       const formData = new FormData();
       const fileCVUploadFile = values.fileCV as any;
@@ -285,20 +286,20 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
 
       await ApplyServices.createRecruitmentMultipart(formData);
       // Track application submission start
-      trackEvent("application_start", "job_application", `job_${jobId}`);
+      trackEvent("application_start", "job_application", `job_${jobCode}`);
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
       // Track successful application submission
-      trackEvent("application_success", "job_application", `job_${jobId}`);
-      message.success(
+      trackEvent("application_success", "job_application", `job_${jobCode}`);
+      messageApi.success(
         "Ứng tuyển thành công! Chúng tôi sẽ liên hệ với bạn sớm."
       );
       form.resetFields();
     } catch (error) {
       console.error("Error submitting application:", error);
       // Track failed application submission
-      trackEvent("application_error", "job_application", `job_${jobId}`);
-      message.error("Có lỗi xảy ra khi ứng tuyển!");
+      trackEvent("application_error", "job_application", `job_${jobCode}`);
+      messageApi.error("Có lỗi xảy ra khi ứng tuyển!");
     } finally {
       setLoading(false);
     }
@@ -343,12 +344,12 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         file.type ===
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
       if (!isValidFormat) {
-        message.error("Chỉ hỗ trợ file PDF, DOC, DOCX!");
+        messageApi.error("Chỉ hỗ trợ file PDF, DOC, DOCX!");
         return false;
       }
       const isValidSize = file.size / 1024 / 1024 < 5;
       if (!isValidSize) {
-        message.error("File không được vượt quá 5MB!");
+        messageApi.error("File không được vượt quá 5MB!");
         return false;
       }
       return false; // Prevent auto upload
@@ -359,7 +360,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         const url = URL.createObjectURL(file.originFileObj);
         window.open(url, "_blank");
       } else {
-        message.info("Preview chỉ khả dụng cho file PDF");
+        messageApi.info("Preview chỉ khả dụng cho file PDF");
       }
     },
   };
@@ -408,7 +409,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
           <h2>Không tìm thấy công việc</h2>
           <p>
             {" "}
-            Công việc có ID &quot;{jobId}&quot; không tồn tại hoặc đã bị xóa.
+            Công việc có ID &quot;{jobCode}&quot; không tồn tại hoặc đã bị xóa.
           </p>
         </div>
       </div>

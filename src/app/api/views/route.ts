@@ -2,16 +2,46 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import redis from "@/lib/upstash";
 
+export async function GET(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    const jobCode = url.searchParams.get("jobCode");
+    if (!jobCode) {
+      return NextResponse.json({ error: "Missing jobCode" }, { status: 400 });
+    }
+
+    if (
+      !process.env.UPSTASH_REDIS_REST_URL ||
+      !process.env.UPSTASH_REDIS_REST_TOKEN
+    ) {
+      return NextResponse.json(
+        { error: "Upstash not configured", views: null },
+        { status: 501 }
+      );
+    }
+
+    const key = `job:views:${jobCode}`;
+    const current = await redis.get(key);
+    return NextResponse.json({ jobCode, views: Number(current ?? 0) });
+  } catch (err) {
+    console.error("Error in views GET API:", err);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { jobId } = body || {};
-    if (!jobId) {
-      return NextResponse.json({ error: "Missing jobId" }, { status: 400 });
+    const { jobCode } = body || {};
+    if (!jobCode) {
+      return NextResponse.json({ error: "Missing jobCode" }, { status: 400 });
     }
 
     // Use a namespaced key per job
-    const key = `job:views:${jobId}`;
+    const key = `job:views:${jobCode}`;
 
     // TTL for per-IP dedupe (seconds). 24 hours.
     const IP_TTL_SECONDS = 24 * 60 * 60;
@@ -35,7 +65,7 @@ export async function POST(req: NextRequest) {
     // Increment and return new value
     // If we have an IP, use a per-IP key with NX+EX to ensure one increment per IP within TTL.
     if (ip) {
-      const ipKey = `job:views:${jobId}:ip:${ip}`;
+      const ipKey = `job:views:${jobCode}:ip:${ip}`;
       // Attempt to set the ipKey only if it does not exist.
       // If set returns a truthy value, it was created and we should increment the main counter.
       const setResult = await redis.set(ipKey, "1", {
@@ -44,25 +74,25 @@ export async function POST(req: NextRequest) {
       });
       if (setResult) {
         const newCount = await redis.incr(key);
-        return NextResponse.json({ jobId, views: Number(newCount) });
+        return NextResponse.json({ jobCode, views: Number(newCount) });
       }
 
       // IP already seen within TTL: return current count without incrementing.
       const current = await redis.get(key);
-      return NextResponse.json({ jobId, views: Number(current ?? 0) });
+      return NextResponse.json({ jobCode, views: Number(current ?? 0) });
     }
 
-    // No IP available: try to dedupe using a cookie named job_viewed_{jobId}.
+    // No IP available: try to dedupe using a cookie named job_viewed_{jobCode}.
     // If cookie present, return current count; otherwise increment and set a Set-Cookie header.
-    const cookieName = `job_viewed_${jobId}`;
+    const cookieName = `job_viewed_${jobCode}`;
     const hasCookie = req.cookies.get(cookieName)?.value;
     if (hasCookie) {
       const current = await redis.get(key);
-      return NextResponse.json({ jobId, views: Number(current ?? 0) });
+      return NextResponse.json({ jobCode, views: Number(current ?? 0) });
     }
 
     const newCount = await redis.incr(key);
-    const res = NextResponse.json({ jobId, views: Number(newCount) });
+    const res = NextResponse.json({ jobCode, views: Number(newCount) });
     // Set a 24h cookie so subsequent requests from same browser won't increment.
     res.headers.set(
       "Set-Cookie",

@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AntdThemeProvider from "./AntdThemeProvider";
 import AntdAppProvider from "./AntdAppProvider";
+import AntdMessageProvider from "@/hooks/AntdMessageProvider";
 import { ReduxProvider } from "./StoreProvider";
 import NotificationHolder from "@/hooks/NotificationHolder";
 import PageTransition from "@/components/PageTransition";
@@ -29,9 +30,11 @@ export default async function RootLayout({
               <AntdThemeProvider>
                 <AntdRegistry>
                   <AntdAppProvider>
-                    <NotificationHolder />
-                    <PageTransition />
-                    {children}
+                    <AntdMessageProvider>
+                      <NotificationHolder />
+                      <PageTransition />
+                      {children}
+                    </AntdMessageProvider>
                   </AntdAppProvider>
                 </AntdRegistry>
               </AntdThemeProvider>

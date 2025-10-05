@@ -348,9 +348,10 @@
                     to right,
                     rgb(13, 71, 161),
                     rgb(30, 136, 229)
-                  );
-                  -webkit-background-clip: text;
-                  -webkit-text-fill-color: transparent;
+                  ) !important;
+                  // color: black;
+                  -webkit-background-clip: text !important;
+                  -webkit-text-fill-color: transparent !important;
                   background-clip: text;
                   font-weight: 500;
                   font-size: 14px;
@@ -587,8 +588,8 @@
           padding: 0 32px;
           background: linear-gradient(
             to right,
-            rgb(13, 71, 161),
-            rgb(30, 136, 229)
+            rgb(247, 23, 7),
+            rgb(230, 156, 73)
           );
           border: none;
           border-radius: 8px;

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GoongService } from "@/services/goong/goong.service";
-import { App } from "antd";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { FormInstance } from "antd/es/form";
 import { useCallback, useRef, useState } from "react";
 
@@ -9,11 +9,14 @@ interface UseAddressHandlerProps {
   updateMapUrl: (lat: string, lng: string) => void;
 }
 
-export const useAddressHandler = ({ form, updateMapUrl }: UseAddressHandlerProps) => {
+export const useAddressHandler = ({
+  form,
+  updateMapUrl,
+}: UseAddressHandlerProps) => {
   const [addressOptions, setAddressOptions] = useState<any[]>([]);
   const [addressLoading, setAddressLoading] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const { message } = App.useApp();
+  const messageApi = useAntdMessage();
 
   // API function for address autocomplete with debouncing
   const handleAddressSearch = useCallback(async (searchText: string) => {
@@ -52,7 +55,7 @@ export const useAddressHandler = ({ form, updateMapUrl }: UseAddressHandlerProps
     async (selectedLabel: string, option: any) => {
       // Clear the search options to prevent confusion
       setAddressOptions([]);
-      
+
       try {
         setAddressLoading(true);
         // Get the placeId from the option key (which contains the place_id)
@@ -74,17 +77,17 @@ export const useAddressHandler = ({ form, updateMapUrl }: UseAddressHandlerProps
 
         // Update map
         updateMapUrl(lat, lng);
-        
+
         // Show success message
-        message.success("Đã cập nhật thông tin địa chỉ và bản đồ");
+        messageApi.success("Đã cập nhật thông tin địa chỉ và bản đồ");
       } catch (error) {
         console.error("Error fetching place details:", error);
-        message.error("Lỗi khi lấy thông tin địa chỉ");
+        messageApi.error("Lỗi khi lấy thông tin địa chỉ");
       } finally {
         setAddressLoading(false);
       }
     },
-    [form, updateMapUrl]
+    [form, updateMapUrl, messageApi]
   );
 
   // Clear address options when input is cleared
