@@ -15,7 +15,8 @@ import {
 } from "@/utils/client/validationHelpers";
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
-import { Segmented, message, Tooltip } from "antd";
+import { Segmented, Tooltip } from "antd";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -54,6 +55,7 @@ function Page() {
   const [leaderReportModalOpen, setLeaderReportModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] =
     useState<TuyenDungItem | null>(null);
+  const messageApi = useAntdMessage();
   const [contractLink, setContractLink] = useState<string>("");
   const segmentedOptions = useMemo(
     () => [
@@ -303,7 +305,7 @@ function Page() {
       setSelectedCandidate(_params.data);
       setInterviewModalOpen(true);
     } else {
-      message.warning("Vui lòng chọn ứng viên để tạo lịch phỏng vấn!");
+      messageApi.warning("Vui lòng chọn ứng viên để tạo lịch phỏng vấn!");
     }
   };
 
@@ -318,7 +320,7 @@ function Page() {
       setSelectedCandidate(_params.data);
       setJobOfferModalOpen(true);
     } else {
-      message.warning("Vui lòng chọn ứng viên để tạo lịch hẹn nhận việc!");
+      messageApi.warning("Vui lòng chọn ứng viên để tạo lịch hẹn nhận việc!");
     }
   };
 
@@ -333,7 +335,7 @@ function Page() {
       setSelectedCandidate(_params.data);
       setLeaderReportModalOpen(true);
     } else {
-      message.warning("Vui lòng chọn nhân viên để xem báo cáo!");
+      messageApi.warning("Vui lòng chọn nhân viên để xem báo cáo!");
     }
   };
 

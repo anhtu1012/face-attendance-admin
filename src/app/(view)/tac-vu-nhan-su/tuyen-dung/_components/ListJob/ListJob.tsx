@@ -1,49 +1,50 @@
-import { useState } from "react";
+import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
+import { JobItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.dto";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import {
   MdAttachMoney,
   MdCalendarToday,
   MdLocationOn,
   MdWork,
 } from "react-icons/md";
+import { getStatusClass, getStatusText } from "../../_utils/status";
 import JobDetailModal from "../JobDetailModal/JobDetailModal";
 import "./ListJob.scss";
-import { getStatusClass, getStatusText } from "../../_utils/status";
-import dayjs from "dayjs";
-
-interface Job {
-  id: number;
-  jobTitle: string;
-  positionName: string;
-  jobDescription: string;
-  status: string;
-  createdAt: string;
-  fromSalary?: string;
-  toSalary?: string;
-  address?: string;
-  requireExperience?: string;
-}
-
-const fakeJobs: Job[] = [
-  {
-    id: 7,
-    jobTitle: "Senior Frontend Developer",
-    positionName: "Streamer",
-    jobDescription:
-      "<p>Phát triển giao diện người dùng với React, TypeScript và Next.js. Tham gia xây dựng các ứng dụng web hiện đại.</p>",
-    status: "OPEN",
-    createdAt: "2025-10-02T18:34:42.961Z",
-    fromSalary: "200",
-    toSalary: "200",
-    address: "Tp.Thủ Đức",
-    requireExperience: "3-5",
-  },
-];
+import CInputLabel from "@/components/basicUI/CInputLabel";
+import { BsSearch } from "react-icons/bs";
+import { columnDefs } from "./column";
+import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
 
 function ListJob() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [clickEffect, setClickEffect] = useState<number | null>(null);
   const [jobDetailOpen, setJobDetailOpen] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
+  const [dataJobs, setDataJobs] = useState<JobItem[]>([]);
+
+  const fetchDataJobs = async (params: string | undefined) => {
+    const selectedFilterColumns = columnDefs
+      .map((col) => col.field)
+      .filter(Boolean) as string[];
+    const quickSearchText = buildQuicksearchParams(
+      params ?? "",
+      selectedFilterColumns,
+      "",
+      columnDefs
+    );
+    try {
+      const searchFilter: FilterQueryStringTypeItem[] = [];
+      const response = await JobServices.getJob(searchFilter, quickSearchText);
+      setDataJobs(response.data || []);
+    } catch (error) {
+      console.log("Error fetching jobs:", error);
+    }
+  };
+  useEffect(() => {
+    fetchDataJobs(undefined);
+  }, []);
 
   const handleJobCardClick = (jobId: number) => {
     // Tạo hiệu ứng click
@@ -58,7 +59,7 @@ function ListJob() {
     setSelectedJobId(selectedJobId === jobId ? null : jobId);
   };
 
-  const handleViewJobDetail = (job: Job) => {
+  const handleViewJobDetail = (job: JobItem) => {
     setSelectedJob(job);
     setJobDetailOpen(true);
   };
@@ -70,14 +71,25 @@ function ListJob() {
 
   return (
     <div className="list-job-container">
+      <div className="search_job-list">
+        <CInputLabel
+          label="Tìm kiếm"
+          onChange={(e) => fetchDataJobs(e.target.value)}
+          suffix={
+            <>
+              <BsSearch />
+            </>
+          }
+        />
+      </div>
       <div className="job-list">
-        {fakeJobs.map((job) => (
+        {dataJobs.map((job) => (
           <div
             key={job.id}
             className={`job-card ${
-              selectedJobId === job.id ? "selected" : ""
-            } ${clickEffect === job.id ? "click-effect" : ""}`}
-            onClick={() => handleJobCardClick(job.id)}
+              selectedJobId === Number(job.id) ? "selected" : ""
+            } ${clickEffect === Number(job.id) ? "click-effect" : ""}`}
+            onClick={() => handleJobCardClick(Number(job.id))}
           >
             <div className="job-card-header">
               <div className="job-title-section">
@@ -123,7 +135,7 @@ function ListJob() {
               <div className="job-description">
                 <div
                   className="job-description-html"
-                  dangerouslySetInnerHTML={{ __html: job.jobDescription }}
+                  dangerouslySetInnerHTML={{ __html: job.jobDescription ?? "" }}
                 />
               </div>
             </div>
@@ -138,7 +150,6 @@ function ListJob() {
                     handleViewJobDetail(job);
                   }}
                 >
-                  {" "}
                   Xem chi tiết
                 </button>
               </div>
@@ -151,7 +162,7 @@ function ListJob() {
       <JobDetailModal
         open={jobDetailOpen}
         onClose={handleCloseJobDetail}
-        job={selectedJob}
+        jobCode={selectedJob?.jobCode ?? ""}
       />
     </div>
   );

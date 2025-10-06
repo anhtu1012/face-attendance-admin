@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PlusOutlined } from "@ant-design/icons";
 import {
-  App,
   Card,
   Col,
   DatePicker,
@@ -14,6 +13,7 @@ import {
 } from "antd";
 import { FormInstance } from "antd/es/form";
 import { useEffect, useState } from "react";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import dayjs from "dayjs";
 import "../index.scss"; // Import styles
 import { LegalRepresentativeDto } from "@/types/dtoRepresent";
@@ -49,7 +49,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
-  const { message } = App.useApp();
+  const messageApi = useAntdMessage();
 
   // Use Form.useWatch to reactively watch logoUrl and update fileList in an effect
   const watchedLogoUrl = Form.useWatch("logoUrl", form);
@@ -106,12 +106,12 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
   const beforeUpload = (file: any) => {
     const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
     if (!isJpgOrPng) {
-      message.error("Chỉ có thể tải lên file JPG/PNG!");
+      messageApi.error("Chỉ có thể tải lên file JPG/PNG!");
       return false;
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error("Hình ảnh phải nhỏ hơn 2MB!");
+      messageApi.error("Hình ảnh phải nhỏ hơn 2MB!");
       return false;
     }
     return false; // Prevent auto upload, handle manually
@@ -119,7 +119,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
   // Handle form validation failure
   const handleFinishFailed = (errorInfo: any) => {
     console.log("Form validation failed:", errorInfo);
-    message.error("Vui lòng kiểm tra lại các trường bắt buộc!");
+    messageApi.error("Vui lòng kiểm tra lại các trường bắt buộc!");
   };
 
   return (

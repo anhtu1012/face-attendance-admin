@@ -11,7 +11,6 @@ import {
   Divider,
   Form,
   Input,
-  message,
   Select,
   Tabs,
   Upload,
@@ -19,7 +18,7 @@ import {
 } from "antd";
 // Use fetch directly for /api/views POSTs (credentials included)
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   FaBriefcase,
   FaBuilding,
@@ -41,6 +40,14 @@ import { MdEmail, MdPhone } from "react-icons/md";
 import "./JobApplicationPage.scss";
 import { useSelectData } from "@/hooks/useSelectData";
 import ApplyServices from "@/services/apply/apply.service";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
+import {
+  getStatusColor,
+  getStatusText,
+} from "@/app/(view)/tac-vu-nhan-su/tuyen-dung/_utils/status";
+import dayjs from "dayjs";
 
 // Cookie TTL for dedupe (seconds). 24 hours = 86400 seconds
 const COOKIE_TTL_SECONDS = 24 * 60 * 60;
@@ -49,48 +56,13 @@ interface JobApplicationFormData {
   fullName: string;
   email: string;
   phone: string;
-  birthDay: Date;
+  birthday: string;
   address: string;
   fileCV: File | null; // CV file
   gender: string;
   experience: string; // Số năm kinh nghiệm
   skillIds: string[]; // Kỹ năng
-}
-
-interface JobDetail {
-  id: string;
-  title: string;
-  position: string;
-  department: string;
-  company: string;
-  location: string;
-  companyAddress: string;
-  companyPhone: string;
-  companyEmail: string;
-  employmentType: string;
-  experience: string;
-  salaryMin: number;
-  salaryMax: number;
-  deadline: string;
-  workingHours: string;
-  probationPeriod: string;
-  description: string;
-  responsibilities: string;
-  requirements: string;
-  benefits: string;
-  skillsRequired: string[];
-  recruiter: {
-    name: string;
-    position: string;
-    email: string;
-    phone: string;
-  };
-  statistics: {
-    views: number;
-    applicants: number;
-    shortlisted: number;
-  };
-  status: string;
+  jobApplicationFormId?: string; // Job ID
 }
 
 type JobApplicationClientProps = {
@@ -103,71 +75,34 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   initialViewed,
 }) => {
   const params = useParams();
-  const jobId = params.jobId as string;
+  const jobCode = params.jobCode as string;
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const messageApi = useAntdMessage();
   const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
   const [jobLoading, setJobLoading] = useState(true);
+  const [isFormValid, setIsFormValid] = useState(false);
   const { selectSkill, selectGender } = useSelectData({ fetchSkill: true });
-
+  const companyInfo = {
+    companyName: "FaceAI Technology Solutions",
+    workingHours: "8:00 - 17:30 (T2-T6)",
+    companyAddress: "123 Đường ABC, Quận 1, TP.HCM",
+    location: "123 Đường ABC, Quận 1, TP.HCM",
+    companyEmail: "company12@gmail.com",
+    companyPhone: "0123 456 789",
+  };
   useEffect(() => {
-    if (!jobId) return;
+    if (!jobCode) return;
 
     const load = async (id: string) => {
       setJobLoading(true);
       try {
-        // Simulate API call - replace with actual API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const res = await JobServices.getDetailJob(jobCode);
 
-        // Mock job data based on jobId
-        const mockJobDetail: JobDetail = {
-          id: id,
-          title: "Senior Frontend Developer",
-          position: "Developer",
-          department: "Công Nghệ Thông Tin",
-          company: "FaceAI Technology Solutions",
-          location: "Hà Nội",
-          companyAddress: "Tầng 5, Tòa nhà ABC, 123 Đường XYZ, Quận 1, TP.HCM",
-          companyPhone: "(028) 1234-5678",
-          companyEmail: "hr@faceai.vn",
-          employmentType: "Toàn thời gian",
-          experience: "3-5 năm",
-          salaryMin: 25,
-          salaryMax: 35,
-          deadline: "2024-03-15",
-          workingHours: "8:00 - 17:30 (T2-T6)",
-          probationPeriod: "2 tháng",
-          description:
-            "<p>Chúng tôi đang tìm kiếm một <strong>Senior Frontend Developer</strong> tài năng để tham gia vào đội ngũ phát triển sản phẩm của chúng tôi. Bạn sẽ có cơ hội làm việc với các công nghệ hiện đại và đóng góp vào việc xây dựng các ứng dụng web tuyệt vời.</p>",
-          responsibilities:
-            "<ul><li>Phát triển các tính năng frontend mới sử dụng React, TypeScript</li><li>Tối ưu hóa hiệu suất ứng dụng và trải nghiệm người dùng</li><li>Review code và mentor các junior developers</li><li>Tham gia vào quy trình CI/CD và deployment</li><li>Hợp tác chặt chẽ với team Backend và Design</li></ul>",
-          requirements:
-            "<ul><li>Có ít nhất 3 năm kinh nghiệm với React, TypeScript</li><li>Thành thạo Next.js, Redux Toolkit, SCSS</li><li>Hiểu biết sâu về UI/UX principles và responsive design</li><li>Kinh nghiệm làm việc với RESTful API và GraphQL</li><li>Khả năng làm việc nhóm tốt và giao tiếp hiệu quả</li><li>Tiếng Anh giao tiếp cơ bản</li></ul>",
-          benefits:
-            "<ul><li>Lương thưởng hấp dẫn theo năng lực (25-35 triệu VNĐ)</li><li>Bảo hiểm sức khỏe cao cấp cho bản thân và gia đình</li><li>Thưởng hiệu suất định kỳ và thưởng dự án</li><li>Du lịch hàng năm cùng công ty</li><li>Cơ hội đào tạo và phát triển nghề nghiệp</li><li>Môi trường làm việc hiện đại, thân thiện</li></ul>",
-          skillsRequired: [
-            "React",
-            "TypeScript",
-            "Next.js",
-            "SCSS",
-            "Redux",
-            "Git",
-          ],
-          recruiter: {
-            name: "Nguyễn Thị Lan Anh",
-            position: "HR Manager",
-            email: "lananh.nguyen@faceai.vn",
-            phone: "0912-345-678",
-          },
-          statistics: { views: 245, applicants: 32, shortlisted: 8 },
-          status: "Active",
-        };
-
-        // Apply initialViews from server if provided
         if (typeof initialViews === "number") {
-          mockJobDetail.statistics.views = initialViews;
+          res.statistics.views = initialViews;
         }
-        setJobDetail(mockJobDetail);
+        setJobDetail(res);
 
         // Track URL visit for this specific job application page
         trackUrlVisit(`/apply/${id}`, {
@@ -205,7 +140,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   credentials: "include",
-                  body: JSON.stringify({ jobId: id }),
+                  body: JSON.stringify({ jobCode: id }),
                 });
 
                 if (resp.status === 501) {
@@ -255,54 +190,127 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         }
       } catch (error) {
         console.error("Error fetching job detail:", error);
-        message.error("Không thể tải thông tin công việc!");
+        messageApi.error("Không thể tải thông tin công việc!");
       } finally {
         setJobLoading(false);
       }
     };
 
-    load(jobId);
-  }, [jobId, initialViewed, initialViews]);
+    load(jobCode);
+  }, [jobCode, initialViewed, initialViews, messageApi]);
 
   const handleSubmitApplication = async (values: JobApplicationFormData) => {
     setLoading(true);
     try {
       console.log("Application data:", values);
-      console.log("Job ID:", jobId);
+      console.log("Job ID:", jobCode);
+      if (values.birthday) {
+        values.birthday = dayjs(values.birthday).toISOString();
+      }
+      values.jobApplicationFormId = jobDetail?.id;
       // Build multipart/form-data
       const formData = new FormData();
-      const fileCVUploadFile = values.fileCV as any;
-      const fileCVOriginFile: File | undefined =
-        fileCVUploadFile?.originFileObj;
-      if (fileCVOriginFile) {
-        formData.append("fileCV", fileCVOriginFile, fileCVOriginFile.name);
+
+      // Support different shapes returned by Antd Upload inside Form:
+      // - File (native)
+      // - UploadFile object with originFileObj
+      // - Array of UploadFile
+      const extractFile = (val: any): File | undefined => {
+        if (!val) return undefined;
+        if (val instanceof File) return val;
+        if (Array.isArray(val)) {
+          const first = val[0];
+          return first?.originFileObj ?? first?.file ?? undefined;
+        }
+        return val?.originFileObj ?? val?.file ?? undefined;
+      };
+
+      const fileCVFile = extractFile(values.fileCV);
+      if (fileCVFile) {
+        formData.append("fileCV", fileCVFile, fileCVFile.name);
       }
 
-      // Append each field as string
+      // Append other fields as strings. Skip fileCV (already appended).
       Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, String(value));
+        if (key === "fileCV") return;
+        if (value === undefined || value === null) return;
+        // For arrays (like skillIds), append each item separately
+        if (Array.isArray(value)) {
+          value.forEach((v) => formData.append(key, String(v)));
+        } else {
+          formData.append(key, String(value));
+        }
       });
 
       await ApplyServices.createRecruitmentMultipart(formData);
       // Track application submission start
-      trackEvent("application_start", "job_application", `job_${jobId}`);
+      trackEvent("application_start", "job_application", `job_${jobCode}`);
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
       // Track successful application submission
-      trackEvent("application_success", "job_application", `job_${jobId}`);
-      message.success(
+      trackEvent("application_success", "job_application", `job_${jobCode}`);
+      messageApi.success(
         "Ứng tuyển thành công! Chúng tôi sẽ liên hệ với bạn sớm."
       );
       form.resetFields();
+      setIsFormValid(false);
     } catch (error) {
       console.error("Error submitting application:", error);
       // Track failed application submission
-      trackEvent("application_error", "job_application", `job_${jobId}`);
-      message.error("Có lỗi xảy ra khi ứng tuyển!");
+      trackEvent("application_error", "job_application", `job_${jobCode}`);
+      messageApi.error("Có lỗi xảy ra khi ứng tuyển!");
     } finally {
       setLoading(false);
     }
   };
+
+  // Check whether required fields across both tabs are filled and have no validation errors.
+  const checkFormValid = useCallback(() => {
+    // List all required field names used in the form (both tabs)
+    const requiredFields = [
+      "fullName",
+      "email",
+      "phone",
+      "birthday",
+      "gender",
+      "experience",
+      "skillIds",
+      "fileCV",
+    ];
+
+    const values = form.getFieldsValue(requiredFields);
+
+    // If any required value is missing/empty -> invalid
+    for (const key of requiredFields) {
+      const val = values[key];
+      if (val === undefined || val === null) {
+        setIsFormValid(false);
+        return;
+      }
+      if (Array.isArray(val) && val.length === 0) {
+        setIsFormValid(false);
+        return;
+      }
+      if (typeof val === "string" && val.trim() === "") {
+        setIsFormValid(false);
+        return;
+      }
+    }
+
+    // Ensure there are no validation errors reported by the form for required fields
+    const errors = form.getFieldsError(requiredFields);
+    if (errors.some((e) => e.errors && e.errors.length > 0)) {
+      setIsFormValid(false);
+      return;
+    }
+
+    setIsFormValid(true);
+  }, [form]);
+
+  // Initialize validity on mount and whenever the check function changes
+  useEffect(() => {
+    checkFormValid();
+  }, [checkFormValid]);
 
   const experienceYearsOptions = [
     { value: "0", label: "Chưa có kinh nghiệm" },
@@ -343,12 +351,12 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         file.type ===
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
       if (!isValidFormat) {
-        message.error("Chỉ hỗ trợ file PDF, DOC, DOCX!");
+        messageApi.error("Chỉ hỗ trợ file PDF, DOC, DOCX!");
         return false;
       }
       const isValidSize = file.size / 1024 / 1024 < 5;
       if (!isValidSize) {
-        message.error("File không được vượt quá 5MB!");
+        messageApi.error("File không được vượt quá 5MB!");
         return false;
       }
       return false; // Prevent auto upload
@@ -359,35 +367,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         const url = URL.createObjectURL(file.originFileObj);
         window.open(url, "_blank");
       } else {
-        message.info("Preview chỉ khả dụng cho file PDF");
+        messageApi.info("Preview chỉ khả dụng cho file PDF");
       }
     },
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
-        return "#52c41a";
-      case "pending":
-        return "#faad14";
-      case "closed":
-        return "#f5222d";
-      default:
-        return "#d9d9d9";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
-        return "Đang tuyển dụng";
-      case "pending":
-        return "Chờ phê duyệt";
-      case "closed":
-        return "Đã đóng";
-      default:
-        return status;
-    }
   };
 
   if (jobLoading) {
@@ -408,7 +390,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
           <h2>Không tìm thấy công việc</h2>
           <p>
             {" "}
-            Công việc có ID &quot;{jobId}&quot; không tồn tại hoặc đã bị xóa.
+            Công việc có ID &quot;{jobCode}&quot; không tồn tại hoặc đã bị xóa.
           </p>
         </div>
       </div>
@@ -425,28 +407,24 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
               <FaBuilding size={50} className="company-icon" />
             </div>
             <div className="company-name">
-              <h1>{jobDetail.company}</h1>
+              <h1>{companyInfo.companyName}</h1>
             </div>
           </div>
           <div className="company-contact">
             <div className="contact-top">
               <div className="contact-item">
                 <FaPhone className="contact-icon" />
-                <span>{jobDetail.companyPhone}</span>
+                <span>{companyInfo.companyPhone}</span>
               </div>
               <div className="contact-item">
                 <FaEnvelope className="contact-icon" />
-                <span>{jobDetail.companyEmail}</span>
-              </div>
-              <div className="contact-item">
-                <FaMapMarkerAlt className="contact-icon" />
-                <span className="address-text">{jobDetail.location}</span>
+                <span>{companyInfo.companyEmail}</span>
               </div>
             </div>
             <div className="contact-bottom">
               <div className="contact-item">
                 <FaMapMarkerAlt className="contact-icon" />
-                <span>{jobDetail.companyAddress}</span>
+                <span>{companyInfo.companyAddress}</span>
               </div>
             </div>
           </div>
@@ -478,6 +456,10 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   onFinish={handleSubmitApplication}
                   className="application-form"
                   requiredMark="optional"
+                  onFieldsChange={() => {
+                    // non-intrusive validity check when user changes fields
+                    checkFormValid();
+                  }}
                 >
                   <Tabs
                     defaultActiveKey="1"
@@ -567,7 +549,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                             <div className="form-row">
                               <div className="form-col-6">
                                 <Form.Item
-                                  name="birthDay"
+                                  name="birthday"
                                   label="Ngày sinh"
                                   // validate on change so the age validator runs immediately after user picks a date
                                   validateTrigger={["onChange", "onBlur"]}
@@ -656,11 +638,6 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                                   />
                                 </Form.Item>
                               </div>
-                              <div style={{ display: "none" }}>
-                                <Form.Item name="jobApplicationFormId ">
-                                  <input />
-                                </Form.Item>
-                              </div>
                             </div>
                           </>
                         ),
@@ -693,7 +670,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                               </div>
                               <div className="form-col-6">
                                 <Form.Item
-                                  name="skillIds "
+                                  name="skillIds"
                                   label="Kỹ năng"
                                   rules={[
                                     {
@@ -754,6 +731,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                       type="primary"
                       htmlType="submit"
                       loading={loading}
+                      disabled={!isFormValid || loading}
                       className="submit-btn"
                       size="large"
                       icon={<FaCheck />}
@@ -774,7 +752,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                 {/* Job Header */}
                 <div className="job-header">
                   <div className="job-title-section">
-                    <h1 className="job-title">{jobDetail.title}</h1>
+                    <h1 className="job-title">{jobDetail.jobTitle}</h1>
                     <div className="job-meta">
                       <Badge
                         color={getStatusColor(jobDetail.status)}
@@ -782,7 +760,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                         className="status-badge"
                       />
                       <span className="company-name">
-                        <FaBuilding /> {jobDetail.company}
+                        <FaBuilding /> {companyInfo.companyName}
                       </span>
                     </div>
                   </div>
@@ -795,7 +773,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                       <FaMapMarkerAlt className="info-icon" />
                       <div className="info-text">
                         <span className="info-label">Địa điểm</span>
-                        <span className="info-value">{jobDetail.location}</span>
+                        <span className="info-value">{jobDetail.address}</span>
                       </div>
                     </div>
 
@@ -804,7 +782,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                       <div className="info-text">
                         <span className="info-label">Mức lương</span>
                         <span className="info-value">
-                          {jobDetail.salaryMin}-{jobDetail.salaryMax} triệu VNĐ
+                          {jobDetail.fromSalary}-{jobDetail.toSalary} triệu VNĐ
                         </span>
                       </div>
                     </div>
@@ -814,7 +792,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                       <div className="info-text">
                         <span className="info-label">Kinh nghiệm</span>
                         <span className="info-value">
-                          {jobDetail.experience}
+                          {jobDetail.requireExperience} năm
                         </span>
                       </div>
                     </div>
@@ -823,7 +801,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                       <FaCalendarAlt className="info-icon" />
                       <div className="info-text">
                         <span className="info-label">Hạn nộp</span>
-                        <span className="info-value">{jobDetail.deadline}</span>
+                        <span className="info-value">
+                          {dayjs(jobDetail.expirationDate).format("DD/MM/YYYY")}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -838,7 +818,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   </h3>
                   <div
                     className="content"
-                    dangerouslySetInnerHTML={{ __html: jobDetail.description }}
+                    dangerouslySetInnerHTML={{
+                      __html: jobDetail.jobDescription ?? "",
+                    }}
                   />
                 </div>
 
@@ -849,7 +831,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   <div
                     className="content"
                     dangerouslySetInnerHTML={{
-                      __html: jobDetail.responsibilities,
+                      __html: jobDetail.jobResponsibility ?? "",
                     }}
                   />
                 </div>
@@ -860,7 +842,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   </h3>
                   <div
                     className="content"
-                    dangerouslySetInnerHTML={{ __html: jobDetail.requirements }}
+                    dangerouslySetInnerHTML={{
+                      __html: jobDetail.jobOverview ?? "",
+                    }}
                   />
                 </div>
 
@@ -870,7 +854,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   </h3>
                   <div
                     className="content"
-                    dangerouslySetInnerHTML={{ __html: jobDetail.benefits }}
+                    dangerouslySetInnerHTML={{
+                      __html: jobDetail.jobBenefit ?? "",
+                    }}
                   />
                 </div>
 
@@ -915,8 +901,8 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                       <FaUsers />
                     </div>
                     <div className="contact-info">
-                      <h4>{jobDetail.recruiter.name}</h4>
-                      <p>{jobDetail.recruiter.position}</p>
+                      <h4>{jobDetail.recruiter.fullName}</h4>
+                      <p>{jobDetail.recruiter.positionName}</p>
                       <div className="contact-details">
                         <div className="contact-item">
                           <MdEmail />

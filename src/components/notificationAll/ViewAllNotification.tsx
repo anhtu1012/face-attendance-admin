@@ -4,6 +4,7 @@ import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { NotificationService } from "@/services/notification/notification.service";
 import { NotificationItem } from "@/dtos/notification/notification.response.dto";
 import React, { useEffect, useState } from "react";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { useSelector } from "react-redux";
 import {
   Card,
@@ -17,7 +18,6 @@ import {
   Pagination,
   Empty,
   Spin,
-  message,
   Row,
   Col,
   Badge,
@@ -57,42 +57,46 @@ function ViewAllNotification() {
 
   const authData = useSelector(selectAuthLogin);
   const userCode = authData.userProfile?.code;
+  const messageApi = useAntdMessage();
 
-  const getData = async (
-    page = currentPage,
-    limit = pageSize,
-    quickkSearch = quickSearch
-  ) => {
-    if (!userCode) return;
+  const getData = React.useCallback(
+    async (
+      page = currentPage,
+      limit = pageSize,
+      quickkSearch = quickSearch
+    ) => {
+      if (!userCode) return;
 
-    setLoading(true);
-    try {
-      const searchOwnweFilter: any = [
-        { key: "limit", type: "=", value: limit },
-        { key: "offset", type: "=", value: (page - 1) * limit },
-      ];
+      setLoading(true);
+      try {
+        const searchOwnweFilter: any = [
+          { key: "limit", type: "=", value: limit },
+          { key: "offset", type: "=", value: (page - 1) * limit },
+        ];
 
-      const result = await NotificationService.getNotifications(
-        searchOwnweFilter,
-        {
-          ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
-          userCode: userCode,
-        }
-      );
+        const result = await NotificationService.getNotifications(
+          searchOwnweFilter,
+          {
+            ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
+            userCode: userCode,
+          }
+        );
 
-      setNotifications(result.data || []);
-      setTotal(result.count || 0);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      message.error("Không thể tải danh sách thông báo");
-    } finally {
-      setLoading(false);
-    }
-  };
+        setNotifications(result.data || []);
+        setTotal(result.count || 0);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+        messageApi.error("Không thể tải danh sách thông báo");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [userCode, currentPage, pageSize, quickSearch, messageApi]
+  );
 
   useEffect(() => {
     getData();
-  }, [userCode]);
+  }, [userCode, getData]);
 
   const handleSearch = (value: string) => {
     setQuickSearch(value);
@@ -116,12 +120,12 @@ function ViewAllNotification() {
     setMarkingAsRead(true);
     try {
       await NotificationService.markAllAsRead(userCode);
-      message.success("Đã đánh dấu tất cả thông báo đã đọc");
+  messageApi.success("Đã đánh dấu tất cả thông báo đã đọc");
       // Refresh data
       getData(currentPage, pageSize, quickSearch);
     } catch (error) {
       console.error("Error marking all as read:", error);
-      message.error("Không thể đánh dấu đã đọc");
+  messageApi.error("Không thể đánh dấu đã đọc");
     } finally {
       setMarkingAsRead(false);
     }
@@ -131,7 +135,7 @@ function ViewAllNotification() {
     setMarkingOneAsRead(notificationId);
     try {
       await NotificationService.markOneRead(notificationId);
-      message.success("Đã đánh dấu thông báo đã đọc");
+  messageApi.success("Đã đánh dấu thông báo đã đọc");
       // Update local state
       setNotifications(prev =>
         prev.map(notif =>
@@ -140,7 +144,7 @@ function ViewAllNotification() {
       );
     } catch (error) {
       console.error("Error marking one as read:", error);
-      message.error("Không thể đánh dấu đã đọc");
+  messageApi.error("Không thể đánh dấu đã đọc");
     } finally {
       setMarkingOneAsRead("");
     }

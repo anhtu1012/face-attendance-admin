@@ -6,7 +6,6 @@ import {
   DatePicker,
   Form,
   Input,
-  message,
   Modal,
   Select,
   TimePicker,
@@ -25,6 +24,7 @@ import { MdLocationOn } from "react-icons/md";
 import InvitationTemplate from "./InvitationTemplate";
 import { generateInvitationHTML } from "./invitationTemplateHTML";
 import "./InterviewScheduleModal.scss";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 
 const { TextArea } = Input;
 
@@ -91,6 +91,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
   const [interviewType, setInterviewType] = useState<"online" | "offline">(
     "offline"
   );
+  const messageApi = useAntdMessage();
 
   // Company location (only one location)
   const companyLocation: CompanyLocation = {
@@ -180,9 +181,9 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       setInterviewDetails(details);
       setShowInvitation(true);
 
-      message.success("Tạo lịch phỏng vấn thành công!");
+      messageApi.success("Tạo lịch phỏng vấn thành công!");
     } catch {
-      message.error("Có lỗi xảy ra khi tạo lịch phỏng vấn!");
+      messageApi.error("Có lỗi xảy ra khi tạo lịch phỏng vấn!");
     } finally {
       setLoading(false);
     }
@@ -226,7 +227,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
 
-          message.success("Đã tải ảnh thư mời phỏng vấn!");
+          messageApi.success("Đã tải ảnh thư mời phỏng vấn!");
         }
       }, "image/png");
 
@@ -234,7 +235,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       document.body.removeChild(tempDiv);
     } catch (error) {
       console.error("Error generating invitation image:", error);
-      message.error("Có lỗi xảy ra khi tạo ảnh thư mời!");
+      messageApi.error("Có lỗi xảy ra khi tạo ảnh thư mời!");
     }
   };
 

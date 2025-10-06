@@ -9,11 +9,11 @@ import redis from "@/lib/upstash";
 export default async function JobApplicationPageServer({
   params,
 }: {
-  params?: Promise<{ jobId: string }> | undefined;
+  params?: Promise<{ jobCode: string }> | undefined;
 }) {
   // Next's PageProps may type `params` as a Promise; await it when present.
   const resolvedParams = params ? await params : undefined;
-  const { jobId } = resolvedParams ?? {};
+  const { jobCode } = resolvedParams ?? {};
 
   let initialViews: number | undefined = undefined;
   let initialViewed = false;
@@ -23,7 +23,7 @@ export default async function JobApplicationPageServer({
       process.env.UPSTASH_REDIS_REST_URL &&
       process.env.UPSTASH_REDIS_REST_TOKEN
     ) {
-      const key = `job:views:${jobId}`;
+      const key = `job:views:${jobCode}`;
       // Read-only: fetch current views but do NOT increment on SSR. The client will
       // call `/api/views` which handles IP-based dedupe and performs the increment.
       const current = await redis.get(key);

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const JobStatusEnum = z.enum(["OPEN", "CLOSED"]);
+export type JobStatus = z.infer<typeof JobStatusEnum>;
 // Job (Vị trí tuyển dụng) schema
 export const JobItemSchema = z.object({
   id: z.string().optional(),
@@ -17,9 +19,12 @@ export const JobItemSchema = z.object({
   address: z.string().optional(),
   supervisorId: z.string().optional(),
   positionId: z.string().optional(),
-  requireSkill: z.array(z.string()).optional(),
+  positionName: z.string().optional(),
+  requireSkill: z.array(z.string()),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
+  status: JobStatusEnum, // e.g., "ACTIVE": open, "CLOSED": closed
+  jobCode: z.string().optional(), // Mã công việc
 });
 
 export type JobItem = z.infer<typeof JobItemSchema>;

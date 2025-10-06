@@ -1,5 +1,6 @@
 "use client";
-import { Button, Divider, message, Modal, Rate } from "antd";
+import { Button, Divider, Modal, Rate } from "antd";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   FaEnvelope,
@@ -43,17 +44,20 @@ const LeaderReportModal: React.FC<LeaderReportModalProps> = ({
     detailedReport: "",
   });
 
-  const loadReportData = useCallback(async (candidateId: string) => {
-    try {
-      setLoading(true);
-      // Simulate API call to load existing report
-      console.log("Loading report data for candidate:", candidateId);
+  const messageApi = useAntdMessage();
 
-      // Mock data for demonstration
-      const mockData: ReportData = {
-        salary: 15000000,
-        rating: 4.5,
-        detailedReport: `
+  const loadReportData = useCallback(
+    async (candidateId: string) => {
+      try {
+        setLoading(true);
+        // Simulate API call to load existing report
+        console.log("Loading report data for candidate:", candidateId);
+
+        // Mock data for demonstration
+        const mockData: ReportData = {
+          salary: 15000000,
+          rating: 4.5,
+          detailedReport: `
           <h3>Báo cáo đánh giá nhân viên</h3>
           
           <h4>Điểm mạnh:</h4>
@@ -65,16 +69,18 @@ const LeaderReportModal: React.FC<LeaderReportModalProps> = ({
             <li>Chủ động trong công việc và có khả năng làm việc độc lập</li>
           </ul>
         `,
-      };
+        };
 
-      setReportData(mockData);
-    } catch (error) {
-      console.error("Error loading report data:", error);
-      message.error("Không thể tải dữ liệu báo cáo");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+        setReportData(mockData);
+      } catch (error) {
+        console.error("Error loading report data:", error);
+        messageApi.error("Không thể tải dữ liệu báo cáo");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [messageApi]
+  );
 
   useEffect(() => {
     if (open && candidateData) {

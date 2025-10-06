@@ -1,146 +1,128 @@
-import React from "react";
-import { Modal, Button, Badge, Timeline, Progress, Tabs, message } from "antd";
+"use client";
+import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import { Badge, Button, Modal, Progress, Tabs, Spin } from "antd";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import dayjs from "dayjs";
+import React, { useEffect, useState } from "react";
 import {
+  FaBriefcase,
+  FaBuilding,
+  FaClock,
+  FaCopy,
+  FaEdit,
+  FaEye,
+  FaGraduationCap,
+  FaHeart,
+  FaLink,
   FaMapMarkerAlt,
   FaMoneyBillWave,
-  FaClock,
-  FaBuilding,
-  FaUsers,
-  FaBriefcase,
-  FaGraduationCap,
-  FaCalendarAlt,
-  FaEye,
-  FaHeart,
   FaShareAlt,
-  FaEdit,
   FaStar,
-  FaLink,
-  FaCopy,
+  FaUsers,
 } from "react-icons/fa";
 import { MdEmail, MdPhone } from "react-icons/md";
+import { getStatusColor, getStatusText } from "../../_utils/status";
 import "./JobDetailModal.scss";
-import dayjs from "dayjs";
-
-interface Job {
-  id: number;
-  jobTitle: string;
-  positionName: string;
-  jobDescription: string;
-  status: string;
-  createdAt: string;
-  fromSalary?: string;
-  toSalary?: string;
-  address?: string;
-  requireExperience?: string;
-}
+import axios from "axios";
 
 interface JobDetailModalProps {
   open: boolean;
   onClose: () => void;
-  job: Job | null;
+  jobCode: string;
 }
 
 const JobDetailModal: React.FC<JobDetailModalProps> = ({
   open,
   onClose,
-  job,
+  jobCode,
 }) => {
-  if (!job) return null;
+  const [jobDetails, setJobDetails] = useState<JobDetail>();
+  const [viewsLoading, setViewsLoading] = useState(false);
+  const messageApi = useAntdMessage();
   const companyInfo = {
     companyName: "FaceAI Technology Solutions",
     workingHours: "8:00 - 17:30 (T2-T6)",
   };
-  // Mock detailed data
-  const jobDetails = {
-    ...job,
-    requireExperience: "3-5 năm",
-    expirationDate: "2025-10-27T17:00:00.000Z",
-    jobBenefit:
-      '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Lương thưởng hấp dẫn theo năng lực</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Bảo hiểm sức khỏe cao cấp</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Thưởng hiệu suất định kỳ</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Du lịch hàng năm cùng công ty</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Cơ hội thăng tiến rõ ràng</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Môi trường làm việc hiện đại</li></ol><p><br></p>',
-    jobOverview:
-      '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Kinh nghiệm 3+ năm với React, TypeScript</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Thành thạo Next.js, Redux Toolkit</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Hiểu biết về UI/UX principles</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Kinh nghiệm với RESTful API</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Khả năng làm việc nhóm tốt</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Tiếng Anh giao tiếp cơ bản</li></ol><p><br></p>',
-    jobResponsibility:
-      '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Phát triển các tính năng frontend mới</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Tối ưu hóa hiệu suất ứng dụng</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Review code và mentor junior developers</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Tham gia vào quy trình CI/CD</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Hợp tác với team Backend và Design</li></ol><p><br></p>',
-    recruiter: {
-      fullName: "Nguyễn Thị Lan Anh",
-      positionName: "HR Manager",
-      email: "lananh.nguyen@faceai.vn",
-      phone: "0912-345-678",
-    },
-    statistics: {
-      views: 245,
-      applicants: 32,
-      shortlisted: 8,
-    },
-    requireSkill: [
-      "UI/UX Design",
-      "Frontend",
-      "Mobile Development",
-      "DevOps",
-      "Backend",
-    ],
-    trialPeriod: "2 tháng",
-  };
+  const fetchJobDetails = async (jobCode: string) => {
+    try {
+      const res = await JobServices.getDetailJob(jobCode);
+      // Set job details early so the modal can render while we fetch views
+      setJobDetails(res);
 
-  console.log("Job Details:", jobDetails);
+      // Use axios to fetch views count from internal API and show a spinner while loading
+      let views: number | null = null;
+      setViewsLoading(true);
+      try {
+        const resp = await axios.get(
+          `/api/views?jobCode=${encodeURIComponent(jobCode)}`
+        );
+        views = resp.data.views;
+      } catch (err) {
+        console.warn("Error fetching views from /api/views:", err);
+      } finally {
+        setViewsLoading(false);
+      }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
-        return "#52c41a";
-      case "pending":
-        return "#faad14";
-      case "closed":
-        return "#f5222d";
-      default:
-        return "#d9d9d9";
+      // tỷ lệ ứng tuyển = applicants / views
+      const applicationRate =
+        res.statistics && res.statistics.applicants && views
+          ? (Number(res.statistics.applicants) / Number(views)) * 100
+          : 0;
+      console.log("Tỷ lệ ứng tuyển:", applicationRate);
+
+      // Update jobDetails with views and applicationRate once available
+      setJobDetails((prev) =>
+        prev
+          ? {
+              ...prev,
+              statistics: {
+                ...prev.statistics,
+                views: Number(views ?? 0),
+                applicationRate,
+              },
+            }
+          : prev
+      );
+    } catch (error) {
+      console.log(error);
     }
   };
-
-  const getStatusText = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
-        return "Đang tuyển dụng";
-      case "pending":
-        return "Chờ phê duyệt";
-      case "closed":
-        return "Đã đóng";
-      default:
-        return status;
+  useEffect(() => {
+    if (jobCode) {
+      fetchJobDetails(jobCode);
     }
-  };
+  }, [jobCode]);
+  if (!jobDetails) return null;
 
   const handleApply = () => {
     // Create job application link
-    const applicationLink = `${window.location.origin}/apply/${job.id}`;
+    const applicationLink = `${window.location.origin}/apply/${jobDetails?.jobCode}`;
 
     // Open in new tab
     window.open(applicationLink, "_blank");
-
-    console.log("Apply for job:", job.id);
-    console.log("Application link:", applicationLink);
   };
 
   const handleCopyApplicationLink = async () => {
-    const applicationLink = `${window.location.origin}/apply/${job.id}`;
+    const applicationLink = `${window.location.origin}/apply/${jobDetails.jobCode}`;
 
     try {
       await navigator.clipboard.writeText(applicationLink);
-      message.success("Đã sao chép link ứng tuyển!");
+      messageApi.success("Đã sao chép link ứng tuyển!");
     } catch (error) {
       console.error("Error copying link:", error);
-      message.error("Không thể sao chép link!");
+      messageApi.error("Không thể sao chép link!");
     }
   };
 
   const handleSaveJob = () => {
     // Handle save job logic
-    console.log("Save job:", job.id);
+    console.log("Save job:", jobDetails);
   };
 
   const handleShareJob = () => {
     // Handle share job logic
-    console.log("Share job:", job.id);
+    console.log("Share job:", jobDetails);
   };
 
   const tabItems = [
@@ -155,7 +137,9 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             </h4>
             <div
               className="content"
-              dangerouslySetInnerHTML={{ __html: jobDetails.jobResponsibility }}
+              dangerouslySetInnerHTML={{
+                __html: jobDetails.jobResponsibility ?? "",
+              }}
             />
           </div>
 
@@ -165,7 +149,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             </h4>
             <div
               className="content"
-              dangerouslySetInnerHTML={{ __html: jobDetails.jobOverview }}
+              dangerouslySetInnerHTML={{ __html: jobDetails.jobOverview ?? "" }}
             />
           </div>
 
@@ -175,7 +159,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             </h4>
             <div
               className="content"
-              dangerouslySetInnerHTML={{ __html: jobDetails.jobBenefit }}
+              dangerouslySetInnerHTML={{ __html: jobDetails.jobBenefit ?? "" }}
             />
           </div>
         </div>
@@ -187,10 +171,10 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
       children: (
         <div className="recruitment-info">
           <div className="info-grid">
-            <div className="info-item">
+            {/* <div className="info-item">
               <span className="info-label">Hình thức làm việc:</span>
               <span className="info-value">Toàn thời gian</span>
-            </div>
+            </div> */}
             <div className="info-item">
               <span className="info-label">Thời gian làm việc:</span>
               <span className="info-value">{companyInfo.workingHours}</span>
@@ -257,7 +241,13 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 <FaEye />
               </div>
               <div className="stat-content">
-                <h3>{jobDetails.statistics.views}</h3>
+                <h3>
+                  {viewsLoading ? (
+                    <Spin size="small" />
+                  ) : (
+                    jobDetails.statistics.views ?? "0"
+                  )}
+                </h3>
                 <p>Lượt xem</p>
               </div>
             </div>
@@ -266,7 +256,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 <FaUsers />
               </div>
               <div className="stat-content">
-                <h3>{jobDetails.statistics.applicants}</h3>
+                <h3>{jobDetails.statistics?.applicants}</h3>
                 <p>Ứng viên</p>
               </div>
             </div>
@@ -275,7 +265,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 <FaStar />
               </div>
               <div className="stat-content">
-                <h3>{jobDetails.statistics.shortlisted}</h3>
+                <h3>{jobDetails.statistics?.shortlisted}</h3>
                 <p>Được chọn</p>
               </div>
             </div>
@@ -286,7 +276,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             <div className="progress-item">
               <span>Tỷ lệ ứng tuyển</span>
               <Progress
-                percent={75}
+                percent={jobDetails.statistics?.applicationRate || 0}
                 strokeColor={{
                   "0%": "rgb(13, 71, 161)",
                   "100%": "rgb(30, 136, 229)",
@@ -305,7 +295,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             </div>
           </div>
 
-          <Timeline className="recruitment-timeline">
+          {/* <Timeline className="recruitment-timeline">
             <Timeline.Item color="green">Đăng tuyển - 15/01/2024</Timeline.Item>
             <Timeline.Item color="blue">
               Tiếp nhận hồ sơ - 20/01/2024
@@ -314,7 +304,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               Phỏng vấn vòng 1 - 25/01/2024
             </Timeline.Item>
             <Timeline.Item>Phỏng vấn vòng 2 - Dự kiến 01/02/2024</Timeline.Item>
-          </Timeline>
+          </Timeline> */}
         </div>
       ),
     },
@@ -339,7 +329,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 <input
                   type="text"
                   readOnly
-                  value={`${window.location.origin}/apply/${job.id}`}
+                  value={`${window.location.origin}/apply/${jobDetails.jobCode}`}
                   className="link-text"
                 />
                 <Button
@@ -358,7 +348,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 icon={<FaLink />}
                 onClick={() =>
                   window.open(
-                    `${window.location.origin}/apply/${job.id}`,
+                    `${window.location.origin}/apply/${jobDetails.jobCode}`,
                     "_blank"
                   )
                 }
@@ -386,7 +376,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               <div className="info-item">
                 <span className="info-label">Số lượng ứng tuyển qua link:</span>
                 <span className="info-value">
-                  {jobDetails.statistics.applicants} ứng viên
+                  {jobDetails.statistics?.applicants} ứng viên
                 </span>
               </div>
               <div className="info-item">
@@ -416,11 +406,11 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
         <div className="job-detail-header">
           <div className="job-header-content">
             <div className="job-title-section">
-              <h1 className="job-title-detail">{job.jobTitle}</h1>
+              <h1 className="job-title-detail">{jobDetails.jobTitle}</h1>
               <div className="job-meta">
                 <Badge
-                  color={getStatusColor(job.status)}
-                  text={getStatusText(job.status)}
+                  color={getStatusColor(jobDetails.status)}
+                  text={getStatusText(jobDetails.status)}
                   className="status-badge"
                 />
                 <span className="company-name">
@@ -458,7 +448,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               <FaMapMarkerAlt className="info-icon" />
               <div className="info-text">
                 <span className="info-label">Địa điểm</span>
-                <span className="info-value">{job.address}</span>
+                <span className="info-value">{jobDetails.address}</span>
               </div>
             </div>
 
@@ -468,7 +458,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 <span className="info-label">Mức lương</span>
                 <span className="info-value">
                   {" "}
-                  {job.fromSalary}-{job.toSalary} Triệu VNĐ
+                  {jobDetails.fromSalary}-{jobDetails.toSalary} Triệu VNĐ
                 </span>
               </div>
             </div>
@@ -483,13 +473,15 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               </div>
             </div>
 
-            <div className="info-card">
+            {/* <div className="info-card">
               <FaCalendarAlt className="info-icon" />
               <div className="info-text">
                 <span className="info-label">Hạn nộp</span>
-                <span className="info-value">{jobDetails.expirationDate}</span>
+                <span className="info-value">
+                  {dayjs(jobDetails.expirationDate).format("DD/MM/YYYY")}
+                </span>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -507,13 +499,13 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
           <div className="footer-content">
             <div className="footer-info">
               <p>
-                Đã có <strong>{jobDetails.statistics.applicants}</strong> người
+                Đã có <strong>{jobDetails.statistics?.applicants}</strong> người
                 ứng tuyển cho vị trí này
               </p>
             </div>
             <div className="footer-actions">
               <Button size="large" onClick={onClose} className="cancel-btn">
-                Đóng
+                Hủy
               </Button>
               <Button
                 type="primary"
@@ -521,7 +513,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 className="apply-btn"
                 onClick={handleApply}
               >
-                Ứng tuyển ngay
+                Đóng ứng tuyển
               </Button>
             </div>
           </div>
