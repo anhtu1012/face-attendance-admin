@@ -24,8 +24,8 @@ class JobServicesBase extends AxiosService {
     );
   }
   async getDetailJob(jobCode: string): Promise<JobDetail> {
-    return this.getWithFilter(
-      `${this.basePath}/tuyen-dung/danh-sach-cong-viec/chi-tiet/${jobCode}`
+    return this.get(
+      `${this.basePath}/tuyen-dung/danh-sach-cong-viec/chi-tiet?jobCode=${jobCode}`
     );
   }
 
