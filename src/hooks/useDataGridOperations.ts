@@ -41,7 +41,8 @@ interface UseDataGridOperationsConfig<T> {
   fetchData?: (
     currentPage: number,
     pageSize: number,
-    quickSearchText: string | undefined
+    quickSearchText?: string | undefined,
+    ...rest: any[]
   ) => Promise<void>;
   columnDefs?: any[];
 }

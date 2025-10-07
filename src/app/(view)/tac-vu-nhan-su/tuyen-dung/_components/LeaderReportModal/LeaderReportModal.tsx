@@ -14,8 +14,7 @@ import "./LeaderReportModal.scss";
 
 interface CandidateData {
   id: string;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   phone: string;
 }
@@ -132,9 +131,7 @@ const LeaderReportModal: React.FC<LeaderReportModalProps> = ({
                   <FaUser />
                 </div>
                 <div className="candidate-name-section">
-                  <h3 className="candidate-name">
-                    {candidateData.lastName} {candidateData.firstName}
-                  </h3>
+                  <h3 className="candidate-name">{candidateData.fullName}</h3>
                   <p className="candidate-title">Nhân viên đã tuyển dụng</p>
                 </div>
               </div>

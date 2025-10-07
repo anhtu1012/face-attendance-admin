@@ -138,7 +138,10 @@
     "gender": "Gender",
     "phone": "Phone",
     "address": "Address",
-    "isActive": "Status"
+    "isActive": "Status",
+    "fullName": "Full Name",
+    "skills": "Skills",
+    "experience": "Experience"
   },
   "NhomNguoiDung": {
     "roleCode": "Role Code",

@@ -1,44 +1,45 @@
-import React, { useState } from "react";
+import { SelectOption } from "@/dtos/select/select.dto";
+import { CreateJobRequest } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.request.dto";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import SelectServices from "@/services/select/select.service";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
 import {
-  Modal,
+  Button,
+  DatePicker,
   Form,
   Input,
-  DatePicker,
-  Select,
-  Button,
-  Tabs,
   InputNumber,
+  Modal,
+  Select,
+  Tabs,
 } from "antd";
-import { useAntdMessage } from "@/hooks/AntdMessageProvider";
-import { FaCheck, FaBriefcase, FaInfoCircle, FaUsers } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaBriefcase, FaCheck, FaInfoCircle, FaUsers } from "react-icons/fa";
 import "react-quill-new/dist/quill.snow.css";
+import { useSelector } from "react-redux";
 import "./JobCreationModal.scss";
 import QuillEditor from "./QuillEditor";
-import { useSelectData } from "@/hooks/useSelectData";
-import SelectServices from "@/services/select/select.service";
-import { SelectOption } from "@/dtos/select/select.dto";
-import { useSelector } from "react-redux";
-import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
-import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
-import { CreateJobRequest } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.request.dto";
 
 interface JobCreationModalProps {
   open: boolean;
   onClose: () => void;
   onSuccess: (link: string) => void;
+  selectOptions: {
+    selectRole: SelectOption[];
+    selectSkill: SelectOption[];
+    selectExperience: SelectOption[];
+  };
 }
 
 const JobCreationModal: React.FC<JobCreationModalProps> = ({
   open,
   onClose,
   onSuccess,
+  selectOptions,
 }) => {
   const [form] = Form.useForm<CreateJobRequest>();
   const [loading, setLoading] = useState(false);
-  const { selectRole, selectSkill } = useSelectData({
-    fetchRole: true,
-    fetchSkill: true,
-  });
   const messageApi = useAntdMessage();
   const { userProfile } = useSelector(selectAuthLogin);
   const [positionOptionsState, setPositionOptionsState] =
@@ -54,15 +55,6 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
       setPositionOptionsState([]);
     }
   };
-
-  const experienceOptions = [
-    { value: "0", label: "Không cần kinh nghiệm" },
-    { value: "0-1", label: "Từ 0 đến 1 năm " },
-    { value: "1-3", label: "Từ 1 đến 3 năm" },
-    { value: "3-5", label: "Từ 3 đến 5 năm" },
-    { value: "5-7", label: "Từ 5 đến 7 năm" },
-    { value: "10", label: "Trên 10 năm" },
-  ];
 
   const probationOptions = [
     { value: "1_MONTH", label: "1 tháng" },
@@ -202,7 +194,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                         >
                           <Select
                             placeholder="Chọn vai trò..."
-                            options={selectRole}
+                            options={selectOptions.selectRole}
                             className="custom-select"
                             onChange={handleRoleChange}
                           />
@@ -239,7 +231,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                         >
                           <Select
                             placeholder="Chọn mức kinh nghiệm..."
-                            options={experienceOptions}
+                            options={selectOptions.selectExperience}
                             className="custom-select"
                           />
                         </Form.Item>
@@ -381,7 +373,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                           <Select
                             mode="multiple"
                             placeholder="Chọn kỹ năng yêu cầu..."
-                            options={selectSkill}
+                            options={selectOptions.selectSkill}
                             className="custom-select"
                             maxTagCount="responsive"
                           />

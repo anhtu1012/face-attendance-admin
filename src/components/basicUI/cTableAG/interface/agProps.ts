@@ -11,8 +11,18 @@ import { InputSearchProps } from "../../InputSearch";
 import { ActionButtonsProps } from "@/components/action-button";
 export interface ExtendedColDef extends ColDef {
   context?: {
-    typeColumn?: "Select" | "Text" | "Number" | "Date" | "Time" | "Tag";
+    typeColumn?:
+      | "Select"
+      | "Text"
+      | "Number"
+      | "Date"
+      | "Time"
+      | "Tag"
+      | "File";
     selectOptions?: Array<{ value: any; label: string }>;
+    multiple?: boolean; // allow multiple selection when true
+    maxLength?: number; // max length for Text columns
+    inputType?: "text" | "email"; // input type for Text columns
     // API integration for Select columns
     onSearchAPI?: (
       searchText: string

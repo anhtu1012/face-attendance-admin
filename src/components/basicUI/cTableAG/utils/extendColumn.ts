@@ -1,4 +1,8 @@
-import { ColDef } from "@ag-grid-community/core";
+import {
+  ColDef,
+  ICellRendererParams,
+  ValueFormatterParams,
+} from "@ag-grid-community/core";
 import { ExtendedColDef } from "../interface/agProps";
 import dayjs from "dayjs";
 import {
@@ -6,6 +10,8 @@ import {
   TimeCellEditor,
 } from "../components/CustomTableInput/EditorDateTable";
 import AntdSelectCellEditor from "../components/CustomTableInput/AntdSelectCellEditor";
+import AntdTextCellEditor from "../components/CustomTableInput/AntdTextCellEditor";
+import FileUploadCellRenderer from "../components/CustomTableInput/FileUploadCellRenderer";
 import TagCellRenderer from "../components/CustomTableInput/TagCellRenderer";
 
 // Update the processColumnDefs function to handle Number type
@@ -20,19 +26,58 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
         cellEditor: AntdSelectCellEditor,
         cellEditorParams: {
           values: colDef.context.selectOptions,
+          // allow multiple selection when context.multiple is true
+          // context may include a 'multiple' flag; use unknown cast to satisfy lint
+          multiple:
+            (colDef.context as unknown as { multiple?: boolean })?.multiple ||
+            false,
           // Pass API integration props
           onSearchAPI: colDef.context.onSearchAPI,
           apiDebounceTime: colDef.context.apiDebounceTime || 500,
           minSearchLength: colDef.context.minSearchLength || 1,
           loadingInitialOptions: colDef.context.loadingInitialOptions || false,
         },
-        valueFormatter: (params) => {
-          const found = colDef.context?.selectOptions?.find(
-            (item) => item.value === params.value
+        // Display joined labels if multiple, and provide a tooltip for full content
+        cellRenderer: (params: ICellRendererParams) => {
+          const val = params.value as unknown;
+          const options = (colDef.context?.selectOptions || []) as Array<{
+            value: unknown;
+            label: string;
+          }>;
+          if (Array.isArray(val)) {
+            const labels = (val as unknown[])
+              .map(
+                (v) =>
+                  options.find((o) => String(o.value) === String(v))?.label ||
+                  String(v)
+              )
+              .join(", ");
+            return `${String(labels)}`;
+          }
+          const found = options.find(
+            (item) => String(item.value) === String(val)
           );
-          return found ? found.label : params.value;
+          const text = found ? found.label : String(val ?? "");
+          return `${String(text)}`;
         },
       };
+    }
+
+    // File / Upload column
+    if (colDef.context?.typeColumn === "File") {
+      return {
+        ...colDef,
+        // Preserve editable flag from original column definition (do not forcibly disable)
+        editable:
+          typeof colDef.editable === "boolean" ? colDef.editable : false,
+        cellRenderer: FileUploadCellRenderer,
+        cellRendererParams: {
+          ...(colDef.cellRendererParams || {}),
+        },
+        valueFormatter: (params: ValueFormatterParams) => {
+          return params?.value || "";
+        },
+      } as ColDef;
     }
 
     // Handle Number type columns
@@ -69,6 +114,26 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
       };
     }
 
+    // Handle Text type columns (single-line input, can be email)
+    if (colDef.context?.typeColumn === "Text") {
+      return {
+        ...colDef,
+        cellEditor: AntdTextCellEditor,
+        cellEditorParams: {
+          ...(colDef.cellEditorParams || {}),
+          maxLength: colDef.context?.maxLength,
+          inputType: colDef.context?.inputType || "text",
+        },
+        valueFormatter: (params) => {
+          // If there's already a valueFormatter, keep it
+          if (typeof colDef.valueFormatter === "function") {
+            return colDef.valueFormatter(params);
+          }
+          return params.value ?? "";
+        },
+      };
+    }
+
     // Handle Time type columns - chỉ chọn giờ phút
     if (colDef.context?.typeColumn === "Time") {
       return {
@@ -98,6 +163,16 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
           selectOptions: options,
         },
         valueFormatter: (params) => {
+          const val = params.value;
+          if (Array.isArray(val)) {
+            return (val as unknown[])
+              .map(
+                (v) =>
+                  options.find((item) => String(item.value) === String(v))
+                    ?.label || String(v)
+              )
+              .join(", ");
+          }
           const found = options.find((item) => item.value === params.value);
           return found ? found.label : params.value;
         },
@@ -106,6 +181,10 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
               cellEditor: AntdSelectCellEditor,
               cellEditorParams: {
                 values: options,
+                // pass multiple flag through for Tag editing
+                multiple:
+                  (colDef.context as unknown as { multiple?: boolean })
+                    ?.multiple || false,
               },
             }
           : {}),

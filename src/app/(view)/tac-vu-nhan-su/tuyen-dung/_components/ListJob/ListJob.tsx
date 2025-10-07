@@ -17,7 +17,11 @@ import { BsSearch } from "react-icons/bs";
 import { columnDefs } from "./column";
 import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
 
-function ListJob() {
+type ListJobProps = {
+  onJobCardClick?: (jobId: number | null) => Promise<void> | void;
+};
+
+function ListJob({ onJobCardClick }: ListJobProps) {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [clickEffect, setClickEffect] = useState<number | null>(null);
   const [jobDetailOpen, setJobDetailOpen] = useState(false);
@@ -57,6 +61,14 @@ function ListJob() {
 
     // Toggle selection
     setSelectedJobId(selectedJobId === jobId ? null : jobId);
+    try {
+      const newSelected = selectedJobId === jobId ? null : jobId;
+      setTimeout(() => {
+        try {
+          onJobCardClick?.(newSelected);
+        } catch {}
+      }, 0);
+    } catch {}
   };
 
   const handleViewJobDetail = (job: JobItem) => {

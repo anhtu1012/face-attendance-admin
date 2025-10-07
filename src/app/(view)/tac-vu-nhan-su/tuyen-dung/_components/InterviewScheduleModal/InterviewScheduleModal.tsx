@@ -33,8 +33,7 @@ interface InterviewScheduleModalProps {
   onClose: () => void;
   candidateData?: {
     id: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
     email: string;
     phone: string;
   };
@@ -61,8 +60,7 @@ interface CompanyLocation {
 interface InterviewDetails {
   candidate: {
     id: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
     email: string;
     phone: string;
   };
@@ -221,7 +219,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = `Thu_moi_phong_van_${interviewDetails.candidate.lastName}_${interviewDetails.candidate.firstName}.png`;
+          link.download = `Thu_moi_phong_van_${interviewDetails.candidate.fullName}.png`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -323,9 +321,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                   <FaUser />
                 </div>
                 <div className="candidate-name-section">
-                  <h3 className="candidate-name">
-                    {candidateData.lastName} {candidateData.firstName}
-                  </h3>
+                  <h3 className="candidate-name">{candidateData.fullName}</h3>
                   <div className="candidate-title">Ứng viên phỏng vấn</div>
                 </div>
               </div>

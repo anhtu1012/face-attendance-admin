@@ -1,8 +1,7 @@
 export interface InterviewDetails {
   candidate: {
     id: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
     email: string;
     phone: string;
   };
@@ -47,8 +46,7 @@ export const generateInvitationHTML = (
         <div style="margin-bottom: 25px;">
           <div style="font-weight: bold; font-size: 18px; margin-bottom: 8px; color: #333;">Kính gửi:</div>
           <div style="font-size: 20px; color: #1890ff; font-weight: 600; border-bottom: 2px solid #1890ff; padding-bottom: 5px; display: inline-block;">
-            ${interviewDetails.candidate.lastName} ${
-    interviewDetails.candidate.firstName
+            ${interviewDetails.candidate.fullName}
   }
           </div>
         </div>

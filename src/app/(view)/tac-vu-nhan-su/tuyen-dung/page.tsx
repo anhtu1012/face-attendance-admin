@@ -19,7 +19,7 @@ import { Segmented, Tooltip } from "antd";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import "./index.scss";
 import "./_components/JobCreationModal/JobCreationModal.scss";
@@ -47,7 +47,7 @@ function Page() {
   const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
     undefined
   );
-  const [selectedStatus, setSelectedStatus] = useState<string>("Applied");
+  const [selectedStatus, setSelectedStatus] = useState<string>("LIEN_HE");
   const [modalOpen, setModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
@@ -57,115 +57,67 @@ function Page() {
     useState<TuyenDungItem | null>(null);
   const messageApi = useAntdMessage();
   const [contractLink, setContractLink] = useState<string>("");
+  const [jobId, setJobId] = useState<string>("");
   const segmentedOptions = useMemo(
     () => [
-      { label: "Liên hệ", value: "Applied" },
-      { label: "Phỏng vấn", value: "Interview" },
-      { label: "Nhận việc", value: "Offer" },
-      { label: "Hợp đồng", value: "Hired" },
-      { label: "Hủy hẹn", value: "Rejected" },
-      { label: "Chưa phù hợp", value: "NotSuitable" },
-      { label: "Hoàn thành", value: "Done" },
+      { label: "Liên hệ", value: "LIEN_HE" },
+      { label: "Phỏng vấn", value: "PHONG_VAN" },
+      { label: "Nhận việc", value: "NHAN_VIEC" },
+      { label: "Hợp đồng", value: "HOP_DONG" },
+      { label: "Hủy hẹn", value: "HUY_HEN" },
+      { label: "Chưa phù hợp", value: "CHUA_PHU_HOP" },
+      { label: "Hoàn thành", value: "HOAN_THANH" },
     ],
     []
   );
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  const { selectGender } = useSelectData({});
+  const {
+    selectGender,
+    selectSkill,
+    selectRole,
+    selectExperience,
+    selectExperienceYears,
+  } = useSelectData({
+    fetchSkill: true,
+    fetchRole: true,
+  });
   const handleFetchUser = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
       setLoading(true);
+      if (!jobId) {
+        setRowData([]);
+        setTotalItems(0);
+        setLoading(false);
+        return;
+      }
       try {
         const searchFilter: any = [
           { key: "limit", type: "=", value: limit },
           { key: "offset", type: "=", value: (page - 1) * limit },
         ];
-        console.log(searchFilter);
-        console.log(quickSearch);
-        const dataFake: TuyenDungItem[] = [
-          {
-            id: "cand-001",
-            firstName: "Văn A",
-            lastName: "Nguyễn",
-            email: "nguyenvana@example.com",
-            phone: "0912345678",
-            birthDay: "1993-05-20T00:00:00.000Z",
-            address: "Ba Đình, Hà Nội",
-            gender: "M",
-            status: "Applied",
-          },
-          {
-            id: "cand-002",
-            firstName: "Thị C",
-            lastName: "Lê",
-            email: "lethic@example.com",
-            phone: "0903111222",
-            birthDay: "1997-11-03T00:00:00.000Z",
-            address: "Quận 1, Hồ Chí Minh",
-            gender: "F",
-            status: "Interview",
-          },
-          {
-            id: "cand-003",
-            firstName: "Minh D",
-            lastName: "Trần",
-            email: "trandminh@example.com",
-            phone: "0987654321",
-            birthDay: "1990-02-15T00:00:00.000Z",
-            address: "Đống Đa, Hà Nội",
-            gender: "M",
-            status: "Offer",
-          },
-          {
-            id: "cand-004",
-            firstName: "Lan E",
-            lastName: "Phạm",
-            email: "phamlan@example.com",
-            phone: "0911223344",
-            birthDay: "1995-08-10T00:00:00.000Z",
-            address: "Thanh Khê, Đà Nẵng",
-            gender: "F",
-            status: "Hired",
-          },
-          {
-            id: "cand-005",
-            firstName: "Hùng F",
-            lastName: "Hoàng",
-            email: "hoanghung@example.com",
-            phone: "0955667788",
-            birthDay: "1988-12-25T00:00:00.000Z",
-            address: "Ninh Kiều, Cần Thơ",
-            gender: "M",
-            status: "Rejected",
-          },
-        ];
+        const params: Record<string, string | number | boolean> = {
+          jobId: jobId,
+        };
+        if (selectedStatus !== "All") {
+          params.status = selectedStatus;
+        }
 
-        // const response = await TuyenDungServices.getTuyenDung(
-        //   searchFilter,
-        //   quickSearch
-        // );
-        setRowData(dataFake);
-        setTotalItems(dataFake.length);
+        const response = await TuyenDungServices.getTuyenDung(
+          searchFilter,
+          quickSearch,
+          params
+        );
+        setRowData(response.data);
+        setTotalItems(response.data.length);
       } catch (error: any) {
         showError(error.response?.data?.message || mes("fetchError"));
       } finally {
         setLoading(false);
       }
     },
-    [currentPage, mes, pageSize]
-  );
-
-  useEffect(() => {
-    handleFetchUser(currentPage, pageSize);
-  }, [currentPage, handleFetchUser, pageSize]);
-
-  const filteredData = useMemo(
-    () =>
-      selectedStatus === "All"
-        ? rowData
-        : rowData.filter((item) => item.status === selectedStatus),
-    [rowData, selectedStatus]
+    [currentPage, jobId, mes, pageSize, selectedStatus]
   );
 
   const columnDefs: ColDef[] = useMemo(
@@ -182,11 +134,11 @@ function Page() {
         },
         cellRendererParams: {
           colorMap: {
-            Applied: "#ff9800",
-            Interview: "#2196f3",
-            Offer: "#4caf50",
-            Hired: "#9c27b0",
-            Rejected: "#f44336",
+            LIEN_HE: "#ff9800",
+            PHONG_VAN: "#2196f3",
+            NHAN_VIEC: "#4caf50",
+            HOP_DONG: "#9c27b0",
+            HUY_HEN: "#f44336",
             "On Hold": "#607d8b",
             Withdrawn: "#795548",
             Shortlisted: "#00bcd4",
@@ -195,28 +147,19 @@ function Page() {
         },
       },
       {
-        field: "lastName",
-        headerName: t("lastName"),
+        field: "fullName",
+        headerName: t("fullName"),
         editable: true,
         width: 150,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "lastName", params);
-        },
-      },
-      {
-        field: "firstName",
-        headerName: t("firstName"),
-        editable: true,
-        width: 150,
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "firstName", params);
+          return itemErrorCellStyle(itemId, "fullName", params);
         },
       },
       {
         field: "email",
         headerName: "Email",
+        context: { typeColumn: "Text", inputType: "email", maxLength: 100 },
         editable: true,
         width: 180,
         cellStyle: (params) => {
@@ -258,25 +201,50 @@ function Page() {
         },
       },
       {
-        field: "address",
-        headerName: t("address"),
+        field: "skillIds",
+        headerName: t("skills"),
         editable: true,
-        width: 150,
+        width: 250,
+        context: {
+          typeColumn: "Select",
+          selectOptions: selectSkill,
+          multiple: true,
+        },
       },
       {
-        field: "file",
-        headerName: "CV",
+        field: "experience",
+        headerName: t("experience"),
         editable: true,
         width: 150,
+        context: {
+          typeColumn: "Select",
+          selectOptions: selectExperienceYears,
+        },
+      },
+      {
+        field: "fileCV",
+        headerName: "CV",
+        editable: false,
+        width: 150,
+        context: {
+          typeColumn: "File",
+        },
       },
     ],
-    [t, selectGender, itemErrorCellStyle, segmentedOptions]
+    [
+      t,
+      segmentedOptions,
+      selectGender,
+      selectSkill,
+      selectExperienceYears,
+      itemErrorCellStyle,
+    ]
   );
 
   const handlePageChange = (page: number, size: number) => {
     setCurrentPage(page);
     setPageSize(size);
-    handleFetchUser(page, size);
+    handleFetchUser(page, size, quickSearchText);
   };
 
   // Modal handlers
@@ -299,7 +267,7 @@ function Page() {
     setContractLink("");
   };
 
-  // Interview modal handlers
+  // PHONG_VAN modal handlers
   const handleOpenInterviewModal = (_params: any) => {
     if (_params) {
       setSelectedCandidate(_params.data);
@@ -348,13 +316,13 @@ function Page() {
     gridRef,
     createNewItem: (i) => ({
       unitKey: `${Date.now()}_${i}`,
-      firstName: "",
-      lastName: "",
+      fullName: "",
       email: "",
-      birthDay: dayjs().toISOString(),
+      // default birthday: 18 years ago
+      birthday: dayjs().subtract(18, "year").toISOString(),
       gender: "",
       phone: "",
-      address: "",
+      experience: "",
       status: "",
     }),
     duplicateCheckField: "email",
@@ -362,14 +330,13 @@ function Page() {
     rowData,
     setRowData,
     requiredFields: [
-      { field: "firstName", label: t("firstName") },
-      { field: "lastName", label: t("lastName") },
+      { field: "fullName", label: t("fullName") },
       { field: "email", label: "Email" },
-      { field: "birthDay", label: t("birthDay") },
+      { field: "birthday", label: t("birthDay") },
       { field: "gender", label: t("gender") },
       { field: "phone", label: t("phone") },
-      { field: "address", label: t("address") },
-      { field: "status", label: t("isActive") },
+      { field: "skillIds", label: t("skills") },
+      { field: "experience", label: t("experience") },
     ],
     t,
     // Quicksearch parameters
@@ -394,7 +361,7 @@ function Page() {
   );
 
   const buttonProps = (_params: any) => {
-    if (selectedStatus === "Interview") {
+    if (selectedStatus === "PHONG_VAN") {
       return (
         <Tooltip title="Tạo lịch hẹn">
           <FaPlusCircle
@@ -404,7 +371,7 @@ function Page() {
           />
         </Tooltip>
       );
-    } else if (selectedStatus === "Offer") {
+    } else if (selectedStatus === "NHAN_VIEC") {
       return (
         <Tooltip title="Hẹn nhận việc">
           <FaPlusCircle
@@ -414,7 +381,7 @@ function Page() {
           />
         </Tooltip>
       );
-    } else if (selectedStatus === "Hired") {
+    } else if (selectedStatus === "HOP_DONG") {
       return (
         <Tooltip title="Xem báo cáo từ Leader">
           <GoReport
@@ -462,7 +429,12 @@ function Page() {
                 onClick={handleOpenModal}
               />
             </div>
-            <ListJob />
+            <ListJob
+              onJobCardClick={(jobId?: number | null) => {
+                const jobIdStr = String(jobId ?? "");
+                setJobId(jobIdStr);
+              }}
+            />
           </>
         }
         content2={
@@ -477,7 +449,7 @@ function Page() {
             </div>
             <AgGridComponentWrapper
               showSearch={true}
-              rowData={filteredData}
+              rowData={rowData}
               loading={loading}
               columnDefs={columnDefs}
               gridRef={gridRef}
@@ -499,9 +471,9 @@ function Page() {
               toolColumnRenderer={buttonProps}
               showActionButtons={true}
               actionButtonsProps={{
-                hideAdd: selectedStatus !== "Applied" ? true : false,
-                hideDelete: selectedStatus !== "Applied" ? true : false,
-                hideDivider: selectedStatus !== "Applied" ? true : false,
+                hideAdd: selectedStatus !== "LIEN_HE" ? true : false,
+                hideDelete: selectedStatus !== "LIEN_HE" ? true : false,
+                hideDivider: selectedStatus !== "LIEN_HE" ? true : false,
                 onSave: handleSave,
                 onDelete: handleDelete,
                 rowSelected: dataGrid.rowSelected,
@@ -521,6 +493,7 @@ function Page() {
         open={modalOpen}
         onClose={handleCloseModal}
         onSuccess={handleContractSuccess}
+        selectOptions={{ selectRole, selectSkill, selectExperience }}
       />
 
       {/* Success Modal */}
@@ -530,7 +503,7 @@ function Page() {
         jobLink={contractLink}
       />
 
-      {/* Interview Schedule Modal */}
+      {/* PHONG_VAN Schedule Modal */}
       <InterviewScheduleModal
         open={interviewModalOpen}
         onClose={handleCloseInterviewModal}
@@ -538,8 +511,7 @@ function Page() {
           selectedCandidate
             ? {
                 id: selectedCandidate.id || "",
-                firstName: selectedCandidate.firstName || "",
-                lastName: selectedCandidate.lastName || "",
+                fullName: selectedCandidate.fullName || "",
                 email: selectedCandidate.email || "",
                 phone: selectedCandidate.phone || "",
               }
@@ -547,7 +519,7 @@ function Page() {
         }
       />
 
-      {/* Job Offer Modal */}
+      {/* Job NHAN_VIEC Modal */}
       <JobOfferModal
         open={jobOfferModalOpen}
         onClose={handleCloseJobOfferModal}
@@ -555,8 +527,7 @@ function Page() {
           selectedCandidate
             ? {
                 id: selectedCandidate.id || "",
-                firstName: selectedCandidate.firstName || "",
-                lastName: selectedCandidate.lastName || "",
+                fullName: selectedCandidate.fullName || "",
                 email: selectedCandidate.email || "",
                 phone: selectedCandidate.phone || "",
               }
@@ -572,8 +543,7 @@ function Page() {
           selectedCandidate
             ? {
                 id: selectedCandidate.id || "",
-                firstName: selectedCandidate.firstName || "",
-                lastName: selectedCandidate.lastName || "",
+                fullName: selectedCandidate.fullName || "",
                 email: selectedCandidate.email || "",
                 phone: selectedCandidate.phone || "",
               }

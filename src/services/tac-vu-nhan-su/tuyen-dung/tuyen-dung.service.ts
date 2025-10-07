@@ -8,8 +8,7 @@ import {
 import { TuyenDungResponseGetItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.response.dto";
 
 class TuyenDungServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/sa/user";
-  protected readonly additionalPath = "/v1/sa/user/array";
+  protected readonly basePath = "/v1/recruitment";
 
   async getTuyenDung(
     searchFilter: FilterQueryStringTypeItem[] = [],
@@ -17,7 +16,7 @@ class TuyenDungServicesBase extends AxiosService {
     params?: Record<string, string | number | boolean>
   ): Promise<TuyenDungResponseGetItem> {
     return this.getWithFilter(
-      `${this.basePath}`,
+      `${this.basePath}/tuyen-dung`,
       searchFilter,
       quickSearchText,
       params
@@ -28,11 +27,11 @@ class TuyenDungServicesBase extends AxiosService {
     const payload = {
       payload: data,
     };
-    return this.post(`${this.additionalPath}`, payload);
+    return this.post(`${this.basePath}`, payload);
   };
 
   async updateTuyenDung(payload: UpdateTuyenDungRequest): Promise<any> {
-    return this.put(`${this.additionalPath}`, payload);
+    return this.put(`${this.basePath}`, payload);
   }
 
   async deleteTuyenDung(id: string): Promise<any> {
