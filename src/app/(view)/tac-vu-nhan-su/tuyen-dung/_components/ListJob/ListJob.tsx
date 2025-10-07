@@ -2,12 +2,13 @@ import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import { JobItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.dto";
 import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MdAttachMoney,
   MdCalendarToday,
   MdLocationOn,
   MdWork,
+  MdExpandMore,
 } from "react-icons/md";
 import { getStatusClass, getStatusText } from "../../_utils/status";
 import JobDetailModal from "../JobDetailModal/JobDetailModal";
@@ -16,6 +17,7 @@ import CInputLabel from "@/components/basicUI/CInputLabel";
 import { BsSearch } from "react-icons/bs";
 import { columnDefs } from "./column";
 import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
+import Cbutton from "@/components/basicUI/Cbutton";
 
 type ListJobProps = {
   onJobCardClick?: (jobId: number | null) => Promise<void> | void;
@@ -27,6 +29,20 @@ function ListJob({ onJobCardClick }: ListJobProps) {
   const [jobDetailOpen, setJobDetailOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
   const [dataJobs, setDataJobs] = useState<JobItem[]>([]);
+  // track collapsed state per job id
+  const [collapsedJobs, setCollapsedJobs] = useState<Set<number>>(new Set());
+
+  const toggleCollapseAll = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!dataJobs || dataJobs.length === 0) return;
+    // If all are collapsed, expand all. Otherwise collapse all.
+    const allCollapsed = dataJobs.every((j) => collapsedJobs.has(Number(j.id)));
+    if (allCollapsed) {
+      setCollapsedJobs(new Set());
+    } else {
+      setCollapsedJobs(new Set(dataJobs.map((j) => Number(j.id))));
+    }
+  };
 
   const fetchDataJobs = async (params: string | undefined) => {
     const selectedFilterColumns = columnDefs
@@ -50,6 +66,16 @@ function ListJob({ onJobCardClick }: ListJobProps) {
     fetchDataJobs(undefined);
   }, []);
 
+  const toggleCollapse = (e: React.MouseEvent, jobId: number) => {
+    // prevent card click/select when toggling
+    e.stopPropagation();
+    setCollapsedJobs((prev) => {
+      const next = new Set(prev);
+      if (next.has(jobId)) next.delete(jobId);
+      else next.add(jobId);
+      return next;
+    });
+  };
   const handleJobCardClick = (jobId: number) => {
     // Tạo hiệu ứng click
     setClickEffect(jobId);
@@ -93,6 +119,31 @@ function ListJob({ onJobCardClick }: ListJobProps) {
             </>
           }
         />
+        <div>
+          <Cbutton
+            className={`collapse-all-button ${
+              dataJobs.length > 0 &&
+              dataJobs.every((j) => collapsedJobs.has(Number(j.id)))
+                ? "collapsed"
+                : ""
+            }`}
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+              toggleCollapseAll(e)
+            }
+            title={
+              dataJobs.length > 0 &&
+              dataJobs.every((j) => collapsedJobs.has(Number(j.id)))
+                ? "Mở tất cả"
+                : "Thu gọn tất cả"
+            }
+            aria-pressed={
+              dataJobs.length > 0 &&
+              dataJobs.every((j) => collapsedJobs.has(Number(j.id)))
+            }
+          >
+            <MdExpandMore />
+          </Cbutton>
+        </div>
       </div>
       <div className="job-list">
         {dataJobs.map((job) => (
@@ -108,6 +159,18 @@ function ListJob({ onJobCardClick }: ListJobProps) {
                 <h3 className="job-title">{job.jobTitle}</h3>
                 <span className="job-department">{job.positionName}</span>
               </div>
+              <div className="job-header-controls">
+                <button
+                  className={`collapse-toggle ${
+                    collapsedJobs.has(Number(job.id)) ? "collapsed" : ""
+                  }`}
+                  onClick={(e) => toggleCollapse(e, Number(job.id))}
+                  aria-expanded={!collapsedJobs.has(Number(job.id))}
+                  title={collapsedJobs.has(Number(job.id)) ? "Mở" : "Thu gọn"}
+                >
+                  <MdExpandMore />
+                </button>
+              </div>
               <div className="job-status-section">
                 <span className={`job-status ${getStatusClass(job.status)}`}>
                   {getStatusText(job.status)}
@@ -115,7 +178,11 @@ function ListJob({ onJobCardClick }: ListJobProps) {
               </div>
             </div>
 
-            <div className="job-card-body">
+            <div
+              className={`job-card-body ${
+                collapsedJobs.has(Number(job.id)) ? "collapsed" : "expanded"
+              }`}
+            >
               <div className="job-info-row">
                 <div className="job-info-item">
                   <MdWork className="job-info-icon" />
