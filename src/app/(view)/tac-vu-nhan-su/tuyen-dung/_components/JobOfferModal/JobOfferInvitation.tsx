@@ -3,8 +3,7 @@ import React from "react";
 interface JobOfferDetails {
   candidate: {
     id: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
     email: string;
     phone: string;
   };
@@ -94,8 +93,7 @@ const JobOfferInvitation: React.FC<JobOfferInvitationProps> = ({
               fontWeight: 600,
             }}
           >
-            Kính chào {details.candidate.lastName} {details.candidate.firstName}
-            !
+            Kính chào {details.candidate.fullName}!
           </h2>
           <p
             style={{

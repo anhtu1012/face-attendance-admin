@@ -25,8 +25,7 @@ interface JobOfferModalProps {
   onClose: () => void;
   candidateData?: {
     id: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
     email: string;
     phone: string;
   };
@@ -56,8 +55,7 @@ interface CompanyLocation {
 interface JobOfferDetails {
   candidate: {
     id: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
     email: string;
     phone: string;
   };
@@ -182,7 +180,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = `Thu_moi_nhan_viec_${jobOfferDetails.candidate.lastName}_${jobOfferDetails.candidate.firstName}.png`;
+          link.download = `Thu_moi_nhan_viec_${jobOfferDetails.candidate.fullName}.png`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -283,9 +281,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
                   <FaUser />
                 </div>
                 <div className="candidate-name-section">
-                  <h3 className="candidate-name">
-                    {candidateData.lastName} {candidateData.firstName}
-                  </h3>
+                  <h3 className="candidate-name">{candidateData.fullName}</h3>
                   <div className="candidate-title">Ứng viên nhận việc</div>
                 </div>
               </div>

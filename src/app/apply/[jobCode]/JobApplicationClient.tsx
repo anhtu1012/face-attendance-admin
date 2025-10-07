@@ -82,7 +82,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
   const [jobLoading, setJobLoading] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { selectSkill, selectGender } = useSelectData({ fetchSkill: true });
+  const { selectSkill, selectGender, selectExperienceYears } = useSelectData({
+    fetchSkill: true,
+  });
   const companyInfo = {
     companyName: "FaceAI Technology Solutions",
     workingHours: "8:00 - 17:30 (T2-T6)",
@@ -311,30 +313,6 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   useEffect(() => {
     checkFormValid();
   }, [checkFormValid]);
-
-  const experienceYearsOptions = [
-    { value: "0", label: "Chưa có kinh nghiệm" },
-    { value: "0.5", label: "6 tháng" },
-    { value: "1", label: "1 năm" },
-    { value: "1.5", label: "1 năm rưỡi" },
-    { value: "2", label: "2 năm" },
-    { value: "2.5", label: "2 năm rưỡi" },
-    { value: "3", label: "3 năm" },
-    { value: "3.5", label: "3 năm rưỡi" },
-    { value: "4", label: "4 năm" },
-    { value: "4.5", label: "4 năm rưỡi" },
-    { value: "5", label: "5 năm" },
-    { value: "5.5", label: "5 năm rưỡi" },
-    { value: "6", label: "6 năm" },
-    { value: "6.5", label: "6 năm rưỡi" },
-    { value: "7", label: "7 năm" },
-    { value: "7.5", label: "7 năm rưỡi" },
-    { value: "8", label: "8 năm" },
-    { value: "8.5", label: "8 năm rưỡi" },
-    { value: "9", label: "9 năm" },
-    { value: "9.5", label: "9 năm rưỡi" },
-    { value: "10", label: "10+ năm" },
-  ];
 
   const uploadProps = {
     name: "file",
@@ -662,7 +640,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                                 >
                                   <Select
                                     placeholder="Chọn hoặc nhập số năm kinh nghiệm"
-                                    options={experienceYearsOptions}
+                                    options={selectExperienceYears}
                                     className="custom-select"
                                     size="large"
                                   />

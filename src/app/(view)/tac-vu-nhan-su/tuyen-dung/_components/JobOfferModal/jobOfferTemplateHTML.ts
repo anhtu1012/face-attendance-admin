@@ -53,9 +53,7 @@ export const generateJobOfferHTML = (details: JobOfferDetails): string => {
             font-size: 1.5rem;
             font-weight: 600;
           ">
-            Kính chào ${details.candidate.lastName} ${
-    details.candidate.firstName
-  }!
+            Kính chào ${details.candidate.fullName}!
           </h2>
           <p style="
             margin: 0;

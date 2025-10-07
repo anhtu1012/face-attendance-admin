@@ -16,11 +16,12 @@ import { useBroadcastChannel } from "@/hooks/useBroadcastChannel";
 
 interface AntdSelectCellEditorProps extends ICellEditorParams {
   values?: { label: string; value: string }[] | string[];
-  onValueChange?: (newValue: string, oldValue: string) => any;
+  onValueChange?: (newValue: any, oldValue: any) => any;
   onScroll?: (itemIndex: number) => void;
   allowAddOption?: boolean;
   openOutside?: boolean; // Controls if dropdown opens automatically (default: false)
   isLoading?: boolean; // Added isLoading prop to control loading state
+  multiple?: boolean; // enable multiple select mode
   // API integration props
   onSearchAPI?: (
     searchText: string
@@ -37,7 +38,10 @@ interface BoardCastChannelNew {
 const AntdSelectCellEditor = forwardRef(
   (props: AntdSelectCellEditorProps, ref) => {
     // Make sure to handle the case where props.value might be undefined
-    const [value, setValue] = useState<string | undefined>(props.value);
+    // Support both single string and multiple (string[]) values
+    const [value, setValue] = useState<string | string[] | undefined>(
+      props.value as string | string[] | undefined
+    );
     const [options, setOptions] = useState<SelectProps["options"]>([]);
     const [originalOptions, setOriginalOptions] = useState<
       SelectProps["options"]
@@ -184,21 +188,32 @@ const AntdSelectCellEditor = forwardRef(
     ]);
 
     // Handle change event
-    const handleChange = (newValue: string) => {
+    const handleChange = (newValue: any) => {
+      // newValue can be string or string[] depending on mode
       setValue(newValue);
 
-      // Find the selected option
-      const selectedOption = (options ?? []).find(
-        (option) => option.value === newValue
-      );
-      if (props.onSelect && selectedOption) {
-        props.onSelect(selectedOption);
+      // Handle callback for single or multiple selection
+      if (props.multiple) {
+        // for multiple selection, call onSelect with array of selected options
+        if (Array.isArray(newValue)) {
+          const selectedOptions = (options ?? []).filter((option) =>
+            newValue.includes(option.value)
+          );
+          if (props.onSelect) props.onSelect(selectedOptions);
+        }
+      } else {
+        const selectedOption = (options ?? []).find(
+          (option) => option.value === newValue
+        );
+        if (props.onSelect && selectedOption) {
+          props.onSelect(selectedOption);
+        }
       }
 
       if (props.onValueChange) {
         const validatedValue = props.onValueChange(newValue, props.value);
         if (validatedValue !== undefined) {
-          setValue(validatedValue);
+          setValue(validatedValue as any);
         }
       }
 
@@ -377,7 +392,7 @@ const AntdSelectCellEditor = forwardRef(
         <Select
           ref={selectRef}
           showSearch
-          value={value}
+          value={value as any}
           placeholder="Select a value"
           defaultActiveFirstOption={false}
           filterOption={false}
@@ -391,6 +406,8 @@ const AntdSelectCellEditor = forwardRef(
           listHeight={256}
           popupMatchSelectWidth={false}
           styles={{ popup: { root: { minWidth: "200px" } } }}
+          // Enable multiple mode when requested
+          mode={props.multiple ? "multiple" : undefined}
           dropdownAlign={{
             points:
               dropdownProps.verticalPlacement === "top"
@@ -401,7 +418,7 @@ const AntdSelectCellEditor = forwardRef(
           }}
           getPopupContainer={() => document.body}
           open={isOpen}
-          onDropdownVisibleChange={handleDropdownVisibleChange}
+          onOpenChange={handleDropdownVisibleChange}
           loading={loading} // Pass loading state to Select component
         />
       </div>

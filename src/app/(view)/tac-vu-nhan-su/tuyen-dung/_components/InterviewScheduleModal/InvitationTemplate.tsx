@@ -11,8 +11,7 @@ interface InvitationTemplateProps {
   interviewDetails: {
     candidate: {
       id: string;
-      firstName: string;
-      lastName: string;
+      fullName: string;
       email: string;
       phone: string;
     };
@@ -47,8 +46,7 @@ const InvitationTemplate: React.FC<InvitationTemplateProps> = ({
       <div style={{ marginBottom: 16 }}>
         <Text strong>Kính gửi: </Text>
         <Text style={{ color: "#1890ff" }}>
-          {interviewDetails.candidate.lastName}{" "}
-          {interviewDetails.candidate.firstName}
+          {interviewDetails.candidate.fullName}
         </Text>
       </div>
 

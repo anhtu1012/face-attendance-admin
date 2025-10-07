@@ -113,7 +113,10 @@
     "gender": "Giới tính",
     "phone": "Số điện thoại",
     "address": "Địa chỉ",
-    "isActive": "Trạng thái"
+    "isActive": "Trạng thái",
+    "fullName": "Họ và tên",
+    "skills": "Kĩ năng",
+    "experience": "Kinh nghiệm"
   },
   "NhomNguoiDung": {
     "roleCode": "Mã vai trò",

@@ -286,7 +286,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             <div className="progress-item">
               <span>Tỷ lệ phù hợp</span>
               <Progress
-                percent={60}
+                percent={jobDetails.statistics?.properRatio || 0}
                 strokeColor={{
                   "0%": "rgb(13, 71, 161)",
                   "100%": "rgb(30, 136, 229)",
