@@ -79,6 +79,7 @@ function Page() {
     selectRole,
     selectExperience,
     selectExperienceYears,
+    selectCandidate,
   } = useSelectData({
     fetchSkill: true,
     fetchRole: true,
@@ -130,19 +131,21 @@ function Page() {
         filter: false,
         context: {
           typeColumn: "Tag",
-          selectOptions: segmentedOptions,
+          selectOptions: selectCandidate,
         },
         cellRendererParams: {
           colorMap: {
-            LIEN_HE: "#ff9800",
-            PHONG_VAN: "#2196f3",
-            NHAN_VIEC: "#4caf50",
-            HOP_DONG: "#9c27b0",
-            HUY_HEN: "#f44336",
-            "On Hold": "#607d8b",
-            Withdrawn: "#795548",
-            Shortlisted: "#00bcd4",
-            Finalist: "#e91e63",
+            TO_CONTACT: "#1976D2", // blue
+            CANNOT_CONTACT: "#9E9E9E", // grey
+            TO_INTERVIEW: "#43A047", // green
+            INTERVIEW_FAILED: "#E53935", // red
+            INTERVIEW_RESCHEDULED: "#FB8C00", // orange
+            JOB_OFFERED: "#00796B", // teal
+            CONTRACT_SIGNING: "#6A1B9A", // purple
+            INTERVIEW_REJECTED: "#FF7043", // light red/orange
+            OFFER_REJECTED: "#C62828", // dark red
+            NOT_SUITABLE: "#9E9E9E", // grey
+            HOAN_THANH: "#2E7D32", // dark green
           },
         },
       },
@@ -233,10 +236,10 @@ function Page() {
     ],
     [
       t,
-      segmentedOptions,
       selectGender,
       selectSkill,
       selectExperienceYears,
+      selectCandidate,
       itemErrorCellStyle,
     ]
   );
