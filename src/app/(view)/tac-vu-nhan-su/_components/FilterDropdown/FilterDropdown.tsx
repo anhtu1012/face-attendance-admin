@@ -12,7 +12,10 @@ import {
 } from "antd";
 import React, { useMemo, useState, useEffect } from "react";
 import { FaFilter, FaSearch } from "react-icons/fa";
-import { FilterDropdownProps, FilterValues } from "../../_types/filter.types";
+import {
+  FilterDropdownProps,
+  FilterValues,
+} from "../../phong-van-nhan-viec/_types/filter.types";
 import "./FilterDropdown.scss";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";

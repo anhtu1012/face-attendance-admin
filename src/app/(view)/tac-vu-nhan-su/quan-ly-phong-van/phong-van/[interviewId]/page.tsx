@@ -30,10 +30,6 @@ export default function AppointmentDetailPage() {
   const fetchAppointmentDetail = async () => {
     setLoading(true);
     try {
-      // TODO: Replace with actual API call
-      // const response = await AppointmentServices.getAppointmentById(interviewId);
-      // setAppointment(response.data);
-
       // Mock data for now
       await new Promise((resolve) => setTimeout(resolve, 500));
       setAppointment({

@@ -135,10 +135,12 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
   }, [data]);
 
   const getDetailPath = (item: AppointmentItem) => {
+    // If IsHumanPV flag is set, use the human PV management route segment
+    const baseSegment = IsHumanPV ? "quan-ly-phong-van" : "phong-van-nhan-viec";
     if (type === "interview") {
-      return `/tac-vu-nhan-su/phong-van-nhan-viec/phong-van/${item.id}`;
+      return `/tac-vu-nhan-su/${baseSegment}/phong-van/${item.id}`;
     }
-    return `/tac-vu-nhan-su/phong-van-nhan-viec/nhan-viec/${item.id}`;
+    return `/tac-vu-nhan-su/${baseSegment}/nhan-viec/${item.id}`;
   };
 
   return (
@@ -324,62 +326,91 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                 </span>
                               </div>
 
-                              {IsHumanPV && appointment.status === "PENDING" && (
-                                <div className="appointment-actions" onClick={(e) => e.stopPropagation()}>
-                                  <div className="actions-hover">
-                                    <Button
-                                      size="small"
-                                      type="primary"
-                                      className="accept-btn"
-                                      onClick={() => onAccept?.(appointment)}
-                                    >
-                                      Chấp nhận
-                                    </Button>
-                                    <Popover
-                                      trigger="click"
-                                      placement="bottomRight"
-                                      overlayClassName="reject-popover"
-                                      content={(
-                                        <div className="reject-content">
-                                          <div className="reject-title">Nhập lý do từ chối</div>
-                                          <Input.TextArea
-                                            className="reject-input"
-                                            rows={3}
-                                            maxLength={500}
-                                            placeholder="Nhập lý do..."
-                                            onPressEnter={(e) => {
-                                              const value = (e.target as HTMLTextAreaElement).value?.trim();
-                                              if (value) {
-                                                onReject?.(appointment, value);
-                                              }
-                                            }}
-                                          />
-                                          <div className="reject-actions">
-                                            <Button size="small">Hủy</Button>
-                                            <Button
-                                              size="small"
-                                              danger
-                                              type="primary"
-                                              onClick={(ev) => {
-                                                const pop = (ev.currentTarget as HTMLElement).closest(".ant-popover") as HTMLElement | null;
-                                                const textarea = pop?.querySelector(".reject-input textarea") as HTMLTextAreaElement | null;
-                                                const value = textarea?.value?.trim() || "";
+                              {IsHumanPV &&
+                                appointment.status === "PENDING" && (
+                                  <div
+                                    className="appointment-actions"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <div className="actions-hover">
+                                      <Button
+                                        size="small"
+                                        type="primary"
+                                        className="accept-btn"
+                                        onClick={() => onAccept?.(appointment)}
+                                      >
+                                        Chấp nhận
+                                      </Button>
+                                      <Popover
+                                        trigger="click"
+                                        placement="bottomRight"
+                                        overlayClassName="reject-popover"
+                                        content={
+                                          <div className="reject-content">
+                                            <div className="reject-title">
+                                              Nhập lý do từ chối
+                                            </div>
+                                            <Input.TextArea
+                                              className="reject-input"
+                                              rows={3}
+                                              maxLength={500}
+                                              placeholder="Nhập lý do..."
+                                              onPressEnter={(e) => {
+                                                const value = (
+                                                  e.target as HTMLTextAreaElement
+                                                ).value?.trim();
                                                 if (value) {
-                                                  onReject?.(appointment, value);
+                                                  onReject?.(
+                                                    appointment,
+                                                    value
+                                                  );
                                                 }
                                               }}
-                                            >
-                                              Xác nhận
-                                            </Button>
+                                            />
+                                            <div className="reject-actions">
+                                              <Button size="small">Hủy</Button>
+                                              <Button
+                                                size="small"
+                                                danger
+                                                type="primary"
+                                                onClick={(ev) => {
+                                                  const pop = (
+                                                    ev.currentTarget as HTMLElement
+                                                  ).closest(
+                                                    ".ant-popover"
+                                                  ) as HTMLElement | null;
+                                                  const textarea =
+                                                    pop?.querySelector(
+                                                      ".reject-input textarea"
+                                                    ) as HTMLTextAreaElement | null;
+                                                  const value =
+                                                    textarea?.value?.trim() ||
+                                                    "";
+                                                  if (value) {
+                                                    onReject?.(
+                                                      appointment,
+                                                      value
+                                                    );
+                                                  }
+                                                }}
+                                              >
+                                                Xác nhận
+                                              </Button>
+                                            </div>
                                           </div>
-                                        </div>
-                                      )}
-                                    >
-                                      <Button size="small" danger className="reject-btn">Từ chối</Button>
-                                    </Popover>
+                                        }
+                                      >
+                                        <Button
+                                          size="small"
+                                          danger
+                                          className="reject-btn"
+                                        >
+                                          Từ chối
+                                        </Button>
+                                      </Popover>
+                                    </div>
                                   </div>
-                                </div>
-                              )}
+                                )}
                             </div>
                           </Tooltip>
                         ))}

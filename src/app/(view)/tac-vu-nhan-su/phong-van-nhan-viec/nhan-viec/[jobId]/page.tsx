@@ -8,8 +8,8 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Spin, Tag } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import AppointmentDetailTabs from "../../_shared/AppointmentDetailTabs/AppointmentDetailTabs";
 import "./page.scss";
+import AppointmentDetailTabs from "../../../_shared/AppointmentDetailTabs";
 
 const statusConfig = {
   PENDING: { text: "Chờ xác nhận", color: "orange" },

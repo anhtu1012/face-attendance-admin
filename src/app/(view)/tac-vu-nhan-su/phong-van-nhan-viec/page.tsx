@@ -5,7 +5,7 @@ import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Tabs } from "antd";
 import AppointmentWeeklyView from "@/components/ViewComponent/AppointmentWeeklyView";
-import FilterDropdown from "./_components/FilterDropdown/FilterDropdown";
+import FilterDropdown from "../_components/FilterDropdown/FilterDropdown";
 import { JobOfferItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
 import InterviewServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/interview.service";
 import JobOfferServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.service";
@@ -18,7 +18,7 @@ import {
   filterJobOfferData,
 } from "./_utils/mockData";
 import "./index.scss";
-import "./_components/FilterDropdown/FilterDropdown.scss";
+import "../_components/FilterDropdown/FilterDropdown.scss";
 import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";

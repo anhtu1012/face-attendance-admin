@@ -7,7 +7,7 @@ import { showError } from "@/hooks/useNotification";
 import InterviewServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/interview.service";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import FilterDropdown from "../phong-van-nhan-viec/_components/FilterDropdown";
+import FilterDropdown from "../_components/FilterDropdown";
 import { FilterValues } from "../phong-van-nhan-viec/_types/filter.types";
 import {
   filterInterviewData,

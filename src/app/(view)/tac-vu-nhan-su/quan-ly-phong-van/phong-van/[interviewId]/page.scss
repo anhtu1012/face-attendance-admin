@@ -1,0 +1,142 @@
+.interview-detail-page {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+
+  .page-header {
+    margin-bottom: 16px;
+    padding: 12px 20px;
+    background: linear-gradient(
+      45deg,
+      rgb(21, 101, 192),
+      rgb(66, 165, 245),
+      rgb(21, 101, 192),
+      rgb(66, 165, 245)
+    );
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(21, 101, 192, 0.15);
+
+    .back-button {
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 4px 12px;
+      height: auto;
+
+      &:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .header-info {
+      .header-main {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+
+        .page-title {
+          margin: 0;
+          font-size: 24px;
+          font-weight: 700;
+          color: #ffffff;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          flex: 1;
+        }
+
+        .header-meta {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .position-name {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+          }
+
+          .status-tag {
+            font-weight: 600;
+            border: none;
+            color: #fff !important;
+            padding: 6px 12px;
+            border-radius: 999px;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.12);
+            background: linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.06),
+              rgba(255, 255, 255, 0.02)
+            );
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: none;
+            font-size: 13px;
+            line-height: 1;
+
+            /* specific color overrides (antd Tag will set background, we ensure readable white text) */
+            &.ant-tag-orange {
+              background: linear-gradient(90deg, #ff9f43, #ff7a00);
+            }
+            &.ant-tag-green {
+              background: linear-gradient(90deg, #34d399, #10b981);
+            }
+            &.ant-tag-red {
+              background: linear-gradient(90deg, #f43f5e, #ef4444);
+            }
+            &.ant-tag-blue {
+              background: linear-gradient(90deg, #60a5fa, #3b82f6);
+            }
+            &.ant-tag-default {
+              background: rgba(255, 255, 255, 0.15);
+              color: #fff !important;
+            }
+          }
+        }
+      }
+
+      .page-subtitle {
+        margin: 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.interview-detail-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 16px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .interview-detail-page {
+    .page-header {
+      padding: 16px;
+
+      .header-info {
+        .page-title {
+          font-size: 22px;
+        }
+
+        .page-subtitle {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
