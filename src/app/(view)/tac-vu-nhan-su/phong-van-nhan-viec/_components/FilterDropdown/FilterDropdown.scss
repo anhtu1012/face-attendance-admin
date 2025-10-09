@@ -1,0 +1,91 @@
+.filter-button {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  svg {
+    font-size: 16px;
+  }
+}
+
+.filter-dropdown-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  min-width: 320px;
+
+  .filter-form {
+    .ant-form-item {
+      margin-bottom: 16px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .ant-form-item-label > label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .filter-actions {
+      margin-top: 20px;
+      margin-bottom: 0;
+
+      .ant-form-item-control-input-content {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .ant-space {
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .ant-btn-primary {
+        background: linear-gradient(
+          45deg,
+          rgb(21, 101, 192),
+          rgb(66, 165, 245)
+        );
+        border: none;
+
+        &:hover {
+          background: linear-gradient(
+            45deg,
+            rgb(13, 71, 161),
+            rgb(30, 136, 229)
+          );
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .filter-dropdown-content {
+    min-width: 280px;
+    padding: 12px;
+
+    .filter-form {
+      .ant-form-item {
+        margin-bottom: 12px;
+      }
+
+      .filter-actions {
+        margin-top: 16px;
+      }
+    }
+  }
+}

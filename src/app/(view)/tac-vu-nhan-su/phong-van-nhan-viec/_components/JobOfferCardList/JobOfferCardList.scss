@@ -1,0 +1,182 @@
+.job-offer-card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 15px;
+  }
+}
+
+.job-offer-card-list-loading,
+.job-offer-card-list-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  width: 100%;
+}
+
+.job-offer-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    border-color: rgb(66, 165, 245);
+  }
+
+  .ant-card-body {
+    padding: 0;
+  }
+}
+
+.job-offer-card-header {
+  background: linear-gradient(
+    45deg,
+    rgb(21, 101, 192),
+    rgb(66, 165, 245),
+    rgb(21, 101, 192),
+    rgb(66, 165, 245)
+  );
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px 10px 0 0;
+
+  .job-offer-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+
+    .icon {
+      font-size: 20px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+    }
+  }
+
+  .job-offer-card-status-tag {
+    font-weight: 600;
+    border: none;
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+}
+
+.job-offer-card-body {
+  padding: 20px;
+
+  .job-offer-card-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #333;
+
+    .icon {
+      color: rgb(66, 165, 245);
+      font-size: 16px;
+      min-width: 16px;
+    }
+
+    span {
+      flex: 1;
+
+      &.truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .job-offer-card-footer {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e8e8e8;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+
+    .guide-person-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+
+      .icon {
+        color: rgb(66, 165, 245);
+        font-size: 18px;
+      }
+
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .label {
+          font-size: 12px;
+          color: #888;
+          font-weight: 500;
+        }
+
+        .value {
+          font-size: 14px;
+          color: #333;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .change-guide-person-btn {
+      flex-shrink: 0;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
+
+// Custom scrollbar
+.job-offer-card-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.job-offer-card-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.job-offer-card-list::-webkit-scrollbar-thumb {
+  background: rgb(66, 165, 245);
+  border-radius: 10px;
+
+  &:hover {
+    background: rgb(21, 101, 192);
+  }
+}

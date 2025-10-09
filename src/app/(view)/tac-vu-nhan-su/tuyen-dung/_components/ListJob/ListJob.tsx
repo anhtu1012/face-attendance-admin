@@ -18,6 +18,7 @@ import { BsSearch } from "react-icons/bs";
 import { columnDefs } from "./column";
 import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
 import Cbutton from "@/components/basicUI/Cbutton";
+import Cselect from "@/components/Cselect";
 
 type ListJobProps = {
   onJobCardClick?: (jobId: number | null) => Promise<void> | void;
@@ -31,6 +32,9 @@ function ListJob({ onJobCardClick }: ListJobProps) {
   const [dataJobs, setDataJobs] = useState<JobItem[]>([]);
   // track collapsed state per job id
   const [collapsedJobs, setCollapsedJobs] = useState<Set<number>>(new Set());
+  const [selectedMonth, setSelectedMonth] = useState<string>(
+    dayjs().format("YYYY-MM")
+  );
 
   const toggleCollapseAll = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -44,7 +48,7 @@ function ListJob({ onJobCardClick }: ListJobProps) {
     }
   };
 
-  const fetchDataJobs = async (params: string | undefined) => {
+  const fetchDataJobs = async (month: string, params?: string | undefined) => {
     const selectedFilterColumns = columnDefs
       .map((col) => col.field)
       .filter(Boolean) as string[];
@@ -56,14 +60,40 @@ function ListJob({ onJobCardClick }: ListJobProps) {
     );
     try {
       const searchFilter: FilterQueryStringTypeItem[] = [];
-      const response = await JobServices.getJob(searchFilter, quickSearchText);
+      // compute start and end of month
+      const fromDate = dayjs(month + "-01")
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      const toDate = dayjs(month + "-01")
+        .endOf("month")
+        .format("YYYY-MM-DD");
+      const paramsObj: Record<string, string> = { fromDate, toDate };
+      const response = await JobServices.getJob(
+        searchFilter,
+        quickSearchText,
+        paramsObj
+      );
       setDataJobs(response.data || []);
     } catch (error) {
       console.log("Error fetching jobs:", error);
     }
   };
   useEffect(() => {
-    fetchDataJobs(undefined);
+    fetchDataJobs(selectedMonth);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // generate month options (last 12 months)
+  const monthOptions = React.useMemo(() => {
+    const opts: { label: string; value: string }[] = [];
+    for (let i = 0; i < 12; i++) {
+      const m = dayjs().subtract(i, "month");
+      opts.push({
+        label: `Tháng ${m.format("MM/YYYY")}`,
+        value: m.format("YYYY-MM"),
+      });
+    }
+    return opts;
   }, []);
 
   const toggleCollapse = (e: React.MouseEvent, jobId: number) => {
@@ -111,13 +141,24 @@ function ListJob({ onJobCardClick }: ListJobProps) {
     <div className="list-job-container">
       <div className="search_job-list">
         <CInputLabel
-          label="Tìm kiếm"
-          onChange={(e) => fetchDataJobs(e.target.value)}
+          label="Tìm kiếm nhanh"
+          onChange={(e) => fetchDataJobs(selectedMonth, e.target.value)}
           suffix={
             <>
               <BsSearch />
             </>
           }
+        />
+        <Cselect
+          label="Chọn tháng"
+          style={{ width: "100%", height: "36px" }}
+          value={selectedMonth}
+          onChange={(val) => {
+            const monthVal = String(val || "");
+            setSelectedMonth(monthVal);
+            fetchDataJobs(monthVal);
+          }}
+          options={monthOptions}
         />
         <div>
           <Cbutton
@@ -187,7 +228,10 @@ function ListJob({ onJobCardClick }: ListJobProps) {
                 <div className="job-info-item">
                   <MdWork className="job-info-icon" />
                   <span className="job-info-text">
-                    {job.requireExperience} năm
+                    {Number(job.requireExperience) === 0 ||
+                    !job.requireExperience
+                      ? "Không Cần KN"
+                      : `${job.requireExperience} năm`}
                   </span>
                 </div>
                 <div className="job-info-item">

@@ -1,0 +1,310 @@
+// Compact Modern Card List Design
+.shared-card-list-loading,
+.shared-card-list-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  background: #f8fafc;
+  border-radius: 12px;
+
+  .ant-empty-description {
+    color: #64748b;
+    font-size: 14px;
+  }
+}
+
+.shared-card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  padding: 16px 0;
+
+  @media (max-width: 1400px) {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.shared-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  background: #ffffff;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+
+  .ant-card-body {
+    padding: 0;
+  }
+
+  // Card Header - Colored by Status
+  .card-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+
+    // Subtle shine effect
+    &::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      bottom: -50%;
+      left: -50%;
+      background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+
+    &:hover::after {
+      transform: translateX(100%);
+    }
+
+    .header-left {
+      flex: 1;
+      min-width: 0;
+
+      .date-time {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+
+        .icon {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .date,
+        .time {
+          font-size: 13px;
+          font-weight: 600;
+          color: #ffffff;
+        }
+
+        .separator {
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 12px;
+        }
+      }
+
+      .status-text {
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.95);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .online-badge {
+      .ant-badge-status-dot {
+        width: 8px;
+        height: 8px;
+      }
+
+      .ant-badge-status-text {
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Card Body - Compact Layout
+  .card-body {
+    padding: 16px;
+
+    .job-title {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .title-icon {
+        font-size: 16px;
+        color: #667eea;
+      }
+    }
+
+    .job-meta {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+
+      .ant-tag {
+        margin: 0;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 2px 8px;
+      }
+    }
+
+    .location-info,
+    .handler-info,
+    .notes {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      font-size: 13px;
+      color: #475569;
+      border-top: 1px solid #f1f5f9;
+
+      .icon {
+        font-size: 14px;
+        color: #667eea;
+        flex-shrink: 0;
+      }
+
+      span {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .location-info {
+      .meeting-link {
+        color: #10b981;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s;
+
+        &:hover {
+          color: #059669;
+          text-decoration: underline;
+        }
+
+        svg {
+          font-size: 12px;
+        }
+      }
+
+      .icon {
+        color: #10b981;
+      }
+    }
+
+    .handler-info {
+      .label {
+        font-weight: 600;
+        color: #64748b;
+        flex: 0 0 auto;
+      }
+
+      .name {
+        font-weight: 600;
+        color: #1e293b;
+      }
+    }
+
+    .notes {
+      align-items: flex-start;
+      
+      .icon {
+        color: #f59e0b;
+        margin-top: 2px;
+      }
+
+      span {
+        white-space: normal;
+        line-height: 1.5;
+        color: #64748b;
+      }
+    }
+  }
+}
+
+// Loading state
+.shared-card-list-loading {
+  .ant-spin-text {
+    color: #64748b;
+    margin-top: 10px;
+    font-size: 13px;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .shared-card {
+    .card-header {
+      padding: 12px;
+
+      .header-left {
+        .date-time {
+          font-size: 12px;
+
+          .icon {
+            font-size: 11px;
+          }
+        }
+
+        .status-text {
+          font-size: 10px;
+        }
+      }
+    }
+
+    .card-body {
+      padding: 12px;
+
+      .job-title {
+        font-size: 15px;
+      }
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .shared-card-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .shared-card {
+    box-shadow: none;
+    border: 1px solid #e2e8f0;
+    page-break-inside: avoid;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
