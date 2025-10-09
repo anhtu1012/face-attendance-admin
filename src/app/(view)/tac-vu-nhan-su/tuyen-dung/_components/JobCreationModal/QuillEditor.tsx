@@ -32,6 +32,16 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
     setIsMounted(true);
   }, []);
 
+  // Load Quill CSS on client only to avoid SSR trying to fetch source maps
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // dynamic import the css so that server-side build won't try to load .map
+    // @ts-expect-error - importing css as side-effect on client only
+    import("react-quill-new/dist/quill.snow.css").catch(() => {
+      // ignore if CSS can't be loaded in dev; this prevents blocking
+    });
+  }, []);
+
   // Default modules configuration
   const defaultModules = {
     toolbar: [

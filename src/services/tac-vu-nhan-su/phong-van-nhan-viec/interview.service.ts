@@ -2,8 +2,8 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import {
-  CreateInterviewRequest,
-  UpdateInterviewRequest,
+  CreateAppointmentRequest as CreateInterviewRequest,
+  UpdateAppointmentRequest as UpdateInterviewRequest,
 } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 
 class InterviewServicesBase extends AxiosService {

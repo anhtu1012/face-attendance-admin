@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -54,12 +53,17 @@ const LoginPage: React.FC = () => {
       const res = await AuthServices.login(values);
       dispatch(setAuthData(res));
       toast.success("Đăng nhập thành công");
+
+      // Chuyển trang ngay lập tức, PageTransition sẽ handle loading
       setIsNavigating(true);
       router.push("/");
+
+      // Reset state sau khi router.push được gọi
+      // Không cần setTimeout vì PageTransition đã handle
       setTimeout(() => {
         setIsLogin(false);
         setIsNavigating(false);
-      }, 500);
+      }, 100);
     } catch (error: any) {
       console.log(error);
       toast.error("Đăng nhập thất bại");

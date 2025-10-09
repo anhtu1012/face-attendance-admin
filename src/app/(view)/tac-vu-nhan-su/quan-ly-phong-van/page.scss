@@ -1,0 +1,24 @@
+/* Bottom fixed notice for pending interview confirmations */
+.pending-notice {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* allow clicks to pass through except on content */
+  z-index: 9999;
+}
+
+.pending-notice__content {
+  pointer-events: auto;
+  margin: 12px;
+  background: rgba(255, 250, 230, 0.98);
+  color: #333;
+  padding: 10px 16px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  font-size: 13px;
+  max-width: 980px;
+  text-align: center;
+}
