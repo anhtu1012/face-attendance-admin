@@ -32,9 +32,12 @@ import SuccessModal from "./_components/SuccessModal/SuccessModal";
 import InterviewScheduleModal from "./_components/InterviewScheduleModal/InterviewScheduleModal";
 import JobOfferModal from "./_components/JobOfferModal/JobOfferModal";
 import LeaderReportModal from "./_components/LeaderReportModal/LeaderReportModal";
+import React from "react";
 import { FaPlusCircle } from "react-icons/fa";
+import InterviewListModal from "./_components/InterviewListModal/InterviewListModal";
 import { GoReport } from "react-icons/go";
-
+import { BiSolidSkipNextCircle } from "react-icons/bi";
+import { FcViewDetails } from "react-icons/fc";
 function Page() {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("NguoiDung");
@@ -58,6 +61,7 @@ function Page() {
   const messageApi = useAntdMessage();
   const [contractLink, setContractLink] = useState<string>("");
   const [jobId, setJobId] = useState<string>("");
+  const [listModalOpen, setListModalOpen] = useState(false);
   const segmentedOptions = useMemo(
     () => [
       { label: "Liên hệ", value: "LIEN_HE" },
@@ -280,6 +284,16 @@ function Page() {
     }
   };
 
+  const handleOpenInterviewListModal = (_params: any) => {
+    if (_params) {
+      // optionally set selected candidate for context
+      setSelectedCandidate(_params.data);
+      setListModalOpen(true);
+    } else {
+      messageApi.warning("Vui lòng chọn ứng viên để xem lịch phỏng vấn!");
+    }
+  };
+
   const handleCloseInterviewModal = () => {
     setInterviewModalOpen(false);
     setSelectedCandidate(null);
@@ -362,15 +376,44 @@ function Page() {
     TuyenDungServices.deleteTuyenDung,
     () => handleFetchUser(currentPage, pageSize, quickSearchText)
   );
+  const handleChangeStatusToInterview = (_params: any) => {
+    console.log(_params);
+  };
 
   const buttonProps = (_params: any) => {
-    if (selectedStatus === "PHONG_VAN") {
+    if (selectedStatus === "LIEN_HE") {
+      return (
+        <Tooltip title="Chuyển đến phỏng vấn">
+          <BiSolidSkipNextCircle
+            className="tool-icon interview-icon"
+            size={30}
+            onClick={() => handleChangeStatusToInterview(_params)}
+          />
+        </Tooltip>
+      );
+    } else if (
+      selectedStatus === "PHONG_VAN" &&
+      _params.data.status === "TO_INTERVIEW"
+    ) {
       return (
         <Tooltip title="Tạo lịch hẹn">
           <FaPlusCircle
             className="tool-icon interview-icon"
             size={30}
             onClick={() => handleOpenInterviewModal(_params)}
+          />
+        </Tooltip>
+      );
+    } else if (
+      _params.data.status === "INTERVIEW_SCHEDULED" &&
+      selectedStatus === "PHONG_VAN"
+    ) {
+      return (
+        <Tooltip title="Chi tiết lịch phỏng vấn">
+          <FcViewDetails
+            className="tool-icon interview-icon"
+            size={30}
+            onClick={() => handleOpenInterviewListModal(_params)}
           />
         </Tooltip>
       );
@@ -490,6 +533,21 @@ function Page() {
           </>
         }
       />
+
+      {/* Interview list modal for scheduled items */}
+      {/* Lazy load component to avoid bundle bloat - import at top dynamically if needed */}
+      {listModalOpen && (
+        <React.Suspense>
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-ignore */}
+          <InterviewListModal
+            open={listModalOpen}
+            onClose={() => setListModalOpen(false)}
+            candidateId={selectedCandidate?.id}
+            candidateName={selectedCandidate?.fullName}
+          />
+        </React.Suspense>
+      )}
 
       {/* Job Creation Modal */}
       <JobCreationModal

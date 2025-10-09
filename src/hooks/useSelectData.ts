@@ -35,8 +35,10 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     { label: "Không LH Được", value: "CANNOT_CONTACT" }, //1
     { label: "Phỏng vấn", value: "TO_INTERVIEW" }, //2
     { label: "Rớt PV", value: "INTERVIEW_FAILED" }, //2
+    { label: "Đã hẹn PV", value: "INTERVIEW_SCHEDULED" }, //2
     { label: "Hẹn lại", value: "INTERVIEW_RESCHEDULED" }, //2
     { label: "Nhận việc", value: "JOB_OFFERED" }, //3
+    { label: "Đã hẹn NV", value: "JOB_SCHEDULED" }, //3
     { label: "Làm Hợp đồng", value: "CONTRACT_SIGNING" }, //4
     { label: "Từ chối PV", value: "INTERVIEW_REJECTED" }, //5
     { label: "Từ chối NV", value: "OFFER_REJECTED" }, //5

@@ -16,7 +16,6 @@ import {
 } from "antd";
 import React, { useState } from "react";
 import { FaBriefcase, FaCheck, FaInfoCircle, FaUsers } from "react-icons/fa";
-import "react-quill-new/dist/quill.snow.css";
 import { useSelector } from "react-redux";
 import "./JobCreationModal.scss";
 import QuillEditor from "./QuillEditor";

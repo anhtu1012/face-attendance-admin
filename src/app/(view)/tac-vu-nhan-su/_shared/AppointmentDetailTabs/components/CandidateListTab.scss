@@ -1,0 +1,161 @@
+.candidate-list-tab {
+  .candidates-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .header-icon {
+          font-size: 20px;
+          background: linear-gradient(
+            45deg,
+            rgb(21, 101, 192),
+            rgb(66, 165, 245)
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .header-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #1e293b;
+        }
+
+        .count-badge {
+          .ant-badge-count {
+            background: linear-gradient(
+              45deg,
+              rgb(21, 101, 192),
+              rgb(66, 165, 245)
+            );
+            box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3);
+          }
+        }
+      }
+
+      .search-input {
+        max-width: 300px;
+        border-radius: 8px;
+
+        .gradient-icon {
+          background: linear-gradient(
+            45deg,
+            rgb(21, 101, 192),
+            rgb(66, 165, 245)
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+      }
+    }
+
+    .candidates-table {
+      .candidate-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .candidate-avatar {
+          flex-shrink: 0;
+          background: linear-gradient(
+            135deg,
+            rgb(21, 101, 192),
+            rgb(66, 165, 245)
+          );
+        }
+
+        .candidate-details {
+          .candidate-name {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+          }
+
+          .candidate-gender {
+            font-size: 12px;
+            color: #64748b;
+          }
+        }
+      }
+
+      .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .contact-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .contact-icon {
+            font-size: 14px;
+            background: linear-gradient(
+              45deg,
+              rgb(21, 101, 192),
+              rgb(66, 165, 245)
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+
+          a {
+            color: rgb(21, 101, 192);
+            text-decoration: none;
+            transition: all 0.2s ease;
+
+            &:hover {
+              color: rgb(66, 165, 245);
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+
+      .skills-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .status-text {
+        font-weight: 500;
+      }
+
+      .no-cv {
+        color: #94a3b8;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .candidate-list-tab {
+    .candidates-card {
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .search-input {
+          max-width: 100%;
+          width: 100%;
+        }
+      }
+    }
+  }
+}
