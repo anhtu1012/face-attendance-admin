@@ -141,7 +141,8 @@
     "isActive": "Status",
     "fullName": "Full Name",
     "skills": "Skills",
-    "experience": "Experience"
+    "experience": "Experience",
+    "createdAt": "CreatedAt"
   },
   "NhomNguoiDung": {
     "roleCode": "Role Code",
@@ -222,7 +223,8 @@
     "themMoi": "Add new user",
     "xemChiTiet": "View details",
     "chinhSua": "Edit user information",
-    "xoa": "Delete user"
+    "xoa": "Delete user",
+    "boPhan": "Department"
   },
   "DanhMucDon": {
     "maDon": "Form Code",
@@ -464,5 +466,9 @@
   "UserComponent": {
     "userName": "userName",
     "firstName": "Full Name"
+  },
+  "DanhMucBoPhan": {
+    "departmentName": "Department Name",
+    "description": "Description"
   }
 }

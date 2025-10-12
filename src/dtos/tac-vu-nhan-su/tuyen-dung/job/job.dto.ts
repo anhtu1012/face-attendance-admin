@@ -14,6 +14,15 @@ export const JobItemSchema = z.object({
   trialPeriod: z.string().optional(),
   fromSalary: z.string().optional(),
   toSalary: z.string().optional(),
+  // Quantities for recruitment pipeline wrapped in quantityStatus
+  quantityStatus: z
+    .object({
+      toContactQuantity: z.number().optional(),
+      toInterviewQuantity: z.number().optional(),
+      toJobOfferedQuantity: z.number().optional(),
+      toContractQuantity: z.number().optional(),
+    })
+    .optional(),
   requireExperience: z.string().optional(),
   expirationDate: z.string().optional(), // ISO date string
   address: z.string().optional(),

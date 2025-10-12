@@ -85,6 +85,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     if (!socket) return;
 
     const handleNewNotification = (notification: NotificationItem) => {
+      console.log("notification", notification);
+
       toast.info(notification.title, {
         position: "top-right",
         autoClose: 5000,
@@ -96,11 +98,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       setNotifications((prev) => [notification, ...prev]);
     };
     // Listen for notifications with dynamic key using userCode
-    const notificationKey = `NOTIFICATION_CREATED_${userCode}`;
-    socket.on(notificationKey, handleNewNotification);
+    // const notificationKey = `NOTIFICATION_CREATED_${userCode}`;
+    socket.on("NEW_CANDIDATE_APPLY", handleNewNotification);
 
     return () => {
-      socket.off(notificationKey, handleNewNotification);
+      socket.off("NEW_CANDIDATE_APPLY", handleNewNotification);
     };
   }, [socket, userCode]);
 
@@ -358,7 +360,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         }}
       >
         <Link
-          href={getLinkNoti(authData.userProfile?.roleCode || "")}
+          href={getLinkNoti(authData.userProfile?.roleId || "")}
           style={{ textDecoration: "none" }}
         >
           <Button

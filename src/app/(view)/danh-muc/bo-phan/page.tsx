@@ -1,13 +1,12 @@
 "use client";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { Position } from "@/dtos/danhMuc/chuc-vu/chucVu.dto";
+import { BoPhan } from "@/dtos/danhMuc/bo-phan/bophan.dto";
 
 import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
 import { useDataGridOperations } from "@/hooks/useDataGridOperations";
-import { useSelectData } from "@/hooks/useSelectData";
 import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
-import DanhMucChucVuServices from "@/services/danh-muc/chuc-vu/chucVu.service";
+import DanhMucBoPhanServices from "@/services/danh-muc/bo-phan/bophan.service";
 import {
   getItemId,
   useHasItemFieldError,
@@ -24,12 +23,12 @@ const defaultPageSize = 20;
 
 function Page() {
   const mes = useTranslations("HandleNotion");
-  const t = useTranslations("DanhMucChucVu");
+  const t = useTranslations("DanhMucBoPhan");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItem, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(defaultPageSize);
   const [loading, setLoading] = useState(false);
-  const [rowData, setRowData] = useState<Position[]>([]);
+  const [rowData, setRowData] = useState<BoPhan[]>([]);
   const gridRef = useRef<AgGridReact>({} as AgGridReact);
   const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
     undefined
@@ -37,62 +36,28 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  const { selectRole, selectDepartment } = useSelectData({
-    fetchRole: true,
-    fetchDepartment: true,
-  });
+
   // Define columnDefs first before dataGrid hook
   const columnDefs: ColDef[] = useMemo(
     () => [
       {
-        field: "positionName",
-        headerName: t("tenChucVu"),
+        field: "departmentName",
+        headerName: t("departmentName"),
         editable: true,
-        width: 180,
+        width: 200,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "positionName", params);
-        },
-      },
-      {
-        field: "departmentId",
-        headerName: t("boPhan"),
-        editable: true,
-        width: 150,
-        context: { typeColumn: "Select", selectOptions: selectDepartment },
-      },
-      {
-        field: "roleId",
-        headerName: t("quyenChucVu"),
-        editable: true,
-        width: 150,
-        context: {
-          typeColumn: "Select",
-          selectOptions: selectRole,
+          return itemErrorCellStyle(itemId, "departmentName", params);
         },
       },
       {
         field: "description",
-        headerName: t("moTa"),
+        headerName: t("description"),
         editable: true,
-        width: 200,
-      },
-      {
-        field: "overtimeSalary",
-        headerName: t("luongTangCa"),
-        editable: true,
-        width: 150,
-        context: { typeColumn: "Number" },
-      },
-      {
-        field: "lateFine",
-        headerName: t("phiDiMuon"),
-        editable: true,
-        width: 150,
-        context: { typeColumn: "Number" },
+        width: 300,
       },
     ],
-    [itemErrorCellStyle, selectDepartment, selectRole, t]
+    [itemErrorCellStyle, t]
   );
 
   const fetchData = useCallback(
@@ -111,7 +76,7 @@ function Page() {
             value: (currentPage - 1) * pageSize,
           },
         ];
-        const response = await DanhMucChucVuServices.getDanhMucChucVu(
+        const response = await DanhMucBoPhanServices.getDanhMucBoPhan(
           searchFilter,
           quickSearchText
         );
@@ -126,29 +91,18 @@ function Page() {
     [setLoading, setRowData, setTotalItems]
   );
 
-  const dataGrid = useDataGridOperations<Position>({
+  const dataGrid = useDataGridOperations<BoPhan>({
     gridRef,
     createNewItem: (i) => ({
       unitKey: `${Date.now()}_${i}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: "",
-      updatedBy: "",
-      positionName: "",
-      departmentId: "",
-      roleId: "",
+      departmentName: "",
       description: "",
-      overtimeSalary: 0,
-      lateFine: 0,
     }),
-    duplicateCheckField: "positionName",
+    duplicateCheckField: "departmentName",
     mes,
     rowData,
     setRowData,
-    requiredFields: [
-      { field: "positionName", label: t("tenChucVu") },
-      { field: "roleId", label: t("quyenChucVu") },
-    ],
+    requiredFields: [{ field: "departmentName", label: t("departmentName") }],
     t,
     // Quicksearch parameters
     setCurrentPage,
@@ -158,16 +112,16 @@ function Page() {
     columnDefs,
   });
 
-  // Create save handler (chờ API service được implement)
+  // Create save handler
   const handleSave = dataGrid.createSaveHandler(
-    DanhMucChucVuServices.createDanhMucChucVu,
-    DanhMucChucVuServices.updateDanhMucChucVu,
+    DanhMucBoPhanServices.createDanhMucBoPhan,
+    DanhMucBoPhanServices.updateDanhMucBoPhan,
     () => fetchData(currentPage, pageSize, quickSearchText)
   );
 
-  // Create delete handler (chờ API service được implement)
+  // Create delete handler
   const handleDelete = dataGrid.createDeleteHandler(
-    DanhMucChucVuServices.deleteDanhMucChucVu,
+    DanhMucBoPhanServices.deleteDanhMucBoPhan,
     () => fetchData(currentPage, pageSize, quickSearchText)
   );
 

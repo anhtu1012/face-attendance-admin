@@ -19,8 +19,8 @@ export const mockInterviewData: AppointmentItem[] = [
     endTime: "10:00",
     interviewType: "offline",
     location: "Tầng 5, Tòa nhà ABC, 123 Đường XYZ, Quận Ba Đình, Hà Nội",
-    interviewer: "Trần Thị Bình",
-    interviewerEmail: "tranthibinh@company.com",
+    interviewer: "Trần Thị B",
+    interviewerEmail: "tran.thi.b@company.com",
     interviewerPhone: "0987654321",
     status: "PENDING",
     notes:
@@ -424,6 +424,29 @@ export const filterInterviewData = (
 
   return filtered;
 };
+
+// Export schedule templates derived from mockInterviewData
+export const mockScheduleTemplates = mockInterviewData.map((item) => {
+  const baseDate = dayjs(item.interviewDate);
+  const [sh, sm] = item.startTime.split(":").map((s) => Number(s));
+  const [eh, em] = item.endTime.split(":").map((s) => Number(s));
+
+  const startTime = baseDate.hour(sh).minute(sm).second(0);
+  const endTime = baseDate.hour(eh).minute(em).second(0);
+
+  return {
+    id: `tpl-${item.id}`,
+    label: `${baseDate.format("DD/MM/YYYY")} ${item.startTime}-${
+      item.endTime
+    } - ${item.interviewer}`,
+    date: startTime,
+    startTime,
+    endTime,
+    interviewerEmail: item.interviewerEmail,
+    interviewType: item.interviewType,
+    meetingLink: item.meetingLink,
+  };
+});
 
 // Helper function to filter job offer data
 export const filterJobOfferData = (

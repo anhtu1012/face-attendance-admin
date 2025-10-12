@@ -21,10 +21,18 @@ import Cbutton from "@/components/basicUI/Cbutton";
 import Cselect from "@/components/Cselect";
 
 type ListJobProps = {
-  onJobCardClick?: (jobId: number | null) => Promise<void> | void;
+  // Pass jobId and optional quantityStatus object when a job card is clicked
+  onJobCardClick?: (
+    jobId: number | null,
+    quantityStatus?: Record<string, number> | null
+  ) => Promise<void> | void;
+  // Set of job IDs that have new candidates
+  newJobIds?: Set<string>;
+  // Callback to clear the new badge when job is clicked
+  onClearNewBadge?: (jobId: string) => void;
 };
 
-function ListJob({ onJobCardClick }: ListJobProps) {
+function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [clickEffect, setClickEffect] = useState<number | null>(null);
   const [jobDetailOpen, setJobDetailOpen] = useState(false);
@@ -63,10 +71,10 @@ function ListJob({ onJobCardClick }: ListJobProps) {
       // compute start and end of month
       const fromDate = dayjs(month + "-01")
         .startOf("month")
-        .format("YYYY-MM-DD");
+        .toISOString();
       const toDate = dayjs(month + "-01")
         .endOf("month")
-        .format("YYYY-MM-DD");
+        .toISOString();
       const paramsObj: Record<string, string> = { fromDate, toDate };
       const response = await JobServices.getJob(
         searchFilter,
@@ -106,7 +114,10 @@ function ListJob({ onJobCardClick }: ListJobProps) {
       return next;
     });
   };
-  const handleJobCardClick = (jobId: number) => {
+  const handleJobCardClick = (
+    jobId: number,
+    quantityStatus?: Record<string, number> | null
+  ) => {
     // Tạo hiệu ứng click
     setClickEffect(jobId);
 
@@ -115,19 +126,33 @@ function ListJob({ onJobCardClick }: ListJobProps) {
       setClickEffect(null);
     }, 300);
 
+    // Clear new badge when job is clicked
+    if (onClearNewBadge && newJobIds?.has(String(jobId))) {
+      onClearNewBadge(String(jobId));
+    }
+
     // Toggle selection
     setSelectedJobId(selectedJobId === jobId ? null : jobId);
     try {
       const newSelected = selectedJobId === jobId ? null : jobId;
       setTimeout(() => {
         try {
-          onJobCardClick?.(newSelected);
+          onJobCardClick?.(
+            newSelected,
+            newSelected ? quantityStatus ?? null : null
+          );
         } catch {}
       }, 0);
     } catch {}
   };
 
   const handleViewJobDetail = (job: JobItem) => {
+    // When user explicitly opens job detail, clear the "New" badge for that job
+    if (onClearNewBadge) {
+      try {
+        onClearNewBadge(String(job.id));
+      } catch {}
+    }
     setSelectedJob(job);
     setJobDetailOpen(true);
   };
@@ -193,11 +218,18 @@ function ListJob({ onJobCardClick }: ListJobProps) {
             className={`job-card ${
               selectedJobId === Number(job.id) ? "selected" : ""
             } ${clickEffect === Number(job.id) ? "click-effect" : ""}`}
-            onClick={() => handleJobCardClick(Number(job.id))}
+            onClick={() =>
+              handleJobCardClick(Number(job.id), job.quantityStatus ?? null)
+            }
           >
             <div className="job-card-header">
               <div className="job-title-section">
-                <h3 className="job-title">{job.jobTitle}</h3>
+                <h3 className="job-title">
+                  {job.jobTitle}
+                  {newJobIds?.has(String(job.id)) && (
+                    <span className="new-badge">New</span>
+                  )}
+                </h3>
                 <span className="job-department">{job.positionName}</span>
               </div>
               <div className="job-header-controls">
