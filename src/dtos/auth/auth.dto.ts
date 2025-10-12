@@ -8,7 +8,7 @@ export const UserInforSchema = z.object({
   code: z.string(),
   userName: z.string(),
   password: z.string().optional(), // Optional as it may not be returned in responses
-  roleCode: z.string(),
+  roleId: z.string(),
   role: z.string(),
   firstName: z.string(),
   lastName: z.string(),

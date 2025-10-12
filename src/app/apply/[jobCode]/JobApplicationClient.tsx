@@ -233,10 +233,22 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
       }
 
       // Append other fields as strings. Skip fileCV (already appended).
+      // Special-case `skillIds`: send as a single comma-separated string instead of multiple entries.
       Object.entries(values).forEach(([key, value]) => {
         if (key === "fileCV") return;
         if (value === undefined || value === null) return;
-        // For arrays (like skillIds), append each item separately
+
+        if (key === "skillIds") {
+          // If skillIds is an array, join with commas; otherwise coerce to string.
+          if (Array.isArray(value)) {
+            formData.append(key, value.map((v) => String(v)).join(","));
+          } else {
+            formData.append(key, String(value));
+          }
+          return;
+        }
+
+        // For other arrays, append each item separately
         if (Array.isArray(value)) {
           value.forEach((v) => formData.append(key, String(v)));
         } else {

@@ -116,7 +116,8 @@
     "isActive": "Trạng thái",
     "fullName": "Họ và tên",
     "skills": "Kĩ năng",
-    "experience": "Kinh nghiệm"
+    "experience": "Kinh nghiệm",
+    "createdAt": "Thời gian nộp"
   },
   "NhomNguoiDung": {
     "roleCode": "Mã vai trò",
@@ -195,7 +196,8 @@
     "themMoi": "Thêm người dùng mới",
     "xemChiTiet": "Xem thông tin chi tiết",
     "chinhSua": "Chỉnh sửa thông tin người dùng",
-    "xoa": "Xóa người dùng"
+    "xoa": "Xóa người dùng",
+    "boPhan": "Bộ phận"
   },
   "DanhMucDon": {
     "maDon": "Mã đơn",
@@ -437,5 +439,9 @@
   "UserComponent": {
     "userName": "Tên đăng nhập",
     "firstName": "Họ và tên"
+  },
+  "DanhMucBoPhan": {
+    "departmentName": "Tên phòng ban",
+    "description": "Mô tả"
   }
 }

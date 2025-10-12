@@ -10,6 +10,7 @@ export const CreatePositionSchema = z.object({
     .string()
     .min(2, "Position name must be at least 2 characters"),
   roleId: z.string(),
+  departmentId: z.string().optional(),
   description: z.string().optional(),
   overtimeSalary: z.string().or(z.number()).optional(),
   lateFine: z.string().or(z.number()).optional(),
@@ -35,6 +36,7 @@ export const UpdatePositionSchema = PositionSchema.omit({
       .min(2, "Position name must be at least 2 characters")
       .optional(),
     roleId: z.string().optional(),
+    departmentId: z.string().optional(),
     description: z.string().optional(),
     overtimeSalary: z.string().or(z.number()).nullable().optional(),
     lateFine: z.string().or(z.number()).nullable().optional(),

@@ -25,6 +25,7 @@ import InvitationTemplate from "./InvitationTemplate";
 import { generateInvitationHTML } from "./invitationTemplateHTML";
 import "./InterviewScheduleModal.scss";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import { mockScheduleTemplates } from "@/app/(view)/tac-vu-nhan-su/phong-van-nhan-viec/_utils/mockData";
 
 const { TextArea } = Input;
 
@@ -122,6 +123,45 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       email: "pham.thi.d@company.com",
     },
   ];
+
+  // transform imported templates into options
+  const templateOptions = mockScheduleTemplates.map((t) => ({
+    value: t.id,
+    label: t.label,
+  }));
+
+  const handleTemplateSelect = (templateId: string | undefined) => {
+    if (!templateId) {
+      // clear template selection
+      form.setFieldsValue({
+        date: undefined,
+        startTime: undefined,
+        endTime: undefined,
+        meetingLink: undefined,
+      });
+      return;
+    }
+
+    const tpl = mockScheduleTemplates.find((m) => m.id === templateId);
+    if (!tpl) return;
+
+    // find interviewer by email
+    const interviewerMatch = interviewers.find(
+      (i) => i.email === tpl.interviewerEmail
+    );
+
+    setInterviewType(tpl.interviewType as "online" | "offline");
+
+    form.setFieldsValue({
+      date: tpl.date,
+      startTime: tpl.startTime,
+      endTime: tpl.endTime,
+      interviewType: tpl.interviewType,
+      meetingLink: tpl.meetingLink || undefined,
+      interviewer: interviewerMatch ? interviewerMatch.value : undefined,
+      interviewerEmail: tpl.interviewerEmail,
+    });
+  };
 
   useEffect(() => {
     if (open && candidateData) {
@@ -346,11 +386,30 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
               layout="vertical"
               onFinish={handleSubmit}
               className="interview-form"
+              onValuesChange={(changedValues) => {
+                if (changedValues && changedValues.interviewerEmail) {
+                  const email = changedValues.interviewerEmail;
+                  const match = interviewers.find((i) => i.email === email);
+                  if (match) {
+                    form.setFieldsValue({ interviewer: match.value });
+                  }
+                }
+              }}
             >
               <div className="form-section-title">
                 <FaCalendarAlt />
                 Thông tin thời gian
               </div>
+
+              <Form.Item label="Các lịch hẹn đã có" name="scheduleTemplate">
+                <Select
+                  placeholder="Chọn mẫu để tự động điền"
+                  size="large"
+                  onChange={handleTemplateSelect}
+                  options={templateOptions}
+                  allowClear
+                />
+              </Form.Item>
 
               <div className="form-row">
                 <div className="form-col-6">

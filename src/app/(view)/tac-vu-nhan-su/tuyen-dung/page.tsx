@@ -3,8 +3,10 @@
 import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { TuyenDungItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.dto";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { useDataGridOperations } from "@/hooks/useDataGridOperations";
 import { showError } from "@/hooks/useNotification";
+import { useRecruitmentSocket } from "@/hooks/useRecruitmentSocket";
 import { useSelectData } from "@/hooks/useSelectData";
 import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
 import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
@@ -16,28 +18,31 @@ import {
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
 import { Segmented, Tooltip } from "antd";
-import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import dayjs from "dayjs";
+import "dayjs/locale/vi";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { useTranslations } from "next-intl";
-import { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { BiSolidSkipNextCircle } from "react-icons/bi";
+import { FaPlusCircle } from "react-icons/fa";
+import { FcViewDetails } from "react-icons/fc";
+import { GoReport } from "react-icons/go";
 import { useSelector } from "react-redux";
-import "./index.scss";
-import "./_components/JobCreationModal/JobCreationModal.scss";
-import "./_components/SuccessModal/SuccessModal.scss";
-import "./_components/JobDetailModal/JobDetailModal.scss";
-import "./_components/LeaderReportModal/LeaderReportModal.scss";
-import ListJob from "./_components/ListJob/ListJob";
-import JobCreationModal from "./_components/JobCreationModal/JobCreationModal";
-import SuccessModal from "./_components/SuccessModal/SuccessModal";
+import InterviewListModal from "./_components/InterviewListModal/InterviewListModal";
 import InterviewScheduleModal from "./_components/InterviewScheduleModal/InterviewScheduleModal";
+import JobCreationModal from "./_components/JobCreationModal/JobCreationModal";
+import "./_components/JobCreationModal/JobCreationModal.scss";
+import "./_components/JobDetailModal/JobDetailModal.scss";
 import JobOfferModal from "./_components/JobOfferModal/JobOfferModal";
 import LeaderReportModal from "./_components/LeaderReportModal/LeaderReportModal";
-import React from "react";
-import { FaPlusCircle } from "react-icons/fa";
-import InterviewListModal from "./_components/InterviewListModal/InterviewListModal";
-import { GoReport } from "react-icons/go";
-import { BiSolidSkipNextCircle } from "react-icons/bi";
-import { FcViewDetails } from "react-icons/fc";
+import "./_components/LeaderReportModal/LeaderReportModal.scss";
+import ListJob from "./_components/ListJob/ListJob";
+import SuccessModal from "./_components/SuccessModal/SuccessModal";
+import "./_components/SuccessModal/SuccessModal.scss";
+import "./index.scss";
+dayjs.extend(relativeTime);
+dayjs.locale("vi");
+
 function Page() {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("NguoiDung");
@@ -51,6 +56,10 @@ function Page() {
     undefined
   );
   const [selectedStatus, setSelectedStatus] = useState<string>("LIEN_HE");
+  const [quantityStatus, setQuantityStatus] = useState<Record<
+    string,
+    number
+  > | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
@@ -62,18 +71,138 @@ function Page() {
   const [contractLink, setContractLink] = useState<string>("");
   const [jobId, setJobId] = useState<string>("");
   const [listModalOpen, setListModalOpen] = useState(false);
-  const segmentedOptions = useMemo(
-    () => [
-      { label: "Liên hệ", value: "LIEN_HE" },
-      { label: "Phỏng vấn", value: "PHONG_VAN" },
-      { label: "Nhận việc", value: "NHAN_VIEC" },
-      { label: "Hợp đồng", value: "HOP_DONG" },
-      { label: "Hủy hẹn", value: "HUY_HEN" },
-      { label: "Chưa phù hợp", value: "CHUA_PHU_HOP" },
-      { label: "Hoàn thành", value: "HOAN_THANH" },
-    ],
-    []
-  );
+  const [newJobIds, setNewJobIds] = useState<Set<string>>(new Set());
+  // Track new count for each status tab
+  const [newCounts, setNewCounts] = useState<Record<string, number>>({
+    LIEN_HE: 0,
+    PHONG_VAN: 0,
+    NHAN_VIEC: 0,
+    HOP_DONG: 0,
+  });
+
+  const segmentedOptions = useMemo(() => {
+    // Helper to show count if available
+    const withCount = (label: string, key?: string) => {
+      const count =
+        key && quantityStatus && quantityStatus[key] !== undefined
+          ? ` (${quantityStatus[key]})`
+          : "";
+      return `${label}${count}`;
+    };
+
+    // Helper to create label with badge
+    const withBadge = (
+      label: string,
+      statusKey: string,
+      quantityKey?: string
+    ) => {
+      const baseLabel = withCount(label, quantityKey);
+      const newCount = newCounts[statusKey] || 0;
+
+      if (newCount > 0) {
+        return (
+          <span>
+            {baseLabel}
+            <span
+              className="segmented-new-badge"
+              style={{
+                position: "absolute",
+                top: "-3px",
+                right: "-7px",
+                background: "linear-gradient(135deg, #ff4081 0%, #ff6e40 100%)",
+                color: "white",
+                fontSize: "10px",
+                fontWeight: "700",
+                padding: "2px 6px",
+                borderRadius: "10px",
+                boxShadow: "0 2px 6px rgba(255, 64, 129, 0.5)",
+                animation: "pulse 2s ease-in-out infinite",
+              }}
+            >
+              {newCount}
+            </span>
+          </span>
+        );
+      }
+
+      return baseLabel;
+    };
+
+    return [
+      {
+        label: withBadge("Liên hệ", "LIEN_HE", "toContactQuantity"),
+        value: "LIEN_HE",
+      },
+      {
+        label: withBadge("Phỏng vấn", "PHONG_VAN", "toInterviewQuantity"),
+        value: "PHONG_VAN",
+      },
+      {
+        label: withBadge("Nhận việc", "NHAN_VIEC", "toJobOfferedQuantity"),
+        value: "NHAN_VIEC",
+      },
+      {
+        label: withBadge("Hợp đồng", "HOP_DONG", "toContractQuantity"),
+        value: "HOP_DONG",
+      },
+      { label: withCount("Hủy hẹn"), value: "HUY_HEN" },
+      { label: withCount("Chưa phù hợp"), value: "CHUA_PHU_HOP" },
+      { label: withCount("Hoàn thành"), value: "HOAN_THANH" },
+    ];
+  }, [quantityStatus, newCounts]);
+
+  // Sử dụng custom hook để xử lý socket events
+  useRecruitmentSocket({
+    jobId,
+    selectedStatus,
+    onNewCandidate: (newJobId, candidateInfo) => {
+      console.log("aaa", newJobId);
+      console.log("aabb", candidateInfo);
+
+      // Mark this job as having new candidates
+      setNewJobIds((prev) => new Set(prev).add(String(newJobId)));
+
+      // If this is the currently selected job, update the quantity and add to grid
+      if (String(jobId) === String(newJobId)) {
+        // Update quantity status
+        setQuantityStatus((prev) => {
+          if (!prev) return { toContactQuantity: 1 };
+          return {
+            ...prev,
+            toContactQuantity: Number(prev.toContactQuantity || 0) + 1,
+          };
+        });
+
+        // Increment new count for LIEN_HE tab
+        setNewCounts((prev) => ({
+          ...prev,
+          LIEN_HE: Number(prev.LIEN_HE || 0) + 1,
+        }));
+
+        // If we're on LIEN_HE tab and status is TO_CONTACT, add to grid
+        if (
+          selectedStatus === "LIEN_HE" &&
+          candidateInfo.status === "TO_CONTACT"
+        ) {
+          setRowData((prev) => [candidateInfo, ...prev]);
+          setTotalItems((prev) => prev + 1);
+        }
+      }
+    },
+    onCandidateStatusChanged: (affectedJobId, candidateId, newStatus) => {
+      console.log(`Candidate ${candidateId} status changed to ${newStatus}`);
+      // Có thể thêm logic cập nhật UI khi status thay đổi
+    },
+    onInterviewScheduled: (affectedJobId, candidateId) => {
+      console.log(`Interview scheduled for candidate ${candidateId}`);
+      // Có thể thêm notification hoặc refresh data
+    },
+    onJobOfferSent: (affectedJobId, candidateId) => {
+      console.log(`Job offer sent to candidate ${candidateId}`);
+      // Có thể thêm notification hoặc refresh data
+    },
+  });
+
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
@@ -168,25 +297,13 @@ function Page() {
         headerName: "Email",
         context: { typeColumn: "Text", inputType: "email", maxLength: 100 },
         editable: true,
-        width: 180,
+        width: 220,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
           return itemErrorCellStyle(itemId, "email", params);
         },
       },
-      {
-        field: "birthday",
-        headerName: t("birthDay"),
-        editable: true,
-        width: 190,
-        context: {
-          typeColumn: "Date",
-        },
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "birthday", params);
-        },
-      },
+
       {
         field: "gender",
         headerName: t("gender"),
@@ -208,6 +325,31 @@ function Page() {
         },
       },
       {
+        field: "createdAt",
+        headerName: t("createdAt"),
+        editable: false,
+        width: 180,
+        // show relative time like "2 phút trước", with tooltip for exact time
+        valueFormatter: (params) => {
+          const v = params.value;
+          if (!v) return "";
+          try {
+            return dayjs(v).fromNow();
+          } catch {
+            return String(v);
+          }
+        },
+        tooltipValueGetter: (params) => {
+          const v = params.value;
+          if (!v) return "";
+          try {
+            return dayjs(v).format("DD/MM/YYYY HH:mm:ss");
+          } catch {
+            return String(v);
+          }
+        },
+      },
+      {
         field: "skillIds",
         headerName: t("skills"),
         editable: true,
@@ -226,6 +368,21 @@ function Page() {
         context: {
           typeColumn: "Select",
           selectOptions: selectExperienceYears,
+        },
+      },
+      {
+        field: "birthday",
+        headerName: t("birthDay"),
+        editable: true,
+        width: 190,
+        context: {
+          typeColumn: "Date",
+          dateFormat: "YYYY-MM-DD",
+          timeFormat: "",
+        },
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "birthday", params);
         },
       },
       {
@@ -459,8 +616,16 @@ function Page() {
           <>
             <div
               className="header-add-button"
-              style={{ position: "absolute", top: 13, right: 10 }}
+              style={{
+                position: "absolute",
+                top: 13,
+                right: 10,
+                display: "flex",
+                gap: "10px",
+                alignItems: "center",
+              }}
             >
+              {/* Create Job Button */}
               <FaPlusCircle
                 size={30}
                 style={{
@@ -470,15 +635,29 @@ function Page() {
                   borderRadius: "50%",
                   backgroundColor: "rgba(255, 255, 255, 0.1)",
                   zIndex: 1000,
+                  cursor: "pointer",
                 }}
                 title="Tạo công việc"
                 onClick={handleOpenModal}
               />
             </div>
             <ListJob
-              onJobCardClick={(jobId?: number | null) => {
+              onJobCardClick={(
+                jobId?: number | null,
+                qs?: Record<string, number> | null
+              ) => {
                 const jobIdStr = String(jobId ?? "");
                 setJobId(jobIdStr);
+                // store quantityStatus when a job is selected, clear when deselected
+                setQuantityStatus(qs ?? null);
+              }}
+              newJobIds={newJobIds}
+              onClearNewBadge={(jobId) => {
+                setNewJobIds((prev) => {
+                  const next = new Set(prev);
+                  next.delete(jobId);
+                  return next;
+                });
               }}
             />
           </>
@@ -490,12 +669,21 @@ function Page() {
                 className="status-segmented"
                 options={segmentedOptions}
                 value={selectedStatus}
-                onChange={(value) => setSelectedStatus(value as string)}
+                onChange={(value) => {
+                  const newStatus = value as string;
+                  setSelectedStatus(newStatus);
+
+                  // Reset new count for this tab when user views it
+                  setNewCounts((prev) => ({
+                    ...prev,
+                    [newStatus]: 0,
+                  }));
+                }}
               />
             </div>
             <AgGridComponentWrapper
               showSearch={true}
-              rowData={rowData}
+              rowData={dataGrid.rowData}
               loading={loading}
               columnDefs={columnDefs}
               gridRef={gridRef}
@@ -507,6 +695,7 @@ function Page() {
                 checkboxes: false,
               }}
               onCellValueChanged={dataGrid.onCellValueChanged}
+              onSelectionChanged={dataGrid.onSelectionChanged}
               paginationCurrentPage={currentPage}
               pagination={true}
               maxRowsVisible={10}

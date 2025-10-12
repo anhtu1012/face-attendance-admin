@@ -8,7 +8,11 @@
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 80px;
   --header-height: 64px;
-  --primary-gradient: linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229));
+  --primary-gradient: linear-gradient(
+    to right,
+    rgb(13, 71, 161),
+    rgb(30, 136, 229)
+  );
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
   --shadow-light: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -711,7 +715,7 @@ html.dark {
 
 // Admin content wrapper
 .admin-content-wrapper {
-  padding: 24px 32px;
+  padding: 24px;
   overflow: initial;
   display: flex;
   flex-direction: column;
@@ -858,9 +862,13 @@ html.dark {
       background: var(--primary-gradient);
       border-radius: 4px;
 
-        &:hover {
-          background: linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229));
-        }
+      &:hover {
+        background: linear-gradient(
+          to right,
+          rgb(13, 71, 161),
+          rgb(30, 136, 229)
+        );
+      }
     }
 
     &:hover {
@@ -957,7 +965,7 @@ html.dark {
   }
 
   .admin-content-wrapper {
-    padding: 16px 20px;
+    padding: 16px;
 
     .content-header {
       padding: 18px 20px;
@@ -1047,7 +1055,7 @@ html.dark {
   }
 
   .admin-content-wrapper {
-    padding: 12px 16px;
+    padding: 12px;
 
     .content-header {
       padding: 16px 18px;
@@ -1425,7 +1433,11 @@ html.dark {
 
     .page-title-section {
       .page-title {
-        background: linear-gradient(to right, rgb(64, 169, 255), rgb(30, 136, 229));
+        background: linear-gradient(
+          to right,
+          rgb(64, 169, 255),
+          rgb(30, 136, 229)
+        );
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;

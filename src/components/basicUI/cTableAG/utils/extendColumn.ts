@@ -100,16 +100,26 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
       };
     }
     if (colDef.context?.typeColumn === "Date") {
+      // allow customizing date and time format via context
+      const dateFormat =
+        (colDef.context as unknown as { dateFormat?: string })?.dateFormat ||
+        "DD/MM/YYYY";
+      const timeFormat =
+        (colDef.context as unknown as { timeFormat?: string })?.timeFormat ||
+        "HH:mm:ss";
+      const combinedFormat = `${dateFormat} ${timeFormat}`.trim();
+
       return {
         ...colDef,
         cellEditor: DatepickerCellEditor, // Custom date editor
         cellEditorParams: {
-          format: "DD/MM/YYYY HH:mm:ss", // Default date format
+          // pass the combined format to the editor; allow overrides from colDef.cellEditorParams
+          format: combinedFormat,
           ...(colDef.cellEditorParams || {}),
         },
         valueFormatter: (params) => {
           const date = dayjs(params.value);
-          return date.isValid() ? date.format("DD/MM/YYYY HH:mm:ss") : ""; // Default display format
+          return date.isValid() ? date.format(combinedFormat) : "";
         },
       };
     }

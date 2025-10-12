@@ -11,6 +11,7 @@ import AntdMessageProvider from "@/hooks/AntdMessageProvider";
 import { ReduxProvider } from "./StoreProvider";
 import NotificationHolder from "@/hooks/NotificationHolder";
 import PageTransition from "@/components/PageTransition";
+import SocketProvider from "@/components/SocketProvider";
 // import BubbleCursor from "@/components/BubbleCursor";
 
 export default async function RootLayout({
@@ -27,6 +28,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <ReduxProvider>
+              <SocketProvider />
               <AntdThemeProvider>
                 <AntdRegistry>
                   <AntdAppProvider>

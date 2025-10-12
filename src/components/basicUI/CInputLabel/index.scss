@@ -16,7 +16,12 @@
     padding: 6px;
     border-radius: 4px;
     outline: none; // Bỏ outline mặc định của input
-    height: 36px !important;
+    height: 40px !important;
+    border: 2px solid rgba(13, 71, 161, 0.2) !important;
+    border-radius: 8px !important;
+    height: auto !important;
+    min-height: 42px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
   }
 
   .label {

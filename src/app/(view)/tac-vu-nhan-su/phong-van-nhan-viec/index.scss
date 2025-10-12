@@ -3,7 +3,6 @@
   height: 100%;
 
   .appointments-container {
-    padding: 20px;
     height: 100%;
 
     .appointments-tabs {
@@ -73,8 +72,6 @@
 @media (max-width: 768px) {
   .phong-van-nhan-viec-page {
     .appointments-container {
-      padding: 12px;
-
       .appointments-tabs {
         .interview-tab-content,
         .job-offer-tab-content {
