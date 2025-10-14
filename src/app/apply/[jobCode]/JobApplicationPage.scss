@@ -764,3 +764,426 @@
     }
   }
 }
+
+// Dark Mode Styles
+html.dark {
+  .job-application-page {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+
+    // Loading Container Dark
+    .loading-container {
+      p {
+        color: #b0b0b0;
+      }
+
+      .loading-spinner {
+        border-color: #2a2a3e;
+        border-top-color: rgb(100, 181, 246);
+      }
+    }
+
+    // Error Container Dark
+    .error-container {
+      h2 {
+        color: #ff6b6b;
+      }
+
+      p {
+        color: #b0b0b0;
+      }
+    }
+
+    // Company Header Dark
+    .company-header {
+      background: linear-gradient(
+        to right,
+        rgb(21, 101, 192),
+        rgb(66, 165, 245)
+      );
+      box-shadow: 0 4px 20px rgba(66, 165, 245, 0.3);
+
+      .company-header-content {
+        .company-info {
+          .company-name {
+            color: #ffffff;
+          }
+        }
+
+        .company-contact {
+          .contact-item {
+            .contact-icon {
+              color: rgba(255, 255, 255, 0.9);
+            }
+
+            span {
+              color: rgba(255, 255, 255, 0.95);
+            }
+          }
+        }
+      }
+    }
+
+    // Application Form Section Dark
+    .application-form-section {
+      .application-form-card {
+        background: #1e1e2e;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+        .ant-card-body {
+          background: #1e1e2e;
+        }
+
+        .form-header {
+          background: linear-gradient(
+            to right,
+            rgb(21, 101, 192),
+            rgb(66, 165, 245)
+          );
+
+          h2 {
+            color: #ffffff;
+          }
+
+          p {
+            color: rgba(255, 255, 255, 0.95);
+          }
+        }
+
+        .application-form {
+          .ant-form-item {
+            .ant-form-item-label > label {
+              color: #e0e0e0;
+            }
+
+            .ant-form-item-explain-error {
+              color: #ff6b6b;
+            }
+          }
+
+          .custom-input {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+            color: #e0e0e0;
+
+            &::placeholder {
+              color: #666;
+            }
+
+            &:hover,
+            &:focus {
+              background: #2a2a3e;
+              border-color: rgb(100, 181, 246);
+              box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+            }
+
+            .anticon {
+              color: rgb(100, 181, 246);
+            }
+
+            input {
+              background: transparent;
+              color: #e0e0e0;
+
+              &::placeholder {
+                color: #666;
+              }
+            }
+          }
+
+          .custom-datepicker {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+
+            &:hover,
+            &.ant-picker-focused {
+              background: #2a2a3e;
+              border-color: rgb(100, 181, 246);
+              box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+            }
+
+            input {
+              background: transparent;
+              color: #e0e0e0;
+
+              &::placeholder {
+                color: #666;
+              }
+            }
+
+            .ant-picker-suffix {
+              color: rgb(100, 181, 246);
+            }
+          }
+
+          .custom-select {
+            .ant-select-selector {
+              background: #2a2a3e !important;
+              border-color: #3a3a4e !important;
+              color: #e0e0e0;
+            }
+
+            &:hover .ant-select-selector,
+            &.ant-select-focused .ant-select-selector {
+              background: #2a2a3e !important;
+              border-color: rgb(100, 181, 246) !important;
+              box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2) !important;
+            }
+
+            .ant-select-selection-placeholder {
+              color: #666;
+            }
+
+            .ant-select-selection-item {
+              color: #e0e0e0;
+            }
+
+            .ant-select-arrow {
+              color: rgb(100, 181, 246);
+            }
+          }
+
+          .cv-upload {
+            border-color: #3a3a4e;
+            background: #2a2a3e;
+
+            &:hover {
+              border-color: rgb(100, 181, 246);
+              background: rgba(100, 181, 246, 0.1);
+            }
+
+            .upload-content {
+              .upload-icon {
+                color: rgb(100, 181, 246);
+              }
+
+              .upload-text {
+                color: #e0e0e0;
+
+                span {
+                  color: rgb(100, 181, 246);
+                }
+              }
+
+              .upload-hint {
+                color: #888;
+              }
+            }
+
+            .ant-upload-list {
+              .ant-upload-list-item {
+                background: #2a2a3e;
+                border-color: #3a3a4e;
+
+                .ant-upload-list-item-name {
+                  color: rgb(100, 181, 246);
+                }
+
+                .ant-upload-list-item-actions {
+                  .anticon {
+                    color: rgb(100, 181, 246);
+
+                    &:hover {
+                      color: rgb(66, 165, 245);
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          .form-actions {
+            .submit-btn {
+              background: linear-gradient(
+                to right,
+                rgb(21, 101, 192),
+                rgb(66, 165, 245)
+              );
+              box-shadow: 0 6px 20px rgba(66, 165, 245, 0.4);
+
+              &:hover {
+                box-shadow: 0 8px 25px rgba(66, 165, 245, 0.5);
+              }
+            }
+          }
+        }
+
+        // Ant Design Tabs Dark Mode
+        .ant-tabs {
+          .ant-tabs-nav {
+            &::before {
+              border-color: #3a3a4e;
+            }
+
+            .ant-tabs-tab {
+              color: #b0b0b0;
+
+              &:hover {
+                color: rgb(100, 181, 246);
+              }
+
+              &.ant-tabs-tab-active {
+                .ant-tabs-tab-btn {
+                  color: rgb(100, 181, 246);
+                }
+              }
+            }
+
+            .ant-tabs-ink-bar {
+              background: rgb(100, 181, 246);
+            }
+          }
+        }
+      }
+    }
+
+    // Job Details Section Dark
+    .job-details-section {
+      .job-details-card {
+        background: #1e1e2e;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+        .ant-card-body {
+          background: #1e1e2e;
+        }
+
+        .job-header {
+          .job-title-section {
+            .job-title {
+              color: #e0e0e0;
+            }
+
+            .job-meta {
+              .status-badge {
+                .ant-badge-status-text {
+                  color: #b0b0b0;
+                }
+              }
+
+              .company-name {
+                color: #b0b0b0;
+
+                svg {
+                  color: rgb(100, 181, 246);
+                }
+              }
+            }
+          }
+        }
+
+        .job-quick-info {
+          .info-grid {
+            .info-item {
+              background: rgba(100, 181, 246, 0.1);
+              border-left-color: rgb(100, 181, 246);
+
+              .info-icon {
+                color: rgb(100, 181, 246);
+              }
+
+              .info-text {
+                .info-label {
+                  color: #b0b0b0;
+                }
+
+                .info-value {
+                  color: #e0e0e0;
+                }
+              }
+            }
+          }
+        }
+
+        .ant-divider {
+          border-color: #3a3a4e;
+        }
+
+        h3 {
+          color: #e0e0e0;
+
+          svg {
+            color: rgb(100, 181, 246);
+          }
+        }
+
+        .job-description,
+        .job-responsibilities,
+        .job-requirements,
+        .job-benefits {
+          .content {
+            color: #b0b0b0;
+
+            p {
+              color: #b0b0b0;
+            }
+
+            ul li {
+              color: #b0b0b0;
+            }
+
+            strong {
+              color: #e0e0e0;
+            }
+          }
+        }
+
+        .job-statistics {
+          .stats-row {
+            .stat-item {
+              background: linear-gradient(
+                135deg,
+                rgba(100, 181, 246, 0.1) 0%,
+                rgba(21, 101, 192, 0.1) 100%
+              );
+              border-color: rgba(100, 181, 246, 0.2);
+
+              .stat-number {
+                color: rgb(100, 181, 246);
+              }
+
+              .stat-label {
+                color: #b0b0b0;
+              }
+            }
+          }
+        }
+
+        .recruiter-contact {
+          .contact-card {
+            background: linear-gradient(135deg, #2a2a3e 0%, #252538 100%);
+            border-color: #3a3a4e;
+
+            .contact-avatar {
+              background: linear-gradient(
+                to right,
+                rgb(21, 101, 192),
+                rgb(66, 165, 245)
+              );
+            }
+
+            .contact-info {
+              h4 {
+                color: #e0e0e0;
+              }
+
+              > p {
+                color: #b0b0b0;
+              }
+
+              .contact-details {
+                .contact-item {
+                  svg {
+                    color: rgb(100, 181, 246);
+                  }
+
+                  span {
+                    color: #b0b0b0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

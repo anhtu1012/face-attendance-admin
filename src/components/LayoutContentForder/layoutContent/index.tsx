@@ -225,7 +225,7 @@ function LayoutContent({
                 },
               }}
               style={{
-                backgroundColor: "#fff",
+                // backgroundColor: "#fff",
                 height: "calc(100vh - 106px)",
                 borderRadius: "10px",
                 overflowY: "auto",
