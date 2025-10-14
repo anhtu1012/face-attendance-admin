@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // Appointment Schema
 export const AppointmentItemSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   candidateId: z.string(),
   candidateName: z.string(),
   candidateEmail: z.string().email(),
@@ -40,16 +40,17 @@ export type AppointmentItem = z.infer<typeof AppointmentItemSchema>;
 
 // For request
 export interface CreateAppointmentRequest {
-  candidateId: string;
-  interviewDate: string;
-  startTime: string;
-  endTime: string;
-  interviewType: "online" | "offline";
-  meetingLink?: string;
-  location?: string;
-  interviewer: string;
-  interviewerEmail: string;
-  notes?: string;
+  address: string;
+  date: string; // ISO date string
+  startTime: string; // ISO date string
+  endTime: string; // ISO date string
+  interviewerId: string;
+  jobId: string;
+  listIntervieweeId: string[];
+  typeAppointment: "online" | "offline";
+  linkMeet?: string;
+  interviewerCount: number;
+  note?: string;
 }
 
 export interface UpdateAppointmentRequest {

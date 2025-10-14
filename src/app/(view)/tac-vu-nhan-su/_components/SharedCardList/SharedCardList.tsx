@@ -153,7 +153,7 @@ const SharedCardList = <T extends CardItem>({
               {isOnline && (
                 <Badge
                   status="processing"
-                  text="Online"
+                  text="online"
                   className="online-badge"
                 />
               )}

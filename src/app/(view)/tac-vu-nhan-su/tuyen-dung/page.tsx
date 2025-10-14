@@ -24,6 +24,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { BiSolidSkipNextCircle } from "react-icons/bi";
+import { AiOutlineCloseCircle } from "react-icons/ai";
 import { FaPlusCircle } from "react-icons/fa";
 import { FcViewDetails } from "react-icons/fc";
 import { GoReport } from "react-icons/go";
@@ -271,6 +272,7 @@ function Page() {
             TO_CONTACT: "#1976D2", // blue
             CANNOT_CONTACT: "#9E9E9E", // grey
             TO_INTERVIEW: "#43A047", // green
+            INTERVIEW_SCHEDULED: "#0288D1", // light blue
             INTERVIEW_FAILED: "#E53935", // red
             INTERVIEW_RESCHEDULED: "#FB8C00", // orange
             JOB_OFFERED: "#00796B", // teal
@@ -533,33 +535,132 @@ function Page() {
     TuyenDungServices.deleteTuyenDung,
     () => handleFetchUser(currentPage, pageSize, quickSearchText)
   );
-  const handleChangeStatusToInterview = (_params: any) => {
-    console.log(_params);
+
+  const handleChangeStatusToInterview = async (
+    _params: any,
+    status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED"
+  ) => {
+    if (!_params || !_params.data) {
+      messageApi.warning("Vui lòng chọn ứng viên!");
+      return;
+    }
+
+    const candidate = _params.data;
+    const id = candidate.id;
+    if (!id) {
+      messageApi.error("Không tìm thấy id ứng viên");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await TuyenDungServices.updateStatusUngVien(id, status);
+
+      // If moving from LIEN_HE -> PHONG_VAN (TO_INTERVIEW), update quantityStatus counts optimistically
+      if (status === "TO_INTERVIEW") {
+        setQuantityStatus((prev) => {
+          if (!prev) return prev;
+          const prevToContact = Number(prev.toContactQuantity || 0);
+          const prevToInterview = Number(prev.toInterviewQuantity || 0);
+          return {
+            ...prev,
+            toContactQuantity: Math.max(prevToContact - 1, 0),
+            toInterviewQuantity: prevToInterview + 1,
+          } as Record<string, number>;
+        });
+
+        // Also decrement newCounts for LIEN_HE and increment for PHONG_VAN (if applicable)
+        setNewCounts((prev) => ({
+          ...prev,
+          LIEN_HE: Math.max(Number(prev.LIEN_HE || 0) - 1, 0),
+          PHONG_VAN: Number(prev.PHONG_VAN || 0) + 1,
+        }));
+      }
+
+      const successMsg =
+        status === "CANNOT_CONTACT"
+          ? "Đã đánh dấu không liên hệ được"
+          : "Đã chuyển sang trạng thái phỏng vấn";
+      messageApi.success(successMsg);
+
+      // refresh current page
+      handleFetchUser(currentPage, pageSize, quickSearchText);
+    } catch (error: any) {
+      showError(error.response?.data?.message || mes("fetchError"));
+    } finally {
+      setLoading(false);
+    }
+  };
+  const hanldeViewSuccess = () => {
+    // Update quantity status: decrement PHONG_VAN count
+    setQuantityStatus((prev) => {
+      if (!prev) return prev;
+      const prevToInterview = Number(prev.toInterviewQuantity || 0);
+      return {
+        ...prev,
+        toInterviewQuantity: Math.max(prevToInterview - 1, 0),
+      } as Record<string, number>;
+    });
+
+    // Decrement newCounts for PHONG_VAN
+    setNewCounts((prev) => ({
+      ...prev,
+      PHONG_VAN: Math.max(Number(prev.PHONG_VAN || 0) - 1, 0),
+    }));
+
+    // Refresh the grid
+    handleFetchUser(currentPage, pageSize, quickSearchText);
   };
 
   const buttonProps = (_params: any) => {
     if (selectedStatus === "LIEN_HE") {
       return (
-        <Tooltip title="Chuyển đến phỏng vấn">
-          <BiSolidSkipNextCircle
-            className="tool-icon interview-icon"
-            size={30}
-            onClick={() => handleChangeStatusToInterview(_params)}
-          />
-        </Tooltip>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <Tooltip title="Không liên hệ được">
+            <AiOutlineCloseCircle
+              className="tool-icon cannot-contact-icon"
+              size={26}
+              style={{ color: "#c62828" }}
+              onClick={() =>
+                handleChangeStatusToInterview(_params, "CANNOT_CONTACT")
+              }
+            />
+          </Tooltip>
+          <Tooltip title="Chuyển đến phỏng vấn">
+            <BiSolidSkipNextCircle
+              className="tool-icon interview-icon"
+              size={30}
+              onClick={() =>
+                handleChangeStatusToInterview(_params, "TO_INTERVIEW")
+              }
+            />
+          </Tooltip>
+        </div>
       );
     } else if (
       selectedStatus === "PHONG_VAN" &&
       _params.data.status === "TO_INTERVIEW"
     ) {
       return (
-        <Tooltip title="Tạo lịch hẹn">
-          <FaPlusCircle
-            className="tool-icon interview-icon"
-            size={30}
-            onClick={() => handleOpenInterviewModal(_params)}
-          />
-        </Tooltip>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <Tooltip title="Từ chối phỏng vấn">
+            <AiOutlineCloseCircle
+              className="tool-icon cannot-contact-icon"
+              size={26}
+              style={{ color: "#c62828" }}
+              onClick={() =>
+                handleChangeStatusToInterview(_params, "INTERVIEW_REJECTED")
+              }
+            />
+          </Tooltip>
+          <Tooltip title="Tạo lịch hẹn">
+            <FaPlusCircle
+              className="tool-icon interview-icon"
+              size={30}
+              onClick={() => handleOpenInterviewModal(_params)}
+            />
+          </Tooltip>
+        </div>
       );
     } else if (
       _params.data.status === "INTERVIEW_SCHEDULED" &&
@@ -643,13 +744,29 @@ function Page() {
             </div>
             <ListJob
               onJobCardClick={(
-                jobId?: number | null,
+                clickedJobId?: number | null,
                 qs?: Record<string, number> | null
               ) => {
-                const jobIdStr = String(jobId ?? "");
+                const jobIdStr = String(clickedJobId ?? "");
+                const prevJobIdStr = String(jobId ?? "");
+                const selectingDifferentJob = jobIdStr !== prevJobIdStr;
+
                 setJobId(jobIdStr);
-                // store quantityStatus when a job is selected, clear when deselected
-                setQuantityStatus(qs ?? null);
+
+                // If the user deselected (clicked same card to clear), clear quantityStatus
+                if (clickedJobId == null) {
+                  setQuantityStatus(null);
+                  return;
+                }
+
+                // If selecting a different job, replace quantityStatus with server-provided qs
+                if (selectingDifferentJob) {
+                  setQuantityStatus(qs ?? null);
+                  return;
+                }
+
+                // If selecting the same job again (e.g. opening detail), preserve any optimistic local counts
+                setQuantityStatus((prev) => prev ?? qs ?? null);
               }}
               newJobIds={newJobIds}
               onClearNewBadge={(jobId) => {
@@ -767,6 +884,8 @@ function Page() {
               }
             : undefined
         }
+        jobId={jobId}
+        onSuccess={hanldeViewSuccess}
       />
 
       {/* Job NHAN_VIEC Modal */}

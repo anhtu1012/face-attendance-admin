@@ -1,11 +1,16 @@
+import { CreateAppointmentRequest } from "./../../../dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
+import { AppointmentResponseGetItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.response.dto";
 import {
   CreateTuyenDungRequest,
   UpdateTuyenDungRequest,
 } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.request.dto";
-import { TuyenDungResponseGetItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.response.dto";
+import {
+  NguoiPhongVanResponseGetItem,
+  TuyenDungResponseGetItem,
+} from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.response.dto";
 
 class TuyenDungServicesBase extends AxiosService {
   protected readonly basePath = "/v1/recruitment";
@@ -17,6 +22,30 @@ class TuyenDungServicesBase extends AxiosService {
   ): Promise<TuyenDungResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}/tuyen-dung`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
+  async getNguoiPhongVan(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<NguoiPhongVanResponseGetItem> {
+    return this.getWithFilter(
+      `${this.basePath}/tuyen-dung/nguoi-phong-van`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
+  async getDanhSachPhongVan(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<AppointmentResponseGetItem> {
+    return this.getWithFilter(
+      `${this.basePath}/lich-hen/lich-hen-ung-vien`,
       searchFilter,
       quickSearchText,
       params
@@ -34,8 +63,21 @@ class TuyenDungServicesBase extends AxiosService {
     return this.put(`${this.basePath}`, payload);
   }
 
+  async updateStatusUngVien(
+    id: string,
+    status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED"
+  ): Promise<any> {
+    return this.put(`${this.basePath}/tuyen-dung/update-status/${id}`, {
+      status,
+    });
+  }
+
   async deleteTuyenDung(id: string): Promise<any> {
     return this.delete(`${this.basePath}/${id}`);
+  }
+
+  async createAppointment(data: CreateAppointmentRequest): Promise<any> {
+    return this.post(`${this.basePath}/tuyen-dung/tao-cuoc-hen`, data);
   }
 }
 

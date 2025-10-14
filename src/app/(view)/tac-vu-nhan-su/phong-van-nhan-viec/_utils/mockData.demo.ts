@@ -105,8 +105,8 @@ console.log(`  - Rejected: ${stats.rejected}`);
 console.log(`  - Completed: ${stats.completed}`);
 console.log(`  - Cancelled: ${stats.cancelled}`);
 console.log("\nBy Type:");
-console.log(`  - Online: ${stats.online}`);
-console.log(`  - Offline: ${stats.offline}`);
+console.log(`  - online: ${stats.online}`);
+console.log(`  - offline: ${stats.offline}`);
 
 // ==========================================
 // Example 8: Job Offer Statistics

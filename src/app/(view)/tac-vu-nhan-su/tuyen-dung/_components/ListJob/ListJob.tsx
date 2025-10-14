@@ -224,13 +224,11 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
           >
             <div className="job-card-header">
               <div className="job-title-section">
-                <h3 className="job-title">
-                  {job.jobTitle}
-                  {newJobIds?.has(String(job.id)) && (
-                    <span className="new-badge">New</span>
-                  )}
-                </h3>
+                <h3 className="job-title">{job.jobTitle}</h3>
                 <span className="job-department">{job.positionName}</span>
+                {newJobIds?.has(String(job.id)) && (
+                  <span className="new-badge">New</span>
+                )}
               </div>
               <div className="job-header-controls">
                 <button

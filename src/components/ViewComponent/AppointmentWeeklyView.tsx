@@ -298,14 +298,14 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                         <VideoCameraOutlined />
                                         <span>
                                           {appointment.meetingLink
-                                            ? "Online Meeting"
+                                            ? "online Meeting"
                                             : "Phỏng vấn trực tuyến"}
                                         </span>
                                       </>
                                     ) : (
                                       <>
                                         <EnvironmentOutlined />
-                                        <span>{"Offline"}</span>
+                                        <span>{"offline"}</span>
                                       </>
                                     )}
                                   </div>

@@ -276,6 +276,10 @@
 
 .new-badge {
   display: inline-block;
+  margin-left: 8px;
+  // position: absolute;
+  // top: 5px;
+  // left: 5px;
   background: linear-gradient(135deg, #ff4081 0%, #ff6e40 100%);
   color: white !important;
   padding: 3px 10px;

@@ -204,8 +204,6 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   const handleSubmitApplication = async (values: JobApplicationFormData) => {
     setLoading(true);
     try {
-      console.log("Application data:", values);
-      console.log("Job ID:", jobCode);
       if (values.birthday) {
         values.birthday = dayjs(values.birthday).toISOString();
       }
@@ -268,11 +266,11 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
       );
       form.resetFields();
       setIsFormValid(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting application:", error);
       // Track failed application submission
       trackEvent("application_error", "job_application", `job_${jobCode}`);
-      messageApi.error("Có lỗi xảy ra khi ứng tuyển!");
+      messageApi.error(error.response?.data?.message || "Ứng tuyển thất bại!");
     } finally {
       setLoading(false);
     }
