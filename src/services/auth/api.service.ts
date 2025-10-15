@@ -28,8 +28,8 @@ class AuthServicesBase extends AxiosService {
     return this.post(`${this.basePath}/register`, formData);
   }
 
-  async logout(): Promise<UserResponseLogoutItem> {
-    return this.post(`${this.basePath}/logout`, {});
+  async logout(token: string): Promise<UserResponseLogoutItem> {
+    return this.post(`${this.basePath}/logout`, { token: token });
   }
 }
 

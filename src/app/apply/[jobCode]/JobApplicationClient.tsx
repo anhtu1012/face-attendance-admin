@@ -82,6 +82,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
   const [jobLoading, setJobLoading] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("1");
   const { selectSkill, selectGender, selectExperienceYears } = useSelectData({
     fetchSkill: true,
   });
@@ -276,19 +277,12 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
     }
   };
 
-  // Check whether required fields across both tabs are filled and have no validation errors.
+  // Check whether required fields for the current active tab are filled and have no validation errors.
   const checkFormValid = useCallback(() => {
-    // List all required field names used in the form (both tabs)
-    const requiredFields = [
-      "fullName",
-      "email",
-      "phone",
-      "birthday",
-      "gender",
-      "experience",
-      "skillIds",
-      "fileCV",
-    ];
+    const tab1Fields = ["fullName", "email", "phone", "birthday", "gender"];
+    const tab2Fields = ["experience", "skillIds", "fileCV"];
+
+    const requiredFields = activeTab === "1" ? tab1Fields : tab2Fields;
 
     const values = form.getFieldsValue(requiredFields);
 
@@ -317,7 +311,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
     }
 
     setIsFormValid(true);
-  }, [form]);
+  }, [form, activeTab]);
 
   // Initialize validity on mount and whenever the check function changes
   useEffect(() => {
@@ -450,7 +444,8 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   }}
                 >
                   <Tabs
-                    defaultActiveKey="1"
+                    activeKey={activeTab}
+                    onChange={(k) => setActiveTab(String(k))}
                     items={[
                       {
                         key: "1",
@@ -689,6 +684,12 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                                       message: "Vui lòng upload CV!",
                                     },
                                   ]}
+                                  valuePropName="fileList"
+                                  getValueFromEvent={(e: any) => {
+                                    // Antd Upload emits an event object; normalize to fileList
+                                    if (Array.isArray(e)) return e;
+                                    return e && e.fileList ? e.fileList : undefined;
+                                  }}
                                 >
                                   <Upload.Dragger
                                     {...uploadProps}
@@ -715,20 +716,50 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   />
 
                   <div className="form-actions">
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      loading={loading}
-                      disabled={!isFormValid || loading}
-                      className="submit-btn"
-                      size="large"
-                      icon={<FaCheck />}
-                      block
-                    >
-                      {loading
-                        ? "Đang gửi ứng tuyển..."
-                        : "Gửi hồ sơ ứng tuyển"}
-                    </Button>
+                    {activeTab === "1" ? (
+                      <Button
+                        type="primary"
+                        onClick={async () => {
+                          // Validate tab1 fields, then go to tab2 if valid
+                          const tab1Fields = [
+                            "fullName",
+                            "email",
+                            "phone",
+                            "birthday",
+                            "gender",
+                          ];
+                          try {
+                            await form.validateFields(tab1Fields as any);
+                            setActiveTab("2");
+                          } catch {
+                            // validation errors will be shown by antd
+                            setIsFormValid(false);
+                          }
+                        }}
+                        disabled={!isFormValid}
+                        className="submit-btn"
+                        size="large"
+                        icon={<FaCheck />}
+                        block
+                      >
+                        Tiếp theo
+                      </Button>
+                    ) : (
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        disabled={!isFormValid || loading}
+                        className="submit-btn"
+                        size="large"
+                        icon={<FaCheck />}
+                        block
+                      >
+                        {loading
+                          ? "Đang gửi ứng tuyển..."
+                          : "Gửi hồ sơ ứng tuyển"}
+                      </Button>
+                    )}
                   </div>
                 </Form>
               </Card>

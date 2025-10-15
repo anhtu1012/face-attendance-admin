@@ -4,6 +4,8 @@
 import { useBroadcastChannel } from "@/hooks/useBroadcastChannel";
 import { clearAllColumnPreferences } from "@/lib/store/slices/columnPreferencesSlice";
 import { clearAuthData, selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import AuthServices from "@/services/auth/api.service";
+import { clearAllCookies, getCookie } from "@/utils/client/getCookie";
 import { toggleDarkMode } from "@/utils/theme-utils";
 import {
   AppstoreAddOutlined,
@@ -48,13 +50,13 @@ const HeaderComponent: React.FC<HeaderProps> = ({
   }, []);
   const handleLogOut = async () => {
     try {
-      // const token = getCookie("token");
-      // if (token) {
-      //   await AuthServices.logout(token);
-      // }
+      const token = getCookie("token");
+      if (token) {
+        await AuthServices.logout(token);
+      }
       dispatch(clearAuthData());
       dispatch(clearAllColumnPreferences());
-
+      clearAllCookies();
       window.location.href = "/login";
       toast.success("Đăng xuất thành công!!");
     } catch (error: any) {

@@ -67,8 +67,17 @@ function Page() {
         editable: true,
         width: 150,
         context: {
-          typeColumn: "Select",
+          typeColumn: "Tag",
           selectOptions: selectRole,
+        },
+        cellRendererParams: {
+          colorMap: {
+            1: "blue",
+            2: "green",
+            4: "red",
+            5: "cyan",
+            6: "pink",
+          },
         },
       },
       {

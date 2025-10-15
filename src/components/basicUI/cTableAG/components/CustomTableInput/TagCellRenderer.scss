@@ -1,0 +1,177 @@
+// Tag Cell Renderer Styles
+.tag-cell-renderer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  padding: 4px 0;
+
+  .custom-tag {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 20px;
+    padding: 2px 12px;
+    border-radius: 6px;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+
+    // Hover effect
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    // Default color (when no color is specified)
+    &.ant-tag-default {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Success/Green
+    &.ant-tag-success,
+    &.ant-tag-green {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Processing/Blue
+    &.ant-tag-processing,
+    &.ant-tag-blue {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Error/Red
+    &.ant-tag-error,
+    &.ant-tag-red {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Warning/Orange
+    &.ant-tag-warning,
+    &.ant-tag-orange {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Yellow
+    &.ant-tag-yellow {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #78350f;
+      border: none;
+    }
+
+    // Purple
+    &.ant-tag-purple {
+      background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Pink
+    &.ant-tag-pink {
+      background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Cyan
+    &.ant-tag-cyan {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Lime
+    &.ant-tag-lime {
+      background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Geekblue
+    &.ant-tag-geekblue {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Magenta
+    &.ant-tag-magenta {
+      background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Volcano
+    &.ant-tag-volcano {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Gold
+    &.ant-tag-gold {
+      background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+      color: #713f12;
+      border: none;
+    }
+
+    // Gray
+    &.ant-tag-gray {
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      color: #fff;
+      border: none;
+    }
+
+    // Text truncation for long labels
+    span {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .tag-cell-renderer {
+    .custom-tag {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+      &:hover {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      }
+    }
+  }
+}
+
+// Animation for newly added tags
+@keyframes tagFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tag-cell-renderer .custom-tag {
+  animation: tagFadeIn 0.2s ease-out;
+}

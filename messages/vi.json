@@ -186,7 +186,7 @@
   "DanhMucChucVu": {
     "maChucVu": "Mã chức vụ",
     "tenChucVu": "Tên chức vụ",
-    "quyenChucVu": "Quyền",
+    "quyenChucVu": "Vai trò hệ thống",
     "moTa": "Mô tả",
     "luongCoBan": "Lương cơ bản/giờ",
     "phuCap": "Phụ cấp",
@@ -197,7 +197,7 @@
     "xemChiTiet": "Xem thông tin chi tiết",
     "chinhSua": "Chỉnh sửa thông tin người dùng",
     "xoa": "Xóa người dùng",
-    "boPhan": "Bộ phận"
+    "boPhan": "Phòng ban"
   },
   "DanhMucDon": {
     "maDon": "Mã đơn",

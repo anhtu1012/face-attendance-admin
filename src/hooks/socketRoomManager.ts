@@ -92,7 +92,7 @@ class SocketRoomManager {
     const userId = userProfile?.id;
     const roleId = userProfile?.roleId;
 
-    console.log("👤 [SocketManager] User info:", { userId, roleId });
+    console.log("[SocketManager] User info:", { userId, roleId });
 
     if (!userId || !roleId) {
       return;
@@ -197,7 +197,7 @@ class SocketRoomManager {
    * Leave tất cả các rooms
    */
   leaveAllRooms() {
-    console.log("🚪 [SocketManager] Leaving all rooms...");
+    console.log("[SocketManager] Leaving all rooms...");
 
     this.joinedRooms.forEach((room) => {
       this.leaveRoom(room);
@@ -224,7 +224,7 @@ class SocketRoomManager {
    * Cleanup khi logout hoặc disconnect
    */
   cleanup() {
-    console.log("🧹 [SocketManager] Cleaning up...");
+    console.log("[SocketManager] Cleaning up...");
     this.leaveAllRooms();
     this.socket = null;
   }

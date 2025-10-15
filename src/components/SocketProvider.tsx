@@ -14,8 +14,8 @@ export default function SocketProvider() {
 
   useEffect(() => {
     if (socket && isLoggedIn) {
-      console.log("🔌 [SocketProvider] Socket initialized for logged-in user");
-      console.log("🏠 [SocketProvider] Current rooms:", joinedRooms);
+      console.log("[SocketProvider] Socket initialized for logged-in user");
+      console.log("[SocketProvider] Current rooms:", joinedRooms);
     }
   }, [socket, isLoggedIn, joinedRooms]);
 

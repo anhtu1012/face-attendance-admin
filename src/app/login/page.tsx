@@ -1,21 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { selectAuthLogin, setAuthData } from "@/lib/store/slices/loginSlice";
+import { setAuthData } from "@/lib/store/slices/loginSlice";
 import AuthServices from "@/services/auth/api.service";
-import { clearAllCookies } from "@/utils/client/getCookie";
+import { reconnectSocketWithNewToken } from "@/hooks/useSocket";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import backgroundImage from "../../../public/assets/image/BackgroundFaceAI.png";
 import "./login.scss";
-import { useSelector } from "react-redux";
 
 interface LoginForm {
   username: string;
@@ -28,24 +27,7 @@ const LoginPage: React.FC = () => {
   const [signInForm] = useForm<LoginForm>();
   const [isNavigating, setIsNavigating] = useState(false);
   const dispatch = useDispatch();
-  const { accessToken } = useSelector(selectAuthLogin);
   const router = useRouter();
-  useEffect(() => {
-    if (accessToken) {
-      const base64Url = accessToken.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const payload = JSON.parse(atob(base64));
-      const currentTime = Math.floor(Date.now() / 1000);
-      const expDate = payload.exp;
-      const timeLeft = expDate - currentTime;
-      const timeLeftInMinutes = Math.floor(timeLeft / 60);
-      if (timeLeftInMinutes > 0) {
-        router.push("/");
-        return;
-      }
-    }
-    clearAllCookies();
-  }, [router, accessToken]);
   const onFinish = async (values: any) => {
     if (isLogin || isNavigating) return;
     setIsLogin(true);
@@ -53,22 +35,24 @@ const LoginPage: React.FC = () => {
       const res = await AuthServices.login(values);
       dispatch(setAuthData(res));
       toast.success("Đăng nhập thành công");
+      // Set tokens and store data
+      AuthServices.setToken(res.accessToken);
+      AuthServices.setRefreshToken(res.refreshToken);
 
-      // Chuyển trang ngay lập tức, PageTransition sẽ handle loading
-      setIsNavigating(true);
-      router.push("/");
-
-      // Reset state sau khi router.push được gọi
-      // Không cần setTimeout vì PageTransition đã handle
+      // Reconnect socket với token mới
       setTimeout(() => {
-        setIsLogin(false);
-        setIsNavigating(false);
-      }, 100);
+        reconnectSocketWithNewToken();
+      }, 300);
+
+      router.push("/");
     } catch (error: any) {
       console.log(error);
       toast.error("Đăng nhập thất bại");
       setIsLogin(false);
       setIsNavigating(false);
+    } finally {
+      setIsLogin(false);
+      setIsNavigating(true);
     }
   };
 

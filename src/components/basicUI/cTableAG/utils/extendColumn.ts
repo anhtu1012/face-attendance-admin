@@ -186,6 +186,11 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
           const found = options.find((item) => item.value === params.value);
           return found ? found.label : params.value;
         },
+        // Add suppressKeyboardEvent to prevent issues with async operations
+        suppressKeyboardEvent: (params) => {
+          // Allow keyboard navigation only when not editing
+          return params.editing;
+        },
         ...(colDef.editable
           ? {
               cellEditor: AntdSelectCellEditor,

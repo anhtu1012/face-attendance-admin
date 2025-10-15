@@ -51,27 +51,37 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
   const [previewTitle, setPreviewTitle] = useState("");
   const messageApi = useAntdMessage();
 
-  // Use Form.useWatch to reactively watch logoUrl and update fileList in an effect
+  // Use Form.useWatch to reactively watch logoUrl (which may be a fileList or a url string)
   const watchedLogoUrl = Form.useWatch("logoUrl", form);
 
   useEffect(() => {
-    if (watchedLogoUrl && typeof watchedLogoUrl === "string") {
-      const currentUrl = logoFileList[0]?.url;
-      if (currentUrl !== watchedLogoUrl) {
-        setLogoFileList([
-          {
-            uid: "-1",
-            name: "logo.jpg",
-            status: "done",
-            url: watchedLogoUrl,
-          },
-        ]);
-      }
-    } else if (!watchedLogoUrl && logoFileList.length > 0) {
+    // Normalize watched value into a fileList for the Upload preview
+    if (!watchedLogoUrl) {
       setLogoFileList([]);
+      return;
     }
-    // Only run when watchedLogoUrl changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // If form stores a string URL, create a done file entry
+    if (typeof watchedLogoUrl === "string") {
+      setLogoFileList([
+        {
+          uid: "-1",
+          name: "logo.jpg",
+          status: "done",
+          url: watchedLogoUrl,
+        },
+      ]);
+      return;
+    }
+
+    // If form stores antd Upload fileList, use it directly
+    if (Array.isArray(watchedLogoUrl)) {
+      setLogoFileList(watchedLogoUrl as any[]);
+      return;
+    }
+
+    // Otherwise clear
+    setLogoFileList([]);
   }, [watchedLogoUrl]);
 
   const getBase64 = (file: File): Promise<string> =>
@@ -85,12 +95,8 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
   // Handle logo upload
   const handleLogoChange = ({ fileList }: any) => {
     setLogoFileList(fileList);
-    // Update form field with the file
-    if (fileList.length > 0) {
-      form.setFieldsValue({ logoUrl: fileList[0] });
-    } else {
-      form.setFieldsValue({ logoUrl: null });
-    }
+    // Update form field with the fileList
+    form.setFieldsValue({ logoUrl: fileList });
   };
 
   const handlePreview = async (file: any) => {
@@ -221,6 +227,11 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
               label="Logo công ty"
               name="logoUrl"
               style={{ height: "100%" }}
+              valuePropName="fileList"
+              getValueFromEvent={(e: any) => {
+                if (Array.isArray(e)) return e;
+                return e && e.fileList ? e.fileList : undefined;
+              }}
             >
               <div
                 style={{
@@ -232,6 +243,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
                 <Upload
                   name="logo"
                   listType="picture-card"
+                  // fileList is controlled for preview only; Form keeps canonical value
                   fileList={logoFileList}
                   onChange={handleLogoChange}
                   onPreview={handlePreview}
@@ -266,6 +278,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
                   onCancel={() => setPreviewOpen(false)}
                   centered
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     alt="logo preview"
                     style={{ width: "100%" }}
