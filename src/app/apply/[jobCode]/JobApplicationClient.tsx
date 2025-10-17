@@ -324,6 +324,17 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
             // const submitResp = await ApplyServices.createRecruitmentMultipart(
             //   formData
             // );
+            // Track application events
+            trackEvent(
+              "application_start",
+              "job_application",
+              `job_${jobCode}`
+            );
+            trackEvent(
+              "application_success",
+              "job_application",
+              `job_${jobCode}`
+            );
 
             setAnalysisResult(result);
             setShowAnalysisModal(true);
@@ -365,7 +376,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         }
       }
     },
-    [jobDetail, messageApi, fileToBase64]
+    [jobDetail, fileToBase64, jobCode, messageApi]
   );
 
   const handleSubmitApplication = async (values: JobApplicationFormData) => {
@@ -395,10 +406,6 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
       // Check if email and phone exist
       // await ApplyServices.checkMailAndPhoneExist(values.email, values.phone);
 
-      // Track application events
-      trackEvent("application_start", "job_application", `job_${jobCode}`);
-      trackEvent("application_success", "job_application", `job_${jobCode}`);
-
       // Determine whether user wanted immediate AI result from the form field
       const wantsAiResult = form.getFieldValue("receiveAiResult") ?? true;
 
@@ -408,17 +415,43 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
           // User wants immediate AI result - show loading modal and result
           await performCvAnalysis(file, true, formData);
         } else {
-          // User doesn't want immediate result - show thank you message and analyze in background
-          messageApi.success({
-            content:
-              "Cảm ơn bạn đã ứng tuyển! Chúng tôi sẽ xem xét và liên hệ với bạn sớm.",
-            duration: 5,
-          });
+          // User doesn't want immediate result - save to deferred queue for processing at midnight
+          try {
+            const deferredResp = await fetch("/api/deferred-apply", {
+              method: "POST",
+              body: formData,
+            });
 
-          // Perform analysis silently in background
-          performCvAnalysis(file, false, formData).catch((err) => {
-            console.error("Background CV analysis failed:", err);
-          });
+            if (!deferredResp.ok) {
+              const errorData = await deferredResp.json().catch(() => ({}));
+              throw new Error(
+                errorData.error || "Failed to submit application"
+              );
+            }
+
+            const deferredData = await deferredResp.json();
+            console.log(
+              "Application saved to deferred queue:",
+              deferredData.id
+            );
+
+            messageApi.success({
+              content:
+                deferredData.message ||
+                "Cảm ơn bạn đã ứng tuyển! Chúng tôi sẽ xem xét và liên hệ với bạn sớm.",
+              duration: 5,
+            });
+
+            // Track deferred submission
+            trackEvent(
+              "application_deferred",
+              "job_application",
+              `job_${jobCode}`
+            );
+          } catch (deferredError) {
+            console.error("Deferred submission failed:", deferredError);
+            throw deferredError; // Will be caught by outer catch
+          }
         }
       } else {
         // No file, just show success

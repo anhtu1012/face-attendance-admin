@@ -4,17 +4,17 @@ import CvPromptSettingsService from "@/services/admin/quan-tri-he-thong/cv-promp
 import type { CvPromptSettings } from "@/types/CvPromptSettings";
 import { DEFAULT_CV_PROMPT_SETTINGS_VI } from "@/types/CvPromptSettings";
 import {
+  BulbOutlined,
   DeleteOutlined,
   EditOutlined,
-  PlusOutlined,
-  StarOutlined,
+  GlobalOutlined,
   InfoCircleOutlined,
   PercentageOutlined,
-  BulbOutlined,
-  FileTextOutlined,
-  GlobalOutlined,
+  PlusOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 import {
+  Badge,
   Button,
   Card,
   Divider,
@@ -30,11 +30,10 @@ import {
   Tabs,
   Tag,
   Tooltip,
-  Badge,
 } from "antd";
 import { useCallback, useEffect, useState } from "react";
-import { translations } from "./translations";
 import "./cv-prompt-settings.scss";
+import { translations } from "./translations";
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -161,7 +160,9 @@ function CvPromptSettingsPage() {
       message.success(translations.messages.toggleActiveSuccess.vi(isActive));
       fetchSettings();
     } catch (error: any) {
-      message.error(error.message || translations.messages.toggleActiveError.vi);
+      message.error(
+        error.message || translations.messages.toggleActiveError.vi
+      );
     } finally {
       setLoading(false);
     }
@@ -221,19 +222,34 @@ function CvPromptSettingsPage() {
 
   const columns = [
     {
-      title: <BilingualLabel vi={translations.columns.name.vi} en={translations.columns.name.en} />,
+      title: (
+        <BilingualLabel
+          vi={translations.columns.name.vi}
+          en={translations.columns.name.en}
+        />
+      ),
       dataIndex: "name",
       key: "name",
       width: 200,
     },
     {
-      title: <BilingualLabel vi={translations.columns.description.vi} en={translations.columns.description.en} />,
+      title: (
+        <BilingualLabel
+          vi={translations.columns.description.vi}
+          en={translations.columns.description.en}
+        />
+      ),
       dataIndex: "description",
       key: "description",
       ellipsis: true,
     },
     {
-      title: <BilingualLabel vi={translations.columns.status.vi} en={translations.columns.status.en} />,
+      title: (
+        <BilingualLabel
+          vi={translations.columns.status.vi}
+          en={translations.columns.status.en}
+        />
+      ),
       key: "status",
       width: 150,
       render: (_: any, record: CvPromptSettings) => (
@@ -241,15 +257,19 @@ function CvPromptSettingsPage() {
           {record.isDefault && (
             <Tooltip title="Cấu hình mặc định / Default configuration">
               <Badge status="warning" />
-              <Tag className="cv-prompt-settings__tag--default" icon={<StarOutlined />}>
+              <Tag
+                className="cv-prompt-settings__tag--default"
+                icon={<StarOutlined />}
+              >
                 {translations.status.default.vi}
               </Tag>
             </Tooltip>
           )}
-          <Tooltip 
-            title={record.isActive ? 
-              "Click để vô hiệu hóa / Click to deactivate" : 
-              "Click để kích hoạt / Click to activate"
+          <Tooltip
+            title={
+              record.isActive
+                ? "Click để vô hiệu hóa / Click to deactivate"
+                : "Click để kích hoạt / Click to activate"
             }
           >
             <Switch
@@ -264,7 +284,12 @@ function CvPromptSettingsPage() {
       ),
     },
     {
-      title: <BilingualLabel vi={translations.columns.weights.vi} en={translations.columns.weights.en} />,
+      title: (
+        <BilingualLabel
+          vi={translations.columns.weights.vi}
+          en={translations.columns.weights.en}
+        />
+      ),
       key: "weights",
       width: 200,
       render: (_: any, record: CvPromptSettings) => (
@@ -285,7 +310,12 @@ function CvPromptSettingsPage() {
       ),
     },
     {
-      title: <BilingualLabel vi={translations.columns.actions.vi} en={translations.columns.actions.en} />,
+      title: (
+        <BilingualLabel
+          vi={translations.columns.actions.vi}
+          en={translations.columns.actions.en}
+        />
+      ),
       key: "action",
       width: 150,
       render: (_: any, record: CvPromptSettings) => (
@@ -335,12 +365,17 @@ function CvPromptSettingsPage() {
     <div className="cv-prompt-settings__container">
       <Card
         className="cv-prompt-settings__card"
-        title={<BilingualLabel vi={translations.pageTitle.vi} en={translations.pageTitle.en} />}
+        title={
+          <BilingualLabel
+            vi={translations.pageTitle.vi}
+            en={translations.pageTitle.en}
+          />
+        }
         extra={
-          <Button 
+          <Button
             type="primary"
             className="cv-prompt-settings__button--create"
-            icon={<PlusOutlined />} 
+            icon={<PlusOutlined />}
             onClick={handleCreate}
           >
             {translations.createButton.vi}
@@ -359,9 +394,18 @@ function CvPromptSettingsPage() {
 
       <Modal
         className="cv-prompt-settings__modal"
-        title={editingId ? 
-          <BilingualLabel vi={translations.editTitle.vi} en={translations.editTitle.en} /> : 
-          <BilingualLabel vi={translations.createTitle.vi} en={translations.createTitle.en} />
+        title={
+          editingId ? (
+            <BilingualLabel
+              vi={translations.editTitle.vi}
+              en={translations.editTitle.en}
+            />
+          ) : (
+            <BilingualLabel
+              vi={translations.createTitle.vi}
+              en={translations.createTitle.en}
+            />
+          )
         }
         open={isModalVisible}
         onOk={handleSubmit}
@@ -379,109 +423,209 @@ function CvPromptSettingsPage() {
       >
         <Form form={form} layout="vertical" className="cv-settings-form">
           <Tabs defaultActiveKey="1" animated={{ inkBar: true, tabPane: true }}>
-            <TabPane 
+            <TabPane
               tab={
                 <span>
                   <InfoCircleOutlined style={{ marginRight: 8 }} />
-                  <BilingualLabel vi={translations.tabs.basicInfo.vi} en={translations.tabs.basicInfo.en} />
+                  <BilingualLabel
+                    vi={translations.tabs.basicInfo.vi}
+                    en={translations.tabs.basicInfo.en}
+                  />
                 </span>
-              } 
+              }
               key="1"
             >
               <Form.Item
                 name="name"
-                label={<BilingualLabel vi={translations.form.name.vi} en={translations.form.name.en} />}
-                rules={[{ required: true, message: translations.messages.nameRequired.vi }]}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.name.vi}
+                    en={translations.form.name.en}
+                  />
+                }
+                rules={[
+                  {
+                    required: true,
+                    message: translations.messages.nameRequired.vi,
+                  },
+                ]}
               >
                 <Input placeholder={translations.placeholders.name.vi} />
               </Form.Item>
 
-              <Form.Item 
-                name="description" 
-                label={<BilingualLabel vi={translations.form.description.vi} en={translations.form.description.en} />}
+              <Form.Item
+                name="description"
+                label={
+                  <BilingualLabel
+                    vi={translations.form.description.vi}
+                    en={translations.form.description.en}
+                  />
+                }
               >
-                <TextArea rows={2} placeholder={translations.placeholders.description.vi} />
+                <TextArea
+                  rows={2}
+                  placeholder={translations.placeholders.description.vi}
+                />
               </Form.Item>
 
               <Space>
                 <Form.Item
                   name="isActive"
-                  label={<BilingualLabel vi={translations.form.isActive.vi} en={translations.form.isActive.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.isActive.vi}
+                      en={translations.form.isActive.en}
+                    />
+                  }
                   valuePropName="checked"
                 >
-                  <Switch checkedChildren={translations.form.yes.vi} unCheckedChildren={translations.form.no.vi} />
+                  <Switch
+                    checkedChildren={translations.form.yes.vi}
+                    unCheckedChildren={translations.form.no.vi}
+                  />
                 </Form.Item>
 
                 <Form.Item
                   name="isDefault"
-                  label={<BilingualLabel vi={translations.form.isDefault.vi} en={translations.form.isDefault.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.isDefault.vi}
+                      en={translations.form.isDefault.en}
+                    />
+                  }
                   valuePropName="checked"
                 >
-                  <Switch checkedChildren={translations.form.yes.vi} unCheckedChildren={translations.form.no.vi} />
+                  <Switch
+                    checkedChildren={translations.form.yes.vi}
+                    unCheckedChildren={translations.form.no.vi}
+                  />
                 </Form.Item>
               </Space>
             </TabPane>
 
-            <TabPane 
+            <TabPane
               tab={
                 <span>
                   <PercentageOutlined style={{ marginRight: 8 }} />
-                  <BilingualLabel vi={translations.tabs.matchScoreWeights.vi} en={translations.tabs.matchScoreWeights.en} />
+                  <BilingualLabel
+                    vi={translations.tabs.matchScoreWeights.vi}
+                    en={translations.tabs.matchScoreWeights.en}
+                  />
                 </span>
-              } 
+              }
               key="2"
             >
               <Form.Item
                 name={["matchScoreWeights", "technicalSkills"]}
-                label={<BilingualLabel vi={translations.form.technicalSkills.vi} en={translations.form.technicalSkills.en} />}
-                rules={[{ required: true, message: translations.messages.weightRequired.vi }]}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.technicalSkills.vi}
+                    en={translations.form.technicalSkills.en}
+                  />
+                }
+                rules={[
+                  {
+                    required: true,
+                    message: translations.messages.weightRequired.vi,
+                  },
+                ]}
               >
                 <InputNumber min={0} max={100} style={{ width: "100%" }} />
               </Form.Item>
 
               <Form.Item
                 name={["matchScoreWeights", "experience"]}
-                label={<BilingualLabel vi={translations.form.experience.vi} en={translations.form.experience.en} />}
-                rules={[{ required: true, message: translations.messages.weightRequired.vi }]}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.experience.vi}
+                    en={translations.form.experience.en}
+                  />
+                }
+                rules={[
+                  {
+                    required: true,
+                    message: translations.messages.weightRequired.vi,
+                  },
+                ]}
               >
                 <InputNumber min={0} max={100} style={{ width: "100%" }} />
               </Form.Item>
 
               <Form.Item
                 name={["matchScoreWeights", "seniority"]}
-                label={<BilingualLabel vi={translations.form.seniority.vi} en={translations.form.seniority.en} />}
-                rules={[{ required: true, message: translations.messages.weightRequired.vi }]}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.seniority.vi}
+                    en={translations.form.seniority.en}
+                  />
+                }
+                rules={[
+                  {
+                    required: true,
+                    message: translations.messages.weightRequired.vi,
+                  },
+                ]}
               >
                 <InputNumber min={0} max={100} style={{ width: "100%" }} />
               </Form.Item>
             </TabPane>
 
-            <TabPane 
+            <TabPane
               tab={
                 <span>
                   <StarOutlined style={{ marginRight: 8 }} />
-                  <BilingualLabel vi={translations.tabs.recommendationThresholds.vi} en={translations.tabs.recommendationThresholds.en} />
+                  <BilingualLabel
+                    vi={translations.tabs.recommendationThresholds.vi}
+                    en={translations.tabs.recommendationThresholds.en}
+                  />
                 </span>
-              } 
+              }
               key="3"
             >
               <Divider>{translations.form.stronglyRecommend.vi}</Divider>
               <div className="threshold-fields">
                 <Form.Item
-                  name={["recommendationThresholds", "stronglyRecommend", "min"]}
-                  label={<BilingualLabel vi={translations.form.min.vi} en={translations.form.min.en} />}
+                  name={[
+                    "recommendationThresholds",
+                    "stronglyRecommend",
+                    "min",
+                  ]}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.min.vi}
+                      en={translations.form.min.en}
+                    />
+                  }
                 >
                   <InputNumber min={0} max={100} />
                 </Form.Item>
                 <Form.Item
-                  name={["recommendationThresholds", "stronglyRecommend", "max"]}
-                  label={<BilingualLabel vi={translations.form.max.vi} en={translations.form.max.en} />}
+                  name={[
+                    "recommendationThresholds",
+                    "stronglyRecommend",
+                    "max",
+                  ]}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.max.vi}
+                      en={translations.form.max.en}
+                    />
+                  }
                 >
                   <InputNumber min={0} max={100} />
                 </Form.Item>
                 <Form.Item
-                  name={["recommendationThresholds", "stronglyRecommend", "label"]}
-                  label={<BilingualLabel vi={translations.form.label.vi} en={translations.form.label.en} />}
+                  name={[
+                    "recommendationThresholds",
+                    "stronglyRecommend",
+                    "label",
+                  ]}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.label.vi}
+                      en={translations.form.label.en}
+                    />
+                  }
                 >
                   <Input />
                 </Form.Item>
@@ -491,19 +635,34 @@ function CvPromptSettingsPage() {
               <div className="threshold-fields">
                 <Form.Item
                   name={["recommendationThresholds", "recommend", "min"]}
-                  label={<BilingualLabel vi={translations.form.min.vi} en={translations.form.min.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.min.vi}
+                      en={translations.form.min.en}
+                    />
+                  }
                 >
                   <InputNumber min={0} max={100} />
                 </Form.Item>
                 <Form.Item
                   name={["recommendationThresholds", "recommend", "max"]}
-                  label={<BilingualLabel vi={translations.form.max.vi} en={translations.form.max.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.max.vi}
+                      en={translations.form.max.en}
+                    />
+                  }
                 >
                   <InputNumber min={0} max={100} />
                 </Form.Item>
                 <Form.Item
                   name={["recommendationThresholds", "recommend", "label"]}
-                  label={<BilingualLabel vi={translations.form.label.vi} en={translations.form.label.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.label.vi}
+                      en={translations.form.label.en}
+                    />
+                  }
                 >
                   <Input />
                 </Form.Item>
@@ -513,19 +672,34 @@ function CvPromptSettingsPage() {
               <div className="threshold-fields">
                 <Form.Item
                   name={["recommendationThresholds", "consider", "min"]}
-                  label={<BilingualLabel vi={translations.form.min.vi} en={translations.form.min.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.min.vi}
+                      en={translations.form.min.en}
+                    />
+                  }
                 >
                   <InputNumber min={0} max={100} />
                 </Form.Item>
                 <Form.Item
                   name={["recommendationThresholds", "consider", "max"]}
-                  label={<BilingualLabel vi={translations.form.max.vi} en={translations.form.max.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.max.vi}
+                      en={translations.form.max.en}
+                    />
+                  }
                 >
                   <InputNumber min={0} max={100} />
                 </Form.Item>
                 <Form.Item
                   name={["recommendationThresholds", "consider", "label"]}
-                  label={<BilingualLabel vi={translations.form.label.vi} en={translations.form.label.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.label.vi}
+                      en={translations.form.label.en}
+                    />
+                  }
                 >
                   <Input />
                 </Form.Item>
@@ -535,58 +709,96 @@ function CvPromptSettingsPage() {
               <div className="threshold-fields">
                 <Form.Item
                   name={["recommendationThresholds", "notGoodFit", "min"]}
-                  label={<BilingualLabel vi={translations.form.min.vi} en={translations.form.min.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.min.vi}
+                      en={translations.form.min.en}
+                    />
+                  }
                 >
                   <InputNumber min={0} max={100} />
                 </Form.Item>
                 <Form.Item
                   name={["recommendationThresholds", "notGoodFit", "max"]}
-                  label={<BilingualLabel vi={translations.form.max.vi} en={translations.form.max.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.max.vi}
+                      en={translations.form.max.en}
+                    />
+                  }
                 >
                   <InputNumber min={0} max={100} />
                 </Form.Item>
                 <Form.Item
                   name={["recommendationThresholds", "notGoodFit", "label"]}
-                  label={<BilingualLabel vi={translations.form.label.vi} en={translations.form.label.en} />}
+                  label={
+                    <BilingualLabel
+                      vi={translations.form.label.vi}
+                      en={translations.form.label.en}
+                    />
+                  }
                 >
                   <Input />
                 </Form.Item>
               </div>
             </TabPane>
 
-            <TabPane 
+            <TabPane
               tab={
                 <span>
                   <BulbOutlined style={{ marginRight: 8 }} />
-                  <BilingualLabel vi={translations.tabs.analysisInstructions.vi} en={translations.tabs.analysisInstructions.en} />
+                  <BilingualLabel
+                    vi={translations.tabs.analysisInstructions.vi}
+                    en={translations.tabs.analysisInstructions.en}
+                  />
                 </span>
-              } 
+              }
               key="4"
             >
               <Form.Item
                 name={["analysisInstructions", "summarySentencesCount"]}
-                label={<BilingualLabel vi={translations.form.summarySentencesCount.vi} en={translations.form.summarySentencesCount.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.summarySentencesCount.vi}
+                    en={translations.form.summarySentencesCount.en}
+                  />
+                }
               >
                 <InputNumber min={1} max={5} />
               </Form.Item>
 
               <Form.Item
                 name={["analysisInstructions", "maxStrengthsCount"]}
-                label={<BilingualLabel vi={translations.form.maxStrengthsCount.vi} en={translations.form.maxStrengthsCount.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.maxStrengthsCount.vi}
+                    en={translations.form.maxStrengthsCount.en}
+                  />
+                }
               >
                 <InputNumber min={1} max={10} />
               </Form.Item>
 
               <Form.Item
                 name={["analysisInstructions", "maxWeaknessesCount"]}
-                label={<BilingualLabel vi={translations.form.maxWeaknessesCount.vi} en={translations.form.maxWeaknessesCount.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.maxWeaknessesCount.vi}
+                    en={translations.form.maxWeaknessesCount.en}
+                  />
+                }
               >
                 <InputNumber min={1} max={10} />
               </Form.Item>
 
               <Form.Item
                 name={["analysisInstructions", "summaryGuidelines"]}
-                label={<BilingualLabel vi={translations.form.summaryGuidelines.vi} en={translations.form.summaryGuidelines.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.summaryGuidelines.vi}
+                    en={translations.form.summaryGuidelines.en}
+                  />
+                }
               >
                 <TextArea
                   rows={4}
@@ -596,7 +808,12 @@ function CvPromptSettingsPage() {
 
               <Form.Item
                 name={["analysisInstructions", "strengthsGuidelines"]}
-                label={<BilingualLabel vi={translations.form.strengthsGuidelines.vi} en={translations.form.strengthsGuidelines.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.strengthsGuidelines.vi}
+                    en={translations.form.strengthsGuidelines.en}
+                  />
+                }
               >
                 <TextArea
                   rows={4}
@@ -606,7 +823,12 @@ function CvPromptSettingsPage() {
 
               <Form.Item
                 name={["analysisInstructions", "weaknessesGuidelines"]}
-                label={<BilingualLabel vi={translations.form.weaknessesGuidelines.vi} en={translations.form.weaknessesGuidelines.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.weaknessesGuidelines.vi}
+                    en={translations.form.weaknessesGuidelines.en}
+                  />
+                }
               >
                 <TextArea
                   rows={4}
@@ -616,37 +838,63 @@ function CvPromptSettingsPage() {
 
               <Form.Item
                 name={["analysisInstructions", "generalRules"]}
-                label={<BilingualLabel vi={translations.form.generalRules.vi} en={translations.form.generalRules.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.generalRules.vi}
+                    en={translations.form.generalRules.en}
+                  />
+                }
               >
-                <TextArea rows={6} placeholder={translations.placeholders.rules.vi} />
+                <TextArea
+                  rows={6}
+                  placeholder={translations.placeholders.rules.vi}
+                />
               </Form.Item>
             </TabPane>
 
-            <TabPane 
+            <TabPane
               tab={
                 <span>
                   <GlobalOutlined style={{ marginRight: 8 }} />
-                  <BilingualLabel vi={translations.tabs.languageConfig.vi} en={translations.tabs.languageConfig.en} />
+                  <BilingualLabel
+                    vi={translations.tabs.languageConfig.vi}
+                    en={translations.tabs.languageConfig.en}
+                  />
                 </span>
-              } 
+              }
               key="5"
             >
               <Divider>{translations.form.vietnamese.vi}</Divider>
               <Form.Item
                 name={["languages", "vi", "roleDescription"]}
-                label={<BilingualLabel vi={translations.form.roleDescription.vi} en={translations.form.roleDescription.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.roleDescription.vi}
+                    en={translations.form.roleDescription.en}
+                  />
+                }
               >
                 <TextArea rows={2} />
               </Form.Item>
               <Form.Item
                 name={["languages", "vi", "analysisTitle"]}
-                label={<BilingualLabel vi={translations.form.analysisTitle.vi} en={translations.form.analysisTitle.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.analysisTitle.vi}
+                    en={translations.form.analysisTitle.en}
+                  />
+                }
               >
                 <Input />
               </Form.Item>
               <Form.Item
                 name={["languages", "vi", "rulesTitle"]}
-                label={<BilingualLabel vi={translations.form.rulesTitle.vi} en={translations.form.rulesTitle.en} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.rulesTitle.vi}
+                    en={translations.form.rulesTitle.en}
+                  />
+                }
               >
                 <Input />
               </Form.Item>
@@ -654,19 +902,34 @@ function CvPromptSettingsPage() {
               <Divider>{translations.form.english.vi}</Divider>
               <Form.Item
                 name={["languages", "en", "roleDescription"]}
-                label={<BilingualLabel vi={translations.form.roleDescription.en} en={translations.form.roleDescription.vi} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.roleDescription.en}
+                    en={translations.form.roleDescription.vi}
+                  />
+                }
               >
                 <TextArea rows={2} />
               </Form.Item>
               <Form.Item
                 name={["languages", "en", "analysisTitle"]}
-                label={<BilingualLabel vi={translations.form.analysisTitle.en} en={translations.form.analysisTitle.vi} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.analysisTitle.en}
+                    en={translations.form.analysisTitle.vi}
+                  />
+                }
               >
                 <Input />
               </Form.Item>
               <Form.Item
                 name={["languages", "en", "rulesTitle"]}
-                label={<BilingualLabel vi={translations.form.rulesTitle.en} en={translations.form.rulesTitle.vi} />}
+                label={
+                  <BilingualLabel
+                    vi={translations.form.rulesTitle.en}
+                    en={translations.form.rulesTitle.vi}
+                  />
+                }
               >
                 <Input />
               </Form.Item>
