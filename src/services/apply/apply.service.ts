@@ -15,6 +15,15 @@ class ApplyServicesBase extends AxiosService {
       headers: { "Content-Type": "multipart/form-data" },
     });
   };
+
+  checkMailAndPhoneExist = async (
+    email: string,
+    phone: string
+  ): Promise<any> => {
+    return this.get(
+      `${this.basePath}/kiem-tra-email-sdt?email=${email}&phone=${phone}`
+    );
+  };
 }
 
 const ApplyServices = new ApplyServicesBase();

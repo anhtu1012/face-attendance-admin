@@ -1,8 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import LayoutContent from "@/components/LayoutContentForder/layoutContent";
+import {
+  getStatusColor,
+  getStatusText,
+} from "@/app/(view)/tac-vu-nhan-su/tuyen-dung/_utils/status";
 import { trackEvent, trackUrlVisit } from "@/components/GoogleAnalytics";
+import LayoutContent from "@/components/LayoutContentForder/layoutContent";
+import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import { useSelectData } from "@/hooks/useSelectData";
+// JobServices import removed (not used in this component)
+import { AnalysisResult } from "@/types/AnalysisResult";
+import { extractFile } from "@/utils/extractFile";
 import {
   Badge,
   Button,
@@ -10,15 +20,15 @@ import {
   DatePicker,
   Divider,
   Form,
+  Checkbox,
   Input,
   Select,
-  Tabs,
   Upload,
   UploadFile,
 } from "antd";
-// Use fetch directly for /api/views POSTs (credentials included)
+import dayjs from "dayjs";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   FaBriefcase,
   FaBuilding,
@@ -37,21 +47,11 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { MdEmail, MdPhone } from "react-icons/md";
+import AIAnalysisLoadingModal from "./_components/AIAnalysisLoadingModal/AIAnalysisLoadingModal";
+import AIAnalysisResultModal from "./_components/AIAnalysisResultModal/AIAnalysisResultModal";
 import "./JobApplicationPage.scss";
-import { useSelectData } from "@/hooks/useSelectData";
 import ApplyServices from "@/services/apply/apply.service";
-import { useAntdMessage } from "@/hooks/AntdMessageProvider";
-import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
-import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
-import {
-  getStatusColor,
-  getStatusText,
-} from "@/app/(view)/tac-vu-nhan-su/tuyen-dung/_utils/status";
-import dayjs from "dayjs";
-
-// Cookie TTL for dedupe (seconds). 24 hours = 86400 seconds
 const COOKIE_TTL_SECONDS = 24 * 60 * 60;
-
 interface JobApplicationFormData {
   fullName: string;
   email: string;
@@ -82,10 +82,15 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
   const [jobLoading, setJobLoading] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("1");
-  const { selectSkill, selectGender, selectExperienceYears } = useSelectData({
-    fetchSkill: true,
+  const { selectGender } = useSelectData({
+    fetchSkill: false,
   });
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
+    null
+  );
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const companyInfo = {
     companyName: "FaceAI Technology Solutions",
     workingHours: "8:00 - 17:30 (T2-T6)",
@@ -100,11 +105,47 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
     const load = async (id: string) => {
       setJobLoading(true);
       try {
-        const res = await JobServices.getDetailJob(jobCode);
+        // const res = await JobServices.getDetailJob(jobCode);
+        const res: JobDetail = {
+          id: "22",
+          createdAt: "2025-10-14T13:25:33.974Z",
+          updatedAt: "2025-10-14T13:25:33.974Z",
+          recruiter: {
+            fullName: "Nguyễn Nhân Sự",
+            positionName: "Giám sát nhân sự",
+            email: "nhansu@gmail.com",
+            phone: "0909909090",
+          },
+          statistics: {
+            applicants: "0",
+            shortlisted: "0",
+            views: 0,
+          },
+          jobId: "22",
+          jobTitle: "Fullstack Developer (MERN)",
+          jobDescription:
+            "<p>Phát triển toàn bộ hệ thống web từ frontend đến backend</p>",
+          jobOverview:
+            "<ol><li>Thành thạo MongoDB, Express, React, Node.js</li><li>Hiểu Git và Agile</li></ol>",
+          jobCode: "JOB-FULL1",
+          positionName: "Fullstack Developer",
+          jobResponsibility:
+            "<ol><li>Thiết kế frontend + backend</li><li>Đảm bảo hiệu suất hệ thống</li></ol>",
+          jobBenefit: "<ol><li>Lương cạnh tranh</li><li>Thưởng quý</li></ol>",
+          trialPeriod: "3_MONTHS",
+          fromSalary: "25",
+          toSalary: "40",
+          address: "Đà Nẵng",
+          status: "OPEN",
+          requireSkill: ["React", "Node.js", "MongoDB", "Express"],
+          expirationDate: "2025-12-15T17:00:00.000Z",
+          requireExperience: "2-5",
+        };
 
         if (typeof initialViews === "number") {
           res.statistics.views = initialViews;
         }
+
         setJobDetail(res);
 
         // Track URL visit for this specific job application page
@@ -202,6 +243,131 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
     load(jobCode);
   }, [jobCode, initialViewed, initialViews, messageApi]);
 
+  // Helper function to convert File to base64
+  const fileToBase64 = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve((reader.result as string).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  // Helper function to perform CV analysis
+  const performCvAnalysis = useCallback(
+    async (file: File, showModalOnComplete: boolean, formData: any) => {
+      if (!jobDetail) return;
+
+      if (showModalOnComplete) {
+        setIsAnalyzing(true);
+        setLoadingStep(0);
+      }
+
+      const stepInterval = showModalOnComplete
+        ? setInterval(() => {
+            setLoadingStep((prev) => (prev < 3 ? prev + 1 : prev));
+          }, 1000)
+        : null;
+
+      try {
+        const payload: any = { jobDetail, language: "vi" };
+
+        // Convert file to base64 and add to payload
+        const base64 = await fileToBase64(file);
+        payload.inlineData = { data: base64, mimeType: file.type };
+
+        const resp = await fetch("/api/analyze-cv", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err?.error || "Analysis API failed");
+        }
+
+        const json = await resp.json();
+        const { result, cached, duration } = json;
+
+        console.log("KẾT QUẢ PHÂN TÍCH:", result);
+        console.log(`Cached: ${cached}, Duration: ${duration}ms`);
+
+        // attach analysis result into the same formData so server gets both files and analysis
+        try {
+          const analysisPayload = {
+            analysisResult: result,
+            matchScore: result?.matchScore ?? null,
+            recommendation: result?.recommendation ?? null,
+          };
+
+          // formData may be a FormData instance or plain object; handle both
+          // Append the analysis result as a plain JSON string (text), not as a file/blob
+          if (formData instanceof FormData) {
+            formData.append("analysisResult", JSON.stringify(analysisPayload));
+          } else if (formData && typeof formData === "object") {
+            // try to convert plain object to FormData
+            const fd = new FormData();
+            Object.entries(formData).forEach(([k, v]) =>
+              fd.append(k, v as any)
+            );
+            fd.append("analysisResult", JSON.stringify(analysisPayload));
+            formData = fd;
+          }
+
+          // Always attempt to submit the combined form data so server records application + analysis
+          // For foreground (showModalOnComplete) we await submission so we can inform the user.
+          if (showModalOnComplete) {
+            if (stepInterval) clearInterval(stepInterval);
+            setLoadingStep(3);
+
+            // const submitResp = await ApplyServices.createRecruitmentMultipart(
+            //   formData
+            // );
+
+            setAnalysisResult(result);
+            setShowAnalysisModal(true);
+
+            // Show success message
+            const message = cached
+              ? "Phân tích CV thành công! (Kết quả từ cache)"
+              : duration
+              ? `Phân tích CV thành công! (${(duration / 1000).toFixed(1)}s)`
+              : "Phân tích CV thành công!";
+
+            messageApi.success({ content: message, duration: 3 });
+
+            // Optionally handle response (submitResp) if needed
+            // console.log("Application submission response:", submitResp);
+          } else {
+            // Background analysis: submit but don't block UI
+            ApplyServices.createRecruitmentMultipart(formData)
+              .then((resp) =>
+                console.log("Background application submitted:", resp)
+              )
+              .catch((err) => console.error("Background submit failed:", err));
+
+            console.log("Phân tích CV hoàn tất ở chế độ nền");
+          }
+        } catch (e2) {
+          console.error("Error appending/submitting analysis result:", e2);
+        }
+      } catch (e) {
+        console.error("Lỗi khi phân tích CV:", e);
+        if (showModalOnComplete) {
+          messageApi.error("Không thể phân tích CV. Vui lòng thử lại!");
+        }
+      } finally {
+        if (stepInterval) clearInterval(stepInterval);
+        if (showModalOnComplete) {
+          setIsAnalyzing(false);
+          setLoadingStep(0);
+        }
+      }
+    },
+    [jobDetail, messageApi, fileToBase64]
+  );
+
   const handleSubmitApplication = async (values: JobApplicationFormData) => {
     setLoading(true);
     try {
@@ -211,41 +377,13 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
       values.jobApplicationFormId = jobDetail?.id;
       // Build multipart/form-data
       const formData = new FormData();
-
-      // Support different shapes returned by Antd Upload inside Form:
-      // - File (native)
-      // - UploadFile object with originFileObj
-      // - Array of UploadFile
-      const extractFile = (val: any): File | undefined => {
-        if (!val) return undefined;
-        if (val instanceof File) return val;
-        if (Array.isArray(val)) {
-          const first = val[0];
-          return first?.originFileObj ?? first?.file ?? undefined;
-        }
-        return val?.originFileObj ?? val?.file ?? undefined;
-      };
-
-      const fileCVFile = extractFile(values.fileCV);
-      if (fileCVFile) {
-        formData.append("fileCV", fileCVFile, fileCVFile.name);
+      const file = extractFile(values.fileCV);
+      if (file) {
+        formData.append("fileCV", file, file.name);
       }
-
-      // Append other fields as strings. Skip fileCV (already appended).
-      // Special-case `skillIds`: send as a single comma-separated string instead of multiple entries.
       Object.entries(values).forEach(([key, value]) => {
         if (key === "fileCV") return;
         if (value === undefined || value === null) return;
-
-        if (key === "skillIds") {
-          // If skillIds is an array, join with commas; otherwise coerce to string.
-          if (Array.isArray(value)) {
-            formData.append(key, value.map((v) => String(v)).join(","));
-          } else {
-            formData.append(key, String(value));
-          }
-          return;
-        }
 
         // For other arrays, append each item separately
         if (Array.isArray(value)) {
@@ -254,22 +392,45 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
           formData.append(key, String(value));
         }
       });
+      // Check if email and phone exist
+      // await ApplyServices.checkMailAndPhoneExist(values.email, values.phone);
 
-      await ApplyServices.createRecruitmentMultipart(formData);
-      // Track application submission start
+      // Track application events
       trackEvent("application_start", "job_application", `job_${jobCode}`);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      // Track successful application submission
       trackEvent("application_success", "job_application", `job_${jobCode}`);
-      messageApi.success(
-        "Ứng tuyển thành công! Chúng tôi sẽ liên hệ với bạn sớm."
-      );
+
+      // Determine whether user wanted immediate AI result from the form field
+      const wantsAiResult = form.getFieldValue("receiveAiResult") ?? true;
+
+      // Perform CV analysis based on checkbox state
+      if (file) {
+        if (wantsAiResult) {
+          // User wants immediate AI result - show loading modal and result
+          await performCvAnalysis(file, true, formData);
+        } else {
+          // User doesn't want immediate result - show thank you message and analyze in background
+          messageApi.success({
+            content:
+              "Cảm ơn bạn đã ứng tuyển! Chúng tôi sẽ xem xét và liên hệ với bạn sớm.",
+            duration: 5,
+          });
+
+          // Perform analysis silently in background
+          performCvAnalysis(file, false, formData).catch((err) => {
+            console.error("Background CV analysis failed:", err);
+          });
+        }
+      } else {
+        // No file, just show success
+        messageApi.success(
+          "Ứng tuyển thành công! Chúng tôi sẽ liên hệ với bạn sớm."
+        );
+      }
+
       form.resetFields();
       setIsFormValid(false);
     } catch (error: any) {
       console.error("Error submitting application:", error);
-      // Track failed application submission
       trackEvent("application_error", "job_application", `job_${jobCode}`);
       messageApi.error(error.response?.data?.message || "Ứng tuyển thất bại!");
     } finally {
@@ -277,17 +438,21 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
     }
   };
 
-  // Check whether required fields for the current active tab are filled and have no validation errors.
+  // Check whether required fields are filled and have no validation errors.
   const checkFormValid = useCallback(() => {
-    const tab1Fields = ["fullName", "email", "phone", "birthday", "gender"];
-    const tab2Fields = ["experience", "skillIds", "fileCV"];
+    const allFields = [
+      "fullName",
+      "email",
+      "phone",
+      "birthday",
+      "gender",
+      "fileCV",
+    ];
 
-    const requiredFields = activeTab === "1" ? tab1Fields : tab2Fields;
-
-    const values = form.getFieldsValue(requiredFields);
+    const values = form.getFieldsValue(allFields);
 
     // If any required value is missing/empty -> invalid
-    for (const key of requiredFields) {
+    for (const key of allFields) {
       const val = values[key];
       if (val === undefined || val === null) {
         setIsFormValid(false);
@@ -304,14 +469,14 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
     }
 
     // Ensure there are no validation errors reported by the form for required fields
-    const errors = form.getFieldsError(requiredFields);
+    const errors = form.getFieldsError(allFields);
     if (errors.some((e) => e.errors && e.errors.length > 0)) {
       setIsFormValid(false);
       return;
     }
 
     setIsFormValid(true);
-  }, [form, activeTab]);
+  }, [form]);
 
   // Initialize validity on mount and whenever the check function changes
   useEffect(() => {
@@ -438,328 +603,238 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                   onFinish={handleSubmitApplication}
                   className="application-form"
                   requiredMark="optional"
+                  initialValues={{ receiveAiResult: true }}
                   onFieldsChange={() => {
                     // non-intrusive validity check when user changes fields
                     checkFormValid();
                   }}
                 >
-                  <Tabs
-                    activeKey={activeTab}
-                    onChange={(k) => setActiveTab(String(k))}
-                    items={[
-                      {
-                        key: "1",
-                        label: "Thông tin",
-                        children: (
-                          <>
-                            <div className="form-row">
-                              <div className="form-col-12">
-                                <Form.Item
-                                  name="fullName"
-                                  label="Họ và tên"
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: "Vui lòng nhập họ và tên!",
-                                    },
-                                    {
-                                      min: 2,
-                                      message:
-                                        "Họ tên phải có ít nhất 2 ký tự!",
-                                    },
-                                  ]}
-                                >
-                                  <Input
-                                    prefix={<FaUser />}
-                                    placeholder="VD: Nguyễn Văn An"
-                                    className="custom-input"
-                                    size="large"
-                                  />
-                                </Form.Item>
-                              </div>
-                            </div>
+                  <div className="form-row">
+                    <div className="form-col-12">
+                      <Form.Item
+                        name="fullName"
+                        label="Họ và tên"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng nhập họ và tên!",
+                          },
+                          {
+                            min: 2,
+                            message: "Họ tên phải có ít nhất 2 ký tự!",
+                          },
+                        ]}
+                      >
+                        <Input
+                          prefix={<FaUser />}
+                          placeholder="VD: Nguyễn Văn An"
+                          className="custom-input"
+                          size="large"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
 
-                            <div className="form-row">
-                              <div className="form-col-6">
-                                <Form.Item
-                                  name="email"
-                                  label="Email"
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: "Vui lòng nhập email!",
-                                    },
-                                    {
-                                      type: "email",
-                                      message: "Email không hợp lệ!",
-                                    },
-                                  ]}
-                                >
-                                  <Input
-                                    prefix={<FaEnvelope />}
-                                    placeholder="example@gmail.com"
-                                    className="custom-input"
-                                    size="large"
-                                  />
-                                </Form.Item>
-                              </div>
-                              <div className="form-col-6">
-                                <Form.Item
-                                  name="phone"
-                                  label="Số điện thoại"
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: "Vui lòng nhập số điện thoại!",
-                                    },
-                                    {
-                                      pattern: /^[0-9+\-\s()]+$/,
-                                      message: "Số điện thoại không hợp lệ!",
-                                    },
-                                  ]}
-                                >
-                                  <Input
-                                    prefix={<FaPhone />}
-                                    placeholder="0912345678"
-                                    className="custom-input"
-                                    size="large"
-                                    maxLength={10}
-                                  />
-                                </Form.Item>
-                              </div>
-                            </div>
+                  <div className="form-row">
+                    <div className="form-col-6">
+                      <Form.Item
+                        name="email"
+                        label="Email"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng nhập email!",
+                          },
+                          {
+                            type: "email",
+                            message: "Email không hợp lệ!",
+                          },
+                        ]}
+                      >
+                        <Input
+                          prefix={<FaEnvelope />}
+                          placeholder="example@gmail.com"
+                          className="custom-input"
+                          size="large"
+                        />
+                      </Form.Item>
+                    </div>
+                    <div className="form-col-6">
+                      <Form.Item
+                        name="phone"
+                        label="Số điện thoại"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng nhập số điện thoại!",
+                          },
+                          {
+                            pattern: /^[0-9+\-\s()]+$/,
+                            message: "Số điện thoại không hợp lệ!",
+                          },
+                        ]}
+                      >
+                        <Input
+                          prefix={<FaPhone />}
+                          placeholder="0912345678"
+                          className="custom-input"
+                          size="large"
+                          maxLength={10}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
 
-                            <div className="form-row">
-                              <div className="form-col-6">
-                                <Form.Item
-                                  name="birthday"
-                                  label="Ngày sinh"
-                                  // validate on change so the age validator runs immediately after user picks a date
-                                  validateTrigger={["onChange", "onBlur"]}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: "Vui lòng chọn ngày sinh!",
-                                    },
-                                    {
-                                      validator: (
-                                        _: unknown,
-                                        value: unknown
-                                      ) => {
-                                        // If no value, let the required rule handle it
-                                        if (!value) return Promise.resolve();
+                  <div className="form-row">
+                    <div className="form-col-6">
+                      <Form.Item
+                        name="birthday"
+                        label="Ngày sinh"
+                        validateTrigger={["onChange", "onBlur"]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng chọn ngày sinh!",
+                          },
+                          {
+                            validator: (_: unknown, value: unknown) => {
+                              if (!value) return Promise.resolve();
 
-                                        // Support objects from date libraries with toDate(), native Date, or parsable strings
-                                        let selectedDate: Date;
-                                        const v = value as unknown;
-                                        if (
-                                          v &&
-                                          typeof (v as { toDate?: () => Date })
-                                            .toDate === "function"
-                                        ) {
-                                          selectedDate = (
-                                            v as { toDate: () => Date }
-                                          ).toDate();
-                                        } else if (v instanceof Date) {
-                                          selectedDate = v as Date;
-                                        } else {
-                                          selectedDate = new Date(String(v));
-                                        }
+                              let selectedDate: Date;
+                              const v = value as unknown;
+                              if (
+                                v &&
+                                typeof (v as { toDate?: () => Date }).toDate ===
+                                  "function"
+                              ) {
+                                selectedDate = (
+                                  v as { toDate: () => Date }
+                                ).toDate();
+                              } else if (v instanceof Date) {
+                                selectedDate = v as Date;
+                              } else {
+                                selectedDate = new Date(String(v));
+                              }
 
-                                        const today = new Date();
-                                        let age =
-                                          today.getFullYear() -
-                                          selectedDate.getFullYear();
-                                        const m =
-                                          today.getMonth() -
-                                          selectedDate.getMonth();
-                                        if (
-                                          m < 0 ||
-                                          (m === 0 &&
-                                            today.getDate() <
-                                              selectedDate.getDate())
-                                        ) {
-                                          age--;
-                                        }
+                              const today = new Date();
+                              let age =
+                                today.getFullYear() -
+                                selectedDate.getFullYear();
+                              const m =
+                                today.getMonth() - selectedDate.getMonth();
+                              if (
+                                m < 0 ||
+                                (m === 0 &&
+                                  today.getDate() < selectedDate.getDate())
+                              ) {
+                                age--;
+                              }
 
-                                        if (age < 18) {
-                                          return Promise.reject(
-                                            new Error("Bạn chưa đủ 18 tuổi!")
-                                          );
-                                        }
+                              if (age < 18) {
+                                return Promise.reject(
+                                  new Error("Bạn chưa đủ 18 tuổi!")
+                                );
+                              }
 
-                                        return Promise.resolve();
-                                      },
-                                    },
-                                  ]}
-                                >
-                                  <DatePicker
-                                    placeholder="Chọn ngày sinh"
-                                    className="custom-datepicker"
-                                    style={{ width: "100%" }}
-                                    size="large"
-                                    format="DD/MM/YYYY"
-                                  />
-                                </Form.Item>
-                              </div>
-                              <div className="form-col-6">
-                                <Form.Item
-                                  name="gender"
-                                  label="Giới tính"
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: "Vui lòng chọn giới tính!",
-                                    },
-                                  ]}
-                                >
-                                  <Select
-                                    placeholder="Chọn giới tính"
-                                    options={selectGender}
-                                    className="custom-select"
-                                    size="large"
-                                  />
-                                </Form.Item>
-                              </div>
-                            </div>
-                          </>
-                        ),
-                      },
-                      {
-                        key: "2",
-                        label: "Kinh nghiệm",
-                        children: (
-                          <>
-                            <div className="form-row">
-                              <div className="form-col-6">
-                                <Form.Item
-                                  name="experience"
-                                  label="Số năm kinh nghiệm"
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message:
-                                        "Vui lòng chọn số năm kinh nghiệm!",
-                                    },
-                                  ]}
-                                >
-                                  <Select
-                                    placeholder="Chọn hoặc nhập số năm kinh nghiệm"
-                                    options={selectExperienceYears}
-                                    className="custom-select"
-                                    size="large"
-                                  />
-                                </Form.Item>
-                              </div>
-                              <div className="form-col-6">
-                                <Form.Item
-                                  name="skillIds"
-                                  label="Kỹ năng"
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: "Vui lòng chọn kỹ năng!",
-                                    },
-                                  ]}
-                                >
-                                  <Select
-                                    mode="tags"
-                                    placeholder="Chọn hoặc nhập kỹ năng của bạn"
-                                    options={selectSkill}
-                                    className="custom-select"
-                                    size="large"
-                                  />
-                                </Form.Item>
-                              </div>
-                            </div>
+                              return Promise.resolve();
+                            },
+                          },
+                        ]}
+                      >
+                        <DatePicker
+                          placeholder="Chọn ngày sinh"
+                          className="custom-datepicker"
+                          style={{ width: "100%" }}
+                          size="large"
+                          format="DD/MM/YYYY"
+                        />
+                      </Form.Item>
+                    </div>
+                    <div className="form-col-6">
+                      <Form.Item
+                        name="gender"
+                        label="Giới tính"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng chọn giới tính!",
+                          },
+                        ]}
+                      >
+                        <Select
+                          placeholder="Chọn giới tính"
+                          options={selectGender}
+                          className="custom-select"
+                          size="large"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
 
-                            <div className="form-row">
-                              <div className="form-col-12">
-                                <Form.Item
-                                  name="fileCV"
-                                  label="Upload CV"
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: "Vui lòng upload CV!",
-                                    },
-                                  ]}
-                                  valuePropName="fileList"
-                                  getValueFromEvent={(e: any) => {
-                                    // Antd Upload emits an event object; normalize to fileList
-                                    if (Array.isArray(e)) return e;
-                                    return e && e.fileList ? e.fileList : undefined;
-                                  }}
-                                >
-                                  <Upload.Dragger
-                                    {...uploadProps}
-                                    className="cv-upload"
-                                  >
-                                    <div className="upload-content">
-                                      <FaCloudUploadAlt className="upload-icon" />
-                                      <p className="upload-text">
-                                        Kéo thả file CV vào đây hoặc{" "}
-                                        <span>click để chọn file</span>
-                                      </p>
-                                      <p className="upload-hint">
-                                        Hỗ trợ: PDF, DOC, DOCX (tối đa 5MB)
-                                      </p>
-                                    </div>
-                                  </Upload.Dragger>
-                                </Form.Item>
-                              </div>
-                            </div>
-                          </>
-                        ),
-                      },
-                    ]}
-                  />
+                  <div className="form-row">
+                    <div className="form-col-12">
+                      <Form.Item
+                        name="fileCV"
+                        // label="Upload CV"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng upload CV!",
+                          },
+                        ]}
+                        valuePropName="fileList"
+                        getValueFromEvent={(e: any) => {
+                          if (Array.isArray(e)) return e;
+                          return e && e.fileList ? e.fileList : undefined;
+                        }}
+                      >
+                        <Upload.Dragger {...uploadProps} className="cv-upload">
+                          <div className="upload-content">
+                            <FaCloudUploadAlt className="upload-icon" />
+                            <p className="upload-text">
+                              Kéo thả file CV vào đây hoặc{" "}
+                              <span>click để chọn file</span>
+                            </p>
+                            {/* <p className="upload-hint">
+                              Hỗ trợ: PDF, DOC, DOCX (tối đa 5MB)
+                            </p> */}
+                          </div>
+                        </Upload.Dragger>
+                      </Form.Item>
+                    </div>
+                  </div>
+
+                  <div className="ai-analysis-option">
+                    <Form.Item
+                      name="receiveAiResult"
+                      valuePropName="checked"
+                      style={{ marginBottom: "1rem" }}
+                    >
+                      <Checkbox className="ai-checkbox-wrapper">
+                        <div className="ai-checkbox-text">
+                          <span className="ai-checkbox-title">
+                            Nhận kết quả phân tích AI
+                          </span>
+                        </div>
+                      </Checkbox>
+                    </Form.Item>
+                  </div>
 
                   <div className="form-actions">
-                    {activeTab === "1" ? (
-                      <Button
-                        type="primary"
-                        onClick={async () => {
-                          // Validate tab1 fields, then go to tab2 if valid
-                          const tab1Fields = [
-                            "fullName",
-                            "email",
-                            "phone",
-                            "birthday",
-                            "gender",
-                          ];
-                          try {
-                            await form.validateFields(tab1Fields as any);
-                            setActiveTab("2");
-                          } catch {
-                            // validation errors will be shown by antd
-                            setIsFormValid(false);
-                          }
-                        }}
-                        disabled={!isFormValid}
-                        className="submit-btn"
-                        size="large"
-                        icon={<FaCheck />}
-                        block
-                      >
-                        Tiếp theo
-                      </Button>
-                    ) : (
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loading}
-                        disabled={!isFormValid || loading}
-                        className="submit-btn"
-                        size="large"
-                        icon={<FaCheck />}
-                        block
-                      >
-                        {loading
-                          ? "Đang gửi ứng tuyển..."
-                          : "Gửi hồ sơ ứng tuyển"}
-                      </Button>
-                    )}
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loading}
+                      disabled={!isFormValid || loading}
+                      className="submit-btn"
+                      size="large"
+                      icon={<FaCheck />}
+                      block
+                    >
+                      {loading
+                        ? "Đang gửi ứng tuyển..."
+                        : "Gửi hồ sơ ứng tuyển"}
+                    </Button>
                   </div>
                 </Form>
               </Card>
@@ -940,6 +1015,16 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
           }
         />
       </div>
+
+      {/* AI Analysis Loading Modal */}
+      <AIAnalysisLoadingModal isOpen={isAnalyzing} loadingStep={loadingStep} />
+
+      {/* AI Analysis Result Modal */}
+      <AIAnalysisResultModal
+        isOpen={showAnalysisModal}
+        onClose={() => setShowAnalysisModal(false)}
+        analysisResult={analysisResult}
+      />
     </div>
   );
 };

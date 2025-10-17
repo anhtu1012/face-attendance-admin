@@ -1,3 +1,5 @@
+@import "./_components/AIAnalysisLoadingModal/AIAnalysisLoadingModal.scss";
+@import "./_components/AIAnalysisResultModal/AIAnalysisResultModal.scss";
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -363,31 +365,31 @@
       }
 
       .cv-upload {
-        border: 2px dashed #d9d9d9;
-        border-radius: 12px;
-        background: #fafafa;
-        transition: all 0.3s ease;
-        min-height: 50px;
+        border: 1px dashed #e0e6f3;
+        border-radius: 10px;
+        background: #fbfdff;
+        transition: all 0.18s ease;
+        min-height: 32px;
 
         &:hover {
           border-color: rgb(30, 136, 229);
-          background: rgba(30, 136, 229, 0.05);
+          background: rgba(30, 136, 229, 0.025);
         }
 
         .upload-content {
-          padding: 1rem;
+          padding: 0.4rem;
           text-align: center;
 
           .upload-icon {
-            font-size: 2rem;
+            font-size: 1.1rem;
             color: rgb(30, 136, 229);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.15rem;
           }
 
           .upload-text {
-            font-size: 0.9rem;
+            font-size: 0.78rem;
             color: #333;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.1rem;
 
             span {
               color: rgb(30, 136, 229);
@@ -396,23 +398,23 @@
           }
 
           .upload-hint {
-            font-size: 0.8rem;
-            color: #999;
+            font-size: 0.72rem;
+            color: #888;
             margin: 0;
           }
         }
 
         .ant-upload-list {
-          margin-top: 0.5rem;
-          padding: 0 1rem;
+          margin-top: 0.2rem;
+          padding: 0 0.5rem;
 
           .ant-upload-list-item {
-            border-radius: 8px;
-            border: 1px solid #e8e8e8;
-            margin-top: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #f0f3fb;
+            margin-top: 0.25rem;
 
             .ant-upload-list-item-name {
-              font-size: 0.85rem;
+              font-size: 0.75rem;
               color: rgb(30, 136, 229);
               font-weight: 500;
             }
@@ -437,8 +439,83 @@
         }
       }
 
+      // AI Analysis Option Checkbox
+      .ai-analysis-option {
+        padding: 0;
+
+        .ai-checkbox-wrapper {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          padding: 1rem 1.25rem;
+          background: linear-gradient(
+            135deg,
+            rgba(30, 136, 229, 0.05),
+            rgba(66, 165, 245, 0.08)
+          );
+          border: 2px solid rgba(30, 136, 229, 0.15);
+          border-radius: 12px;
+          transition: all 0.3s ease;
+          cursor: pointer;
+
+          &:hover {
+            background: linear-gradient(
+              135deg,
+              rgba(30, 136, 229, 0.08),
+              rgba(66, 165, 245, 0.12)
+            );
+            border-color: rgba(30, 136, 229, 0.25);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
+          }
+
+          .ai-checkbox-input {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: rgb(30, 136, 229);
+          }
+
+          .ai-checkbox-label {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            margin: 0;
+
+            .ai-icon {
+              font-size: 1.5rem;
+              color: rgb(30, 136, 229);
+              margin-top: 2px;
+              flex-shrink: 0;
+            }
+
+            .ai-checkbox-text {
+              display: flex;
+              flex-direction: column;
+              gap: 0.25rem;
+
+              .ai-checkbox-title {
+                font-size: 1rem;
+                font-weight: 600;
+                color: rgb(13, 71, 161);
+                line-height: 1.4;
+              }
+
+              .ai-checkbox-desc {
+                font-size: 0.875rem;
+                color: #666;
+                line-height: 1.5;
+              }
+            }
+          }
+        }
+      }
+
       .form-actions {
-        margin-top: 2rem;
+        margin-top: 1.5rem;
 
         .submit-btn {
           background: linear-gradient(
@@ -985,6 +1062,48 @@ html.dark {
                     &:hover {
                       color: rgb(66, 165, 245);
                     }
+                  }
+                }
+              }
+            }
+          }
+
+          // AI Analysis Option Dark Mode
+          .ai-analysis-option {
+            .ai-checkbox-wrapper {
+              background: linear-gradient(
+                135deg,
+                rgba(100, 181, 246, 0.08),
+                rgba(66, 165, 245, 0.12)
+              );
+              border-color: rgba(100, 181, 246, 0.25);
+
+              &:hover {
+                background: linear-gradient(
+                  135deg,
+                  rgba(100, 181, 246, 0.12),
+                  rgba(66, 165, 245, 0.18)
+                );
+                border-color: rgba(100, 181, 246, 0.35);
+                box-shadow: 0 4px 15px rgba(100, 181, 246, 0.25);
+              }
+
+              .ai-checkbox-input {
+                accent-color: rgb(100, 181, 246);
+              }
+
+              .ai-checkbox-label {
+                .ai-icon {
+                  color: rgb(100, 181, 246);
+                }
+
+                .ai-checkbox-text {
+                  .ai-checkbox-title {
+                    color: rgb(144, 202, 249);
+                  }
+
+                  .ai-checkbox-desc {
+                    color: #999;
                   }
                 }
               }
