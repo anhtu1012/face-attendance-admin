@@ -6,23 +6,6 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure Turbopack (stable in Next.js 15)
-  turbopack: {
-    // Optimize for faster compilation
-    resolveAlias: {
-      // Map AG-Grid imports to specific entry points to reduce bundle scanning
-      "@ag-grid-community/core": "@ag-grid-community/core/dist/esm/es6/main.js",
-      "@ag-grid-community/react":
-        "@ag-grid-community/react/dist/esm/es6/index.js",
-    },
-    rules: {
-      // Optimize AG-Grid modules
-      "*.ag-grid.js": {
-        loaders: ["swc-loader"],
-        as: "*.js",
-      },
-    },
-  },
   // Enable experimental features for better performance
   experimental: {
     // Enable optimizePackageImports for common packages
