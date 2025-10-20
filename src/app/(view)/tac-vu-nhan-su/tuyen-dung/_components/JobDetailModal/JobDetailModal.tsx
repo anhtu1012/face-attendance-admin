@@ -1,8 +1,9 @@
 "use client";
 import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
-import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
-import { Badge, Button, Modal, Progress, Tabs, Spin } from "antd";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import { Badge, Button, Modal, Progress, Spin, Tabs } from "antd";
+import axios from "axios";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import {
@@ -13,7 +14,6 @@ import {
   FaEdit,
   FaEye,
   FaGraduationCap,
-  FaHeart,
   FaLink,
   FaMapMarkerAlt,
   FaMoneyBillWave,
@@ -21,10 +21,9 @@ import {
   FaStar,
   FaUsers,
 } from "react-icons/fa";
-import { MdEmail, MdPhone } from "react-icons/md";
+import { MdAutoDelete, MdEmail, MdPhone } from "react-icons/md";
 import { getStatusColor, getStatusText } from "../../_utils/status";
 import "./JobDetailModal.scss";
-import axios from "axios";
 
 interface JobDetailModalProps {
   open: boolean;
@@ -115,9 +114,13 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
     }
   };
 
-  const handleSaveJob = () => {
-    // Handle save job logic
-    console.log("Save job:", jobDetails);
+  const handleDeleteJob = async () => {
+    try {
+      await JobServices.deleteJob(String(jobDetails.id));
+    } catch (error) {
+      console.log(error);
+      messageApi.error("Xóa công việc thất bại!");
+    }
   };
 
   const handleShareJob = () => {
@@ -421,11 +424,11 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
 
             <div className="job-actions-header">
               <Button
-                icon={<FaHeart />}
+                icon={<MdAutoDelete />}
                 className="action-btn save-btn"
-                onClick={handleSaveJob}
+                onClick={handleDeleteJob}
               >
-                Lưu
+                Xóa
               </Button>
               <Button
                 icon={<FaShareAlt />}

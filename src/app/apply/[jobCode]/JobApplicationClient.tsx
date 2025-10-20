@@ -11,16 +11,18 @@ import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { useSelectData } from "@/hooks/useSelectData";
 // JobServices import removed (not used in this component)
+import ApplyServices from "@/services/apply/apply.service";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
 import { AnalysisResult } from "@/types/AnalysisResult";
 import { extractFile } from "@/utils/extractFile";
 import {
   Badge,
   Button,
   Card,
+  Checkbox,
   DatePicker,
   Divider,
   Form,
-  Checkbox,
   Input,
   Select,
   Upload,
@@ -50,7 +52,6 @@ import { MdEmail, MdPhone } from "react-icons/md";
 import AIAnalysisLoadingModal from "./_components/AIAnalysisLoadingModal/AIAnalysisLoadingModal";
 import AIAnalysisResultModal from "./_components/AIAnalysisResultModal/AIAnalysisResultModal";
 import "./JobApplicationPage.scss";
-import ApplyServices from "@/services/apply/apply.service";
 const COOKIE_TTL_SECONDS = 24 * 60 * 60;
 interface JobApplicationFormData {
   fullName: string;
@@ -105,42 +106,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
     const load = async (id: string) => {
       setJobLoading(true);
       try {
-        // const res = await JobServices.getDetailJob(jobCode);
-        const res: JobDetail = {
-          id: "22",
-          createdAt: "2025-10-14T13:25:33.974Z",
-          updatedAt: "2025-10-14T13:25:33.974Z",
-          recruiter: {
-            fullName: "Nguyễn Nhân Sự",
-            positionName: "Giám sát nhân sự",
-            email: "nhansu@gmail.com",
-            phone: "0909909090",
-          },
-          statistics: {
-            applicants: "0",
-            shortlisted: "0",
-            views: 0,
-          },
-          jobId: "22",
-          jobTitle: "Fullstack Developer (MERN)",
-          jobDescription:
-            "<p>Phát triển toàn bộ hệ thống web từ frontend đến backend</p>",
-          jobOverview:
-            "<ol><li>Thành thạo MongoDB, Express, React, Node.js</li><li>Hiểu Git và Agile</li></ol>",
-          jobCode: "JOB-FULL1",
-          positionName: "Fullstack Developer",
-          jobResponsibility:
-            "<ol><li>Thiết kế frontend + backend</li><li>Đảm bảo hiệu suất hệ thống</li></ol>",
-          jobBenefit: "<ol><li>Lương cạnh tranh</li><li>Thưởng quý</li></ol>",
-          trialPeriod: "3_MONTHS",
-          fromSalary: "25",
-          toSalary: "40",
-          address: "Đà Nẵng",
-          status: "OPEN",
-          requireSkill: ["React", "Node.js", "MongoDB", "Express"],
-          expirationDate: "2025-12-15T17:00:00.000Z",
-          requireExperience: "2-5",
-        };
+        const res = await JobServices.getDetailJob(jobCode);
 
         if (typeof initialViews === "number") {
           res.statistics.views = initialViews;
@@ -302,16 +268,50 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
           };
 
           // formData may be a FormData instance or plain object; handle both
-          // Append the analysis result as a plain JSON string (text), not as a file/blob
+          // Append analysis fields individually so server receives typed fields
+          const appendAnalysisToFormData = (fd: FormData, payload: any) => {
+            // matchScore (nullable number)
+            if (
+              payload.matchScore !== undefined &&
+              payload.matchScore !== null
+            ) {
+              fd.append("matchScore", String(payload.matchScore));
+            }
+
+            // summary (string)
+            if (payload.analysisResult && payload.analysisResult.summary) {
+              fd.append("summary", String(payload.analysisResult.summary));
+            }
+
+            // strengths (array of strings) -> append each item as 'strengths'
+            const strengths = payload.analysisResult?.strengths;
+            if (Array.isArray(strengths)) {
+              strengths.forEach((s: any) => fd.append("strengths", String(s)));
+            }
+
+            // weaknesses (array of strings) -> append each item as 'weaknesses'
+            const weaknesses = payload.analysisResult?.weaknesses;
+            if (Array.isArray(weaknesses)) {
+              weaknesses.forEach((w: any) =>
+                fd.append("weaknesses", String(w))
+              );
+            }
+
+            // recommendation (enum string)
+            if (payload.recommendation) {
+              fd.append("recommendation", String(payload.recommendation));
+            }
+          };
+
           if (formData instanceof FormData) {
-            formData.append("analysisResult", JSON.stringify(analysisPayload));
+            appendAnalysisToFormData(formData, analysisPayload);
           } else if (formData && typeof formData === "object") {
             // try to convert plain object to FormData
             const fd = new FormData();
             Object.entries(formData).forEach(([k, v]) =>
               fd.append(k, v as any)
             );
-            fd.append("analysisResult", JSON.stringify(analysisPayload));
+            appendAnalysisToFormData(fd, analysisPayload);
             formData = fd;
           }
 
@@ -321,9 +321,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
             if (stepInterval) clearInterval(stepInterval);
             setLoadingStep(3);
 
-            // const submitResp = await ApplyServices.createRecruitmentMultipart(
-            //   formData
-            // );
+            const submitResp = await ApplyServices.createRecruitmentMultipart(
+              formData
+            );
             // Track application events
             trackEvent(
               "application_start",
@@ -349,7 +349,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
             messageApi.success({ content: message, duration: 3 });
 
             // Optionally handle response (submitResp) if needed
-            // console.log("Application submission response:", submitResp);
+            console.log("Application submission response:", submitResp);
           } else {
             // Background analysis: submit but don't block UI
             ApplyServices.createRecruitmentMultipart(formData)
@@ -404,7 +404,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         }
       });
       // Check if email and phone exist
-      // await ApplyServices.checkMailAndPhoneExist(values.email, values.phone);
+      await ApplyServices.checkMailAndPhoneExist(values.email, values.phone);
 
       // Determine whether user wanted immediate AI result from the form field
       const wantsAiResult = form.getFieldValue("receiveAiResult") ?? true;

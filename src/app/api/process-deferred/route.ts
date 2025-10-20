@@ -148,13 +148,51 @@ async function processOne(id: string): Promise<ProcessResult> {
       app.skillIds.forEach((skillId) => formData.append("skillIds", skillId));
     }
 
-    // Append analysis result
+    // Append analysis result (both JSON blob for backward compatibility
+    // and individual fields so backend that expects separate fields can read them)
     const analysisPayload = {
       analysisResult,
       matchScore: analysisResult?.matchScore ?? null,
       recommendation: analysisResult?.recommendation ?? null,
     };
-    formData.append("analysisResult", JSON.stringify(analysisPayload));
+
+    // Append individual fields similar to client-side appendAnalysisToFormData
+    if (
+      analysisPayload.matchScore !== undefined &&
+      analysisPayload.matchScore !== null
+    ) {
+      formData.append("matchScore", String(analysisPayload.matchScore));
+    }
+
+    // summary (string)
+    if (analysisResult) {
+      const resultObj = analysisResult as unknown as Record<string, unknown>;
+
+      if (resultObj.summary !== undefined && resultObj.summary !== null) {
+        formData.append("summary", String(resultObj.summary));
+      }
+
+      // strengths (array) -> append each item as 'strengths'
+      const strengths = resultObj["strengths"] as unknown;
+      if (Array.isArray(strengths)) {
+        (strengths as unknown[]).forEach((s) =>
+          formData.append("strengths", String(s))
+        );
+      }
+
+      // weaknesses (array) -> append each item as 'weaknesses'
+      const weaknesses = resultObj["weaknesses"] as unknown;
+      if (Array.isArray(weaknesses)) {
+        (weaknesses as unknown[]).forEach((w) =>
+          formData.append("weaknesses", String(w))
+        );
+      }
+    }
+
+    // recommendation (enum string)
+    if (analysisPayload.recommendation) {
+      formData.append("recommendation", String(analysisPayload.recommendation));
+    }
 
     // Submit to backend service
     // Note: ApplyServices.createRecruitmentMultipart expects a backend API

@@ -212,11 +212,12 @@ function Page() {
     selectSkill,
     selectRole,
     selectExperience,
-    selectExperienceYears,
     selectCandidate,
+    selectDepartment,
   } = useSelectData({
     fetchSkill: true,
     fetchRole: true,
+    fetchDepartment: true,
   });
   const handleFetchUser = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
@@ -261,7 +262,7 @@ function Page() {
         field: "status",
         headerName: t("isActive"),
         editable: false,
-        width: 120,
+        width: 150,
         filter: false,
         context: {
           typeColumn: "Tag",
@@ -352,27 +353,6 @@ function Page() {
         },
       },
       {
-        field: "skillIds",
-        headerName: t("skills"),
-        editable: true,
-        width: 250,
-        context: {
-          typeColumn: "Select",
-          selectOptions: selectSkill,
-          multiple: true,
-        },
-      },
-      {
-        field: "experience",
-        headerName: t("experience"),
-        editable: true,
-        width: 150,
-        context: {
-          typeColumn: "Select",
-          selectOptions: selectExperienceYears,
-        },
-      },
-      {
         field: "birthday",
         headerName: t("birthDay"),
         editable: true,
@@ -397,14 +377,7 @@ function Page() {
         },
       },
     ],
-    [
-      t,
-      selectGender,
-      selectSkill,
-      selectExperienceYears,
-      selectCandidate,
-      itemErrorCellStyle,
-    ]
+    [t, selectGender, selectCandidate, itemErrorCellStyle]
   );
 
   const handlePageChange = (page: number, size: number) => {
@@ -860,7 +833,12 @@ function Page() {
         open={modalOpen}
         onClose={handleCloseModal}
         onSuccess={handleContractSuccess}
-        selectOptions={{ selectRole, selectSkill, selectExperience }}
+        selectOptions={{
+          selectRole,
+          selectSkill,
+          selectExperience,
+          selectDepartment,
+        }}
       />
 
       {/* Success Modal */}

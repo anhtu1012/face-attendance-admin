@@ -1,24 +1,24 @@
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
+import Cbutton from "@/components/basicUI/Cbutton";
+import CInputLabel from "@/components/basicUI/CInputLabel";
 import { JobItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.dto";
 import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { BsSearch } from "react-icons/bs";
 import {
   MdAttachMoney,
   MdCalendarToday,
+  MdExpandMore,
   MdLocationOn,
   MdWork,
-  MdExpandMore,
 } from "react-icons/md";
 import { getStatusClass, getStatusText } from "../../_utils/status";
+import FilterDropdown, { FilterValues } from "../FilterDropdown";
 import JobDetailModal from "../JobDetailModal/JobDetailModal";
-import "./ListJob.scss";
-import CInputLabel from "@/components/basicUI/CInputLabel";
-import { BsSearch } from "react-icons/bs";
 import { columnDefs } from "./column";
-import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
-import Cbutton from "@/components/basicUI/Cbutton";
-import Cselect from "@/components/Cselect";
+import "./ListJob.scss";
 
 type ListJobProps = {
   // Pass jobId and optional quantityStatus object when a job card is clicked
@@ -38,11 +38,11 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
   const [jobDetailOpen, setJobDetailOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
   const [dataJobs, setDataJobs] = useState<JobItem[]>([]);
+  const [fromValue, setFromValue] = useState<FilterValues | undefined>(
+    undefined
+  );
   // track collapsed state per job id
   const [collapsedJobs, setCollapsedJobs] = useState<Set<number>>(new Set());
-  const [selectedMonth, setSelectedMonth] = useState<string>(
-    dayjs().format("YYYY-MM")
-  );
 
   const toggleCollapseAll = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -56,7 +56,10 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
     }
   };
 
-  const fetchDataJobs = async (month: string, params?: string | undefined) => {
+  const fetchDataJobs = async (
+    value?: FilterValues,
+    params?: string | undefined
+  ) => {
     const selectedFilterColumns = columnDefs
       .map((col) => col.field)
       .filter(Boolean) as string[];
@@ -68,13 +71,16 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
     );
     try {
       const searchFilter: FilterQueryStringTypeItem[] = [];
-      // compute start and end of month
-      const fromDate = dayjs(month + "-01")
-        .startOf("month")
-        .toISOString();
-      const toDate = dayjs(month + "-01")
-        .endOf("month")
-        .toISOString();
+      // compute start and end dates; if value is missing, fall back to last 1 month
+      const startDefault = dayjs().subtract(1, "month");
+      const endDefault = dayjs();
+      // ensure ISO strings (backend expects ISO 8601)
+      const fromDate = value?.fromDate
+        ? dayjs(value.fromDate).toISOString()
+        : startDefault.toISOString();
+      const toDate = value?.toDate
+        ? dayjs(value.toDate).toISOString()
+        : endDefault.toISOString();
       const paramsObj: Record<string, string> = { fromDate, toDate };
       const response = await JobServices.getJob(
         searchFilter,
@@ -86,24 +92,6 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
       console.log("Error fetching jobs:", error);
     }
   };
-  useEffect(() => {
-    fetchDataJobs(selectedMonth);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // generate month options (last 12 months)
-  const monthOptions = React.useMemo(() => {
-    const opts: { label: string; value: string }[] = [];
-    for (let i = 0; i < 12; i++) {
-      const m = dayjs().subtract(i, "month");
-      opts.push({
-        label: `Tháng ${m.format("MM/YYYY")}`,
-        value: m.format("YYYY-MM"),
-      });
-    }
-    return opts;
-  }, []);
-
   const toggleCollapse = (e: React.MouseEvent, jobId: number) => {
     // prevent card click/select when toggling
     e.stopPropagation();
@@ -162,29 +150,57 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
     setSelectedJob(null);
   };
 
+  const handleCloseJob = async (job: JobItem) => {
+    try {
+      await JobServices.updateJob(String(job.id), { status: "CLOSED" });
+      fetchDataJobs(fromValue);
+    } catch (error) {
+      // Try to log axios-style response message when available, otherwise fall back to Error.message or the raw error.
+      if (typeof error === "object" && error !== null && "response" in error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const errAny = error as any;
+        console.log(errAny.response?.data?.message ?? errAny.message ?? errAny);
+      } else if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <div className="list-job-container">
       <div className="search_job-list">
         <CInputLabel
           label="Tìm kiếm nhanh"
-          onChange={(e) => fetchDataJobs(selectedMonth, e.target.value)}
+          onChange={(e) => fetchDataJobs(fromValue, e.target.value)}
           suffix={
             <>
               <BsSearch />
             </>
           }
         />
-        <Cselect
-          label="Chọn tháng"
-          style={{ width: "100%", height: "36px" }}
-          value={selectedMonth}
-          onChange={(val) => {
-            const monthVal = String(val || "");
-            setSelectedMonth(monthVal);
-            fetchDataJobs(monthVal);
-          }}
-          options={monthOptions}
-        />
+
+        <div>
+          <FilterDropdown
+            onFilter={(value) => {
+              setFromValue(value);
+              fetchDataJobs(value);
+            }}
+            statusOptions={[
+              {
+                label: "Tất cả",
+                value: "",
+              },
+              {
+                label: "Đang tuyển",
+                value: "OPEN",
+              },
+              { label: "Đã đóng", value: "CLOSED" },
+            ]}
+          />
+        </div>
+
         <div>
           <Cbutton
             className={`collapse-all-button ${
@@ -295,7 +311,12 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
 
             <div className="job-card-footer">
               <div className="job-actions">
-                <button className="btn-primary">Đóng Tuyển Dụng</button>
+                <button
+                  className="btn-primary"
+                  onClick={() => handleCloseJob(job)}
+                >
+                  Đóng Tuyển Dụng
+                </button>
                 <button
                   className="btn-secondary"
                   onClick={(e) => {

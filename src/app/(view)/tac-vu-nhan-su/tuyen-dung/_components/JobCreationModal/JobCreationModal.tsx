@@ -28,6 +28,7 @@ interface JobCreationModalProps {
     selectRole: SelectOption[];
     selectSkill: SelectOption[];
     selectExperience: SelectOption[];
+    selectDepartment: SelectOption[];
   };
 }
 
@@ -43,15 +44,46 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
   const { userProfile } = useSelector(selectAuthLogin);
   const [positionOptionsState, setPositionOptionsState] =
     useState<SelectOption[]>();
+  // Do not keep duplicate state for role/department — read directly from the form when needed
 
-  const handleRoleChange = async (value: string) => {
+  const fetchPositions = async (role?: string, departmentId?: string) => {
+    if (!role || !departmentId) return;
     try {
-      const res = await SelectServices.getSelectPositionWithRole(value);
+      const res = await SelectServices.getSelectPositionWithRoleAndDepartment(
+        role,
+        departmentId
+      );
       setPositionOptionsState(res.data || []);
       form.setFieldsValue({ positionId: undefined });
     } catch (err) {
-      console.error("Error fetching positions for role", err);
+      console.error("Error fetching positions for role+department", err);
       setPositionOptionsState([]);
+    }
+  };
+
+  const handleRoleChange = (value: string) => {
+    // read department from form to avoid stale state
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dept = (form.getFieldValue as any)("departmentId") as
+      | string
+      | undefined;
+    if (dept) {
+      fetchPositions(value, dept);
+    } else {
+      setPositionOptionsState([]);
+      form.setFieldsValue({ positionId: undefined });
+    }
+  };
+
+  const handleDepartmentChange = (value: string) => {
+    // read role from form to avoid stale state
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const role = (form.getFieldValue as any)("role") as string | undefined;
+    if (role) {
+      fetchPositions(role, value);
+    } else {
+      setPositionOptionsState([]);
+      form.setFieldsValue({ positionId: undefined });
     }
   };
 
@@ -62,12 +94,9 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
     { value: "6_MONTHS", label: "6 tháng" },
   ];
   const handleSubmit = async (values: CreateJobRequest) => {
-    console.log("Creating job with data:", values);
     setLoading(true);
     try {
-      // Simulate API call
       const res = await JobServices.createJob(values);
-      // Generate mock job link
       const jobId = res?.jobCode || "12345";
       const jobLink = `${window.location.origin}/apply/${jobId}`;
 
@@ -122,6 +151,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
           recruiterEmail: userProfile?.email || "",
           recruiterPhone: userProfile?.phone || "",
           recruiterPosition: "HR Manager",
+          address: "Tp.HCM",
         }}
       >
         <Tabs
@@ -162,18 +192,19 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                       </div>
                       <div className="form-col-6">
                         <Form.Item
-                          name="workingHours"
-                          label="Thời gian làm việc"
+                          name="requireExperience"
+                          label="Kinh nghiệm yêu cầu"
                           rules={[
                             {
                               required: true,
-                              message: "Vui lòng nhập thời gian làm việc!",
+                              message: "Vui lòng chọn mức kinh nghiệm!",
                             },
                           ]}
                         >
-                          <Input
-                            placeholder="VD: 8:00 - 17:30 (T2-T6)"
-                            className="custom-input"
+                          <Select
+                            placeholder="Chọn mức kinh nghiệm..."
+                            options={selectOptions.selectExperience}
+                            className="custom-select"
                           />
                         </Form.Item>
                       </div>
@@ -201,6 +232,25 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                       </div>
                       <div className="form-col-4">
                         <Form.Item
+                          name="departmentId"
+                          label="Phòng ban"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng chọn phòng ban!",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Chọn phòng ban"
+                            options={selectOptions.selectDepartment}
+                            className="custom-select"
+                            onChange={handleDepartmentChange}
+                          />
+                        </Form.Item>
+                      </div>
+                      <div className="form-col-4">
+                        <Form.Item
                           name="positionId"
                           label="Vị trí"
                           rules={[
@@ -217,44 +267,9 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                           />
                         </Form.Item>
                       </div>
-                      <div className="form-col-4">
-                        <Form.Item
-                          name="requireExperience"
-                          label="Kinh nghiệm yêu cầu"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Vui lòng chọn mức kinh nghiệm!",
-                            },
-                          ]}
-                        >
-                          <Select
-                            placeholder="Chọn mức kinh nghiệm..."
-                            options={selectOptions.selectExperience}
-                            className="custom-select"
-                          />
-                        </Form.Item>
-                      </div>
                     </div>
 
-                    <div className="form-row">
-                      <div className="form-col-6">
-                        <Form.Item
-                          name="company"
-                          label="Công ty"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Vui lòng nhập tên công ty!",
-                            },
-                          ]}
-                        >
-                          <Input
-                            placeholder="Tên công ty"
-                            className="custom-input"
-                          />
-                        </Form.Item>
-                      </div>
+                    <div className="form-row" style={{ display: "none" }}>
                       <div className="form-col-6">
                         <Form.Item
                           name="address"

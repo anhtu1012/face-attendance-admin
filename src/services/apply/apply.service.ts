@@ -20,9 +20,10 @@ class ApplyServicesBase extends AxiosService {
     email: string,
     phone: string
   ): Promise<any> => {
-    return this.get(
-      `${this.basePath}/kiem-tra-email-sdt?email=${email}&phone=${phone}`
-    );
+    return this.post(`${this.basePath}/tuyen-dung/kiem-tra-mail-sdt`, {
+      email,
+      phone,
+    });
   };
 }
 
