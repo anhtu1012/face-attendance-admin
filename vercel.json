@@ -1,8 +1,15 @@
 {
+  "buildCommand": "next build",
+  "framework": "nextjs",
   "crons": [
     {
       "path": "/api/process-deferred",
       "schedule": "0 0 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 60
+    }
+  }
 }
