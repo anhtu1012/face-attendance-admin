@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+// Schema for recruitment pipeline quantities
+export const QuantityStatusSchema = z.object({
+  toContactQuantity: z.string(),
+  toInterviewQuantity: z.string(),
+  toJobOfferedQuantity: z.string(),
+  toContractQuantity: z.string(),
+});
+
+export type QuantityStatus = z.infer<typeof QuantityStatusSchema>;
+
 export const JobStatusEnum = z.enum(["OPEN", "CLOSED"]);
 export type JobStatus = z.infer<typeof JobStatusEnum>;
 // Job (Vị trí tuyển dụng) schema
@@ -15,14 +25,7 @@ export const JobItemSchema = z.object({
   fromSalary: z.string().optional(),
   toSalary: z.string().optional(),
   // Quantities for recruitment pipeline wrapped in quantityStatus
-  quantityStatus: z
-    .object({
-      toContactQuantity: z.number().optional(),
-      toInterviewQuantity: z.number().optional(),
-      toJobOfferedQuantity: z.number().optional(),
-      toContractQuantity: z.number().optional(),
-    })
-    .optional(),
+  quantityStatus: QuantityStatusSchema.optional(),
   requireExperience: z.string().optional(),
   expirationDate: z.string().optional(), // ISO date string
   address: z.string().optional(),

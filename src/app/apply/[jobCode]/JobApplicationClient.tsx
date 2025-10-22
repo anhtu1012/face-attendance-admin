@@ -50,7 +50,7 @@ import {
 } from "react-icons/fa";
 import { MdEmail, MdPhone } from "react-icons/md";
 import AIAnalysisLoadingModal from "./_components/AIAnalysisLoadingModal/AIAnalysisLoadingModal";
-import AIAnalysisResultModal from "./_components/AIAnalysisResultModal/AIAnalysisResultModal";
+import AIAnalysisResultModal from "../../../components/AIAnalysisResultModal/AIAnalysisResultModal";
 import "./JobApplicationPage.scss";
 const COOKIE_TTL_SECONDS = 24 * 60 * 60;
 interface JobApplicationFormData {
@@ -366,7 +366,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
       } catch (e) {
         console.error("Lỗi khi phân tích CV:", e);
         if (showModalOnComplete) {
-          messageApi.error("Không thể phân tích CV. Vui lòng thử lại!");
+          messageApi.error(
+            "Hệ thống AI đang quá tải, vui lòng thử lại sau vài phút"
+          );
         }
       } finally {
         if (stepInterval) clearInterval(stepInterval);

@@ -2,6 +2,7 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
+import { QuantityStatus } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.dto";
 import {
   CreateJobRequest,
   UpdateJobRequest,
@@ -18,6 +19,18 @@ class JobServicesBase extends AxiosService {
   ): Promise<JobResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}/tuyen-dung/danh-sach-cong-viec`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
+  async getJobQuanlity(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<QuantityStatus> {
+    return this.getWithFilter(
+      `${this.basePath}/tuyen-dung/so-luong-ung-vien`,
       searchFilter,
       quickSearchText,
       params

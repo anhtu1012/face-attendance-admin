@@ -443,5 +443,8 @@
   "DanhMucBoPhan": {
     "departmentName": "Tên phòng ban",
     "description": "Mô tả"
+  },
+  "InfoInterviewLeader": {
+    "userName": "Tên và Vị trí"
   }
 }

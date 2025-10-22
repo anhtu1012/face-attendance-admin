@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { SelectOption } from "@/dtos/select/select.dto";
 import {
   AppointmentItem,
   CreateAppointmentRequest,
@@ -18,21 +20,12 @@ import {
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useState } from "react";
-import {
-  FaCalendarAlt,
-  FaEnvelope,
-  FaMapMarked,
-  FaPhone,
-  FaUser,
-} from "react-icons/fa";
-import { MdLocationOn } from "react-icons/md";
-import {
-  CompanyLocation,
-  InterviewFormData,
-  InterviewScheduleModalProps,
-} from ".";
+import { FaCalendarAlt, FaEnvelope, FaPhone, FaUser } from "react-icons/fa";
+import { InterviewFormData, InterviewScheduleModalProps } from ".";
 import "./InterviewScheduleModal.scss";
-import { SelectOption } from "@/dtos/select/select.dto";
+import InfoInterviewLeader from "../InfoInterviewLeader/InfoInterviewLeader";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 
 const { TextArea } = Input;
 
@@ -45,27 +38,18 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
+  const { companyInformation } = useSelector(selectAuthLogin);
   const [interviewType, setInterviewType] = useState<"online" | "offline">(
     "offline"
   );
-  const [interviewers, setInterviewers] = useState<
-    { value: string; label: string; email: string }[]
-  >([]);
+
+  const [selectedInterviewers, setSelectedInterviewers] = useState<any[]>([]);
   const [timeKey, setTimeKey] = useState(0);
   const [scheduleTemplate, setScheduleTemplate] = useState<AppointmentItem[]>(
     []
   );
   const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([]);
   const messageApi = useAntdMessage();
-
-  // Company location (only one location)
-  const companyLocation: CompanyLocation = {
-    id: "hq",
-    name: "FaceAI Technology Solutions",
-    address: "Tầng 5, Tòa nhà ABC, 123 Đường XYZ, Quận Ba Đình, Hà Nội",
-    mapUrl: "https://maps.google.com/?q=123+Đường+XYZ+Quận+Ba+Đình+Hà+Nội",
-  };
 
   const handleTemplateSelect = (templateId: string | undefined) => {
     if (!templateId) {
@@ -83,11 +67,6 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       (m: AppointmentItem) => m.id === templateId
     );
     if (!tpl) return;
-
-    // find interviewer by email
-    const interviewerMatch = interviewers.find(
-      (i) => i.email === tpl.interviewerEmail
-    );
 
     // Normalize interviewType to match form values (lowercase)
     const normalizedType =
@@ -107,13 +86,8 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       date: dateVal,
       startTime: startVal,
       endTime: endVal,
-      // form field is named `typeAppointment`
       typeAppointment: normalizedType,
-      // form field is named `linkMeet`
       linkMeet: tpl.meetingLink || undefined,
-      // form field for interviewer select is interviewerId
-      interviewerId: interviewerMatch ? interviewerMatch.value : undefined,
-      interviewerEmail: tpl.interviewerEmail,
     });
   };
 
@@ -126,20 +100,11 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
 
   // Fetch interviewers for the given job when modal opens or jobId changes
   useEffect(() => {
-    let mounted = true;
-
     const loadInterviewers = async () => {
       if (!open) return;
 
       try {
-        if (!jobId) {
-          setInterviewers([]);
-          return;
-        }
-
-        const resp = await TuyenDungServices.getNguoiPhongVan([], undefined, {
-          jobId,
-        });
+        if (!jobId) return;
         const resSh = await TuyenDungServices.getDanhSachPhongVan(
           [],
           undefined,
@@ -155,9 +120,6 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
           ).format("HH:mm")} đến ${dayjs(t.endTime).format("HH:mm")}`,
         }));
         setTemplateOptions(data);
-
-        const options = resp?.data ?? [];
-        if (mounted) setInterviewers(options);
       } catch (err) {
         console.error("Failed to load interviewers:", err);
         messageApi.error("Không thể tải danh sách người phỏng vấn");
@@ -165,28 +127,18 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
     };
 
     loadInterviewers();
-
-    return () => {
-      mounted = false;
-    };
   }, [open, jobId, messageApi, candidateData]);
 
   const handleInterviewTypeChange = (type: "online" | "offline") => {
     setInterviewType(type);
   };
 
-  const handleInterviewerChange = (interviewerValue: string) => {
-    const interviewer = interviewers.find(
-      (int) => int.value === interviewerValue
-    );
-    if (interviewer) {
-      form.setFieldsValue({ interviewerEmail: interviewer.email });
-    }
-  };
-
   const handleSubmit = async (values: InterviewFormData) => {
     if (!candidateData) return;
-    console.log("values", values);
+    if (selectedInterviewers.length === 0) {
+      messageApi.error("Vui lòng chọn ít nhất một người phỏng vấn!");
+      return;
+    }
     const selectedDate = values.date ? dayjs(values.date) : undefined;
     const start = values.startTime ? dayjs(values.startTime) : undefined;
     const end = values.endTime ? dayjs(values.endTime) : undefined;
@@ -220,9 +172,12 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
         startTime: startTimeStr,
         endTime: endTimeStr,
         listIntervieweeId: [candidateData.id],
-        address: companyLocation.address,
+        address: companyInformation.addressLine,
         jobId: jobId || "",
-        interviewerCount: 1,
+        interviewerId: selectedInterviewers.map(
+          (interviewer) => interviewer.value
+        ),
+        interviewerCount: selectedInterviewers.length,
       };
       // Update candidate status to INTERVIEW_SCHEDULED
       await TuyenDungServices.createAppointment(
@@ -265,7 +220,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
   };
 
   const disabledDate = (current: Dayjs) => {
-    return current && current < dayjs().startOf("day");
+    return current && current <= dayjs().endOf("day");
   };
 
   // Disable times for startTime when selected date is today: can't pick past times
@@ -396,15 +351,6 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                 onFinish={handleSubmit}
                 className="interview-form"
                 onValuesChange={(changedValues) => {
-                  if (changedValues && changedValues.interviewerEmail) {
-                    const email = changedValues.interviewerEmail;
-                    const match = interviewers.find((i) => i.email === email);
-                    if (match) {
-                      form.setFieldsValue({ interviewer: match.value });
-                    }
-                  }
-
-                  // When date or startTime changes, bump key so TimePickers remount and recalc disabledTime
                   if (
                     changedValues &&
                     (changedValues.date || changedValues.startTime)
@@ -539,52 +485,6 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                   </Form.Item>
                 )}
 
-                <div className="form-section-title">
-                  <FaUser />
-                  Thông tin người phỏng vấn
-                </div>
-
-                <div className="form-row">
-                  <div className="form-col-6">
-                    <Form.Item
-                      name="interviewerId"
-                      label="Người phỏng vấn"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng chọn người phỏng vấn!",
-                        },
-                      ]}
-                    >
-                      <Select
-                        placeholder="Chọn người phỏng vấn"
-                        size="large"
-                        onChange={handleInterviewerChange}
-                        options={interviewers}
-                      />
-                    </Form.Item>
-                  </div>
-                  <div className="form-col-6">
-                    <Form.Item
-                      name="interviewerEmail"
-                      label="Email người phỏng vấn"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Email không được để trống!",
-                        },
-                        { type: "email", message: "Email không hợp lệ!" },
-                      ]}
-                    >
-                      <Input
-                        placeholder="Email người phỏng vấn"
-                        size="large"
-                        readOnly
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-
                 <Form.Item name="notes" label="Ghi chú">
                   <TextArea
                     rows={4}
@@ -594,52 +494,20 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
               </Form>
             </div>
 
-            {interviewType === "offline" && (
-              <div className="map-section">
-                <div className="map-header">
-                  <MdLocationOn />
-                  Địa điểm phỏng vấn
-                </div>
-
-                <Card className="location-info" size="small">
-                  <div className="location-item">
-                    <MdLocationOn className="location-icon" />
-                    <div className="location-text">
-                      <strong>{companyLocation.name}</strong>
-                    </div>
-                  </div>
-                  <div className="location-item">
-                    <div className="location-text">
-                      {companyLocation.address}
-                    </div>
-                  </div>
-
-                  <div className="map-container">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.096857648785!2d105.78405031442596!3d21.02880539313429!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab4cd5c3cfb3%3A0x1c98063b23b5a7b1!2zSMOgIE7hu5lp!5e0!3m2!1svi!2s!4v1677837562541!5m2!1svi!2s"
-                      title="Location Map"
-                      width="100%"
-                      height="300"
-                      style={{ border: 0, borderRadius: "12px" }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    />
-                  </div>
-
-                  <div className="map-actions">
-                    <Button
-                      className="map-button"
-                      icon={<FaMapMarked />}
-                      href={companyLocation.mapUrl}
-                      target="_blank"
-                    >
-                      Xem trên Google Maps
-                    </Button>
-                  </div>
-                </Card>
+            <div className="map-section">
+              <div className="map-header">
+                <FaUser />
+                Thông tin người phỏng vấn
               </div>
-            )}
+              <div>
+                <InfoInterviewLeader
+                  jobId={jobId}
+                  onSelectedChange={(selectInterviwer) => {
+                    setSelectedInterviewers(selectInterviwer);
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </>
       </div>

@@ -3,7 +3,7 @@ export { default } from "./FilterDropdown";
 export interface FilterValues {
   fromDate: string;
   toDate: string;
-  status: { label: string; value: string }[];
+  status: string;
 }
 export interface FilterDropdownProps {
   onFilter: (values: FilterValues) => void;

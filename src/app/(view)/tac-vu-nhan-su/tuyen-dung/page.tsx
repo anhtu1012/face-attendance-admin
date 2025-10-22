@@ -9,6 +9,7 @@ import { showError } from "@/hooks/useNotification";
 import { useRecruitmentSocket } from "@/hooks/useRecruitmentSocket";
 import { useSelectData } from "@/hooks/useSelectData";
 import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
 import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
 import {
   getItemId,
@@ -23,8 +24,9 @@ import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { BiSolidSkipNextCircle } from "react-icons/bi";
 import { AiOutlineCloseCircle } from "react-icons/ai";
+import { BiSolidSkipNextCircle } from "react-icons/bi";
+import AIAnalysisResultModal from "@/components/AIAnalysisResultModal/AIAnalysisResultModal";
 import { FaPlusCircle } from "react-icons/fa";
 import { FcViewDetails } from "react-icons/fc";
 import { GoReport } from "react-icons/go";
@@ -66,6 +68,7 @@ function Page() {
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
   const [jobOfferModalOpen, setJobOfferModalOpen] = useState(false);
   const [leaderReportModalOpen, setLeaderReportModalOpen] = useState(false);
+  const [aiAnalysisModalOpen, setAiAnalysisModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] =
     useState<TuyenDungItem | null>(null);
   const messageApi = useAntdMessage();
@@ -157,12 +160,7 @@ function Page() {
     jobId,
     selectedStatus,
     onNewCandidate: (newJobId, candidateInfo) => {
-      console.log("aaa", newJobId);
-      console.log("aabb", candidateInfo);
-
-      // Mark this job as having new candidates
       setNewJobIds((prev) => new Set(prev).add(String(newJobId)));
-
       // If this is the currently selected job, update the quantity and add to grid
       if (String(jobId) === String(newJobId)) {
         // Update quantity status
@@ -189,18 +187,6 @@ function Page() {
           setTotalItems((prev) => prev + 1);
         }
       }
-    },
-    onCandidateStatusChanged: (affectedJobId, candidateId, newStatus) => {
-      console.log(`Candidate ${candidateId} status changed to ${newStatus}`);
-      // Có thể thêm logic cập nhật UI khi status thay đổi
-    },
-    onInterviewScheduled: (affectedJobId, candidateId) => {
-      console.log(`Interview scheduled for candidate ${candidateId}`);
-      // Có thể thêm notification hoặc refresh data
-    },
-    onJobOfferSent: (affectedJobId, candidateId) => {
-      console.log(`Job offer sent to candidate ${candidateId}`);
-      // Có thể thêm notification hoặc refresh data
     },
   });
 
@@ -283,6 +269,16 @@ function Page() {
             NOT_SUITABLE: "#9E9E9E", // grey
             HOAN_THANH: "#2E7D32", // dark green
           },
+        },
+      },
+      {
+        field: "analysisResult.matchScore",
+        headerName: " Tỉ lệ (%)",
+        editable: false,
+        width: 100,
+        filter: false,
+        context: {
+          typeColumn: "Tag",
         },
       },
       {
@@ -467,7 +463,6 @@ function Page() {
       unitKey: `${Date.now()}_${i}`,
       fullName: "",
       email: "",
-      // default birthday: 18 years ago
       birthday: dayjs().subtract(18, "year").toISOString(),
       gender: "",
       phone: "",
@@ -585,10 +580,51 @@ function Page() {
     handleFetchUser(currentPage, pageSize, quickSearchText);
   };
 
+  const hanldeJobCardClick = async (
+    jobId: number | null,
+    jobCode: string | null
+  ) => {
+    if (jobId == null || jobCode == null) return;
+    setJobId(String(jobId));
+    try {
+      const res = await JobServices.getJobQuanlity([], undefined, {
+        jobCode: jobCode,
+      });
+
+      const convertedData = {
+        toContactQuantity: Number(res.toContactQuantity) || 0,
+        toInterviewQuantity: Number(res.toInterviewQuantity) || 0,
+        toJobOfferedQuantity: Number(res.toJobOfferedQuantity) || 0,
+        toContractQuantity: Number(res.toContractQuantity) || 0,
+      };
+      setQuantityStatus(convertedData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const buttonProps = (_params: any) => {
-    if (selectedStatus === "LIEN_HE") {
+    // Default view details button that appears in all cases
+    const defaultViewButton = (
+      <Tooltip title="Xem chi tiết">
+        <FcViewDetails
+          className="tool-icon view-details-icon"
+          size={26}
+          onClick={() => {
+            setSelectedCandidate(_params.data);
+            setAiAnalysisModalOpen(true);
+          }}
+        />
+      </Tooltip>
+    );
+
+    if (
+      selectedStatus === "LIEN_HE" ||
+      _params.data.status === "NOT_SUITABLE"
+    ) {
       return (
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {defaultViewButton}
           <Tooltip title="Không liên hệ được">
             <AiOutlineCloseCircle
               className="tool-icon cannot-contact-icon"
@@ -616,6 +652,7 @@ function Page() {
     ) {
       return (
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {defaultViewButton}
           <Tooltip title="Từ chối phỏng vấn">
             <AiOutlineCloseCircle
               className="tool-icon cannot-contact-icon"
@@ -716,31 +753,7 @@ function Page() {
               />
             </div>
             <ListJob
-              onJobCardClick={(
-                clickedJobId?: number | null,
-                qs?: Record<string, number> | null
-              ) => {
-                const jobIdStr = String(clickedJobId ?? "");
-                const prevJobIdStr = String(jobId ?? "");
-                const selectingDifferentJob = jobIdStr !== prevJobIdStr;
-
-                setJobId(jobIdStr);
-
-                // If the user deselected (clicked same card to clear), clear quantityStatus
-                if (clickedJobId == null) {
-                  setQuantityStatus(null);
-                  return;
-                }
-
-                // If selecting a different job, replace quantityStatus with server-provided qs
-                if (selectingDifferentJob) {
-                  setQuantityStatus(qs ?? null);
-                  return;
-                }
-
-                // If selecting the same job again (e.g. opening detail), preserve any optimistic local counts
-                setQuantityStatus((prev) => prev ?? qs ?? null);
-              }}
+              onJobCardClick={hanldeJobCardClick}
               newJobIds={newJobIds}
               onClearNewBadge={(jobId) => {
                 setNewJobIds((prev) => {
@@ -794,6 +807,7 @@ function Page() {
               columnFlex={0}
               showToolColumn={true}
               toolColumnRenderer={buttonProps}
+              toolColumnWidth={150}
               showActionButtons={true}
               actionButtonsProps={{
                 hideAdd: selectedStatus !== "LIEN_HE" ? true : false,
@@ -897,6 +911,18 @@ function Page() {
             : undefined
         }
       />
+
+      {/* AI Analysis Result Modal */}
+      {aiAnalysisModalOpen && (
+        <AIAnalysisResultModal
+          isOpen={aiAnalysisModalOpen}
+          onClose={() => {
+            setAiAnalysisModalOpen(false);
+            setSelectedCandidate(null);
+          }}
+          analysisResult={selectedCandidate?.analysisResult ?? null}
+        />
+      )}
     </div>
   );
 }

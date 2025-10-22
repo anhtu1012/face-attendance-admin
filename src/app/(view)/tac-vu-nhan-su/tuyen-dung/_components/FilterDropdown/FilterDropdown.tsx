@@ -35,7 +35,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
     const vals: FilterValues = {
       fromDate: defaultRange[0].format("YYYY-MM-DD"),
       toDate: defaultRange[1].format("YYYY-MM-DD"),
-      status: statusOptions,
+      status: "OPEN",
     };
     onFilter(vals);
     setIsActive(true);
@@ -65,7 +65,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
     onFilter({
       fromDate: defaultRange[0].format("YYYY-MM-DD"),
       toDate: defaultRange[1].format("YYYY-MM-DD"),
-      status: [],
+      status: "OPEN",
     });
     setIsActive(false);
     setOpen(false);
@@ -110,7 +110,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         className="filter-form"
         initialValues={{
           dateRange: defaultRange,
-          status: statusOptions,
+          status: "OPEN",
         }}
         onValuesChange={onValuesChange}
       >

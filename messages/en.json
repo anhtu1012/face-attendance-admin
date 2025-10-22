@@ -470,5 +470,8 @@
   "DanhMucBoPhan": {
     "departmentName": "Department Name",
     "description": "Description"
+  },
+  "InfoInterviewLeader": {
+    "userName": "Name and position"
   }
 }

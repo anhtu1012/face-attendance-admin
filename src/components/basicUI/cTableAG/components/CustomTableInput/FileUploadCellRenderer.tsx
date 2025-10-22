@@ -94,7 +94,11 @@ const FileUploadCellRenderer: React.FC<ICellRendererParams> = (params) => {
         <>
           {/* Icon to replace file (opens file picker) */}
           <Upload beforeUpload={beforeUpload} showUploadList={false}>
-            <Button type="text" size="small" icon={iconByExt(getExt(fileName))} />
+            <Button
+              type="text"
+              size="small"
+              icon={iconByExt(getExt(fileName))}
+            />
           </Upload>
           <Tooltip title={fileName}>
             {isUrl(fileName) ? (
@@ -105,11 +109,11 @@ const FileUploadCellRenderer: React.FC<ICellRendererParams> = (params) => {
                 style={{ fontSize: 12, color: "#1890ff", marginLeft: 6 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                {fileName}
+                LINK_CV
               </a>
             ) : (
               <span style={{ fontSize: 12, color: "#333", marginLeft: 6 }}>
-                {fileName}
+                LINK_CV
               </span>
             )}
           </Tooltip>
@@ -117,7 +121,10 @@ const FileUploadCellRenderer: React.FC<ICellRendererParams> = (params) => {
       ) : (
         <>
           <Upload beforeUpload={beforeUpload} showUploadList={false}>
-            <Button icon={<UploadOutlined style={{ color: "#1890ff" }} />} size="small">
+            <Button
+              icon={<UploadOutlined style={{ color: "#1890ff" }} />}
+              size="small"
+            >
               Tải lên
             </Button>
           </Upload>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AnalysisResultSchema } from "./analysis-result.schema";
 
 // Tuyển dụng Schema
 export const TuyenDungItemSchema = z.object({
@@ -12,6 +13,7 @@ export const TuyenDungItemSchema = z.object({
   fileCV: z.string().optional(), // URL to the CV file
   gender: z.enum(["M", "F", ""]),
   status: z.string(),
+  analysisResult: AnalysisResultSchema.optional(),
   experience: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),

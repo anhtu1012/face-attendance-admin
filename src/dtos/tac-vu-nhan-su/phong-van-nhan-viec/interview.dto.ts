@@ -44,9 +44,9 @@ export interface CreateAppointmentRequest {
   date: string; // ISO date string
   startTime: string; // ISO date string
   endTime: string; // ISO date string
-  interviewerId: string;
   jobId: string;
   listIntervieweeId: string[];
+  interviewerId: string[];
   typeAppointment: "online" | "offline";
   linkMeet?: string;
   interviewerCount: number;

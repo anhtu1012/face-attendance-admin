@@ -1,4 +1,3 @@
-import { AnalysisResult } from "@/types/AnalysisResult";
 import { Button, Col, Modal, Progress, Row, Tabs, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
 import {
@@ -13,6 +12,7 @@ import {
   FaTrophy,
 } from "react-icons/fa";
 import "./AIAnalysisResultModal.scss";
+import { AnalysisResult } from "@/dtos/tac-vu-nhan-su/tuyen-dung/analysis-result.schema";
 
 interface AIAnalysisResultModalProps {
   isOpen: boolean;

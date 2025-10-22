@@ -31,6 +31,7 @@ const LoginPage: React.FC = () => {
   const onFinish = async (values: any) => {
     if (isLogin || isNavigating) return;
     setIsLogin(true);
+
     try {
       const res = await AuthServices.login(values);
       dispatch(setAuthData(res));
@@ -44,6 +45,7 @@ const LoginPage: React.FC = () => {
         reconnectSocketWithNewToken();
       }, 300);
 
+      setIsNavigating(true);
       router.push("/");
     } catch (error: any) {
       console.log(error);
@@ -51,8 +53,10 @@ const LoginPage: React.FC = () => {
       setIsLogin(false);
       setIsNavigating(false);
     } finally {
+      // Ensure loading flag is cleared. Do NOT set navigating=true here because
+      // finally runs on both success and failure and previously caused the
+      // spinner to keep spinning after a failed login.
       setIsLogin(false);
-      setIsNavigating(true);
     }
   };
 

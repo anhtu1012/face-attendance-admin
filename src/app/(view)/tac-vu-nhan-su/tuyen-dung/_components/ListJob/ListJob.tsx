@@ -21,14 +21,11 @@ import { columnDefs } from "./column";
 import "./ListJob.scss";
 
 type ListJobProps = {
-  // Pass jobId and optional quantityStatus object when a job card is clicked
   onJobCardClick?: (
     jobId: number | null,
-    quantityStatus?: Record<string, number> | null
+    jobCode: string | null
   ) => Promise<void> | void;
-  // Set of job IDs that have new candidates
   newJobIds?: Set<string>;
-  // Callback to clear the new badge when job is clicked
   onClearNewBadge?: (jobId: string) => void;
 };
 
@@ -81,7 +78,16 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
       const toDate = value?.toDate
         ? dayjs(value.toDate).toISOString()
         : endDefault.toISOString();
-      const paramsObj: Record<string, string> = { fromDate, toDate };
+
+      const paramsObj: Record<string, string> = {
+        fromDate,
+        toDate,
+      };
+
+      // Chỉ thêm status vào params nếu có giá trị
+      if (value?.status) {
+        paramsObj.status = value.status;
+      }
       const response = await JobServices.getJob(
         searchFilter,
         quickSearchText,
@@ -102,10 +108,7 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
       return next;
     });
   };
-  const handleJobCardClick = (
-    jobId: number,
-    quantityStatus?: Record<string, number> | null
-  ) => {
+  const handleJobCardClick = (jobId: number, jobCode: string) => {
     // Tạo hiệu ứng click
     setClickEffect(jobId);
 
@@ -125,10 +128,7 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
       const newSelected = selectedJobId === jobId ? null : jobId;
       setTimeout(() => {
         try {
-          onJobCardClick?.(
-            newSelected,
-            newSelected ? quantityStatus ?? null : null
-          );
+          onJobCardClick?.(newSelected, jobCode);
         } catch {}
       }, 0);
     } catch {}
@@ -235,7 +235,7 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
               selectedJobId === Number(job.id) ? "selected" : ""
             } ${clickEffect === Number(job.id) ? "click-effect" : ""}`}
             onClick={() =>
-              handleJobCardClick(Number(job.id), job.quantityStatus ?? null)
+              handleJobCardClick(Number(job.id), job.jobCode ?? "")
             }
           >
             <div className="job-card-header">
