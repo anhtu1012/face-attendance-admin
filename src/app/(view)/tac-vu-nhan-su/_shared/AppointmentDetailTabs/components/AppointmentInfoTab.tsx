@@ -1,24 +1,19 @@
 "use client";
 
-import { Card, Descriptions, Tag, Button, Space, Row, Col } from "antd";
-import {
-  FaCalendarAlt,
-  FaClock,
-  FaMapMarkerAlt,
-  FaUser,
-  FaPhone,
-  FaEnvelope,
-  FaVideo,
-  FaLink,
-  FaStickyNote,
-  FaClipboardList,
-  FaBriefcase,
-  FaUserTie,
-  FaExchangeAlt,
-} from "react-icons/fa";
-import dayjs from "dayjs";
-import "./AppointmentInfoTab.scss";
 import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
+import { Button, Card, Col, Descriptions, Row, Space, Tag } from "antd";
+import dayjs from "dayjs";
+import {
+  FaBriefcase,
+  FaCalendarAlt,
+  FaClipboardList,
+  FaClock,
+  FaLink,
+  FaMapMarkerAlt,
+  FaStickyNote,
+  FaVideo,
+} from "react-icons/fa";
+import "./AppointmentInfoTab.scss";
 
 // Extended interview type to include job-related fields
 type AppointmentWithJobDetails = AppointmentItem & {
@@ -176,81 +171,6 @@ export default function AppointmentInfoTab({
                 </div>
               </Descriptions.Item>
             </Descriptions>
-          </Card>
-        </Col>
-        <Col span={12}>
-          {/* Appointmenter Card */}
-          <Card
-            title={
-              <span>
-                <FaUserTie className="gradient-icon" /> Người phỏng vấn
-              </span>
-            }
-            className="info-card"
-          >
-            <Descriptions column={2} bordered>
-              <Descriptions.Item
-                label={
-                  <span className="label-text">
-                    <FaUser className="gradient-icon" /> Họ và tên
-                  </span>
-                }
-                span={2}
-              >
-                <strong>{interview.interviewer}</strong>
-              </Descriptions.Item>
-
-              <Descriptions.Item
-                label={
-                  <span className="label-text">
-                    <FaEnvelope className="gradient-icon" /> Email
-                  </span>
-                }
-                span={interview.interviewerPhone ? 1 : 2}
-              >
-                <a href={`mailto:${interview.interviewerEmail}`}>
-                  {interview.interviewerEmail}
-                </a>
-              </Descriptions.Item>
-
-              {interview.interviewerPhone && (
-                <Descriptions.Item
-                  label={
-                    <span className="label-text">
-                      <FaPhone className="gradient-icon" /> Số điện thoại
-                    </span>
-                  }
-                  span={1}
-                >
-                  <a href={`tel:${interview.interviewerPhone}`}>
-                    {interview.interviewerPhone}
-                  </a>
-                </Descriptions.Item>
-              )}
-            </Descriptions>
-
-            {/* Change Appointmenter Button - Only show when status is REJECTED */}
-            {interview.status === "REJECTED" && (
-              <div style={{ marginTop: 16, textAlign: "center" }}>
-                <Button
-                  type="primary"
-                  icon={<FaExchangeAlt className="gradient-icon" />}
-                  style={{
-                    background:
-                      "linear-gradient(45deg, rgb(21, 101, 192), rgb(66, 165, 245), rgb(21, 101, 192), rgb(66, 165, 245))",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontWeight: "500",
-                  }}
-                  onClick={() => {
-                    // TODO: Implement change interviewer functionality
-                    console.log("Change interviewer clicked");
-                  }}
-                >
-                  Đổi người phỏng vấn
-                </Button>
-              </div>
-            )}
           </Card>
         </Col>
       </Row>

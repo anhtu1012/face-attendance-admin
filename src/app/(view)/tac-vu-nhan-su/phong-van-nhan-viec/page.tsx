@@ -169,7 +169,9 @@ function Page() {
         interviewType: item.interviewType,
         location: item.location,
         meetingLink: item.meetingLink,
-        interviewer: item.interviewer,
+        interviewer: Array.isArray(item.interviewer)
+          ? item.interviewer.map((i) => i.interviewerName).join(", ")
+          : item.interviewer || "",
         notes: item.notes,
       })),
     [filteredInterviewData]
