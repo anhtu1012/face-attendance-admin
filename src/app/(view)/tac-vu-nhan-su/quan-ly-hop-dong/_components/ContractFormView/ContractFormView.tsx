@@ -9,7 +9,7 @@ import {
   FullscreenOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import MDEditor from "@uiw/react-md-editor";
+import dynamic from "next/dynamic";
 import {
   Button,
   Col,
@@ -23,7 +23,8 @@ import {
   Typography,
 } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import "react-quill-new/dist/quill.snow.css";
 import FullscreenMarkdownEditor from "../FullscreenMarkdownEditor/FullscreenMarkdownEditor";
 import "./ContractFormView.scss";
 import {
@@ -33,6 +34,9 @@ import {
   positionOptions,
   statusOptions,
 } from "./data";
+
+// Dynamically import ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 function ContractFormView({
   selectedUser,
@@ -50,6 +54,54 @@ function ContractFormView({
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("basic-time");
   // const [currentStep, setCurrentStep] = useState(0);
+
+  // Quill modules configuration
+  const quillModules = useMemo(
+    () => ({
+      toolbar: [
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+        [{ font: [] }],
+        [{ size: ["small", false, "large", "huge"] }],
+        ["bold", "italic", "underline", "strike"],
+        [{ color: [] }, { background: [] }],
+        [{ script: "sub" }, { script: "super" }],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ indent: "-1" }, { indent: "+1" }],
+        [{ direction: "rtl" }],
+        [{ align: [] }],
+        ["blockquote", "code-block"],
+        ["link", "image", "video"],
+        ["clean"],
+      ],
+      clipboard: {
+        matchVisual: false,
+      },
+    }),
+    []
+  );
+
+  const quillFormats = [
+    "header",
+    "font",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "script",
+    "list",
+    "bullet",
+    "indent",
+    "direction",
+    "align",
+    "blockquote",
+    "code-block",
+    "link",
+    "image",
+    "video",
+  ];
 
   useEffect(() => {
     if (selectedUser) {
@@ -535,7 +587,7 @@ function ContractFormView({
                         </Row>
                       </div>
 
-                      {/* Markdown Editor */}
+                      {/* Rich Text Editor */}
                       <div className="editor-section">
                         <Form.Item
                           name="description"
@@ -543,27 +595,18 @@ function ContractFormView({
                           getValueFromEvent={(value) => value}
                           getValueProps={(value) => ({ value })}
                         >
-                          <div className="markdown-editor-wrapper-modern">
-                            <MDEditor
+                          <div className="quill-editor-wrapper-modern">
+                            <ReactQuill
+                              theme="snow"
                               value={description}
                               onChange={(value) => {
                                 setDescription(value);
                                 form.setFieldValue("description", value);
                               }}
-                              data-color-mode="light"
-                              preview="edit"
-                              hideToolbar={false}
-                              visibleDragbar={false}
-                              height={500}
-                              textareaProps={{
-                                placeholder:
-                                  "💡 Chọn template mẫu ở trên hoặc bắt đầu viết nội dung hợp đồng...\n\n📝 Sử dụng Markdown để định dạng:\n# Tiêu đề chính\n## Tiêu đề phụ\n- Danh sách\n**Chữ đậm** *Chữ nghiêng*\n\n> Trích dẫn quan trọng\n\n```\nCode block\n```",
-                                style: {
-                                  fontSize: 15,
-                                  lineHeight: 1.7,
-                                  minHeight: 400,
-                                },
-                              }}
+                              modules={quillModules}
+                              formats={quillFormats}
+                              placeholder="💡 Chọn template mẫu ở trên hoặc bắt đầu viết nội dung hợp đồng..."
+                              style={{ height: 400 }}
                             />
                           </div>
                         </Form.Item>

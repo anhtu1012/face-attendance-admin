@@ -41,20 +41,14 @@ function Page() {
   const columnDefs: ColDef[] = useMemo(
     () => [
       {
-        field: "titleContractCode",
-        headerName: "Mã loại hợp đồng",
-        editable: true,
-        width: 180,
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "titleContractCode", params);
-        },
-      },
-      {
-        field: "titleContractName",
+        field: "contractTypeName",
         headerName: "Tên loại hợp đồng",
         editable: true,
         width: 200,
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "contractTypeName", params);
+        },
       },
       {
         field: "note",
@@ -111,19 +105,14 @@ function Page() {
       updatedAt: new Date().toISOString(),
       createdBy: "",
       updatedBy: "",
-      titleContractCode: "",
-      titleContractName: "",
+      contractTypeName: "",
       note: "",
       status: true,
     }),
-    duplicateCheckField: "titleContractCode",
     mes,
     rowData,
     setRowData,
-    requiredFields: [
-      { field: "titleContractCode", label: "Mã loại hợp đồng" },
-      { field: "titleContractName", label: "Tên loại hợp đồng" },
-    ],
+    requiredFields: [{ field: "contractTypeName", label: "Tên loại hợp đồng" }],
     t,
     // Quicksearch parameters
     setCurrentPage,
@@ -134,7 +123,7 @@ function Page() {
   });
   useEffect(() => {
     fetchData(1, defaultPageSize, "");
-  }, [fetchData]);
+  }, []);
 
   // Create save handler (chờ API service được implement)
   const handleSave = dataGrid.createSaveHandler(
@@ -173,6 +162,11 @@ function Page() {
             setCurrentPage(currentPage);
             setPageSize(pageSize);
             fetchData(currentPage, pageSize, quickSearchText);
+          }}
+          rowSelection={{
+            mode: "singleRow",
+            enableClickSelection: true,
+            checkboxes: false,
           }}
           maxRowsVisible={13}
           columnFlex={1}

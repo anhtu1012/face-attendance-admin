@@ -1,15 +1,14 @@
 "use client";
 
-import React, { forwardRef, useEffect, useMemo, useState } from "react";
+import React, { forwardRef, useMemo } from "react";
 import Image from "next/image";
-import { marked } from "marked";
 import { ContractData, Signatures } from "../types";
 import "../styles/PdfPreview.scss";
 import dayjs from "dayjs";
 
 interface PdfPreviewProps {
   data: ContractData;
-  markdown: string;
+  markdown: string; // Giờ đây sẽ nhận HTML thay vì markdown
   signatures: Signatures;
 }
 
@@ -29,27 +28,7 @@ const InfoRow: React.FC<{
 
 export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
   ({ data, markdown, signatures }, ref) => {
-    const [parsedMarkdown, setParsedMarkdown] = useState<string>("");
-
-    useEffect(() => {
-      const parseMarkdown = async () => {
-        try {
-          const result = await marked.parse(markdown);
-          setParsedMarkdown(result);
-        } catch (error) {
-          console.error("Error parsing markdown:", error);
-          setParsedMarkdown(
-            `<p style="color: red;">Error parsing markdown content.</p>`
-          );
-        }
-      };
-
-      if (markdown) {
-        parseMarkdown();
-      } else {
-        setParsedMarkdown("");
-      }
-    }, [markdown]);
+    // markdown giờ đây chứa HTML content, không cần parse nữa
 
     const formattedDate = useMemo(() => {
       const date = new Date(data.effectiveDate);
@@ -182,7 +161,7 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
 
         <div
           className="pdf-content"
-          dangerouslySetInnerHTML={{ __html: parsedMarkdown }}
+          dangerouslySetInnerHTML={{ __html: markdown || "" }}
         />
 
         {/* Signature Block */}

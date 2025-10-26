@@ -1,26 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import {
   CloseOutlined,
-  ColumnWidthOutlined,
-  EditOutlined,
-  EyeOutlined,
   RedoOutlined,
   SaveOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import MDEditor from "@uiw/react-md-editor";
-import {
-  Button,
-  FloatButton,
-  Modal,
-  Segmented,
-  Space,
-  Tooltip,
-  Typography,
-} from "antd";
-import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { Button, FloatButton, Modal, Space, Tooltip, Typography } from "antd";
+import { useEffect, useMemo, useState } from "react";
+import "react-quill-new/dist/quill.snow.css";
 import "./FullscreenMarkdownEditor.scss";
+
+// Dynamically import ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 interface FullscreenMarkdownEditorProps {
   open: boolean;
@@ -36,12 +28,59 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
   onClose,
 }) => {
   const [fullscreenContent, setFullscreenContent] = useState<string>("");
-  const [previewMode, setPreviewMode] = useState<string>("edit");
   const [undoStack, setUndoStack] = useState<string[]>([]);
   const [redoStack, setRedoStack] = useState<string[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { Text, Title } = Typography;
+
+  // Quill modules configuration
+  const quillModules = useMemo(
+    () => ({
+      toolbar: [
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+        [{ font: [] }],
+        [{ size: ["small", false, "large", "huge"] }],
+        ["bold", "italic", "underline", "strike"],
+        [{ color: [] }, { background: [] }],
+        [{ script: "sub" }, { script: "super" }],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ indent: "-1" }, { indent: "+1" }],
+        [{ direction: "rtl" }],
+        [{ align: [] }],
+        ["blockquote", "code-block"],
+        ["link", "image", "video"],
+        ["clean"],
+      ],
+      clipboard: {
+        matchVisual: false,
+      },
+    }),
+    []
+  );
+
+  const quillFormats = [
+    "header",
+    "font",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "script",
+    "list",
+    "bullet",
+    "indent",
+    "direction",
+    "align",
+    "blockquote",
+    "code-block",
+    "link",
+    "image",
+    "video",
+  ];
 
   useEffect(() => {
     if (open) {
@@ -83,33 +122,6 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
       setRedoStack(redoStack.slice(0, -1));
       setFullscreenContent(next);
       setHasUnsavedChanges(next !== content);
-    }
-  };
-
-  // Quick formatting functions
-  const insertMarkdown = (before: string, after = "") => {
-    const textarea = document.querySelector(
-      ".fullscreen-markdown-modal .w-md-editor-text"
-    ) as HTMLTextAreaElement;
-    if (textarea) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const selectedText = textarea.value.substring(start, end);
-      const newText =
-        textarea.value.substring(0, start) +
-        before +
-        selectedText +
-        after +
-        textarea.value.substring(end);
-
-      setFullscreenContent(newText);
-      saveToUndoStack(newText);
-
-      // Restore cursor position
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start + before.length, end + before.length);
-      }, 10);
     }
   };
 
@@ -185,35 +197,11 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
                       marginLeft: 8,
                     }}
                   >
-                    Chưa lưu
+                    ● Chưa lưu
                   </Text>
                 )}
               </div>
             </div>
-          </div>
-
-          <div className="header-center">
-            <Segmented
-              value={previewMode}
-              onChange={setPreviewMode}
-              options={[
-                {
-                  label: "Chỉnh sửa",
-                  value: "edit",
-                  icon: <EditOutlined />,
-                },
-                {
-                  label: "Xem trước",
-                  value: "preview",
-                  icon: <EyeOutlined />,
-                },
-                {
-                  label: "Chia đôi",
-                  value: "live",
-                  icon: <ColumnWidthOutlined />,
-                },
-              ]}
-            />
           </div>
 
           <div className="header-right">
@@ -258,55 +246,19 @@ const FullscreenMarkdownEditor: React.FC<FullscreenMarkdownEditorProps> = ({
           </div>
         </div>
 
-        {/* Enhanced Markdown Editor */}
+        {/* Enhanced Rich Text Editor */}
         <div className="fullscreen-editor-content">
-          <MDEditor
+          <ReactQuill
+            theme="snow"
             value={fullscreenContent}
             onChange={(value) => {
               setFullscreenContent(value || "");
               saveToUndoStack(value || "");
             }}
-            data-color-mode="light"
-            preview={previewMode as any}
-            hideToolbar={false}
-            visibleDragbar={false}
-            height="calc(100vh - 160px)"
-            textareaProps={{
-              placeholder:
-                "✨ Bắt đầu viết nội dung hợp đồng của bạn...\n\n💡 Sử dụng các nút định dạng nhanh ở trên hoặc:\n• # Tiêu đề chính\n• ## Tiêu đề phụ\n• **In đậm**\n• *In nghiêng*\n• - Danh sách\n• > Trích dẫn\n\n🚀 Nhấn Ctrl+S để lưu nhanh!",
-              style: {
-                fontSize: 16,
-                lineHeight: 1.8,
-                fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-              },
-              onKeyDown: (e) => {
-                // Keyboard shortcuts
-                if (e.ctrlKey || e.metaKey) {
-                  switch (e.key) {
-                    case "s":
-                      e.preventDefault();
-                      handleSave();
-                      break;
-                    case "z":
-                      e.preventDefault();
-                      handleUndo();
-                      break;
-                    case "y":
-                      e.preventDefault();
-                      handleRedo();
-                      break;
-                    case "b":
-                      e.preventDefault();
-                      insertMarkdown("**", "**");
-                      break;
-                    case "i":
-                      e.preventDefault();
-                      insertMarkdown("*", "*");
-                      break;
-                  }
-                }
-              },
-            }}
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="✨ Bắt đầu viết nội dung hợp đồng của bạn..."
+            style={{ height: "calc(100vh - 160px)" }}
           />
         </div>
 
