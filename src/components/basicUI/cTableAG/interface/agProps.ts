@@ -9,6 +9,7 @@ import {
 import { AgGridReact } from "@ag-grid-community/react";
 import { InputSearchProps } from "../../InputSearch";
 import { ActionButtonsProps } from "@/components/action-button";
+import { SelectionActionButton } from "../components/SelectionInfoBar/SelectionInfoBar";
 export interface ExtendedColDef extends ColDef {
   context?: {
     typeColumn?:
@@ -102,4 +103,8 @@ export interface AgGridComponentProps {
   onLoadMore?: (currentPage: number, pageSize: number) => void; // Callback khi cần load thêm dữ liệu
   hasMore?: boolean; // Có còn dữ liệu để load thêm hay không
   infiniteScrollThreshold?: number; // Khoảng cách từ cuối để trigger load more (default: 100px)
+
+  // Selection info bar props
+  showSelectionInfoBar?: boolean; // Bật tính năng hiển thị thanh thông tin khi chọn nhiều dòng
+  selectionActionButtons?: SelectionActionButton[]; // Các nút action tùy chỉnh (tối đa 2 nút)
 }

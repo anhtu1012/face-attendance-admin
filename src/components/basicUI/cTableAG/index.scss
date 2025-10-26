@@ -746,3 +746,9 @@ input[type="checkbox"]:checked {
     border: 2px solid #64b5f6 !important;
   }
 }
+
+.required-header .ag-header-cell-label::after {
+  content: " *";
+  color: red;
+  margin-left: 4px;
+}

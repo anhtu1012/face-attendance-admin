@@ -19,6 +19,7 @@ import { BsFiletypeXlsx } from "react-icons/bs";
 import { FiUpload } from "react-icons/fi";
 import { CustomTooltip } from "./components/CustomTooltip";
 import FilterArrayModal from "./components/FilterArrayModal";
+import { SelectionInfoBar } from "./components/SelectionInfoBar/SelectionInfoBar";
 import { useColumnDefinitions } from "./hooks/useColumnDefinitions";
 import { useGridConfiguration } from "./hooks/useGridConfiguration";
 import { useInfiniteScroll } from "./hooks/useInfiniteScroll";
@@ -101,10 +102,14 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   onLoadMore,
   hasMore = false,
   infiniteScrollThreshold = 100,
+  showSelectionInfoBar = false,
+  selectionActionButtons,
 }) => {
   const t = useTranslations("AgGridComponent");
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedRowsCount, setSelectedRowsCount] = useState(0);
+  const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
   const {
     showFilterModal,
@@ -143,7 +148,7 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
     }
     // Fallback for old string format
     const mode = rowSelection === "single" ? "singleRow" : "multiRow";
-    return { mode, enableClickSelection: true, checkboxes: false };
+    return { mode, enableClickSelection: true, checkboxes: true };
   }, [rowSelection]);
 
   // Use infinite scroll hook
@@ -528,10 +533,18 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
 
   // Handle selection changed event
   const handleSelectionChanged = useCallback(() => {
-    if (onSelectionChanged && gridRef.current?.api) {
+    if (gridRef.current?.api) {
       try {
+        // Update selected rows count and data
+        const selectedNodes = gridRef.current.api.getSelectedNodes();
+        const selectedData = selectedNodes.map((node) => node.data);
+        setSelectedRowsCount(selectedNodes.length);
+        setSelectedRows(selectedData);
+
         // Call the callback (without parameters as per interface)
-        onSelectionChanged();
+        if (onSelectionChanged) {
+          onSelectionChanged();
+        }
       } catch (error) {
         console.error("Error in handleSelectionChanged:", error);
         // Still call the callback even if there's an error
@@ -541,6 +554,28 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
       }
     }
   }, [onSelectionChanged, gridRef]);
+
+  // Handle clear selection
+  const handleClearSelection = useCallback(() => {
+    if (gridRef.current?.api) {
+      gridRef.current.api.deselectAll();
+      setSelectedRowsCount(0);
+      setSelectedRows([]);
+    }
+  }, [gridRef]);
+
+  // Create action buttons with selected rows injected
+  const actionButtonsWithData = React.useMemo(() => {
+    if (!selectionActionButtons) return undefined;
+
+    return selectionActionButtons.map((button) => ({
+      ...button,
+      onClick: () => {
+        // Pass selected rows to the onClick handler
+        return button.onClick();
+      },
+    }));
+  }, [selectionActionButtons, selectedRows]);
 
   return (
     <div>
@@ -614,6 +649,18 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
       ) : (
         ""
       )}
+
+      {/* Selection Info Bar */}
+      {showSelectionInfoBar &&
+        normalizedRowSelection.mode === "multiRow" &&
+        normalizedRowSelection.checkboxes && (
+          <SelectionInfoBar
+            selectedCount={selectedRowsCount}
+            loading={loading}
+            actionButtons={actionButtonsWithData}
+            onClearSelection={handleClearSelection}
+          />
+        )}
 
       <div
         ref={gridWrapperRef}

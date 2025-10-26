@@ -137,8 +137,8 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
         onFinish={handleSubmit}
         onFinishFailed={handleFinishFailed}
         initialValues={{
-          shift: [{ shiftName: "", startTime: null, endTime: null }],
           country: "Việt Nam",
+          offDay: "CN",
         }}
       >
         {/* Thông tin công ty */}
@@ -291,7 +291,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
         </Row>
         {/* Thông tin liên hệ */}
         <Row gutter={16}>
-          <Col span={8}>
+          <Col span={6}>
             <Form.Item
               label="Số điện thoại"
               name="phone"
@@ -306,7 +306,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
               <Input placeholder="Nhập số điện thoại" size="large" />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={6}>
             <Form.Item
               label="Email"
               name="email"
@@ -318,7 +318,28 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
               <Input placeholder="Nhập email" size="large" />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={6}>
+            <Form.Item
+              label="Ngày nghỉ"
+              name="offDays"
+              rules={[{ required: true, message: "Vui lòng chọn ngày nghỉ" }]}
+            >
+              <Select
+                size="large"
+                mode="multiple"
+                options={[
+                  { label: "Thứ 2", value: "T2" },
+                  { label: "Thứ 3", value: "T3" },
+                  { label: "Thứ 4", value: "T4" },
+                  { label: "Thứ 5", value: "T5" },
+                  { label: "Thứ 6", value: "T6" },
+                  { label: "Thứ 7", value: "T7" },
+                  { label: "Chủ nhật", value: "CN" },
+                ]}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
             <Form.Item
               label="Website"
               name="website"

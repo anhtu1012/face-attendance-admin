@@ -1,14 +1,16 @@
 import { Dayjs } from "dayjs";
 
+export interface CandidateData {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+}
+
 export interface InterviewScheduleModalProps {
   open: boolean;
   onClose: () => void;
-  candidateData?: {
-    id: string;
-    fullName: string;
-    email: string;
-    phone: string;
-  };
+  candidateData?: CandidateData | CandidateData[];
   jobId?: string;
   onSuccess?: () => void;
 }

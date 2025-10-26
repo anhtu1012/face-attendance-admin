@@ -203,18 +203,24 @@ export class TimeCellEditor implements ICellEditorComp {
     return this.eInput;
   }
 
-  // Trả về giá trị dưới dạng HH:mm
+  // Trả về giá trị dưới dạng ISO string để lưu vào database
   getValue(): string {
     const value = this.eInput.value;
     if (!value) {
-      // Nếu không có giá trị, trả về giờ hiện tại
+      // Nếu không có giá trị, trả về giờ hiện tại dưới dạng ISO
       const now = new Date();
-      const hours = now.getHours().toString().padStart(2, "0");
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      return `${hours}:${minutes}`;
+      return now.toISOString();
     }
 
-    return value; // Đã là format HH:mm
+    // Chuyển HH:mm thành ISO string (ngày hôm nay với giờ đã chọn)
+    const [hours, minutes] = value.split(":");
+    const today = new Date();
+    today.setHours(parseInt(hours, 10));
+    today.setMinutes(parseInt(minutes, 10));
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+
+    return today.toISOString();
   }
 
   destroy(): void {

@@ -18,11 +18,15 @@ import "./InfoInterviewLeader.scss"; // import SCSS
 interface InfoInterviewLeaderProps {
   jobId: string | undefined;
   onSelectedChange?: (selectedUsers: any[]) => void;
+  preSelectedEmails?: string[]; // Array of emails to pre-select
+  disabled?: boolean; // Disable the entire component
 }
 
 function InfoInterviewLeader({
   jobId,
   onSelectedChange,
+  preSelectedEmails = [],
+  disabled = false,
 }: InfoInterviewLeaderProps) {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("InfoInterviewLeader");
@@ -59,6 +63,35 @@ function InfoInterviewLeader({
     handleFetchInterviwer();
   }, [handleFetchInterviwer]);
 
+  // Pre-select interviewers based on emails when data is loaded
+  useEffect(() => {
+    if (
+      rowData.length > 0 &&
+      preSelectedEmails.length > 0 &&
+      gridRef.current?.api
+    ) {
+      // Wait a bit for the grid to be fully rendered
+      setTimeout(() => {
+        const nodesToSelect: any[] = [];
+
+        gridRef.current.api.forEachNode((node: any) => {
+          if (preSelectedEmails.includes(node.data.email)) {
+            nodesToSelect.push(node);
+          }
+        });
+        // Select the nodes
+        gridRef.current.api.setNodesSelected({
+          nodes: nodesToSelect,
+          newValue: true,
+        });
+
+        // Trigger selection change event
+        const selectedData = nodesToSelect.map((node) => node.data);
+        onSelectedChange?.(selectedData);
+      }, 100);
+    }
+  }, [rowData, preSelectedEmails, onSelectedChange]);
+
   const handleRowSelectionChanged = useCallback(() => {
     const selectedNodes = gridRef.current?.api?.getSelectedNodes() || [];
     const selectedData = selectedNodes.map((node) => node.data);
@@ -66,12 +99,18 @@ function InfoInterviewLeader({
   }, [onSelectedChange]);
 
   return (
-    <div className="info-interview-leader">
+    <div
+      className={`info-interview-leader ${disabled ? "disabled" : ""}`}
+      style={{
+        opacity: disabled ? 0.6 : 1,
+        pointerEvents: disabled ? "none" : "auto",
+      }}
+    >
       <AgGridComponent
         loading={loading}
         rowSelection={{
           mode: "multiRow",
-          enableClickSelection: true,
+          enableClickSelection: !disabled,
           checkboxes: true,
         }}
         showSTT={false}
@@ -83,7 +122,7 @@ function InfoInterviewLeader({
         maxRowsVisible={10}
         columnFlex={1}
         showActionButtons={false}
-        onSelectionChanged={handleRowSelectionChanged}
+        onSelectionChanged={disabled ? undefined : handleRowSelectionChanged}
       />
     </div>
   );

@@ -726,7 +726,7 @@ function Page() {
               }}
               paginationPageSize={pageSize}
               paginationCurrentPage={currentPage}
-              maxRowsVisible={30}
+              maxRowsVisible={15}
               onChangePage={handlePageChange}
               onSelectionChanged={onSelectionChanged}
               onCellValueChanged={onCellValueChanged}

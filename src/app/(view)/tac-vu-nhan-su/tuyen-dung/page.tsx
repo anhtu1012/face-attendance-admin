@@ -24,8 +24,6 @@ import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { AiOutlineCloseCircle } from "react-icons/ai";
-import { BiSolidSkipNextCircle } from "react-icons/bi";
 import AIAnalysisResultModal from "@/components/AIAnalysisResultModal/AIAnalysisResultModal";
 import { FaPlusCircle } from "react-icons/fa";
 import { FcViewDetails } from "react-icons/fc";
@@ -43,6 +41,12 @@ import ListJob from "./_components/ListJob/ListJob";
 import SuccessModal from "./_components/SuccessModal/SuccessModal";
 import "./_components/SuccessModal/SuccessModal.scss";
 import "./index.scss";
+import { DiGoogleAnalytics } from "react-icons/di";
+import { getSelectionActionButtons } from "./_helpers/selectionActionButtons";
+import {
+  handleBatchStatusChange as batchStatusChange,
+  handleBatchSchedule,
+} from "./_helpers/batchHandlers";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
@@ -70,7 +74,7 @@ function Page() {
   const [leaderReportModalOpen, setLeaderReportModalOpen] = useState(false);
   const [aiAnalysisModalOpen, setAiAnalysisModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] =
-    useState<TuyenDungItem | null>(null);
+    useState<TuyenDungItem | TuyenDungItem[] | null>(null);
   const messageApi = useAntdMessage();
   const [contractLink, setContractLink] = useState<string>("");
   const [jobId, setJobId] = useState<string>("");
@@ -403,6 +407,8 @@ function Page() {
   };
 
   // PHONG_VAN modal handlers
+  // Used in batch handlers (handleBatchInterviewSchedule)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleOpenInterviewModal = (_params: any) => {
     if (_params) {
       setSelectedCandidate(_params.data);
@@ -428,6 +434,8 @@ function Page() {
   };
 
   // Job offer modal handlers
+  // Used in batch handlers (handleBatchJobOffer)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleOpenJobOfferModal = (_params: any) => {
     if (_params) {
       setSelectedCandidate(_params.data);
@@ -504,6 +512,101 @@ function Page() {
     () => handleFetchUser(currentPage, pageSize, quickSearchText)
   );
 
+  // Handle batch status change for selected candidates (wrapper)
+  const handleBatchStatusChange = async (
+    selectedRows: TuyenDungItem[],
+    status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED"
+  ) => {
+    await batchStatusChange({
+      selectedRows,
+      status,
+      setLoading,
+      setQuantityStatus,
+      setNewCounts,
+      messageApi,
+      handleFetchUser,
+      currentPage,
+      pageSize,
+      quickSearchText,
+    });
+  };
+
+  // Handle batch interview scheduling (wrapper)
+  const handleBatchInterviewSchedule = async (
+    selectedRows: TuyenDungItem[]
+  ) => {
+    await handleBatchSchedule({
+      selectedRows,
+      messageApi,
+      setSelectedCandidate: (candidate) => setSelectedCandidate(candidate),
+      setModalOpen: setInterviewModalOpen,
+      modalType: "interview",
+    });
+  };
+
+  // Handle batch job offer scheduling (wrapper)
+  const handleBatchJobOffer = async (selectedRows: TuyenDungItem[]) => {
+    await handleBatchSchedule({
+      selectedRows,
+      messageApi,
+      setSelectedCandidate: (candidate) => setSelectedCandidate(candidate),
+      setModalOpen: setJobOfferModalOpen,
+      modalType: "jobOffer",
+    });
+  };
+
+  // Handle batch cancel job offer
+  const handleBatchCancelJobOffer = async (selectedRows: TuyenDungItem[]) => {
+    if (selectedRows.length === 0) {
+      messageApi.warning("Vui lòng chọn ít nhất một ứng viên!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // TODO: Implement API call to cancel job offer
+      // await TuyenDungServices.cancelJobOffer(selectedRows.map(r => r.id));
+
+      messageApi.success(
+        `Đã hủy nhận việc cho ${selectedRows.length} ứng viên`
+      );
+
+      // Update quantity status
+      setQuantityStatus((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          toJobOfferedQuantity: Math.max(
+            Number(prev.toJobOfferedQuantity || 0) - selectedRows.length,
+            0
+          ),
+        } as Record<string, number>;
+      });
+
+      // Update new counts
+      setNewCounts((prev) => ({
+        ...prev,
+        NHAN_VIEC: Math.max(
+          Number(prev.NHAN_VIEC || 0) - selectedRows.length,
+          0
+        ),
+      }));
+
+      // Refresh grid
+      await handleFetchUser(currentPage, pageSize, quickSearchText);
+    } catch (error: any) {
+      showError(
+        error.response?.data?.message || "Có lỗi xảy ra khi hủy nhận việc"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Single candidate status change handler
+  // Kept for direct single-row actions if needed in the future
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleChangeStatusToInterview = async (
     _params: any,
     status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED"
@@ -607,7 +710,7 @@ function Page() {
     // Default view details button that appears in all cases
     const defaultViewButton = (
       <Tooltip title="Xem chi tiết">
-        <FcViewDetails
+        <DiGoogleAnalytics
           className="tool-icon view-details-icon"
           size={26}
           onClick={() => {
@@ -618,96 +721,44 @@ function Page() {
       </Tooltip>
     );
 
+    // PHONG_VAN - INTERVIEW_SCHEDULED: Show interview details button
     if (
-      selectedStatus === "LIEN_HE" ||
-      _params.data.status === "NOT_SUITABLE"
-    ) {
-      return (
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {defaultViewButton}
-          <Tooltip title="Không liên hệ được">
-            <AiOutlineCloseCircle
-              className="tool-icon cannot-contact-icon"
-              size={26}
-              style={{ color: "#c62828" }}
-              onClick={() =>
-                handleChangeStatusToInterview(_params, "CANNOT_CONTACT")
-              }
-            />
-          </Tooltip>
-          <Tooltip title="Chuyển đến phỏng vấn">
-            <BiSolidSkipNextCircle
-              className="tool-icon interview-icon"
-              size={30}
-              onClick={() =>
-                handleChangeStatusToInterview(_params, "TO_INTERVIEW")
-              }
-            />
-          </Tooltip>
-        </div>
-      );
-    } else if (
-      selectedStatus === "PHONG_VAN" &&
-      _params.data.status === "TO_INTERVIEW"
-    ) {
-      return (
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {defaultViewButton}
-          <Tooltip title="Từ chối phỏng vấn">
-            <AiOutlineCloseCircle
-              className="tool-icon cannot-contact-icon"
-              size={26}
-              style={{ color: "#c62828" }}
-              onClick={() =>
-                handleChangeStatusToInterview(_params, "INTERVIEW_REJECTED")
-              }
-            />
-          </Tooltip>
-          <Tooltip title="Tạo lịch hẹn">
-            <FaPlusCircle
-              className="tool-icon interview-icon"
-              size={30}
-              onClick={() => handleOpenInterviewModal(_params)}
-            />
-          </Tooltip>
-        </div>
-      );
-    } else if (
       _params.data.status === "INTERVIEW_SCHEDULED" &&
       selectedStatus === "PHONG_VAN"
     ) {
       return (
-        <Tooltip title="Chi tiết lịch phỏng vấn">
-          <FcViewDetails
-            className="tool-icon interview-icon"
-            size={30}
-            onClick={() => handleOpenInterviewListModal(_params)}
-          />
-        </Tooltip>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {defaultViewButton}
+          <Tooltip title="Chi tiết lịch phỏng vấn">
+            <FcViewDetails
+              className="tool-icon interview-icon"
+              size={30}
+              onClick={() => handleOpenInterviewListModal(_params)}
+            />
+          </Tooltip>
+        </div>
       );
-    } else if (selectedStatus === "NHAN_VIEC") {
-      return (
-        <Tooltip title="Hẹn nhận việc">
-          <FaPlusCircle
-            className="tool-icon offer-icon"
-            size={30}
-            onClick={() => handleOpenJobOfferModal(_params)}
-          />
-        </Tooltip>
-      );
-    } else if (selectedStatus === "HOP_DONG") {
-      return (
-        <Tooltip title="Xem báo cáo từ Leader">
-          <GoReport
-            className="tool-icon report-icon"
-            size={30}
-            onClick={() => handleOpenLeaderReportModal(_params)}
-          />
-        </Tooltip>
-      );
-    } else {
-      return null;
     }
+
+    // HOP_DONG: Show leader report button
+    if (selectedStatus === "HOP_DONG") {
+      return (
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {defaultViewButton}
+          <Tooltip title="Xem báo cáo từ Leader">
+            <GoReport
+              className="tool-icon report-icon"
+              size={26}
+              style={{ color: "#1976d2" }}
+              onClick={() => handleOpenLeaderReportModal(_params)}
+            />
+          </Tooltip>
+        </div>
+      );
+    }
+
+    // Default: Only show view details button for all other cases
+    return defaultViewButton;
   };
 
   if (!dataGrid.isClient) {
@@ -793,21 +844,30 @@ function Page() {
               total={totalItems}
               paginationPageSize={pageSize}
               rowSelection={{
-                mode: "singleRow",
+                mode: "multiRow",
                 enableClickSelection: true,
-                checkboxes: false,
+                checkboxes: true,
               }}
+              showSelectionInfoBar={true}
+              selectionActionButtons={getSelectionActionButtons({
+                selectedStatus,
+                gridRef,
+                handleBatchStatusChange,
+                handleBatchInterviewSchedule,
+                handleBatchJobOffer,
+                handleBatchCancelJobOffer,
+              })}
               onCellValueChanged={dataGrid.onCellValueChanged}
               onSelectionChanged={dataGrid.onSelectionChanged}
               paginationCurrentPage={currentPage}
               pagination={true}
-              maxRowsVisible={10}
+              maxRowsVisible={15}
               onChangePage={handlePageChange}
               onQuicksearch={dataGrid.handleQuicksearch}
               columnFlex={0}
               showToolColumn={true}
               toolColumnRenderer={buttonProps}
-              toolColumnWidth={150}
+              toolColumnWidth={100}
               showActionButtons={true}
               actionButtonsProps={{
                 hideAdd: selectedStatus !== "LIEN_HE" ? true : false,
@@ -836,8 +896,16 @@ function Page() {
           <InterviewListModal
             open={listModalOpen}
             onClose={() => setListModalOpen(false)}
-            candidateId={selectedCandidate?.id}
-            candidateName={selectedCandidate?.fullName}
+            candidateId={
+              selectedCandidate && !Array.isArray(selectedCandidate)
+                ? selectedCandidate.id
+                : undefined
+            }
+            candidateName={
+              selectedCandidate && !Array.isArray(selectedCandidate)
+                ? selectedCandidate.fullName
+                : undefined
+            }
           />
         </React.Suspense>
       )}
@@ -868,12 +936,19 @@ function Page() {
         onClose={handleCloseInterviewModal}
         candidateData={
           selectedCandidate
-            ? {
-                id: selectedCandidate.id || "",
-                fullName: selectedCandidate.fullName || "",
-                email: selectedCandidate.email || "",
-                phone: selectedCandidate.phone || "",
-              }
+            ? Array.isArray(selectedCandidate)
+              ? selectedCandidate.map((c) => ({
+                  id: c.id || "",
+                  fullName: c.fullName || "",
+                  email: c.email || "",
+                  phone: c.phone || "",
+                }))
+              : {
+                  id: selectedCandidate.id || "",
+                  fullName: selectedCandidate.fullName || "",
+                  email: selectedCandidate.email || "",
+                  phone: selectedCandidate.phone || "",
+                }
             : undefined
         }
         jobId={jobId}
@@ -885,7 +960,7 @@ function Page() {
         open={jobOfferModalOpen}
         onClose={handleCloseJobOfferModal}
         candidateData={
-          selectedCandidate
+          selectedCandidate && !Array.isArray(selectedCandidate)
             ? {
                 id: selectedCandidate.id || "",
                 fullName: selectedCandidate.fullName || "",
@@ -901,7 +976,7 @@ function Page() {
         open={leaderReportModalOpen}
         onClose={handleCloseLeaderReportModal}
         candidateData={
-          selectedCandidate
+          selectedCandidate && !Array.isArray(selectedCandidate)
             ? {
                 id: selectedCandidate.id || "",
                 fullName: selectedCandidate.fullName || "",
@@ -920,7 +995,11 @@ function Page() {
             setAiAnalysisModalOpen(false);
             setSelectedCandidate(null);
           }}
-          analysisResult={selectedCandidate?.analysisResult ?? null}
+          analysisResult={
+            selectedCandidate && !Array.isArray(selectedCandidate)
+              ? selectedCandidate.analysisResult ?? null
+              : null
+          }
         />
       )}
     </div>

@@ -37,8 +37,7 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  const { selectRole, selectDepartment } = useSelectData({
-    fetchRole: true,
+  const { selectDepartment } = useSelectData({
     fetchDepartment: true,
   });
   // Define columnDefs first before dataGrid hook
@@ -59,49 +58,17 @@ function Page() {
         headerName: t("boPhan"),
         editable: true,
         width: 150,
-        context: { typeColumn: "Select", selectOptions: selectDepartment },
+        context: { typeColumn: "Tag", selectOptions: selectDepartment },
       },
-      {
-        field: "roleId",
-        headerName: t("quyenChucVu"),
-        editable: true,
-        width: 150,
-        context: {
-          typeColumn: "Tag",
-          selectOptions: selectRole,
-        },
-        cellRendererParams: {
-          colorMap: {
-            1: "blue",
-            2: "green",
-            4: "red",
-            5: "cyan",
-            6: "pink",
-          },
-        },
-      },
+
       {
         field: "description",
         headerName: t("moTa"),
         editable: true,
         width: 200,
       },
-      {
-        field: "overtimeSalary",
-        headerName: t("luongTangCa"),
-        editable: true,
-        width: 150,
-        context: { typeColumn: "Number" },
-      },
-      {
-        field: "lateFine",
-        headerName: t("phiDiMuon"),
-        editable: true,
-        width: 150,
-        context: { typeColumn: "Number" },
-      },
     ],
-    [itemErrorCellStyle, selectDepartment, selectRole, t]
+    [itemErrorCellStyle, selectDepartment, t]
   );
 
   const fetchData = useCallback(
@@ -145,19 +112,13 @@ function Page() {
       updatedBy: "",
       positionName: "",
       departmentId: "",
-      roleId: "",
       description: "",
-      overtimeSalary: 0,
-      lateFine: 0,
     }),
     duplicateCheckField: "positionName",
     mes,
     rowData,
     setRowData,
-    requiredFields: [
-      { field: "positionName", label: t("tenChucVu") },
-      { field: "roleId", label: t("quyenChucVu") },
-    ],
+    requiredFields: [{ field: "positionName", label: t("tenChucVu") }],
     t,
     // Quicksearch parameters
     setCurrentPage,

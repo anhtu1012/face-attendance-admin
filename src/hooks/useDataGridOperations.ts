@@ -360,9 +360,6 @@ export function useDataGridOperations<T extends Record<string, any>>({
         throw new Error("validateRowData is required");
       }
       return async () => {
-        console.log("editedRows", editedRows);
-        console.log("changedValues", changedValues);
-
         // Check for duplicates before saving
         if (duplicateIDs.length > 0) {
           showError(mes("duplicateIDs"));

@@ -469,9 +469,76 @@
   },
   "DanhMucBoPhan": {
     "departmentName": "Department Name",
-    "description": "Description"
+    "description": "Description",
+    "shiftStartTime": "Shift Start Time",
+    "hoursOfWork": "Hours Of Work",
+    "shiftEndTime": "Shift End Time",
+    "lunchBreak": "Lunch Break",
+    "totalWorkHour": "Total Work Hour"
   },
   "InfoInterviewLeader": {
     "userName": "Name and position"
+  },
+  "HolidayConfig": {
+    "title": "Holiday Configuration",
+    "publicHolidays": "Public Holidays",
+    "customHolidays": "Custom Holidays",
+    "monthHolidays": "This Month's Holidays",
+    "totalHolidays": "Total Holidays",
+    "addHoliday": "Add Holiday",
+    "reloadPublicHolidays": "Reload Public Holidays",
+    "year": "Year",
+    "holidayList": "Holiday List for Month",
+    "date": "Date",
+    "name": "Holiday Name",
+    "description": "Description",
+    "isRecurring": "Recurring Annually",
+    "type": "Type",
+    "public": "Public",
+    "custom": "Custom",
+    "recurring": "Annual",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this holiday?",
+    "add": "Add",
+    "cancel": "Cancel",
+    "selectDate": "Select Holiday Date",
+    "enterName": "E.g.: Company Holiday",
+    "enterDescription": "Detailed description of the holiday",
+    "select": "Select",
+    "yes": "Yes",
+    "no": "No",
+    "success": {
+      "loaded": "Loaded {count} public holidays!",
+      "added": "Holiday added successfully!",
+      "deleted": "Holiday deleted successfully!"
+    },
+    "error": {
+      "loadFailed": "Cannot load holidays from API",
+      "validation": "Please check the information!"
+    },
+    "placeholder": {
+      "selectDate": "Select holiday date",
+      "enterName": "Enter holiday name",
+      "enterDescription": "Enter description"
+    },
+    "noData": "No holidays this month"
+  },
+  "DanhMucSystemSetting": {
+    "tieuDe": "Title",
+    "moTa": "Description",
+    "giaTri": "Value",
+    "trangThai": "Status",
+    "timKiem": "Search...",
+    "themMoi": "Add new setting",
+    "xemChiTiet": "View details",
+    "chinhSua": "Edit setting",
+    "xoa": "Delete setting",
+    "capNhat": "Update",
+    "huy": "Cancel",
+    "vuilongNhapTieuDe": "Please enter title!",
+    "nhapTieuDe": "Enter title",
+    "nhapMoTa": "Enter description",
+    "vuilongNhapGiaTri": "Please enter value!",
+    "nhapGiaTri": "Enter value"
   }
 }

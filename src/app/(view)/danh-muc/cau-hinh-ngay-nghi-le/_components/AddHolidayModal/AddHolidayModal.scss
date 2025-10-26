@@ -1,0 +1,92 @@
+// Add Holiday Modal Styles
+@import "@/styles/inputs";
+
+.add-holiday-modal {
+  :global {
+    .ant-modal-header {
+      background: linear-gradient(
+        45deg,
+        rgb(21, 101, 192),
+        rgb(66, 165, 245),
+        rgb(21, 101, 192),
+        rgb(66, 165, 245)
+      );
+      border: none;
+      border-radius: 12px 12px 0 0;
+      padding: 20px 24px;
+
+      .ant-modal-title {
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .ant-modal-close {
+      color: white;
+      top: 16px;
+      right: 16px;
+
+      &:hover {
+        color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    .ant-modal-content {
+      border-radius: 12px;
+      box-shadow: 0 12px 48px rgba(21, 101, 192, 0.2);
+    }
+
+    .ant-modal-body {
+      padding: 24px;
+    }
+
+    .ant-modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(21, 101, 192, 0.1);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+
+      .cbutton-wrapper {
+        .cbutton {
+          height: 40px;
+          padding: 0 24px;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .holiday-form {
+    :global {
+      .ant-form-item-label > label {
+        font-weight: 600;
+        color: #262626;
+        font-size: 14px;
+        height: 24px;
+
+        &::before {
+          display: inline-block !important;
+          margin-right: 4px;
+          color: #ff4d4f;
+          font-size: 14px;
+          font-family: SimSun, sans-serif;
+          line-height: 1;
+          content: "*";
+        }
+      }
+
+      .ant-form-item-required::before {
+        display: none !important;
+      }
+
+      // Form item margin
+      .ant-form-item {
+        margin-bottom: 20px;
+      }
+    }
+  }
+}

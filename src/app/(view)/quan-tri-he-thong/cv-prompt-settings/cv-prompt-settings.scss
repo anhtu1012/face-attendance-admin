@@ -24,7 +24,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -51,14 +52,19 @@
     border-radius: 12px;
     animation: fadeInUp 0.5s ease-out;
     transition: all 0.3s ease;
-    
+
     &:hover {
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
       transform: translateY(-2px);
     }
-    
+
     .ant-card-head {
-      background: linear-gradient(135deg, #1e88e5 0%, #1565c0 50%, #0d47a1 100%);
+      background: linear-gradient(
+        135deg,
+        #1e88e5 0%,
+        #1565c0 50%,
+        #0d47a1 100%
+      );
       background-size: 200% 200%;
       animation: shimmer 3s ease-in-out infinite;
       border-radius: 12px 12px 0 0;
@@ -66,9 +72,9 @@
       padding: 20px 24px;
       position: relative;
       overflow: hidden;
-      
+
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: -100%;
@@ -82,11 +88,11 @@
         );
         transition: left 0.5s ease;
       }
-      
+
       &:hover::before {
         left: 100%;
       }
-      
+
       .ant-card-head-title {
         color: white;
         font-size: 18px;
@@ -94,7 +100,7 @@
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
     }
-    
+
     .ant-card-body {
       padding: 24px;
     }
@@ -106,7 +112,7 @@
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
-    
+
     .ant-table-thead > tr > th {
       background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
       color: #0d47a1;
@@ -114,44 +120,44 @@
       border-bottom: 2px solid rgba(30, 136, 229, 0.2);
       padding: 16px;
       transition: all 0.3s ease;
-      
+
       &::before {
         background-color: rgba(30, 136, 229, 0.1) !important;
       }
     }
-    
+
     .ant-table-tbody > tr {
       transition: all 0.3s ease;
-      
+
       > td {
         padding: 16px;
       }
-      
+
       &:hover {
         background-color: #f5f9ff;
         transform: scale(1.01);
         box-shadow: 0 4px 12px rgba(30, 136, 229, 0.08);
       }
-      
+
       &:nth-child(even) {
         background-color: rgba(248, 250, 251, 0.5);
       }
     }
-    
+
     .ant-table-pagination {
       margin: 24px 16px;
-      
+
       .ant-pagination-item {
         border-radius: 6px;
-        
+
         &:hover {
           border-color: #1e88e5;
         }
-        
+
         &-active {
           background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
           border-color: transparent;
-          
+
           a {
             color: white;
           }
@@ -166,37 +172,43 @@
       overflow: hidden;
       box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
       animation: fadeInUp 0.3s ease-out;
-      
+
       @media (prefers-reduced-motion: no-preference) {
         animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
-    
+
     .ant-modal-mask {
       backdrop-filter: blur(4px);
       background-color: rgba(0, 0, 0, 0.5) !important;
     }
-    
+
     .ant-modal-header {
-      background: linear-gradient(135deg, #1e88e5 0%, #1565c0 50%, #0d47a1 100%);
+      background: linear-gradient(
+        135deg,
+        #1e88e5 0%,
+        #1565c0 50%,
+        #0d47a1 100%
+      );
       padding: 20px 32px;
       border-bottom: none;
       position: relative;
-      
+
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, 
+        background: linear-gradient(
+          90deg,
           rgba(255, 255, 255, 0) 0%,
           rgba(255, 255, 255, 0.3) 50%,
           rgba(255, 255, 255, 0) 100%
         );
       }
-      
+
       .ant-modal-title {
         color: white;
         font-size: 20px;
@@ -212,14 +224,14 @@
         height: 56px;
         line-height: 56px;
         font-size: 18px;
-        
+
         &:hover {
           background-color: rgba(255, 255, 255, 0.1);
           border-radius: 8px;
         }
       }
     }
-    
+
     .ant-modal-body {
       padding: 32px;
       background: linear-gradient(to bottom, #f8fafb 0%, #ffffff 100%);
@@ -229,17 +241,17 @@
       padding: 16px 32px;
       background: #f8fafb;
       border-top: 1px solid rgba(13, 71, 161, 0.08);
-      
+
       .ant-btn {
         height: 40px;
         padding: 0 24px;
         font-weight: 500;
         border-radius: 8px;
         transition: all 0.3s ease;
-        
+
         &.ant-btn-default {
           border: 2px solid rgba(13, 71, 161, 0.2);
-          
+
           &:hover {
             border-color: #1e88e5;
             color: #1e88e5;
@@ -247,12 +259,12 @@
             box-shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
           }
         }
-        
+
         &.ant-btn-primary {
           background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
           border: none;
           box-shadow: 0 4px 12px rgba(13, 71, 161, 0.25);
-          
+
           &:hover {
             background: linear-gradient(135deg, #1976d2 0%, #0a3d8f 100%);
             transform: translateY(-1px);
@@ -261,17 +273,17 @@
         }
       }
     }
-    
+
     .ant-tabs {
       .ant-tabs-nav {
         margin-bottom: 32px;
         padding: 0 8px;
-        
+
         &::before {
           border-bottom: 2px solid rgba(13, 71, 161, 0.08);
         }
       }
-      
+
       .ant-tabs-tab {
         padding: 12px 20px;
         margin: 0 4px;
@@ -280,29 +292,29 @@
         color: #666;
         border-radius: 8px 8px 0 0;
         transition: all 0.3s ease;
-        
+
         &:hover {
           color: #1e88e5;
           background-color: rgba(30, 136, 229, 0.05);
         }
-        
+
         &.ant-tabs-tab-active {
           background: white;
           box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
-          
+
           .ant-tabs-tab-btn {
             color: #1e88e5;
             font-weight: 600;
           }
         }
       }
-      
+
       .ant-tabs-ink-bar {
         height: 3px;
         background: linear-gradient(90deg, #1e88e5 0%, #0d47a1 100%);
         border-radius: 2px 2px 0 0;
       }
-      
+
       .ant-tabs-content-holder {
         background: white;
         padding: 24px;
@@ -310,23 +322,23 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       }
     }
-    
+
     .ant-form-item {
       margin-bottom: 24px;
-      
+
       &:last-child {
         margin-bottom: 0;
       }
     }
-    
+
     .ant-form-item-label {
       padding-bottom: 8px;
-      
+
       label {
         font-weight: 600;
         font-size: 14px;
         color: #2c3e50;
-        
+
         .label-en {
           font-size: 12px;
           color: #7f8c8d;
@@ -334,12 +346,12 @@
           font-weight: normal;
           font-style: italic;
         }
-        
+
         &::after {
           content: none;
         }
       }
-      
+
       .ant-form-item-required {
         &::before {
           color: #e74c3c;
@@ -347,16 +359,17 @@
         }
       }
     }
-    
+
     .ant-divider {
       margin: 24px 0;
       border-top-color: rgba(13, 71, 161, 0.08);
-      
+
       &.ant-divider-with-text {
-        &:before, &:after {
+        &:before,
+        &:after {
           border-top-color: rgba(13, 71, 161, 0.12);
         }
-        
+
         .ant-divider-inner-text {
           color: #0d47a1;
           font-weight: 600;
@@ -371,7 +384,7 @@
 
     .ant-switch {
       background-color: rgba(0, 0, 0, 0.25);
-      
+
       &.ant-switch-checked {
         background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
       }
@@ -386,7 +399,7 @@
       height: 40px;
       padding: 0 20px;
       box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
-      
+
       &:hover {
         background: linear-gradient(135deg, #1976d2 0%, #0a3d8f 100%);
         box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
@@ -404,12 +417,12 @@
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(255, 179, 0, 0.3);
       transition: all 0.3s ease;
-      
+
       &:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(255, 179, 0, 0.4);
       }
-      
+
       .anticon {
         margin-right: 4px;
       }
@@ -427,37 +440,37 @@
     border-left: 4px solid #1e88e5;
     box-shadow: 0 2px 8px rgba(30, 136, 229, 0.08);
     transition: all 0.3s ease;
-    
+
     &:hover {
       transform: translateX(4px);
       box-shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
       border-left-width: 6px;
     }
-    
+
     div {
       margin: 6px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       animation: slideIn 0.3s ease-out;
-      
+
       &:first-child {
         animation-delay: 0.1s;
       }
-      
+
       &:nth-child(2) {
         animation-delay: 0.2s;
       }
-      
+
       &:last-child {
         animation-delay: 0.3s;
       }
-      
+
       span:first-child {
         color: #555;
         font-size: 13px;
       }
-      
+
       span:last-child {
         font-weight: 700;
         color: #0d47a1;
@@ -474,31 +487,31 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    
+
     .ant-btn-link {
       padding: 6px 12px;
       height: auto;
       border-radius: 6px;
       font-weight: 500;
       transition: all 0.3s ease;
-      
+
       &:hover {
         background-color: rgba(30, 136, 229, 0.1);
         transform: translateY(-2px);
         box-shadow: 0 2px 8px rgba(30, 136, 229, 0.15);
       }
-      
+
       &.ant-btn-dangerous {
         &:hover {
           background-color: rgba(255, 77, 79, 0.1);
           box-shadow: 0 2px 8px rgba(255, 77, 79, 0.15);
         }
       }
-      
+
       .anticon {
         transition: transform 0.3s ease;
       }
-      
+
       &:hover .anticon {
         transform: scale(1.2);
       }
@@ -511,42 +524,43 @@
   .ant-input {
     @extend .custom-input;
     font-size: 14px;
-    
+
     &:focus {
       box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.12);
     }
   }
-  
+
   .ant-input-number-wrapper {
     @extend .custom-input-number;
     width: 100%;
   }
-  
+
   .ant-input-number {
     width: 100%;
-    
-    &:focus, &:focus-within {
+
+    &:focus,
+    &:focus-within {
       box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.12);
     }
   }
-  
+
   .ant-input-textarea {
     textarea {
       @extend .custom-textarea;
       min-height: 100px;
       font-size: 14px;
       line-height: 1.6;
-      
+
       &:focus {
         box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.12);
       }
-      
+
       &::placeholder {
         color: rgba(0, 0, 0, 0.35);
       }
     }
   }
-  
+
   // Space component adjustments
   .threshold-fields {
     display: flex;
@@ -557,18 +571,18 @@
     border-radius: 12px;
     border: 2px solid rgba(13, 71, 161, 0.08);
     transition: all 0.3s ease;
-    
+
     &:hover {
       border-color: rgba(30, 136, 229, 0.2);
       box-shadow: 0 4px 12px rgba(30, 136, 229, 0.08);
     }
-    
+
     .ant-form-item {
       margin-bottom: 0;
       flex: 1;
     }
   }
-  
+
   // Form item groups with visual cards
   .form-group-card {
     background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
@@ -577,20 +591,20 @@
     border: 2px solid rgba(13, 71, 161, 0.08);
     margin-bottom: 20px;
     transition: all 0.3s ease;
-    
+
     &:hover {
       border-color: rgba(30, 136, 229, 0.2);
       box-shadow: 0 4px 12px rgba(30, 136, 229, 0.08);
     }
   }
-  
+
   // Switch styling
   .ant-form-item-control-input-content {
     .ant-space {
       gap: 24px !important;
     }
   }
-  
+
   // Input number with percentage
   .ant-input-number-group-wrapper {
     width: 100%;

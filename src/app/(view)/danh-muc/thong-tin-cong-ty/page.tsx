@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
+import { CompanyInfo } from "@/dtos/danhMuc/thong-tin-cong-ty/thongTinCongTy.dto";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import DanhMucCompanyInfoServices from "@/services/danh-muc/thong-tin-cong-ty/thong-tin-cong-ty.service";
+import { LegalRepresentativeDto } from "@/types/dtoRepresent";
 import { ErrorResponse } from "@/types/error";
 import { Button, Form } from "antd";
-import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
 import CompanyInfoForm from "./_components/CompanyInfoForm";
-import ShiftManagementCard from "./_components/ShiftManagementCard";
 import SmallGoogleMap from "./_components/SmallGoogleMap";
 import { useAddressHandler } from "./_hooks/useAddressHandler";
 import { useMapHandler } from "./_hooks/useMapHandler";
 import "./index.scss";
-import { CompanyInfo } from "@/dtos/danhMuc/thong-tin-cong-ty/thongTinCongTy.dto";
-import { LegalRepresentativeDto } from "@/types/dtoRepresent";
 
 function Page() {
   const [form] = Form.useForm();
@@ -41,22 +40,11 @@ function Page() {
     setLoading(true);
 
     try {
-      // Format shifts with proper time format
-      const formattedShifts =
-        values.shift?.map((shift: any) => ({
-          shiftName: shift.shiftName,
-          startTime: shift.startTime
-            ? dayjs(shift.startTime).format("HH:mm")
-            : "",
-          endTime: shift.endTime ? dayjs(shift.endTime).format("HH:mm") : "",
-        })) || [];
-
       const companyData: CompanyInfo = {
         ...values,
         establishDate: values.establishDate
           ? dayjs(values.establishDate).toISOString()
           : "",
-        shiftInfor: JSON.stringify(formattedShifts),
       };
       // Build multipart/form-data
       const formData = new FormData();
@@ -64,6 +52,11 @@ function Page() {
       const logoOriginFile: File | undefined = logoUploadFile?.originFileObj;
       if (logoOriginFile) {
         formData.append("logoFile", logoOriginFile, logoOriginFile.name);
+      }
+      if (values.offDay) {
+        values.offDay.forEach((day: any) => {
+          formData.append(`offDays`, day);
+        });
       }
 
       // Append each field as string
@@ -74,10 +67,10 @@ function Page() {
       await DanhMucCompanyInfoServices.createDanhMucCompanyInfoMultipart(
         formData
       );
-  messageApi.success("Lưu thông tin công ty thành công!");
+      messageApi.success("Lưu thông tin công ty thành công!");
     } catch (error) {
-  console.error("Error saving company info:", error);
-  messageApi.error("Lỗi khi lưu thông tin công ty");
+      console.error("Error saving company info:", error);
+      messageApi.error("Lỗi khi lưu thông tin công ty");
     } finally {
       setLoading(false);
     }
@@ -85,9 +78,9 @@ function Page() {
 
   // Handle form reset
   const handleReset = () => {
-  form.resetFields();
-  clearMap();
-  messageApi.info("Đã đặt lại form");
+    form.resetFields();
+    clearMap();
+    messageApi.info("Đã đặt lại form");
   };
 
   // Load fake data for testing
@@ -98,14 +91,7 @@ function Page() {
         await DanhMucCompanyInfoServices.getRepresentCompanyInfo();
       setRepresent(resRepresent.data || []);
       const companyInfo = res.data[0];
-      const rawShifts = Array.isArray(companyInfo.shifts)
-        ? companyInfo.shifts
-        : [];
-      const formattedShifts = rawShifts.map((shift) => ({
-        shiftName: shift.shiftName,
-        startTime: dayjs(shift.startTime, "HH:mm"),
-        endTime: dayjs(shift.endTime, "HH:mm"),
-      }));
+
       // Set form values
       form.setFieldsValue({
         ...companyInfo,
@@ -115,7 +101,6 @@ function Page() {
         identityIssuedDate: companyInfo.identityIssuedDate
           ? dayjs(companyInfo.identityIssuedDate)
           : null,
-        shift: formattedShifts,
       });
       // Update map with coordinates
       updateMapUrl(companyInfo.lat, companyInfo.long);
@@ -150,9 +135,7 @@ function Page() {
                 />
               }
               legalRepresentativeOptions={represent}
-            >
-              <ShiftManagementCard form={form} />
-            </CompanyInfoForm>
+            ></CompanyInfoForm>
 
             <div className="form-actions">
               <Button

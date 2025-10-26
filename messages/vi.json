@@ -442,9 +442,76 @@
   },
   "DanhMucBoPhan": {
     "departmentName": "Tên phòng ban",
-    "description": "Mô tả"
+    "description": "Mô tả",
+    "shiftStartTime": "Bắt đầu ca",
+    "hoursOfWork": "Giờ công",
+    "shiftEndTime": "Kết thúc ca",
+    "lunchBreak": "Giờ nghỉ trưa",
+    "totalWorkHour": "Giờ công"
   },
   "InfoInterviewLeader": {
     "userName": "Tên và Vị trí"
+  },
+  "HolidayConfig": {
+    "title": "Cấu hình Ngày nghỉ lễ",
+    "publicHolidays": "Ngày lễ công cộng",
+    "customHolidays": "Ngày nghỉ tùy chỉnh",
+    "monthHolidays": "Ngày nghỉ tháng này",
+    "totalHolidays": "Tổng số ngày nghỉ",
+    "addHoliday": "Thêm ngày nghỉ lễ",
+    "reloadPublicHolidays": "Tải lại ngày lễ công cộng",
+    "year": "Năm",
+    "holidayList": "Danh sách ngày nghỉ lễ tháng",
+    "date": "Ngày",
+    "name": "Tên ngày nghỉ lễ",
+    "description": "Mô tả",
+    "isRecurring": "Lặp lại hàng năm",
+    "type": "Loại",
+    "public": "Công cộng",
+    "custom": "Tùy chỉnh",
+    "recurring": "Hàng năm",
+    "delete": "Xóa",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa ngày nghỉ lễ này?",
+    "add": "Thêm",
+    "cancel": "Hủy",
+    "selectDate": "Chọn ngày nghỉ lễ",
+    "enterName": "VD: Ngày nghỉ công ty",
+    "enterDescription": "Mô tả chi tiết về ngày nghỉ lễ",
+    "select": "Chọn",
+    "yes": "Có",
+    "no": "Không",
+    "success": {
+      "loaded": "Đã tải {count} ngày nghỉ lễ công cộng!",
+      "added": "Đã thêm ngày nghỉ lễ!",
+      "deleted": "Đã xóa ngày nghỉ lễ!"
+    },
+    "error": {
+      "loadFailed": "Không thể tải ngày nghỉ lễ từ API",
+      "validation": "Vui lòng kiểm tra thông tin!"
+    },
+    "placeholder": {
+      "selectDate": "Chọn ngày nghỉ lễ",
+      "enterName": "Nhập tên ngày nghỉ lễ",
+      "enterDescription": "Nhập mô tả"
+    },
+    "noData": "Không có ngày nghỉ lễ trong tháng này"
+  },
+  "DanhMucSystemSetting": {
+    "tieuDe": "Tiêu đề",
+    "moTa": "Mô tả",
+    "giaTri": "Giá trị",
+    "trangThai": "Trạng thái",
+    "timKiem": "Tìm kiếm...",
+    "themMoi": "Thêm cấu hình mới",
+    "xemChiTiet": "Xem thông tin chi tiết",
+    "chinhSua": "Chỉnh sửa cấu hình",
+    "xoa": "Xóa cấu hình",
+    "capNhat": "Cập nhật",
+    "huy": "Hủy",
+    "vuilongNhapTieuDe": "Vui lòng nhập tiêu đề!",
+    "nhapTieuDe": "Nhập tiêu đề",
+    "nhapMoTa": "Nhập mô tả",
+    "vuilongNhapGiaTri": "Vui lòng nhập giá trị!",
+    "nhapGiaTri": "Nhập giá trị"
   }
 }

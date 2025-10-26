@@ -19,8 +19,17 @@ import {
   TimePicker,
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
-import React, { useEffect, useState } from "react";
-import { FaCalendarAlt, FaEnvelope, FaPhone, FaUser } from "react-icons/fa";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  FaCalendarAlt,
+  FaEnvelope,
+  FaPhone,
+  FaUser,
+  FaChevronDown,
+  FaChevronUp,
+  FaList,
+  FaTh,
+} from "react-icons/fa";
 import { InterviewFormData, InterviewScheduleModalProps } from ".";
 import "./InterviewScheduleModal.scss";
 import InfoInterviewLeader from "../InfoInterviewLeader/InfoInterviewLeader";
@@ -43,23 +52,39 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
     "offline"
   );
 
+  // Normalize candidateData to array
+  const candidates = useMemo(() => {
+    if (!candidateData) return [];
+    return Array.isArray(candidateData) ? candidateData : [candidateData];
+  }, [candidateData]);
+
   const [selectedInterviewers, setSelectedInterviewers] = useState<any[]>([]);
   const [timeKey, setTimeKey] = useState(0);
   const [scheduleTemplate, setScheduleTemplate] = useState<AppointmentItem[]>(
     []
   );
   const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([]);
+  const [isTemplateSelected, setIsTemplateSelected] = useState(false);
+
+  const [templatePreSelectedEmails, setTemplatePreSelectedEmails] = useState<
+    string[]
+  >([]);
+  const [showCandidateList, setShowCandidateList] = useState(true);
+  const [displayMode, setDisplayMode] = useState<"list" | "chips">("chips");
   const messageApi = useAntdMessage();
 
   const handleTemplateSelect = (templateId: string | undefined) => {
     if (!templateId) {
       // clear template selection
+      setIsTemplateSelected(false);
+      setTemplatePreSelectedEmails([]);
       form.setFieldsValue({
         date: undefined,
         startTime: undefined,
         endTime: undefined,
         meetingLink: undefined,
       });
+      setSelectedInterviewers([]);
       return;
     }
 
@@ -67,6 +92,9 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       (m: AppointmentItem) => m.id === templateId
     );
     if (!tpl) return;
+
+    // Set template selection state
+    setIsTemplateSelected(true);
 
     // Normalize interviewType to match form values (lowercase)
     const normalizedType =
@@ -89,12 +117,32 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       typeAppointment: normalizedType,
       linkMeet: tpl.meetingLink || undefined,
     });
+
+    // Auto-select interviewers based on template
+    if (tpl.interviewer && Array.isArray(tpl.interviewer)) {
+      const templateInterviewers = tpl.interviewer.map((interviewer: any) => ({
+        value: interviewer.interviewerEmail, // Use email as identifier
+        label: interviewer.interviewerName,
+        email: interviewer.interviewerEmail,
+        phone: interviewer.interviewerPhone,
+      }));
+      setSelectedInterviewers(templateInterviewers);
+
+      // Set pre-selected emails for InfoInterviewLeader
+      const emails = tpl.interviewer.map(
+        (interviewer: any) => interviewer.interviewerEmail
+      );
+      setTemplatePreSelectedEmails(emails);
+    }
   };
 
   useEffect(() => {
     if (open && candidateData) {
       form.resetFields();
       setInterviewType("offline");
+      setIsTemplateSelected(false);
+      setTemplatePreSelectedEmails([]);
+      setSelectedInterviewers([]);
     }
   }, [open, candidateData, form]);
 
@@ -105,11 +153,14 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
 
       try {
         if (!jobId) return;
+        //ngày hôm sau
+        const fromDate = dayjs().add(1, "day").startOf("day").toISOString();
         const resSh = await TuyenDungServices.getDanhSachPhongVan(
           [],
           undefined,
           {
             jobId,
+            fromDate,
           }
         );
         setScheduleTemplate(resSh?.data);
@@ -134,7 +185,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
   };
 
   const handleSubmit = async (values: InterviewFormData) => {
-    if (!candidateData) return;
+    if (candidates.length === 0) return;
     if (selectedInterviewers.length === 0) {
       messageApi.error("Vui lòng chọn ít nhất một người phỏng vấn!");
       return;
@@ -171,7 +222,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
         date: dateStr,
         startTime: startTimeStr,
         endTime: endTimeStr,
-        listIntervieweeId: [candidateData.id],
+        listIntervieweeId: candidates.map((c) => c.id),
         address: companyInformation.addressLine,
         jobId: jobId || "",
         interviewerId: selectedInterviewers.map(
@@ -292,6 +343,13 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       title={
         <div className="modal-title">
           <FaCalendarAlt /> Tạo lịch phỏng vấn
+          {candidates.length > 0 && (
+            <span
+              style={{ fontSize: "1rem", fontWeight: "600", marginLeft: "8px" }}
+            >
+              ({candidates.length} ứng viên)
+            </span>
+          )}
         </div>
       }
       open={open}
@@ -309,7 +367,9 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
           className="submit-btn"
           onClick={() => form.submit()}
         >
-          {loading ? "Đang tạo lịch..." : "Tạo lịch phỏng vấn"}
+          {loading
+            ? "Đang tạo lịch..."
+            : `Tạo lịch cho ${candidates.length} ứng viên`}
         </Button>,
       ]}
       width={1400}
@@ -317,29 +377,86 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
     >
       <div className="modal-content">
         <>
-          {candidateData && (
+          {candidates.length > 0 && (
             <Card className="candidate-card" size="small">
               <div className="candidate-info-header">
-                <div className="candidate-info">
-                  <div className="candidate-avatar">
-                    <FaUser />
-                  </div>
-                  <div className="candidate-name-section">
-                    <h3 className="candidate-name">{candidateData.fullName}</h3>
-                    <div className="candidate-title">Ứng viên phỏng vấn</div>
-                  </div>
+                <div className="candidate-section-title">
+                  <FaUser style={{ marginRight: "8px" }} />
+                  <span>Danh sách ứng viên</span>
                 </div>
-                <div className="candidate-details">
-                  <div className="candidate-detail-item">
-                    <FaEnvelope className="detail-icon" />
-                    <span className="detail-text">{candidateData.email}</span>
+                <div className="candidate-count-badge-wrapper">
+                  <div className="display-mode-toggle">
+                    <button
+                      className={`mode-btn ${
+                        displayMode === "list" ? "active" : ""
+                      }`}
+                      onClick={() => setDisplayMode("list")}
+                      title="Hiển thị dạng danh sách"
+                    >
+                      <FaList />
+                    </button>
+                    <button
+                      className={`mode-btn ${
+                        displayMode === "chips" ? "active" : ""
+                      }`}
+                      onClick={() => setDisplayMode("chips")}
+                      title="Hiển thị dạng chips"
+                    >
+                      <FaTh />
+                    </button>
                   </div>
-                  <div className="candidate-detail-item">
-                    <FaPhone className="detail-icon" />
-                    <span className="detail-text">{candidateData.phone}</span>
+                  <div
+                    className="candidate-count-badge"
+                    onClick={() => setShowCandidateList(!showCandidateList)}
+                  >
+                    <span className="count-number">{candidates.length}</span>
+                    <span className="count-label">ứng viên</span>
+                    {showCandidateList ? (
+                      <FaChevronUp className="toggle-icon" />
+                    ) : (
+                      <FaChevronDown className="toggle-icon" />
+                    )}
                   </div>
                 </div>
               </div>
+
+              {showCandidateList && displayMode === "list" && (
+                <div className="candidates-list">
+                  {candidates.map((candidate, index) => (
+                    <div key={candidate.id} className="candidate-item">
+                      <div className="candidate-number">{index + 1}</div>
+                      <div className="candidate-info-content">
+                        <h4 className="candidate-name">{candidate.fullName}</h4>
+                        <div className="candidate-contact-details">
+                          <div className="candidate-detail-item">
+                            <FaEnvelope className="detail-icon" />
+                            <span className="detail-text">
+                              {candidate.email}
+                            </span>
+                          </div>
+                          <div className="candidate-detail-item">
+                            <FaPhone className="detail-icon" />
+                            <span className="detail-text">
+                              {candidate.phone}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {showCandidateList && displayMode === "chips" && (
+                <div className="candidates-chips">
+                  {candidates.map((candidate, index) => (
+                    <div key={candidate.id} className="candidate-chip">
+                      <span className="chip-number">{index + 1}</span>
+                      <span className="chip-name">{candidate.fullName}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
           )}
 
@@ -374,6 +491,15 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                   />
                 </Form.Item>
 
+                {isTemplateSelected && (
+                  <div className="template-notice">
+                    <span style={{ color: "#1890ff", fontSize: "14px" }}>
+                      ℹ️ Đã chọn template - Tất cả thông tin đã được tự động
+                      điền và không thể chỉnh sửa
+                    </span>
+                  </div>
+                )}
+
                 <div className="form-row">
                   <div className="form-col-6">
                     <Form.Item
@@ -391,6 +517,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                         style={{ width: "100%" }}
                         format="DD/MM/YYYY"
                         disabledDate={disabledDate}
+                        disabled={isTemplateSelected}
                         size="large"
                       />
                     </Form.Item>
@@ -412,6 +539,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                         format="HH:mm"
                         size="large"
                         disabledTime={disabledStartTime}
+                        disabled={isTemplateSelected}
                         key={timeKey}
                       />
                     </Form.Item>
@@ -433,6 +561,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                         format="HH:mm"
                         size="large"
                         disabledTime={disabledEndTime}
+                        disabled={isTemplateSelected}
                         key={timeKey}
                       />
                     </Form.Item>
@@ -455,6 +584,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                         placeholder="Chọn hình thức phỏng vấn"
                         size="large"
                         onChange={handleInterviewTypeChange}
+                        disabled={isTemplateSelected}
                         options={[
                           {
                             value: "offline",
@@ -481,6 +611,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                     <Input
                       placeholder="https://meet.google.com/xxx-xxxx-xxx"
                       size="large"
+                      disabled={isTemplateSelected}
                     />
                   </Form.Item>
                 )}
@@ -489,6 +620,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                   <TextArea
                     rows={4}
                     placeholder="Ghi chú thêm về buổi phỏng vấn (không bắt buộc)"
+                    disabled={isTemplateSelected}
                   />
                 </Form.Item>
               </Form>
@@ -505,6 +637,8 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                   onSelectedChange={(selectInterviwer) => {
                     setSelectedInterviewers(selectInterviwer);
                   }}
+                  preSelectedEmails={templatePreSelectedEmails}
+                  disabled={isTemplateSelected}
                 />
               </div>
             </div>

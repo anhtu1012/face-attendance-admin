@@ -1,28 +1,33 @@
 import { z } from "zod";
 
+// Interviewer Schema
+export const InterviewerSchema = z.object({
+  interviewerName: z.string(),
+  interviewerEmail: z.string().email(),
+  interviewerPhone: z.string(),
+});
+
 // Appointment Schema
 export const AppointmentItemSchema = z.object({
   id: z.string(),
-  candidateId: z.string(),
-  candidateName: z.string(),
-  candidateEmail: z.string().email(),
-  candidatePhone: z.string(),
-  // Job reference - link to Tuyển dụng module
-  jobId: z.string().optional(), // Reference to JobItem.id from tuyen-dung
-  // Job information (can be cached or fetched from jobId)
-  jobTitle: z.string(), // Vị trí tuyển dụng
-  department: z.string(), // Phòng ban
-  jobLevel: z.string().optional(), // Cấp bậc: Junior, Senior, Manager, etc.
-  // Appointment details
-  interviewDate: z.string(), // ISO date string
+  jobId: z.string(),
+  jobTitle: z.string(),
+  department: z.string(),
+  jobLevel: z.string(),
+  jobDescription: z.string(),
+  jobResponsibility: z.string(),
+  jobBenefit: z.string(),
+  requireExperience: z.string(),
+  fromSalary: z.string(),
+  toSalary: z.string(),
+  requireSkill: z.array(z.string()),
+  interviewDate: z.string(),
   startTime: z.string(),
   endTime: z.string(),
   interviewType: z.enum(["online", "offline"]),
   meetingLink: z.string().optional(),
   location: z.string().optional(),
-  interviewer: z.string(),
-  interviewerEmail: z.string().email(),
-  interviewerPhone: z.string().optional(),
+  interviewer: z.array(InterviewerSchema),
   status: z.enum([
     "PENDING", // Chờ xác nhận
     "ACCEPTED", // Chấp nhận
@@ -31,11 +36,17 @@ export const AppointmentItemSchema = z.object({
     "CANCELLED", // Hủy bỏ
   ]),
   notes: z.string().optional(),
+  // Legacy fields for backward compatibility
+  candidateId: z.string().optional(),
+  candidateName: z.string().optional(),
+  candidateEmail: z.string().email().optional(),
+  candidatePhone: z.string().optional(),
   result: z.string().optional(), // Kết quả phỏng vấn
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 });
 
+export type Interviewer = z.infer<typeof InterviewerSchema>;
 export type AppointmentItem = z.infer<typeof AppointmentItemSchema>;
 
 // For request

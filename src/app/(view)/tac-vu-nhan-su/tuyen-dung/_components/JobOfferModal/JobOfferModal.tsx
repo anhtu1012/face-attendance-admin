@@ -1,34 +1,38 @@
 "use client";
 
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { Button, Card, DatePicker, Form, Input, Modal, TimePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  FaDownload as FaAppDownload,
   FaBuilding,
   FaDownload,
   FaEnvelope,
-  FaKey,
   FaPhone,
   FaUser,
+  FaChevronDown,
+  FaChevronUp,
+  FaList,
+  FaTh,
 } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
 import JobOfferInvitation from "./JobOfferInvitation";
 import "./JobOfferModal.scss";
 import { generateJobOfferHTML } from "./jobOfferTemplateHTML";
-import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 
 const { TextArea } = Input;
+
+interface CandidateData {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+}
 
 interface JobOfferModalProps {
   open: boolean;
   onClose: () => void;
-  candidateData?: {
-    id: string;
-    fullName: string;
-    email: string;
-    phone: string;
-  };
+  candidateData?: CandidateData | CandidateData[];
 }
 
 interface JobOfferFormData {
@@ -85,8 +89,16 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
   const [showInvitation, setShowInvitation] = useState(false);
   const [jobOfferDetails, setJobOfferDetails] =
     useState<JobOfferDetails | null>(null);
+  const [showCandidateList, setShowCandidateList] = useState(true);
+  const [displayMode, setDisplayMode] = useState<"list" | "chips">("list");
 
   const messageApi = useAntdMessage();
+
+  // Normalize candidateData to array
+  const candidates = useMemo(() => {
+    if (!candidateData) return [];
+    return Array.isArray(candidateData) ? candidateData : [candidateData];
+  }, [candidateData]);
 
   // Company location (only one location)
   const companyLocation: CompanyLocation = {
@@ -110,15 +122,19 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
   }, [open, candidateData, form, companyLocation.address]);
 
   const handleSubmit = async (values: JobOfferFormData) => {
-    if (!candidateData) return;
+    if (candidates.length === 0) return;
 
     setLoading(true);
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
+      // For now, use the first candidate for details
+      // TODO: Handle multiple candidates properly
+      const firstCandidate = candidates[0];
+
       const details: JobOfferDetails = {
-        candidate: candidateData,
+        candidate: firstCandidate,
         date: values.date?.format("DD/MM/YYYY") || "",
         startTime: values.startTime?.format("HH:mm") || "",
         endTime: values.endTime?.format("HH:mm") || "",
@@ -269,33 +285,86 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
           {loading ? "Đang tạo lịch..." : "Tạo lịch hẹn nhận việc"}
         </Button>,
       ]}
-      width={1400}
+      width={900}
       className="job-offer-modal"
     >
       <div className="modal-content">
-        {candidateData && (
+        {candidates.length > 0 && (
           <Card className="candidate-card" size="small">
             <div className="candidate-info-header">
-              <div className="candidate-info">
-                <div className="candidate-avatar">
-                  <FaUser />
-                </div>
-                <div className="candidate-name-section">
-                  <h3 className="candidate-name">{candidateData.fullName}</h3>
-                  <div className="candidate-title">Ứng viên nhận việc</div>
-                </div>
+              <div className="candidate-section-title">
+                <FaUser style={{ marginRight: "8px" }} />
+                <span>Danh sách ứng viên</span>
               </div>
-              <div className="candidate-details">
-                <div className="candidate-detail-item">
-                  <FaEnvelope className="detail-icon" />
-                  <span className="detail-text">{candidateData.email}</span>
+              <div className="candidate-count-badge-wrapper">
+                <div className="display-mode-toggle">
+                  <button
+                    className={`mode-btn ${
+                      displayMode === "list" ? "active" : ""
+                    }`}
+                    onClick={() => setDisplayMode("list")}
+                    title="Hiển thị dạng danh sách"
+                  >
+                    <FaList />
+                  </button>
+                  <button
+                    className={`mode-btn ${
+                      displayMode === "chips" ? "active" : ""
+                    }`}
+                    onClick={() => setDisplayMode("chips")}
+                    title="Hiển thị dạng chips"
+                  >
+                    <FaTh />
+                  </button>
                 </div>
-                <div className="candidate-detail-item">
-                  <FaPhone className="detail-icon" />
-                  <span className="detail-text">{candidateData.phone}</span>
+                <div
+                  className="candidate-count-badge"
+                  onClick={() => setShowCandidateList(!showCandidateList)}
+                >
+                  <span className="count-number">{candidates.length}</span>
+                  <span className="count-label">ứng viên</span>
+                  {showCandidateList ? (
+                    <FaChevronUp className="toggle-icon" />
+                  ) : (
+                    <FaChevronDown className="toggle-icon" />
+                  )}
                 </div>
               </div>
             </div>
+
+            {showCandidateList && displayMode === "list" && (
+              <div className="candidates-list">
+                {candidates.map((candidate, index) => (
+                  <div key={candidate.id} className="candidate-item">
+                    <div className="candidate-number">{index + 1}</div>
+                    <div className="candidate-info-content">
+                      <h4 className="candidate-name">{candidate.fullName}</h4>
+                      <div className="candidate-contact-details">
+                        <div className="candidate-detail-item">
+                          <FaEnvelope className="detail-icon" />
+                          <span className="detail-text">{candidate.email}</span>
+                        </div>
+                        <div className="candidate-detail-item">
+                          <FaPhone className="detail-icon" />
+                          <span className="detail-text">{candidate.phone}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {showCandidateList && displayMode === "chips" && (
+              <div className="candidates-chips">
+                {candidates.map((candidate, index) => (
+                  <div key={candidate.id} className="candidate-chip">
+                    <span className="chip-number">{index + 1}</span>
+                    <span className="chip-name">{candidate.fullName}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
         )}
 
@@ -305,6 +374,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
               form={form}
               layout="vertical"
               onFinish={handleSubmit}
+              labelCol={{ span: 24 }}
               className="job-offer-form"
             >
               <div className="form-section-title">
@@ -375,134 +445,6 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
                 />
               </Form.Item>
             </Form>
-          </div>
-
-          <div className="map-section">
-            <div className="form-section-title">
-              <FaKey />
-              Thông tin tài khoản và ứng dụng
-            </div>
-
-            <div className="form-row">
-              <div className="form-col-6">
-                <Form.Item
-                  name="username"
-                  label="Tên đăng nhập"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập tên đăng nhập!",
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="Nhập tên đăng nhập"
-                    size="large"
-                    prefix={<FaUser />}
-                  />
-                </Form.Item>
-              </div>
-              <div className="form-col-6">
-                <Form.Item
-                  name="password"
-                  label="Mật khẩu"
-                  rules={[
-                    { required: true, message: "Vui lòng nhập mật khẩu!" },
-                  ]}
-                >
-                  <Input.Password
-                    placeholder="Nhập mật khẩu"
-                    size="large"
-                    prefix={<FaKey />}
-                  />
-                </Form.Item>
-              </div>
-              <div className="form-col-12">
-                <Form.Item
-                  name="appDownloadLink"
-                  label="Link tải ứng dụng"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập link tải ứng dụng!",
-                    },
-                    { type: "url", message: "Link không hợp lệ!" },
-                  ]}
-                >
-                  <Input
-                    placeholder="https://faceai.app/download"
-                    size="large"
-                    prefix={<FaAppDownload />}
-                  />
-                </Form.Item>
-              </div>
-            </div>
-
-            <div className="form-section-title" style={{ marginTop: "24px" }}>
-              <FaUser />
-              Thông tin người hướng dẫn
-            </div>
-
-            <div className="form-row">
-              <div className="form-col-6">
-                <Form.Item
-                  name="guidePersonName"
-                  layout="vertical"
-                  label="Họ tên"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập tên người hướng dẫn!",
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="Nhập họ tên"
-                    size="large"
-                    prefix={<FaUser />}
-                  />
-                </Form.Item>
-              </div>
-              <div className="form-col-6">
-                <Form.Item
-                  name="guidePersonPhone"
-                  label="Số điện thoại"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập số điện thoại!",
-                    },
-                    {
-                      pattern: /^[0-9+\-\s]+$/,
-                      message: "Số điện thoại không hợp lệ!",
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="Nhập số điện thoại"
-                    size="large"
-                    prefix={<FaPhone />}
-                  />
-                </Form.Item>
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-col-6">
-                <Form.Item
-                  name="guidePersonEmail"
-                  rules={[
-                    { required: true, message: "Vui lòng nhập email!" },
-                    { type: "email", message: "Email không hợp lệ!" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Nhập email"
-                    size="large"
-                    prefix={<FaEnvelope />}
-                  />
-                </Form.Item>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,590 @@
+// Holiday Calendar Styles - Compact & Refined
+.calendar-section {
+  margin-bottom: 16px;
+
+  .calendar-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f3f4f6;
+    background: #ffffff;
+    overflow: hidden;
+
+    :global {
+      .ant-picker-calendar {
+        .ant-picker-panel {
+          border: none;
+          background: transparent;
+        }
+
+        .ant-picker-calendar-header {
+          padding: 12px 16px;
+          background: linear-gradient(
+            135deg,
+            rgb(21, 101, 192),
+            rgb(66, 165, 245)
+          );
+          border-radius: 0;
+
+          .ant-picker-calendar-year-select,
+          .ant-picker-calendar-month-select {
+            background: rgba(255, 255, 255, 0.95);
+            color: rgb(21, 101, 192);
+            border: none;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-weight: 600;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: white;
+              transform: translateY(-1px);
+              box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+            }
+
+            :global {
+              .ant-select-arrow {
+                color: rgb(21, 101, 192);
+              }
+            }
+          }
+
+          .ant-radio-button-wrapper {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.25);
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.2);
+              color: white;
+            }
+
+            &.ant-radio-button-wrapper-checked {
+              background: white;
+              color: rgb(21, 101, 192);
+              border-color: white;
+              font-weight: 600;
+              box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+            }
+          }
+        }
+
+        .ant-picker-cell {
+          padding: 2px;
+
+          &:hover:not(.ant-picker-cell-selected) .ant-picker-cell-inner {
+            background: rgba(21, 101, 192, 0.05);
+            border-radius: 6px;
+          }
+
+          &-selected .ant-picker-cell-inner {
+            background: linear-gradient(
+              135deg,
+              rgb(21, 101, 192),
+              rgb(66, 165, 245)
+            );
+            color: white;
+            font-weight: 600;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(21, 101, 192, 0.18);
+          }
+
+          &-today .ant-picker-cell-inner {
+            border: 2px solid rgb(21, 101, 192);
+            border-radius: 6px;
+            font-weight: 600;
+            position: relative;
+          }
+
+          &-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+            background: linear-gradient(
+              135deg,
+              rgb(21, 101, 192),
+              rgb(66, 165, 245)
+            );
+          }
+        }
+
+        .ant-picker-calendar-date-content {
+          height: auto;
+          min-height: 48px;
+          padding: 4px 2px;
+        }
+
+        // Styling cho header days
+        thead tr th {
+          font-weight: 600;
+          color: #595959;
+          padding: 12px 0;
+          background: #fafafa;
+          border-bottom: 2px solid #f0f0f0;
+        }
+      }
+    }
+
+    .holiday-cell {
+      padding: 4px 2px;
+      max-height: 56px;
+      overflow-y: auto;
+
+      // Compact custom scrollbar
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(21, 101, 192, 0.25);
+        border-radius: 4px;
+
+        &:hover {
+          background: rgba(21, 101, 192, 0.4);
+        }
+      }
+
+      :global {
+        .ant-badge {
+          display: flex;
+          align-items: center;
+          margin-bottom: 6px;
+          padding: 3px 6px;
+          border-radius: 6px;
+          background: rgba(255, 255, 255, 0.95);
+          transition: all 0.18s ease;
+          border: 1px solid transparent;
+
+          &:hover {
+            background: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            transform: translateX(2px);
+          }
+
+          .ant-badge-status-text {
+            font-size: 11px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+            font-weight: 500;
+            margin-left: 6px;
+          }
+
+          &.ant-badge-status-success {
+            border-color: rgba(82, 196, 26, 0.12);
+
+            .ant-badge-status-dot {
+              background: #52c41a;
+              box-shadow: 0 0 0 4px rgba(82, 196, 26, 0.06);
+            }
+
+            .ant-badge-status-text {
+              color: #52c41a;
+            }
+          }
+
+          &.ant-badge-status-processing {
+            border-color: rgba(21, 101, 192, 0.12);
+
+            .ant-badge-status-dot {
+              background: rgb(21, 101, 192);
+              box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.06);
+            }
+
+            .ant-badge-status-text {
+              color: rgb(21, 101, 192);
+            }
+          }
+
+          &.ant-badge-status-warning {
+            border-color: rgba(250, 140, 22, 0.12);
+
+            .ant-badge-status-dot {
+              background: #fa8c16;
+              box-shadow: 0 0 0 4px rgba(250, 140, 22, 0.06);
+            }
+
+            .ant-badge-status-text {
+              color: #fa8c16;
+            }
+          }
+        }
+      }
+
+      .holiday-name {
+        cursor: pointer;
+        transition: all 0.16s ease;
+        position: relative;
+
+        &:hover {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// Holiday Detail Modal Styles - Modern & Beautiful
+:global {
+  .holiday-detail-modal {
+    .ant-modal-content {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .ant-modal-header {
+      background: linear-gradient(135deg, rgb(21, 101, 192), rgb(66, 165, 245));
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+      padding: 14px 18px;
+
+      .ant-modal-title {
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+
+        .detail-modal-title {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .anticon {
+            font-size: 18px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+          }
+
+          span {
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+          }
+        }
+      }
+    }
+
+    .ant-modal-close {
+      .ant-modal-close-x {
+        color: white;
+        font-size: 18px;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        transition: all 0.25s ease;
+
+        &:hover {
+          color: white;
+          background: rgba(255, 255, 255, 0.12);
+          border-radius: 6px;
+        }
+      }
+    }
+
+    .ant-modal-body {
+      padding: 18px;
+      background: #fafafa;
+      max-height: 64vh;
+      overflow-y: auto;
+
+      // Custom scrollbar
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f6f6f6;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(21, 101, 192, 0.22);
+        border-radius: 4px;
+
+        &:hover {
+          background: rgba(21, 101, 192, 0.36);
+        }
+      }
+    }
+
+    .holiday-detail-content {
+      .detail-card {
+        border-radius: 10px;
+        border: 1px solid #eef0f2;
+        background: white;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.22s ease;
+        overflow: hidden;
+
+        &:hover {
+          box-shadow: 0 6px 18px rgba(21, 101, 192, 0.08);
+          transform: translateY(-4px);
+          border-color: rgba(21, 101, 192, 0.08);
+        }
+
+        &:not(:last-child) {
+          margin-bottom: 12px;
+        }
+
+        .ant-card-body {
+          padding: 14px;
+        }
+
+        .detail-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 10px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #f4f6f8;
+          gap: 12px;
+
+          h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #222222;
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
+          }
+
+          .ant-tag {
+            font-weight: 600;
+            border-radius: 6px;
+            padding: 4px 10px;
+            border: none;
+            font-size: 12px;
+            letter-spacing: 0.2px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+            &.ant-tag-green {
+              background: linear-gradient(135deg, #52c41a, #73d13d);
+              color: white;
+            }
+
+            &.ant-tag-orange {
+              background: linear-gradient(135deg, #fa8c16, #ffa940);
+              color: white;
+            }
+
+            &.ant-tag-blue {
+              background: linear-gradient(
+                135deg,
+                rgb(21, 101, 192),
+                rgb(66, 165, 245)
+              );
+              color: white;
+            }
+          }
+        }
+
+        .ant-descriptions {
+          .ant-descriptions-item-label {
+            font-weight: 600;
+            color: #595959;
+            background: #fafafa;
+            padding: 10px 12px !important;
+            border-radius: 6px 0 0 6px;
+          }
+
+          .ant-descriptions-item-content {
+            color: #262626;
+            font-weight: 500;
+            padding: 10px 12px !important;
+            background: white;
+            border-radius: 0 6px 6px 0;
+          }
+
+          .ant-descriptions-row {
+            border-bottom: none;
+
+            &:not(:last-child) {
+              margin-bottom: 6px;
+            }
+          }
+
+          .ant-descriptions-item {
+            padding-bottom: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #f3f4f6;
+          }
+
+          .ant-tag {
+            font-weight: 600;
+            border-radius: 6px;
+            padding: 4px 10px;
+            border: none;
+
+            &.ant-tag-orange {
+              background: linear-gradient(135deg, #fa8c16, #ffa940);
+              color: white;
+              box-shadow: 0 1px 4px rgba(250, 140, 22, 0.12);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .calendar-section {
+    .calendar-card {
+      border-radius: 12px;
+
+      :global {
+        .ant-picker-calendar {
+          .ant-picker-calendar-header {
+            padding: 16px;
+            flex-direction: column;
+            gap: 12px;
+          }
+
+          .ant-picker-calendar-date-content {
+            min-height: 50px;
+            padding: 4px 2px;
+          }
+        }
+      }
+
+      .holiday-cell {
+        padding: 2px;
+        max-height: 50px;
+
+        :global {
+          .ant-badge {
+            padding: 3px 4px;
+            margin-bottom: 4px;
+
+            .ant-badge-status-text {
+              font-size: 10px;
+            }
+
+            .ant-badge-status-dot {
+              width: 6px;
+              height: 6px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  :global {
+    .holiday-detail-modal {
+      .ant-modal {
+        max-width: 95% !important;
+        margin: 12px auto;
+      }
+
+      .ant-modal-header {
+        padding: 16px 20px;
+
+        .ant-modal-title {
+          font-size: 16px;
+
+          .detail-modal-title {
+            gap: 8px;
+
+            .anticon {
+              font-size: 18px;
+            }
+          }
+        }
+      }
+
+      .ant-modal-body {
+        padding: 16px;
+      }
+
+      .detail-card {
+        .ant-card-body {
+          padding: 16px;
+        }
+
+        .detail-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+          padding-bottom: 12px;
+
+          h3 {
+            font-size: 16px;
+          }
+
+          .ant-tag {
+            padding: 4px 10px;
+            font-size: 11px;
+          }
+        }
+
+        .ant-descriptions {
+          .ant-descriptions-item-label,
+          .ant-descriptions-item-content {
+            padding: 10px 12px !important;
+            font-size: 13px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-section {
+    .calendar-card {
+      :global {
+        .ant-picker-calendar {
+          .ant-picker-calendar-date-content {
+            min-height: 40px;
+          }
+        }
+      }
+
+      .holiday-cell {
+        max-height: 40px;
+
+        :global {
+          .ant-badge {
+            .ant-badge-status-text {
+              font-size: 9px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  :global {
+    .holiday-detail-modal {
+      .ant-modal-header {
+        padding: 14px 16px;
+
+        .ant-modal-title {
+          font-size: 15px;
+        }
+      }
+
+      .ant-modal-body {
+        padding: 12px;
+      }
+
+      .detail-card {
+        .ant-card-body {
+          padding: 12px;
+        }
+
+        .detail-header {
+          h3 {
+            font-size: 15px;
+          }
+        }
+      }
+    }
+  }
+}

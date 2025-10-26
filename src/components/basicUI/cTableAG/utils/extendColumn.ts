@@ -154,7 +154,7 @@ export const processColumnDefs = (columnDefs: ExtendedColDef[]): ColDef[] => {
         },
         valueFormatter: (params) => {
           // Hiển thị format HH:mm
-          return params.value || "";
+          return dayjs(params.value).format("HH:mm") || "";
         },
       };
     }
