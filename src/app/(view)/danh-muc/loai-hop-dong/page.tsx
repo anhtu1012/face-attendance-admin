@@ -101,10 +101,6 @@ function Page() {
     gridRef,
     createNewItem: (i) => ({
       unitKey: `${Date.now()}_${i}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: "",
-      updatedBy: "",
       contractTypeName: "",
       note: "",
       status: true,

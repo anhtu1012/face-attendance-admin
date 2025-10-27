@@ -1,0 +1,366 @@
+@import "../../../../styles/inputs.scss";
+@import "../../../../styles/_theme-variables.scss";
+
+.mau-hop-dong-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .form-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(248, 250, 252, 0.95) 100%
+    );
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(13, 71, 161, 0.08);
+    // border: 2px solid rgba(13, 71, 161, 0.1);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 24px 16px;
+      //   border-bottom: 2px solid rgba(13, 71, 161, 0.1);
+      background: linear-gradient(
+        to right,
+        rgb(13, 71, 161),
+        rgb(30, 136, 229)
+      );
+      color: white;
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 24px;
+
+        .form-title {
+          color: white !important;
+          margin: 0 !important;
+          font-size: 24px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .anticon {
+            font-size: 28px;
+          }
+        }
+
+        .progress-section {
+          min-width: 300px;
+
+          .progress-label {
+            color: rgba(255, 255, 255, 0.9);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+          }
+
+          .progress-bar {
+            .ant-progress-bg {
+              background: linear-gradient(90deg, #52c41a, #73d13d) !important;
+            }
+
+            .ant-progress-text {
+              color: white !important;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+      .header-icon {
+        font-size: 32px;
+        color: rgb(13, 71, 161);
+      }
+
+      h3 {
+        color: rgb(13, 71, 161);
+        font-weight: 700;
+      }
+    }
+    // Custom styles for content2 editor wrapper
+    .editor-content-wrapper {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 12px; /* consistent with previous inline padding */
+      box-sizing: border-box;
+      gap: 12px;
+
+      // Quill Editor Wrapper
+      .quill-editor-wrapper {
+        border-radius: 8px;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        .ql-toolbar {
+          /* keep toolbar visible while .ql-editor scrolls */
+          position: sticky;
+          top: 0;
+          z-index: 30;
+          background: #fafafa;
+          border: 2px solid rgba(13, 71, 161, 0.2);
+          border-bottom: none;
+          border-top-left-radius: 8px;
+          border-top-right-radius: 8px;
+          /* subtle separation when overlapping editor */
+          box-shadow: 0 2px 8px rgba(13, 71, 161, 0.06);
+
+          .ql-stroke {
+            stroke: rgb(13, 71, 161);
+          }
+
+          .ql-fill {
+            fill: rgb(13, 71, 161);
+          }
+
+          .ql-picker-label {
+            color: rgb(13, 71, 161);
+          }
+
+          button:hover,
+          button:focus,
+          button.ql-active,
+          .ql-picker-label:hover,
+          .ql-picker-label.ql-active {
+            color: rgb(30, 136, 229);
+
+            .ql-stroke {
+              stroke: rgb(30, 136, 229);
+            }
+
+            .ql-fill {
+              fill: rgb(30, 136, 229);
+            }
+          }
+        }
+
+        .ql-container {
+          border: 2px solid rgba(13, 71, 161, 0.2);
+          border-top: none;
+          border-bottom-left-radius: 8px;
+          border-bottom-right-radius: 8px;
+          font-size: 15px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+            sans-serif;
+          background: rgba(255, 255, 255, 0.8);
+          transition: all 0.3s ease;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(30, 136, 229, 0.4);
+          }
+
+          &.ql-snow {
+            border-color: rgba(13, 71, 161, 0.2);
+          }
+        }
+
+        .ql-editor {
+          min-height: 300px;
+          max-height: 70vh !important;
+          overflow-y: auto;
+          padding: 16px;
+          flex: 1;
+
+          &::-webkit-scrollbar {
+            width: 8px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: rgba(13, 71, 161, 0.05);
+            border-radius: 4px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: rgba(13, 71, 161, 0.2);
+            border-radius: 4px;
+
+            &:hover {
+              background: rgba(13, 71, 161, 0.3);
+            }
+          }
+
+          &.ql-blank::before {
+            color: rgba(0, 0, 0, 0.45);
+            font-style: italic;
+          }
+        }
+      }
+    }
+
+    .ant-card-body {
+      padding: 0;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .template-contract-form {
+    padding: 12px;
+    flex: 1;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(13, 71, 161, 0.05);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(13, 71, 161, 0.2);
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(13, 71, 161, 0.3);
+      }
+    }
+    .ant-form-item-label > label {
+      font-weight: 600;
+      font-size: 14px;
+      color: rgb(13, 71, 161);
+
+      &.ant-form-item-required::before {
+        color: #ff4d4f;
+      }
+    }
+
+    .save-button {
+      background: linear-gradient(
+        135deg,
+        rgb(13, 71, 161) 0%,
+        rgb(30, 136, 229) 100%
+      );
+      border: none;
+      box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+      font-weight: 600;
+      height: 44px;
+      padding: 0 32px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 71, 161, 0.4);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // Custom button styles
+  .ant-btn-primary {
+    background: linear-gradient(
+      135deg,
+      rgb(13, 71, 161) 0%,
+      rgb(30, 136, 229) 100%
+    );
+    border: none;
+    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(13, 71, 161, 0.4);
+      background: linear-gradient(
+        135deg,
+        rgb(30, 136, 229) 0%,
+        rgb(13, 71, 161) 100%
+      );
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  // Print styles cho A4
+  @media print {
+    .quill-editor-wrapper.a4-page {
+      .ql-toolbar {
+        display: none;
+      }
+
+      .ql-container {
+        border: none;
+        padding: 0;
+        background: white;
+      }
+
+      .ql-editor {
+        box-shadow: none;
+        page-break-after: auto;
+      }
+    }
+  }
+}
+
+// Dark mode support (optional)
+[data-theme="dark"] {
+  .mau-hop-dong-container {
+    .form-card {
+      background: linear-gradient(
+        135deg,
+        rgba(30, 30, 30, 0.95) 0%,
+        rgba(40, 40, 40, 0.95) 100%
+      );
+      border-color: rgba(100, 150, 200, 0.2);
+
+      .form-header {
+        background: linear-gradient(
+          to right,
+          rgba(13, 71, 161, 0.15),
+          rgba(30, 136, 229, 0.15)
+        );
+        border-bottom-color: rgba(100, 150, 200, 0.2);
+
+        .header-icon {
+          color: rgb(100, 180, 255);
+        }
+
+        h3 {
+          color: rgb(100, 180, 255);
+        }
+      }
+    }
+
+    .template-contract-form {
+      .ant-form-item-label > label {
+        color: rgb(100, 180, 255);
+      }
+
+      .quill-editor-wrapper {
+        .ql-toolbar {
+          background: rgba(40, 40, 40, 0.8);
+          border-color: rgba(100, 150, 200, 0.3);
+        }
+
+        .ql-container {
+          background: rgba(30, 30, 30, 0.8);
+          border-color: rgba(100, 150, 200, 0.3);
+        }
+      }
+    }
+  }
+}

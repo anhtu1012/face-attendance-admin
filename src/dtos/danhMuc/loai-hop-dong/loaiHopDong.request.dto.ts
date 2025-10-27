@@ -21,10 +21,6 @@ export type CreateContractTypeRequest = z.infer<
  */
 export const UpdateContractTypeSchema = ContractTypeSchema.omit({
   id: true,
-  createdAt: true,
-  updatedAt: true,
-  createdBy: true,
-  updatedBy: true,
 })
   .partial()
   .extend({

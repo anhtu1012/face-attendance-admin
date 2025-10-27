@@ -78,6 +78,18 @@ class SelectServicesBase extends AxiosService {
   async getSelectDepartment(): Promise<PaginatedSelectOptionsResponse> {
     return this.get(`${this.basePath}/department`);
   }
+  async getSelectContractType(): Promise<PaginatedSelectOptionsResponse> {
+    return this.get(`${this.basePath}/contract-type`);
+  }
+
+  async getSelectMauHopDong(
+    quicksearch: string
+  ): Promise<PaginatedSelectOptionsResponse> {
+    const contractTypeId = "contractTypeId";
+    return this.get(
+      `${this.basePath}/template-contract?quicksearchCols=${contractTypeId}&quicksearch=${quicksearch}`
+    );
+  }
 }
 
 const SelectServices = new SelectServicesBase();

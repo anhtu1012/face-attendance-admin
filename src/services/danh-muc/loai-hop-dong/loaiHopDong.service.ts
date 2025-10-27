@@ -8,7 +8,7 @@ import {
 import { ContractTypeResponseGetItem } from "@/dtos/danhMuc/loai-hop-dong/loaiHopDong.response.dto";
 
 class DanhMucLoaiHopDongServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/category/contract-type";
+  protected readonly basePath = "/v1/contract/loai-hop-dong";
 
   async getDanhMucLoaiHopDong(
     searchFilter: FilterQueryStringTypeItem[] = [],
