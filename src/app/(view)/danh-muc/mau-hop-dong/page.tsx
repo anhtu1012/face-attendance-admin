@@ -156,8 +156,6 @@ function Page() {
         description: values.description,
       };
 
-      console.log("Payload to save:", payload);
-
       // TODO: Call API to save template contract
       await MauHopDongServices.createMauHopDong(payload);
 
@@ -290,7 +288,7 @@ function Page() {
             loading={loading}
             block
           >
-            {!selectedTemplateId ? "Lưu mẫu hợp đồng" : "Cập nhật mẫu hợp đồng"}
+            {!selectedTemplateId ? "Tạo mẫu hợp đồng" : "Cập nhật mẫu hợp đồng"}
           </Button>
         </div>
       </Card>
