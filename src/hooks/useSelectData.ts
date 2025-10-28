@@ -8,6 +8,7 @@ type UseSelectDataOptions = {
   fetchSkill?: boolean;
   fetchDepartment?: boolean;
   fetchContractType?: boolean;
+  fetchAllowance?: boolean;
 };
 
 export const useSelectData = (options: UseSelectDataOptions = {}) => {
@@ -17,6 +18,7 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     fetchSkill: false,
     fetchDepartment: false,
     fetchContractType: false,
+    fetchAllowance: false,
   };
   const mergedOptions = { ...defaultOptions, ...options };
   const didFetchRef = useRef(false);
@@ -27,6 +29,7 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
   const [selectContractType, setSelectContractType] = useState<SelectOption[]>(
     []
   );
+  const [selectAllowance, setSelectAllowance] = useState<SelectOption[]>([]);
 
   const [selectGender] = useState<SelectOption[]>([
     {
@@ -114,6 +117,10 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
           const contractType = await SelectServices.getSelectContractType();
           setSelectContractType(contractType.data || []);
         }
+        if (mergedOptions.fetchAllowance !== false) {
+          const allowance = await SelectServices.getSelectAllowance();
+          setSelectAllowance(allowance.data || []);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -132,5 +139,6 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     selectDepartment,
     selectExperienceYears,
     selectContractType,
+    selectAllowance,
   };
 };

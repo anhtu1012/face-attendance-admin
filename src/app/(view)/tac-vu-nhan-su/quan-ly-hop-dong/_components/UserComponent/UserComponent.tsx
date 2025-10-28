@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import AgGridComponent from "@/components/basicUI/cTableAG";
-import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
+import { useDataGridOperations } from "@/hooks/useDataGridOperations";
 import { showError } from "@/hooks/useNotification";
-import NguoiDungServices from "@/services/admin/quan-tri-he-thong/nguoi-dung.service";
+import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
+import { FilterOperationType } from "@chax-at/prisma-filter-common";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { UserComponentPropsProps } from "../../_types/prop";
-import { useDataGridOperations } from "@/hooks/useDataGridOperations";
-import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
-import { FilterOperationType } from "@chax-at/prisma-filter-common";
+import { UserCreateContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/user-create-contract/user-create-contract.dto";
 const defaultPageSize = 20;
 function UserComponent({
   shouldFetch = false,
@@ -22,7 +22,7 @@ function UserComponent({
   const [totalItem, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(defaultPageSize);
   const [loading, setLoading] = useState(true);
-  const [rowData, setRowData] = useState<NguoiDungItem[]>([]);
+  const [rowData, setRowData] = useState<UserCreateContractItem[]>([]);
   const gridRef = useRef<AgGridReact>({} as AgGridReact);
   const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
     undefined
@@ -44,7 +44,7 @@ function UserComponent({
             value: (currentPage - 1) * pageSize,
           },
         ];
-        const response = await NguoiDungServices.getNguoiDung(
+        const response = await QuanLyHopDongServices.getListUserCreateContract(
           searchFilter,
           quickSearchText
         );
@@ -67,27 +67,32 @@ function UserComponent({
         editable: false,
       },
       {
-        field: "firstName",
+        field: "fullName",
         headerName: t("firstName"),
         editable: false,
-        valueFormatter: (params) => {
-          return `${params.data?.firstName || ""} ${
-            params.data?.lastName || ""
-          }`;
-        },
       },
       {
         field: "email",
-        headerName: "email",
+        headerName: "Email",
+        editable: false,
+      },
+      {
+        field: "phone",
+        headerName: "Số điện thoại",
+        editable: false,
+      },
+      {
+        field: "fullNameManager",
+        headerName: "Người quản lý",
         editable: false,
       },
     ],
     [t]
   );
-  const dataGrid = useDataGridOperations<NguoiDungItem>({
+  const dataGrid = useDataGridOperations<UserCreateContractItem>({
     gridRef,
     createNewItem: () => {
-      return {} as NguoiDungItem;
+      return {} as UserCreateContractItem;
     },
     mes,
     rowData,

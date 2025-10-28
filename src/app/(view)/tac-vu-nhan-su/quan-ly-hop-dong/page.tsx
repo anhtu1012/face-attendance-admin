@@ -1,7 +1,8 @@
 "use client";
+import NotFound from "@/app/(error)/not_found/page";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
-import { Col, Modal, Row, Button } from "antd";
+import { UserCreateContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/user-create-contract/user-create-contract.dto";
+import { Button, Col, Modal, Row } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaPlusCircle } from "react-icons/fa";
 import { IoFilterCircle } from "react-icons/io5";
@@ -14,7 +15,6 @@ import TableContract from "./_components/TableContract";
 import UserComponent from "./_components/UserComponent/UserComponent";
 import { FilterRef, TableContractRef } from "./_types/prop";
 import "./index.scss";
-import NotFound from "@/app/(error)/not_found/page";
 
 function Page() {
   const filterRef = useRef<FilterRef>(null);
@@ -22,7 +22,8 @@ function Page() {
   const pdfRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState("Bộ lọc");
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<NguoiDungItem | null>(null);
+  const [selectedUser, setSelectedUser] =
+    useState<UserCreateContractItem | null>(null);
   const [markdown, setMarkdown] = useState<string>("");
   const scales = [0.2, 0.5, 0.75, 1];
   const [scaleIndex, setScaleIndex] = useState<number>(3);
@@ -43,7 +44,7 @@ function Page() {
         refNumber: "HD-001",
       },
       partyB: {
-        name: `${selectedUser.firstName} ${selectedUser.lastName}`,
+        name: selectedUser.fullName || "",
         nationality: "Việt Nam",
         dob: selectedUser.birthDay ? selectedUser.birthDay.toISOString() : "",
         address: selectedUser.address || "416/23 Lê Văn Sỹ, Phường 14, Quận 3",
@@ -207,7 +208,7 @@ function Page() {
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
-        width={800}
+        width={1200}
         title="Chọn người dùng"
       >
         <UserComponent

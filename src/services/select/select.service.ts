@@ -67,12 +67,9 @@ class SelectServicesBase extends AxiosService {
     return this.get(`${this.basePath}/skill`);
   }
   async getSelectPositionWithRoleAndDepartment(
-    roleId: string,
     departmentId: string
   ): Promise<PaginatedSelectOptionsResponse> {
-    return this.get(
-      `${this.basePath}/position?roleId=${roleId}&departmentId=${departmentId}`
-    );
+    return this.get(`${this.basePath}/position?departmentId=${departmentId}`);
   }
 
   async getSelectDepartment(): Promise<PaginatedSelectOptionsResponse> {
@@ -89,6 +86,10 @@ class SelectServicesBase extends AxiosService {
     return this.get(
       `${this.basePath}/template-contract?quicksearchCols=${contractTypeId}&quicksearch=${quicksearch}`
     );
+  }
+
+  async getSelectAllowance(): Promise<PaginatedSelectOptionsResponse> {
+    return this.get(`${this.basePath}/allowance`);
   }
 }
 

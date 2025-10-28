@@ -26,11 +26,11 @@ export interface TableContractRef {
   refetch: () => void;
 }
 
-import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
+import { UserCreateContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/user-create-contract/user-create-contract.dto";
 
 export interface UserComponentPropsProps {
   shouldFetch?: boolean;
-  onUserSelect?: (user: NguoiDungItem) => void;
+  onUserSelect?: (user: UserCreateContractItem) => void;
 }
 
 export interface TableContractProps {

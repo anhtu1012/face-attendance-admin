@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
+import RichTextEditor from "@/components/RichTextEditor";
+import { MauHopDong } from "@/dtos/danhMuc/mau-hop-dong/mau-hop-dong.dto";
+import { SelectOption } from "@/dtos/select/select.dto";
+import { UserCreateContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/user-create-contract/user-create-contract.dto";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import { useSelectData } from "@/hooks/useSelectData";
+import MauHopDongServices from "@/services/danh-muc/mau-hop-dong/mau-hop-dong.service";
+import SelectServices from "@/services/select/select.service";
+import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -9,13 +17,13 @@ import {
   FullscreenOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import dynamic from "next/dynamic";
 import {
   Button,
   Col,
   DatePicker,
   Form,
   Input,
+  InputNumber,
   Progress,
   Row,
   Select,
@@ -23,95 +31,47 @@ import {
   Typography,
 } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useMemo, useState } from "react";
-import "react-quill-new/dist/quill.snow.css";
+import { useEffect, useState } from "react";
 import FullscreenMarkdownEditor from "../FullscreenMarkdownEditor/FullscreenMarkdownEditor";
 import "./ContractFormView.scss";
-import {
-  branchOptions,
-  contractTemplates,
-  managerOptions,
-  positionOptions,
-  statusOptions,
-} from "./data";
-
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+import { FormValues } from "./prop";
 
 function ContractFormView({
   selectedUser,
   onMarkdownChange,
   onExportPdf,
 }: {
-  selectedUser?: NguoiDungItem | null;
+  selectedUser?: UserCreateContractItem | null;
   onMarkdownChange?: (markdown: string) => void;
   onExportPdf?: () => void;
 }) {
-  const [form] = Form.useForm();
-  const [description, setDescription] = useState<string | undefined>("");
+  const messageApi = useAntdMessage();
+  const [form] = Form.useForm<FormValues>();
+  const [content, setDescription] = useState<string | undefined>("");
   const [loading, setLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("basic-time");
-  // const [currentStep, setCurrentStep] = useState(0);
+  const { selectContractType, selectDepartment, selectAllowance } =
+    useSelectData({
+      fetchContractType: true,
+      fetchDepartment: true,
+      fetchAllowance: true,
+    });
+  const [positionOptionsState, setPositionOptionsState] =
+    useState<SelectOption[]>();
 
-  // Quill modules configuration
-  const quillModules = useMemo(
-    () => ({
-      toolbar: [
-        [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        [{ font: [] }],
-        [{ size: ["small", false, "large", "huge"] }],
-        ["bold", "italic", "underline", "strike"],
-        [{ color: [] }, { background: [] }],
-        [{ script: "sub" }, { script: "super" }],
-        [{ list: "ordered" }, { list: "bullet" }],
-        [{ indent: "-1" }, { indent: "+1" }],
-        [{ direction: "rtl" }],
-        [{ align: [] }],
-        ["blockquote", "code-block"],
-        ["link", "image", "video"],
-        ["clean"],
-      ],
-      clipboard: {
-        matchVisual: false,
-      },
-    }),
-    []
-  );
-
-  const quillFormats = [
-    "header",
-    "font",
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "color",
-    "background",
-    "script",
-    "list",
-    "bullet",
-    "indent",
-    "direction",
-    "align",
-    "blockquote",
-    "code-block",
-    "link",
-    "image",
-    "video",
-  ];
+  const [contractTemplates, setContractTemplates] = useState<MauHopDong[]>([]);
 
   useEffect(() => {
     if (selectedUser) {
-      form.setFieldValue("userCode", selectedUser.userName);
+      form.setFieldValue("userId", selectedUser.id);
     }
   }, [selectedUser, form]);
 
   useEffect(() => {
-    onMarkdownChange?.(description || "");
-  }, [description, onMarkdownChange]);
+    onMarkdownChange?.(content || "");
+  }, [content, onMarkdownChange]);
 
   const { Text, Title } = Typography;
 
@@ -119,13 +79,25 @@ function ContractFormView({
     setLoading(true);
     try {
       console.log("Form values:", values);
-      // Xử lý submit form ở đây
-      // await submitContract(values);
+      if (values.startDate) {
+        values.startDate = dayjs(values.startDate).toISOString();
+      }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (values.endDate) {
+        values.endDate = dayjs(values.endDate).toISOString();
+      }
+      if (
+        values.grossSalary !== undefined &&
+        values.grossSalary !== null &&
+        values.grossSalary !== ""
+      ) {
+        const grossNum = Number(values.grossSalary) || 0;
+        const amountVND = Math.round(grossNum * 1_000_000);
+        values.grossSalary = amountVND.toLocaleString("vi-VN");
+      }
 
-      console.log("Contract saved successfully!");
+      await QuanLyHopDongServices.createQuanLyHopDong(values);
+      messageApi.success("Hợp đồng đã được tạo thành công!");
     } catch (error) {
       console.error("Error saving contract:", error);
     } finally {
@@ -159,14 +131,14 @@ function ContractFormView({
     const template = contractTemplates.find((t) => t.id === templateId);
     if (template) {
       setDescription(template.content);
-      form.setFieldValue("description", template.content);
+      form.setFieldValue("content", template.content);
       setSelectedTemplate(templateId);
     }
   };
 
   const handleClearTemplate = () => {
     setDescription("");
-    form.setFieldValue("description", "");
+    form.setFieldValue("content", "");
     setSelectedTemplate("");
   };
 
@@ -181,22 +153,23 @@ function ContractFormView({
 
   const saveFullscreenContent = (content: string) => {
     setDescription(content);
-    form.setFieldValue("description", content);
+    form.setFieldValue("content", content);
   };
 
   // Calculate form completion progress
   const calculateProgress = () => {
-    const values = form.getFieldsValue();
-    const requiredFields = [
-      "title",
-      "status",
-      "startTime",
-      "endTime",
-      "branchCodes",
+    const values = form.getFieldsValue() as Partial<FormValues>;
+    const requiredFields: (keyof FormValues)[] = [
+      "contractTypeId",
+      "startDate",
+      "positionId",
+      "grossSalary",
+      "content",
     ];
-    const completedFields = requiredFields.filter(
-      (field) => values[field] && values[field] !== ""
-    );
+    const completedFields = requiredFields.filter((field) => {
+      const v = values[field];
+      return v !== undefined && v !== null && v !== "";
+    });
     return Math.round((completedFields.length / requiredFields.length) * 100);
   };
 
@@ -205,46 +178,60 @@ function ContractFormView({
     const values = form.getFieldsValue();
     switch (tabKey) {
       case "basic-time":
-        return (
-          values.title && values.status && values.startTime && values.endTime
-        );
+        return values.contractTypeId && values.startDate;
       case "work":
-        return values.branchCodes && values.branchCodes.length > 0;
+        return (
+          Boolean(values.positionId) &&
+          Array.isArray(values.allowanceIds) &&
+          values.allowanceIds.length > 0 &&
+          values.grossSalary
+        );
       case "content":
-        return description && description.trim().length > 0;
+        return content && content.trim().length > 0;
       default:
         return true;
     }
   };
+  const fetchPositions = async (departmentId?: string) => {
+    if (!departmentId) return;
+    try {
+      const res = await SelectServices.getSelectPositionWithRoleAndDepartment(
+        departmentId
+      );
+      setPositionOptionsState(res.data || []);
+      form.setFieldsValue({ positionId: undefined });
+    } catch (err) {
+      console.error("Error fetching positions for department", err);
+      setPositionOptionsState([]);
+    }
+  };
+  const fetchTemplate = async (contractTypeId?: string) => {
+    if (!contractTypeId) return;
+    try {
+      const response = await MauHopDongServices.getMauHopDong([], undefined, {
+        quicksearchCols: "contractTypeId",
+        quicksearch: contractTypeId,
+      });
 
-  // const steps = [
-  //   {
-  //     title: "Thông tin cơ bản",
-  //     icon: <FileTextOutlined />,
-  //     description: "Tiêu đề và trạng thái",
-  //   },
-  //   {
-  //     title: "Thời gian",
-  //     icon: <ClockCircleOutlined />,
-  //     description: "Ngày bắt đầu và kết thúc",
-  //   },
-  //   {
-  //     title: "Thông tin công việc",
-  //     icon: <UserOutlined />,
-  //     description: "Chi nhánh và chức vụ",
-  //   },
-  //   {
-  //     title: "Nội dung hợp đồng",
-  //     icon: <EditOutlined />,
-  //     description: "Mô tả chi tiết",
-  //   },
-  // ];
+      setContractTemplates(response.data || []);
+    } catch (err) {
+      console.error("Error fetching positions for department", err);
+      setPositionOptionsState([]);
+    }
+  };
+
+  const handleDepartmentChange = (value: string) => {
+    if (value) {
+      fetchPositions(value);
+    } else {
+      setPositionOptionsState([]);
+      form.setFieldsValue({ positionId: undefined });
+    }
+  };
 
   return (
     <div className="contract-content-main">
       <div className="contract-form-view-modern">
-        {/* <Card className="contract-form-card-modern"> */}
-        {/* Header with Progress */}
         <div className="form-header">
           <div className="header-content">
             <Title level={2} className="form-title">
@@ -264,27 +251,17 @@ function ContractFormView({
           </div>
         </div>
 
-        {/* Steps Navigation
-          <div className="steps-section">
-            <Steps
-              current={currentStep}
-              onChange={setCurrentStep}
-              items={steps}
-              className="contract-steps"
-            />
-          </div> */}
-
         <Form
           form={form}
           layout="vertical"
           onFinish={handleFormSubmit}
           onValuesChange={(changedValues) => {
-            if (changedValues.startTime || changedValues.endTime) {
-              const startTime =
-                changedValues.startTime || form.getFieldValue("startTime");
-              const endTime =
-                changedValues.endTime || form.getFieldValue("endTime");
-              const duration = calculateDuration(startTime, endTime);
+            if (changedValues.startDate || changedValues.endDate) {
+              const startDate =
+                changedValues.startDate || form.getFieldValue("startDate");
+              const endDate =
+                changedValues.endDate || form.getFieldValue("endDate");
+              const duration = calculateDuration(startDate, endDate);
               form.setFieldValue("duration", duration);
             }
           }}
@@ -310,53 +287,23 @@ function ContractFormView({
                   ),
                   children: (
                     <div className="tab-content">
-                      {/* Thông tin cơ bản */}
-                      {/* <div className="section-header">
-                          <Title level={4}>Thông tin cơ bản của hợp đồng</Title>
-                          <Text type="secondary">
-                            Nhập tiêu đề và trạng thái hợp đồng
-                          </Text>
-                        </div> */}
-
                       <Row gutter={[24, 24]}>
-                        <Col xs={24} lg={16}>
+                        <Col xs={24} lg={24}>
                           <Form.Item
-                            name="title"
+                            name="contractTypeId"
                             label="Tiêu đề hợp đồng"
                             rules={[
                               {
                                 required: true,
                                 message: "Vui lòng nhập tiêu đề!",
                               },
-                              {
-                                min: 10,
-                                message: "Tiêu đề phải có ít nhất 10 ký tự!",
-                              },
-                            ]}
-                          >
-                            <Input
-                              placeholder="Ví dụ: Hợp đồng lao động - Nhân viên IT"
-                              size="large"
-                              showCount
-                              maxLength={200}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} lg={8}>
-                          <Form.Item
-                            name="status"
-                            label="Trạng thái"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng chọn trạng thái!",
-                              },
                             ]}
                           >
                             <Select
-                              placeholder="Chọn trạng thái"
+                              placeholder="Chọn tên hợp đồng"
                               size="large"
-                              options={statusOptions}
+                              options={selectContractType}
+                              onChange={(value) => fetchTemplate(value)}
                             />
                           </Form.Item>
                         </Col>
@@ -376,7 +323,7 @@ function ContractFormView({
                       <Row gutter={[24, 24]}>
                         <Col xs={24} md={8}>
                           <Form.Item
-                            name="startTime"
+                            name="startDate"
                             label="Ngày bắt đầu"
                             rules={[
                               {
@@ -403,14 +350,8 @@ function ContractFormView({
                         </Col>
                         <Col xs={24} md={8}>
                           <Form.Item
-                            name="endTime"
+                            name="endDate"
                             label="Ngày kết thúc"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng chọn ngày kết thúc!",
-                              },
-                            ]}
                             getValueProps={(value) => ({
                               value: value ? dayjs(value) : undefined,
                             })}
@@ -421,10 +362,10 @@ function ContractFormView({
                               placeholder="Chọn ngày kết thúc"
                               size="large"
                               disabledDate={(current) => {
-                                const startTime =
-                                  form.getFieldValue("startTime");
-                                if (startTime) {
-                                  return current && current <= dayjs(startTime);
+                                const startDate =
+                                  form.getFieldValue("startDate");
+                                if (startDate) {
+                                  return current && current <= dayjs(startDate);
                                 }
                                 return (
                                   current && current < dayjs().startOf("day")
@@ -446,10 +387,7 @@ function ContractFormView({
                       </Row>
 
                       {/* Hidden fields */}
-                      <Form.Item name="userCode" hidden>
-                        <Input />
-                      </Form.Item>
-                      <Form.Item name="id" hidden>
+                      <Form.Item name="userId" hidden>
                         <Input />
                       </Form.Item>
                     </div>
@@ -469,49 +407,81 @@ function ContractFormView({
                   children: (
                     <div className="tab-content">
                       <div className="section-header">
-                        <Title level={4}>Thông tin công việc</Title>
+                        {/* <Title level={4}>Thông tin công việc</Title> */}
                         <Text type="secondary">
-                          Chi nhánh làm việc, chức vụ và người quản lý
+                          Phòng ban ,chức vụ , lương cứng và các thông tin phụ
+                          cấp
                         </Text>
                       </div>
 
                       <Row gutter={[24, 24]}>
                         <Col xs={24} lg={12}>
                           <Form.Item
-                            name="branchCodes"
-                            label="Chi nhánh làm việc"
+                            name="departmentId"
+                            label="Phòng ban"
                             rules={[
                               {
                                 required: true,
-                                message: "Vui lòng chọn ít nhất một chi nhánh!",
+                                message: "Vui lòng chọn phòng ban!",
                               },
                             ]}
                           >
                             <Select
-                              placeholder="Chọn các chi nhánh làm việc"
-                              size="large"
+                              placeholder="Chọn phòng ban"
+                              options={selectDepartment}
+                              className="custom-select"
+                              onChange={handleDepartmentChange}
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} lg={12}>
+                          <Form.Item
+                            name="positionId"
+                            label="Chức vụ"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng chọn chức vụ!",
+                              },
+                            ]}
+                          >
+                            <Select
+                              placeholder="Chọn chức vụ..."
+                              options={positionOptionsState}
+                              className="custom-select"
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} lg={24}>
+                          <Form.Item
+                            name="grossSalary"
+                            label="Lương cứng (triệu VNĐ)"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập lương cứng!",
+                              },
+                            ]}
+                          >
+                            <InputNumber
+                              placeholder="25"
+                              className="custom-input-number"
+                              style={{ width: "100%" }}
+                              min={1}
+                              max={200}
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} lg={24}>
+                          <Form.Item
+                            name="allowanceIds"
+                            label="Phụ cấp theo tháng (nếu có)"
+                          >
+                            <Select
+                              placeholder="Chọn phụ cấp hỗ trợ..."
+                              options={selectAllowance}
+                              className="custom-select"
                               mode="multiple"
-                              options={branchOptions}
-                              maxTagCount="responsive"
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} lg={6}>
-                          <Form.Item name="positionCode" label="Chức vụ">
-                            <Select
-                              size="large"
-                              options={positionOptions}
-                              placeholder="Chọn chức vụ"
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} lg={6}>
-                          <Form.Item name="managedBy" label="Quản lý bởi">
-                            <Select
-                              size="large"
-                              allowClear
-                              options={managerOptions}
-                              placeholder="Chọn người quản lý"
                             />
                           </Form.Item>
                         </Col>
@@ -577,7 +547,8 @@ function ContractFormView({
                                 >
                                   <div className="template-option">
                                     <div className="template-name">
-                                      <FileTextOutlined /> {template.name}
+                                      <FileTextOutlined />{" "}
+                                      {template.templateContract}
                                     </div>
                                   </div>
                                 </Select.Option>
@@ -590,25 +561,20 @@ function ContractFormView({
                       {/* Rich Text Editor */}
                       <div className="editor-section">
                         <Form.Item
-                          name="description"
+                          name="content"
                           label="Nội dung chi tiết"
                           getValueFromEvent={(value) => value}
                           getValueProps={(value) => ({ value })}
                         >
-                          <div className="quill-editor-wrapper-modern">
-                            <ReactQuill
-                              theme="snow"
-                              value={description}
-                              onChange={(value) => {
-                                setDescription(value);
-                                form.setFieldValue("description", value);
-                              }}
-                              modules={quillModules}
-                              formats={quillFormats}
-                              placeholder="💡 Chọn template mẫu ở trên hoặc bắt đầu viết nội dung hợp đồng..."
-                              style={{ height: 400 }}
-                            />
-                          </div>
+                          <RichTextEditor
+                            value={content}
+                            onChange={(value) => {
+                              setDescription(value);
+                              form.setFieldValue("content", value);
+                            }}
+                            placeholder="💡 Chọn template mẫu ở trên hoặc bắt đầu viết nội dung hợp đồng..."
+                            height={400}
+                          />
                         </Form.Item>
                       </div>
                     </div>
@@ -629,28 +595,6 @@ function ContractFormView({
               >
                 Xuất PDF
               </Button>
-              {/* <Button
-                size="large"
-                onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-                disabled={currentStep === 0}
-              >
-                Quay lại
-              </Button>
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => {
-                  if (currentStep < steps.length - 1) {
-                    setCurrentStep(currentStep + 1);
-                    setActiveTab(
-                      ["basic", "time", "work", "content"][currentStep + 1]
-                    );
-                  }
-                }}
-                disabled={currentStep === steps.length - 1}
-              >
-                Tiếp tục
-              </Button> */}
             </div>
 
             <div className="action-buttons">
@@ -676,7 +620,7 @@ function ContractFormView({
       {/* Fullscreen Markdown Editor Modal */}
       <FullscreenMarkdownEditor
         open={isFullscreenOpen}
-        content={description || ""}
+        content={content || ""}
         onSave={saveFullscreenContent}
         onClose={closeFullscreenEditor}
       />

@@ -4,6 +4,7 @@ import Cbutton from "@/components/basicUI/Cbutton";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import CRangePicker from "@/components/basicUI/CrangePicker";
 import Cselect from "@/components/Cselect";
+import { useSelectData } from "@/hooks/useSelectData";
 import { Col, Form, Row } from "antd";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
@@ -11,14 +12,17 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FilterProps, FilterRef, FormValues } from "../../_types/prop";
 import "./index.scss";
-import { useSelectData } from "@/hooks/useSelectData";
 // Add ref type
 
 const Filter = forwardRef<FilterRef, FilterProps>(
   ({ disabled = false, onSubmit }, ref) => {
     const t = useTranslations("Filter");
     const [form] = Form.useForm<FormValues>();
-    const { selectRole } = useSelectData({ fetchRole: true });
+    const { selectRole, selectContractType, selectDepartment } = useSelectData({
+      fetchRole: true,
+      fetchDepartment: true,
+      fetchContractType: true,
+    });
     const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(
       dayjs().startOf("day")
     );
@@ -109,16 +113,11 @@ const Filter = forwardRef<FilterRef, FilterProps>(
                     </Form.Item>
                   </Col>
                   <Col span={24}>
-                    <Form.Item name="position">
+                    <Form.Item name="department">
                       <Cselect
-                        label="Chức vụ"
+                        label="Phòng ban"
                         allowClear
-                        defaultValue="nh"
-                        options={[
-                          { label: "Nhân viên", value: "nh" },
-                          { label: "Quản lý", value: "ql" },
-                          { label: "Giám đốc", value: "gd" },
-                        ]}
+                        options={selectDepartment}
                       />
                     </Form.Item>
                   </Col>
@@ -132,12 +131,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(
                       <Cselect
                         label="Loại hợp đồng"
                         allowClear
-                        defaultValue="nh"
-                        options={[
-                          { label: "Nhân viên", value: "nh" },
-                          { label: "Quản lý", value: "ql" },
-                          { label: "Giám đốc", value: "gd" },
-                        ]}
+                        options={selectContractType}
                       />
                     </Form.Item>
                   </Col>
@@ -146,11 +140,13 @@ const Filter = forwardRef<FilterRef, FilterProps>(
                       <Cselect
                         label="Trang thái"
                         allowClear
-                        defaultValue="nh"
+                        defaultValue={""}
                         options={[
-                          { label: "Nhân viên", value: "nh" },
-                          { label: "Quản lý", value: "ql" },
-                          { label: "Giám đốc", value: "gd" },
+                          { label: "Tất cả", value: "" },
+                          { label: "Chờ xử lý", value: "xl" },
+                          { label: "Đang chờ ký", value: "ch" },
+                          { label: "Đã có hiệu lực", value: "hl" },
+                          { label: "Hết hạn", value: "hh" },
                         ]}
                       />
                     </Form.Item>

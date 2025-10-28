@@ -112,6 +112,18 @@ export const CreateContractFormSchema = z.object({
   otpVerifiedAt: z.string().optional(),
 });
 
+// Lightweight Create Contract Request schema (matches frontend create payload)
+export const CreateContractRequestSchema = z.object({
+  userId: z.string().min(1, "User ID is required"),
+  contractTypeId: z.string().min(1, "Contract type ID is required"),
+  positionId: z.string().min(1, "Position ID is required"),
+  grossSalary: z.string().min(1, "Gross salary is required"),
+  content: z.string().min(1, "Content is required"),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+  allowanceIds: z.array(z.string()).optional(),
+});
+
 // Update Contract Schema for API (without file)
 export const UpdateContractSchema = z.object({
   userContractCode: z

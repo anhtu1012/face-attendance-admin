@@ -50,7 +50,6 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
     if (!role || !departmentId) return;
     try {
       const res = await SelectServices.getSelectPositionWithRoleAndDepartment(
-        role,
         departmentId
       );
       setPositionOptionsState(res.data || []);
