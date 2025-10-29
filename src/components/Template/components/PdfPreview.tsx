@@ -29,9 +29,10 @@ const InfoRow: React.FC<{
 export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
   ({ data, markdown, signatures }, ref) => {
     // markdown giờ đây chứa HTML content, không cần parse nữa
+    console.log("signatures", signatures);
 
     const formattedDate = useMemo(() => {
-      const date = new Date(data.effectiveDate);
+      const date = new Date(data.effectiveDate ?? Date.now());
       const adjustedDate = new Date(
         date.getTime() + Math.abs(date.getTimezoneOffset() * 60000)
       );
@@ -168,7 +169,10 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
         <div className="pdf-signatures">
           <div className="pdf-signature-block">
             <p className="pdf-signature-title">BÊN A</p>
-            <p className="pdf-signature-note">
+            <p
+              className="pdf-signature-note"
+              style={{ marginBottom: `${signatures.partyA ? "0rem" : "4rem"}` }}
+            >
               (Ký, đóng dấu và ghi rõ họ tên)
             </p>
             {signatures.partyA && (
@@ -184,7 +188,12 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
           </div>
           <div className="pdf-signature-block">
             <p className="pdf-signature-title">BÊN B</p>
-            <p className="pdf-signature-note">(Ký và ghi rõ họ tên)</p>
+            <p
+              className="pdf-signature-note"
+              style={{ marginBottom: `${signatures.partyB ? "0rem" : "4rem"}` }}
+            >
+              (Ký và ghi rõ họ tên)
+            </p>
             {signatures.partyB && (
               <Image
                 src={signatures.partyB}

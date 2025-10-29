@@ -4,6 +4,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import { MauHopDong } from "@/dtos/danhMuc/mau-hop-dong/mau-hop-dong.dto";
 import { SelectOption } from "@/dtos/select/select.dto";
 import { UserCreateContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/user-create-contract/user-create-contract.dto";
+import { ContractWithUser } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { useSelectData } from "@/hooks/useSelectData";
 import MauHopDongServices from "@/services/danh-muc/mau-hop-dong/mau-hop-dong.service";
@@ -38,12 +39,16 @@ import { FormValues } from "./prop";
 
 function ContractFormView({
   selectedUser,
+  contractDetailData,
   onMarkdownChange,
   onExportPdf,
+  onContractTypeChange,
 }: {
   selectedUser?: UserCreateContractItem | null;
+  contractDetailData?: ContractWithUser | null;
   onMarkdownChange?: (markdown: string) => void;
   onExportPdf?: () => void;
+  onContractTypeChange?: (contractTypeName: string) => void;
 }) {
   const messageApi = useAntdMessage();
   const [form] = Form.useForm<FormValues>();
@@ -68,6 +73,44 @@ function ContractFormView({
       form.setFieldValue("userId", selectedUser.id);
     }
   }, [selectedUser, form]);
+
+  useEffect(() => {
+    if (contractDetailData) {
+      // Populate form with contract detail data
+      const contract = contractDetailData.contract;
+      const userInfo = contractDetailData.userInfor;
+
+      form.setFieldsValue({
+        userId: contract.userId,
+        contractTypeId: contract.contractTypeId,
+        positionId: contract.positionId,
+        grossSalary: parseFloat(contract.grossSalary) / 1_000_000, // Convert to millions
+        allowanceIds: contract.allowanceInfors?.map((a) => a.allowanceId),
+      });
+
+      // Set content if available
+      if (contract.content) {
+        setDescription(contract.content);
+      }
+
+      // Set contract type name
+      if (onContractTypeChange) {
+        onContractTypeChange(contract.contractTypeName);
+      }
+
+      // Fetch position options for the department if method exists
+      if (
+        userInfo.departmentId &&
+        (SelectServices as any).getPositionByDepartment
+      ) {
+        (SelectServices as any)
+          .getPositionByDepartment(userInfo.departmentId)
+          .then((data: SelectOption[]) => {
+            setPositionOptionsState(data);
+          });
+      }
+    }
+  }, [contractDetailData, form, onContractTypeChange]);
 
   useEffect(() => {
     onMarkdownChange?.(content || "");
@@ -98,6 +141,16 @@ function ContractFormView({
 
       await QuanLyHopDongServices.createQuanLyHopDong(values);
       messageApi.success("Hợp đồng đã được tạo thành công!");
+
+      // Clear/reset all fields and editor after successful creation
+      form.resetFields();
+      setDescription("");
+      setSelectedTemplate("");
+      setPositionOptionsState([]);
+      setIsFullscreenOpen(false);
+      setActiveTab("basic-time");
+      setContractTemplates([]);
+      onMarkdownChange?.("");
     } catch (error) {
       console.error("Error saving contract:", error);
     } finally {
@@ -303,7 +356,16 @@ function ContractFormView({
                               placeholder="Chọn tên hợp đồng"
                               size="large"
                               options={selectContractType}
-                              onChange={(value) => fetchTemplate(value)}
+                              onChange={(value) => {
+                                fetchTemplate(value);
+                                // Find contract type name and notify parent
+                                const selectedType = selectContractType?.find(
+                                  (opt) => opt.value === value
+                                );
+                                if (selectedType && onContractTypeChange) {
+                                  onContractTypeChange(selectedType.label);
+                                }
+                              }}
                             />
                           </Form.Item>
                         </Col>
@@ -562,7 +624,7 @@ function ContractFormView({
                       <div className="editor-section">
                         <Form.Item
                           name="content"
-                          label="Nội dung chi tiết"
+                          // label="Nội dung chi tiết"
                           getValueFromEvent={(value) => value}
                           getValueProps={(value) => ({ value })}
                         >
@@ -573,7 +635,7 @@ function ContractFormView({
                               form.setFieldValue("content", value);
                             }}
                             placeholder="💡 Chọn template mẫu ở trên hoặc bắt đầu viết nội dung hợp đồng..."
-                            height={400}
+                            height={300}
                           />
                         </Form.Item>
                       </div>

@@ -113,7 +113,7 @@
 }
 
 .pdf-info-value {
-  flex-shrink: 0;
+  flex: 1;
 }
 
 .pdf-bold-value {
@@ -305,7 +305,7 @@
   font-style: italic;
   font-size: 0.875rem;
   text-align: center !important;
-  margin-bottom: 4rem !important;
+  margin-bottom: 4rem;
 }
 
 .pdf-signature-image {

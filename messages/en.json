@@ -461,7 +461,8 @@
     "startDate": "End Date",
     "duration": "Duration",
     "status": "Status",
-    "endDate": "End Date"
+    "endDate": "End Date",
+    "positionName": "Position Name"
   },
   "UserComponent": {
     "userName": "userName",

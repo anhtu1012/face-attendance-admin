@@ -3,27 +3,33 @@ import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
 import { UserContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 import { useDataGridOperations } from "@/hooks/useDataGridOperations";
+import { useSelectData } from "@/hooks/useSelectData";
 import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
 import { FilterOperationType } from "@chax-at/prisma-filter-common";
+import { Tooltip } from "antd";
 import { useTranslations } from "next-intl";
 import {
+  forwardRef,
   useCallback,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
-  forwardRef,
-  useImperativeHandle,
 } from "react";
+import { AiFillSignature } from "react-icons/ai";
+import { FaFileContract } from "react-icons/fa";
 import {
   FormValues,
   TableContractProps,
   TableContractRef,
 } from "../../_types/prop";
+import ContractDetailModal from "../ContractDetailModal/ContractDetailModal";
+
 const defaultPageSize = 20;
 const TableContract = forwardRef<TableContractRef, TableContractProps>(
-  ({ filterRef }, ref) => {
+  ({ filterRef, onAddAppendix, onTerminateContract }, ref) => {
     const mes = useTranslations("HandleNotion");
     const t = useTranslations("TableContract");
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -35,6 +41,13 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
     const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
       undefined
     );
+    const { selectStatusContract } = useSelectData();
+
+    // Modal state
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedContractId, setSelectedContractId] = useState<string | null>(
+      null
+    );
 
     useImperativeHandle(ref, () => ({
       refetch: () => fetchData(1, pageSize, quickSearchText),
@@ -43,22 +56,36 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
     const columnDefs: ColDef[] = useMemo(
       () => [
         {
+          field: "status",
+          headerName: t("status"),
+          editable: false,
+          width: 150,
+          context: {
+            typeColumn: "Tag",
+            selectOptions: selectStatusContract,
+          },
+          cellRendererParams: {
+            colorMap: {
+              PENDING: "#FB8C00",
+              USER_SIGNED: "#1976D2",
+              DIRECTOR_SIGNED: "#0288D1",
+              INACTIVE: "#00796B",
+              EXPIRED: "#C62828",
+              ACTIVE: "#2E7D32",
+            },
+          },
+        },
+        {
           field: "contractNumber",
           headerName: t("contractNumber"),
           editable: false,
           width: 150,
         },
         {
-          field: "titleContractName",
+          field: "contractTypeName",
           headerName: t("titleContractName"),
           editable: false,
           width: 200,
-        },
-        {
-          field: "contractType",
-          headerName: t("contractType"),
-          editable: false,
-          width: 150,
         },
         {
           field: "fullNameUser",
@@ -67,16 +94,10 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           width: 150,
         },
         {
-          field: "fullNameManager",
-          headerName: t("fullNameManager"),
+          field: "positionName",
+          headerName: t("positionName"),
           editable: false,
           width: 150,
-        },
-        {
-          field: "branchNames",
-          headerName: t("branchNames"),
-          editable: false,
-          width: 250,
         },
         {
           field: "startDate",
@@ -102,39 +123,51 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           editable: false,
           width: 150,
           valueFormatter: (params) => {
-            if (params.value && typeof params.value === "number") {
-              const minutes = params.value;
+            if (params.value) {
+              const minutes = Number(params.value);
               const minutesPerDay = 1440;
-              const daysPerYear = 365;
-              const minutesPerYear = daysPerYear * minutesPerDay;
+              const daysPerMonth = 30.4167; // trung bình
 
-              const years = Math.floor(minutes / minutesPerYear);
-              let remainingMinutes = minutes % minutesPerYear;
+              const totalDays = Math.floor(minutes / minutesPerDay);
 
-              const days = Math.floor(remainingMinutes / minutesPerDay);
-              remainingMinutes = remainingMinutes % minutesPerDay;
+              if (totalDays >= 1) {
+                // Tính tháng dựa trên totalDays để tránh lỗi float khi nhân minutesPerMonth*12
+                let months = Math.floor(totalDays / daysPerMonth);
 
-              const parts = [];
-              if (years > 0) parts.push(`${years} năm`);
-              if (days > 0) parts.push(`${days} ngày`);
-              if (remainingMinutes > 0) parts.push(`${remainingMinutes} phút`);
+                // Lấy số ngày còn lại (làm tròn)
+                let days = Math.round(totalDays - months * daysPerMonth);
 
-              return parts.join(" ") || "0 phút";
+                // Nếu do làm tròn mà days bằng số ngày trung bình 1 tháng => coi là 1 tháng đầy
+                const roundedDaysPerMonth = Math.round(daysPerMonth);
+                if (days >= roundedDaysPerMonth) {
+                  months += 1;
+                  days = 0;
+                }
+
+                // Khống chế trường hợp âm (phòng lỗi)
+                months = Math.max(0, months);
+                days = Math.max(0, days);
+
+                if (months > 0) {
+                  return `${months} tháng${days > 0 ? ` ${days} ngày` : ""}`;
+                }
+                return `${totalDays} ngày`;
+              }
+
+              // Dưới 1 ngày: giờ + phút
+              if (minutes >= 60) {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours} giờ${mins > 0 ? ` ${mins} phút` : ""}`;
+              }
+
+              return `${minutes} phút`;
             }
             return "";
           },
         },
-        {
-          field: "status",
-          headerName: t("status"),
-          editable: false,
-          width: 150,
-          context: {
-            typeColumn: "Tag",
-          },
-        },
       ],
-      [t]
+      [t, selectStatusContract]
     );
     const fetchData = useCallback(
       async (
@@ -201,9 +234,40 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
       columnDefs,
     });
 
+    const buttonProps = (_params: any) => {
+      const defaultViewButton = (
+        <Tooltip title="Xem chi tiết">
+          <FaFileContract
+            style={{ cursor: "pointer", color: "#0288D1" }}
+            size={20}
+            onClick={() => {
+              setSelectedContractId(_params.data.id);
+              setModalOpen(true);
+            }}
+          />
+        </Tooltip>
+      );
+      if (_params.data.status === "ACTIVE") {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {defaultViewButton}
+            <Tooltip title="Ký tên">
+              <AiFillSignature
+                style={{ cursor: "pointer", color: "#0288D1" }}
+                size={20}
+                onClick={() => {
+                  window.location.href = `/tac-vu-nhan-su/quan-ly-hop-dong/${_params.data.id}/signature`;
+                }}
+              />
+            </Tooltip>
+          </div>
+        );
+      }
+      return defaultViewButton;
+    };
+
     return (
       <div>
-        {" "}
         <AgGridComponentWrapper
           showSearch={true}
           rownumber={true}
@@ -217,6 +281,9 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
             enableClickSelection: true,
             checkboxes: false,
           }}
+          showToolColumn={true}
+          toolColumnRenderer={buttonProps}
+          toolColumnWidth={100}
           pagination={true}
           paginationPageSize={pageSize}
           paginationCurrentPage={currentPage}
@@ -229,6 +296,17 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           columnFlex={0}
           onQuicksearch={dataGrid.handleQuicksearch}
           showActionButtons={false}
+        />
+
+        <ContractDetailModal
+          open={modalOpen}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedContractId(null);
+          }}
+          contractId={selectedContractId}
+          onAddAppendix={onAddAppendix}
+          onTerminateContract={onTerminateContract}
         />
       </div>
     );

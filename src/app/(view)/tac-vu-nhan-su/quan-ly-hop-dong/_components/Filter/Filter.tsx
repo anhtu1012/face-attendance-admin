@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { FaRegUserCircle } from "react-icons/fa";
 import { FilterProps, FilterRef, FormValues } from "../../_types/prop";
 import "./index.scss";
 // Add ref type
@@ -18,7 +19,12 @@ const Filter = forwardRef<FilterRef, FilterProps>(
   ({ disabled = false, onSubmit }, ref) => {
     const t = useTranslations("Filter");
     const [form] = Form.useForm<FormValues>();
-    const { selectRole, selectContractType, selectDepartment } = useSelectData({
+    const {
+      selectRole,
+      selectContractType,
+      selectDepartment,
+      selectStatusContract,
+    } = useSelectData({
       fetchRole: true,
       fetchDepartment: true,
       fetchContractType: true,
@@ -123,7 +129,15 @@ const Filter = forwardRef<FilterRef, FilterProps>(
                   </Col>
                   <Col span={24}>
                     <Form.Item name="userName">
-                      <CInputLabel label="Tên nhân viên" allowClear />
+                      <CInputLabel
+                        label="Tên nhân viên"
+                        allowClear
+                        suffix={
+                          <>
+                            <FaRegUserCircle />
+                          </>
+                        }
+                      />
                     </Form.Item>
                   </Col>
                   <Col span={24}>
@@ -140,14 +154,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(
                       <Cselect
                         label="Trang thái"
                         allowClear
-                        defaultValue={""}
-                        options={[
-                          { label: "Tất cả", value: "" },
-                          { label: "Chờ xử lý", value: "xl" },
-                          { label: "Đang chờ ký", value: "ch" },
-                          { label: "Đã có hiệu lực", value: "hl" },
-                          { label: "Hết hạn", value: "hh" },
-                        ]}
+                        options={selectStatusContract}
                       />
                     </Form.Item>
                   </Col>

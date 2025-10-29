@@ -2,6 +2,7 @@
 import NotFound from "@/app/(error)/not_found/page";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { UserCreateContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/user-create-contract/user-create-contract.dto";
+import { ContractWithUser } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 import { Button, Col, Modal, Row } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaPlusCircle } from "react-icons/fa";
@@ -15,6 +16,8 @@ import TableContract from "./_components/TableContract";
 import UserComponent from "./_components/UserComponent/UserComponent";
 import { FilterRef, TableContractRef } from "./_types/prop";
 import "./index.scss";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 
 function Page() {
   const filterRef = useRef<FilterRef>(null);
@@ -24,36 +27,75 @@ function Page() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] =
     useState<UserCreateContractItem | null>(null);
+  const [contractDetailData, setContractDetailData] =
+    useState<ContractWithUser | null>(null);
   const [markdown, setMarkdown] = useState<string>("");
+  const [contractTitle, setContractTitle] =
+    useState<string>("Hợp đồng lao động");
   const scales = [0.2, 0.5, 0.75, 1];
   const [scaleIndex, setScaleIndex] = useState<number>(3);
-
+  const { companyInformation } = useSelector(selectAuthLogin);
   const contractData: ContractData | null = useMemo(() => {
+    // Nếu có dữ liệu từ contract detail, sử dụng nó
+    if (contractDetailData) {
+      return {
+        title: contractDetailData.contract.contractTypeName,
+        city: companyInformation.city || "TP. Hồ Chí Minh",
+        effectiveDate: contractDetailData.contract.startDate,
+        partyA: {
+          companyName: companyInformation.companyName || "",
+          address: companyInformation.addressLine || "",
+          representative: "Nguyễn Văn A",
+          position: "Giám đốc",
+          refNumber: contractDetailData.contract.contractNumber,
+        },
+        partyB: {
+          name: contractDetailData.userInfor.fullName || "",
+          nationality: contractDetailData.userInfor.nationality || "Việt Nam",
+          dob: contractDetailData.userInfor.birthday || "",
+          address: contractDetailData.userInfor.currentAddress || "",
+          idNumber: contractDetailData.userInfor.citizenIdentityCard || "",
+          idIssueDate:
+            contractDetailData.userInfor.issueDate || new Date().toISOString(),
+          idIssuePlace:
+            contractDetailData.userInfor.issueAt || "Công an TP.HCM",
+        },
+      };
+    }
+
+    // Nếu có selected user, sử dụng nó
     if (!selectedUser) return null;
     console.log({ selectedUser });
 
     return {
-      title: "Hợp đồng lao động",
-      city: "Hồ Chí Minh",
+      title: contractTitle,
+      city: companyInformation.city || "TP. Hồ Chí Minh",
       effectiveDate: new Date().toISOString(),
       partyA: {
-        companyName: "Công ty TNHH ABC",
-        address: "123 Đường ABC, Quận 1, TP.HCM",
+        companyName: companyInformation.companyName || "",
+        address: companyInformation.addressLine || "",
         representative: "Nguyễn Văn A",
         position: "Giám đốc",
         refNumber: "HD-001",
       },
       partyB: {
         name: selectedUser.fullName || "",
-        nationality: "Việt Nam",
-        dob: selectedUser.birthDay ? selectedUser.birthDay.toISOString() : "",
-        address: selectedUser.address || "416/23 Lê Văn Sỹ, Phường 14, Quận 3",
-        idNumber: "123456789",
-        idIssueDate: "2020-01-01",
-        idIssuePlace: "TP.HCM",
+        nationality: selectedUser.nationality || "Việt Nam",
+        dob: selectedUser.birthDay,
+        address: selectedUser.currentAddress || "",
+        idNumber: selectedUser.citizenIdentityCard || "",
+        idIssueDate: selectedUser.issueDate || new Date().toISOString(),
+        idIssuePlace: selectedUser.issueAt || "Công an TP.HCM",
       },
     };
-  }, [selectedUser]);
+  }, [
+    companyInformation.addressLine,
+    companyInformation.city,
+    companyInformation.companyName,
+    selectedUser,
+    contractTitle,
+    contractDetailData,
+  ]);
 
   const handleExportPdf = async () => {
     if (pdfRef.current) {
@@ -66,6 +108,18 @@ function Page() {
       tableRef.current?.refetch();
     }
   }, [selected]);
+
+  const handleAddAppendix = (contractData: ContractWithUser) => {
+    // Chuyển sang chế độ tạo hợp đồng với dữ liệu từ contract detail
+    setContractDetailData(contractData);
+    setSelected("Tạo hợp đồng");
+  };
+
+  const handleTerminateContract = (contractData: ContractWithUser) => {
+    // TODO: Implement terminate contract logic
+    console.log("Terminate contract:", contractData);
+  };
+
   return (
     <>
       <LayoutContent
@@ -132,8 +186,10 @@ function Page() {
               <Col span={24}>
                 <ContractFormView
                   selectedUser={selectedUser}
+                  contractDetailData={contractDetailData}
                   onMarkdownChange={setMarkdown}
                   onExportPdf={handleExportPdf}
+                  onContractTypeChange={setContractTitle}
                 />
               </Col>
             )}
@@ -153,7 +209,12 @@ function Page() {
                   }}
                 >
                   {selected === "Bộ lọc" && (
-                    <TableContract ref={tableRef} filterRef={filterRef} />
+                    <TableContract
+                      ref={tableRef}
+                      filterRef={filterRef}
+                      onAddAppendix={handleAddAppendix}
+                      onTerminateContract={handleTerminateContract}
+                    />
                   )}
                   {selected === "Tạo hợp đồng" && (
                     <Col span={24}>

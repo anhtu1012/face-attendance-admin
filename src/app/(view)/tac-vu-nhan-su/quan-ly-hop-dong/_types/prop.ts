@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { Dayjs } from "dayjs";
 
 export interface FormValues {
@@ -27,6 +25,7 @@ export interface TableContractRef {
 }
 
 import { UserCreateContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/user-create-contract/user-create-contract.dto";
+import { ContractWithUser } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 
 export interface UserComponentPropsProps {
   shouldFetch?: boolean;
@@ -35,4 +34,6 @@ export interface UserComponentPropsProps {
 
 export interface TableContractProps {
   filterRef: React.RefObject<FilterRef | null>;
+  onAddAppendix?: (contractData: ContractWithUser) => void;
+  onTerminateContract?: (contractData: ContractWithUser) => void;
 }

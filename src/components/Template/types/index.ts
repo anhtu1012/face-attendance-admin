@@ -17,9 +17,9 @@ export interface PartyB {
 }
 
 export interface ContractData {
-  title: string;
-  city: string;
-  effectiveDate: string;
+  title?: string;
+  city?: string;
+  effectiveDate?: string;
   partyA: PartyA;
   partyB: PartyB;
 }

@@ -58,6 +58,11 @@ const nextConfig = {
         port: "9000",
         pathname: "/**",
       },
+      {
+        protocol: "https" as const,
+        hostname: "thegioibut.com",
+        pathname: "/**",
+      },
     ],
   },
   sassOptions: {

@@ -27,6 +27,7 @@ function UserComponent({
   const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
     undefined
   );
+  const lastFetchRef = useRef<number>(0);
 
   const fetchData = useCallback(
     async (
@@ -34,6 +35,10 @@ function UserComponent({
       pageSize: number,
       quickSearchText: string | undefined
     ) => {
+      const now = Date.now();
+      const last = lastFetchRef.current || 0;
+      if (now - last < 500) return;
+      lastFetchRef.current = now;
       setLoading(true);
       try {
         const searchFilter: FilterQueryStringTypeItem[] = [
@@ -111,7 +116,7 @@ function UserComponent({
     if (shouldFetch) {
       fetchData(1, defaultPageSize, undefined);
     }
-  }, [shouldFetch]);
+  }, [shouldFetch, fetchData]);
 
   return (
     <AgGridComponent

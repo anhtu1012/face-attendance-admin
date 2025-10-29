@@ -434,7 +434,8 @@
     "startDate": "Ngày bắt đầu",
     "duration": "Thời gian",
     "status": "Trạng thái",
-    "endDate": "Ngày kết thúc"
+    "endDate": "Ngày kết thúc",
+    "positionName": "Chức vụ"
   },
   "UserComponent": {
     "userName": "Tên đăng nhập",

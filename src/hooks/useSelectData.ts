@@ -41,6 +41,32 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
       value: "F",
     },
   ]);
+  const [selectStatusContract] = useState<SelectOption[]>([
+    {
+      label: "Chờ xử lý",
+      value: "PENDING",
+    },
+    {
+      label: "Chờ nhân viên ký",
+      value: "USER_SIGNED",
+    },
+    {
+      label: "Chờ ký",
+      value: "DIRECTOR_SIGNED",
+    },
+    {
+      label: "Kèm theo phụ lục",
+      value: "INACTIVE",
+    },
+    {
+      label: "Hết hạn",
+      value: "EXPIRED",
+    },
+    {
+      label: "Hoạt động",
+      value: "ACTIVE",
+    },
+  ]);
   const [selectCandidate] = useState<SelectOption[]>([
     { label: "Liên hệ", value: "TO_CONTACT" }, //1
     { label: "Không LH Được", value: "CANNOT_CONTACT" }, //1
@@ -140,5 +166,6 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     selectExperienceYears,
     selectContractType,
     selectAllowance,
+    selectStatusContract,
   };
 };
