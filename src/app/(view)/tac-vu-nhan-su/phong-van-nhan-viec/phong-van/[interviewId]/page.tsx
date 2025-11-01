@@ -132,7 +132,7 @@ export default function AppointmentDetailPage() {
 
           <div className="page-content">
             <AppointmentDetailTabs
-              interview={interview}
+              interview={"" as any}
               onRefresh={fetchAppointmentDetail}
             />
           </div>

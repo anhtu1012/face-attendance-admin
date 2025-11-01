@@ -3,11 +3,8 @@ import { ContractDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts
 import {
   Badge,
   Card,
-  Col,
   Descriptions,
   Divider,
-  Image,
-  Row,
   Tag,
   Typography,
   Upload,
@@ -48,7 +45,8 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
     }).format(numValue);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string | null, fallback = "N/A") => {
+    if (!dateString) return fallback;
     return dayjs(dateString).format("DD/MM/YYYY");
   };
 
@@ -141,7 +139,9 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
             </span>
           }
         >
-          <Text type="danger">{formatDate(contract.endDate)}</Text>
+          <Text type="danger">
+            {formatDate(contract.endDate, "Không có thời hạn kết thúc")}
+          </Text>
         </Descriptions.Item>
 
         <Descriptions.Item label="Thời hạn" span={2}>
@@ -160,7 +160,7 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
           span={2}
         >
           <Text strong style={{ fontSize: "16px", color: "#52c41a" }}>
-            {formatCurrency(contract.grossSalary)}
+            {contract.grossSalary} VNĐ
           </Text>
         </Descriptions.Item>
 
@@ -236,36 +236,6 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
             </Cbutton>
           </Upload>
         </div>
-      )}
-
-      {(contract.userSignature || contract.directorSignature) && (
-        <>
-          <Divider orientation="left">Chữ ký</Divider>
-          <Row gutter={[24, 24]}>
-            {contract.userSignature && (
-              <Col span={12}>
-                <Card title="Chữ ký nhân viên" className="signature-card">
-                  <Image
-                    src={contract.userSignature}
-                    alt="User Signature"
-                    className="signature-image"
-                  />
-                </Card>
-              </Col>
-            )}
-            {contract.directorSignature && (
-              <Col span={12}>
-                <Card title="Chữ ký giám đốc" className="signature-card">
-                  <Image
-                    src={contract.directorSignature}
-                    alt="Director Signature"
-                    className="signature-image"
-                  />
-                </Card>
-              </Col>
-            )}
-          </Row>
-        </>
       )}
     </Card>
   );

@@ -2,13 +2,13 @@
 
 import { Tabs } from "antd";
 import { useState } from "react";
-import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 import AppointmentInfoTab from "./components/AppointmentInfoTab";
 import "./AppointmentDetailTabs.scss";
 import { CandidateListTab } from "./components";
+import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
 
 interface AppointmentDetailTabsProps {
-  interview: AppointmentItem;
+  interview: AppointmentListWithInterview;
   onRefresh: () => void;
   defaultTab?: string;
 }
@@ -41,7 +41,12 @@ export default function AppointmentDetailTabs({
           Danh sách ứng viên
         </span>
       ),
-      children: <CandidateListTab jobId={interview.jobId} />,
+      children: (
+        <CandidateListTab
+          jobId={interview.jobInfor?.jobId}
+          appointmentId={interview.id}
+        />
+      ),
     },
   ];
 

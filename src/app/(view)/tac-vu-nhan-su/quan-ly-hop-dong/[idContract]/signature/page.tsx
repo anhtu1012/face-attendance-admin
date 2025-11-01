@@ -14,29 +14,31 @@ import { PrintIcon } from "./_components/icons";
 
 // Import types
 import { ContractData, Signatures } from "@/components/Template/types";
-import {
-  ContractDetail,
-  UserInfor,
-} from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
+import { ContractDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 
 // Import service
 import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
 
 // Import styles
-import "./signature.scss";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import { useSelector } from "react-redux";
+import "./signature.scss";
+import { createFileFromDataUrl } from "./_utils/createFileFromDataUrl";
 
 const ContractSignaturePage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const idContract = params.idContract as string;
-
+  const { userProfile } = useSelector(selectAuthLogin);
+  const messageApi = useAntdMessage();
   // Data states
   const [contractData, setContractData] = useState<ContractData | null>(null);
   const [contractDetail, setContractDetail] = useState<ContractDetail | null>(
     null
   );
-  const [userInfo, setUserInfo] = useState<UserInfor | null>(null);
+  // const [userInfo, setUserInfo] = useState<UserInfor | null>(null);
   const [contractContent, setContractContent] = useState<string>("");
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -57,7 +59,6 @@ const ContractSignaturePage: React.FC = () => {
 
   // Print ref
   const printableRef = useRef<HTMLDivElement>(null);
-  console.log("user", userInfo);
 
   // --- FETCH CONTRACT DATA ---
   useEffect(() => {
@@ -72,7 +73,7 @@ const ContractSignaturePage: React.FC = () => {
         const user = response.userInfor;
 
         setContractDetail(contract);
-        setUserInfo(user);
+        // setUserInfo(user);
         setContractContent(contract.content || "");
 
         // Load existing signatures if any
@@ -82,16 +83,17 @@ const ContractSignaturePage: React.FC = () => {
             partyA: contract.directorSignature || null,
           }));
         }
-        if (true) {
+
+        if (contract.userSignature) {
           setSignatures((prev) => ({
             ...prev,
-            partyB:
-              "https://thegioibut.com/wp-content/uploads/2020/09/chu-ky-dep-chu-ky-mau-dep-1024x484.jpg",
+            partyB: contract.userSignature || null,
           }));
         }
 
         // Transform data for PdfPreview component
         const transformedData: ContractData = {
+          userContractId: contract.id,
           title: contract.contractTypeName || "HỢP ĐỒNG LAO ĐỘNG",
           city: "Hà Nội", // Could be dynamic based on company info
           effectiveDate: contract.startDate,
@@ -224,12 +226,16 @@ const ContractSignaturePage: React.FC = () => {
   });
 
   // --- OTP HANDLERS ---
-  const handleVerifySignature = () => {
+  const handleVerifySignature = async () => {
     if (!signatures.partyA || !signatures.partyB) {
       alert("Vui lòng hoàn thành cả 2 chữ ký trước khi xác thực.");
       return;
     }
-
+    console.log("contractId", contractData?.userContractId);
+    await QuanLyHopDongServices.getOpt({
+      userContractId: contractData?.userContractId || "",
+      gmail: userProfile.email || "",
+    });
     setShowOTPModal(true);
     setTimeout(() => {
       const firstInput = document.querySelector(
@@ -248,18 +254,27 @@ const ContractSignaturePage: React.FC = () => {
     setIsVerifying(true);
 
     try {
-      // Call API to save signatures with OTP verification
-      await QuanLyHopDongServices.saveContractSignatures(idContract, {
-        directorSignature: signatures.partyA || undefined,
-        userSignature: signatures.partyB || undefined,
-        otpCode: otpValue,
-      });
+      const formData = new FormData();
+      formData.append("userContractId", contractData?.userContractId || "");
+      formData.append("otpCode", otpValue);
 
-      alert("Xác thực thành công! Chữ ký đã được lưu.");
+      const fileSignA = await createFileFromDataUrl(
+        signatures.partyA,
+        `signatureA-${Date.now()}.png`
+      );
+
+      if (fileSignA) {
+        formData.append("fileSignUrl", fileSignA);
+      } else {
+        // As a fallback, append an empty string so backend receives the field
+        formData.append("fileSignUrl", "");
+      }
+
+      formData.append("signatureType", "DIRECTOR");
+      await QuanLyHopDongServices.saveContractSignatures(formData);
+      messageApi.success("Xác thực OTP và lưu chữ ký thành công.");
       setShowOTPModal(false);
       setOtpValue("");
-
-      // Redirect back to contract list or detail page
       setTimeout(() => {
         router.push("/tac-vu-nhan-su/quan-ly-hop-dong");
       }, 1000);
@@ -280,8 +295,11 @@ const ContractSignaturePage: React.FC = () => {
 
   const handleResendOTP = async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert("Mã OTP đã được gửi lại!");
+      await QuanLyHopDongServices.getOpt({
+        userContractId: contractData?.userContractId || "",
+        gmail: userProfile.email || "",
+      });
+      messageApi.success("Đã gửi lại mã OTP thành công.");
     } catch (err) {
       console.error("Resend OTP error:", err);
       alert("Không thể gửi lại OTP. Vui lòng thử lại.");

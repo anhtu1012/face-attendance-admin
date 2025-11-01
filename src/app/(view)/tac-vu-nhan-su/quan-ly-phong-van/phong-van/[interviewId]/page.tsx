@@ -2,14 +2,15 @@
 "use client";
 
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 import { showError } from "@/hooks/useNotification";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Spin, Tag } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import "./page.scss";
 import AppointmentDetailTabs from "../../../_shared/AppointmentDetailTabs";
+import "./page.scss";
+import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
+import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
 
 const statusConfig = {
   PENDING: { text: "Chờ xác nhận", color: "orange" },
@@ -25,45 +26,22 @@ export default function AppointmentDetailPage() {
   const interviewId = params.interviewId as string;
 
   const [loading, setLoading] = useState(true);
-  const [interview, setAppointment] = useState<AppointmentItem | null>(null);
+  const [interview, setAppointment] =
+    useState<AppointmentListWithInterview | null>(null);
 
   const fetchAppointmentDetail = async () => {
     setLoading(true);
     try {
-      // Mock data for now
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setAppointment({
-        id: interviewId,
-        candidateId: "1",
-        candidateName: "Nguyễn Văn A",
-        candidateEmail: "nguyenvana@example.com",
-        candidatePhone: "0912345678",
-        jobId: "job1",
-        jobTitle: "Senior Frontend Developer",
-        department: "IT Department",
-        jobLevel: "Senior",
-        jobDescription:
-          "Tham gia phát triển sản phẩm web, làm việc với React, Next.js và TypeScript. Tham gia review code, tối ưu hiệu năng và kiến trúc frontend.",
-        jobResponsibility:
-          "Xây dựng giao diện, tích hợp API, đảm bảo chất lượng mã nguồn, viết unit/integration tests.",
-        jobBenefit:
-          "Bảo hiểm, lương tháng 13, du lịch hàng năm, training kỹ thuật.",
-        requireExperience: "3-5 năm",
-        fromSalary: "20,000,000 VND",
-        toSalary: "35,000,000 VND",
-        requireSkill: ["React", "TypeScript", "Next.js", "Unit Testing"],
-        interviewDate: "2025-01-15",
-        startTime: "09:00",
-        endTime: "11:00",
-        interviewType: "online",
-        meetingLink: "https://meet.google.com/abc-defg-hij",
-        location: "Tòa nhà ABC, Quận 1",
-        interviewer: "Trần Thị B",
-        interviewerEmail: "tranthib@company.com",
-        interviewerPhone: "0987654321",
-        status: "PENDING",
-        notes: "Ứng viên có kinh nghiệm 5 năm với React, Next.js",
-      } as unknown as AppointmentItem);
+      const response = await TuyenDungServices.getDanhSachPhongVanWithParam(
+        [],
+        undefined,
+        {
+          appointmentId: interviewId,
+        }
+      );
+      setAppointment(
+        response.data && response.data.length > 0 ? response.data[0] : null
+      );
     } catch (error: any) {
       showError(
         error.response?.data?.message || "Lỗi khi tải thông tin phỏng vấn"
@@ -111,14 +89,21 @@ export default function AppointmentDetailPage() {
             </Button>
             <div className="header-info">
               <div className="header-main">
-                <h1 className="page-title">{interview.jobTitle}</h1>
+                <h1 className="page-title">{interview?.jobInfor?.jobTitle}</h1>
                 <div className="header-meta">
-                  <span className="position-name">{interview.department}</span>
                   <Tag
-                    color={statusConfig[interview.status].color}
+                    color={
+                      statusConfig[
+                        interview.status as keyof typeof statusConfig
+                      ].color
+                    }
                     className="status-tag"
                   >
-                    {statusConfig[interview.status].text}
+                    {
+                      statusConfig[
+                        interview.status as keyof typeof statusConfig
+                      ].text
+                    }
                   </Tag>
                 </div>
               </div>

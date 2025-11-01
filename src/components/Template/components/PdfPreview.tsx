@@ -28,9 +28,6 @@ const InfoRow: React.FC<{
 
 export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
   ({ data, markdown, signatures }, ref) => {
-    // markdown giờ đây chứa HTML content, không cần parse nữa
-    console.log("signatures", signatures);
-
     const formattedDate = useMemo(() => {
       const date = new Date(data.effectiveDate ?? Date.now());
       const adjustedDate = new Date(
@@ -42,6 +39,8 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
         year: adjustedDate.getFullYear(),
       };
     }, [data.effectiveDate]);
+
+    console.log("signatures", signatures.partyA);
 
     return (
       <div ref={ref} className="pdf-preview">

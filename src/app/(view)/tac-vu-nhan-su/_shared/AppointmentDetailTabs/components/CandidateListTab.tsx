@@ -1,107 +1,88 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
-import { useEffect, useState } from "react";
-import { Table, Card, Tag, Avatar, Button, Space, Input, Badge } from "antd";
+import AIAnalysisResultModal from "@/components/AIAnalysisResultModal/AIAnalysisResultModal";
+import { CreateInterviewReportRequest } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.request.dto";
+import { TuyenDungItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.dto";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/quan-ly-phong-van.service";
 import {
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaSearch,
-  FaDownload,
-  FaEye,
-  FaUsers,
-} from "react-icons/fa";
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Input,
+  Progress,
+  Space,
+  Table,
+  Tooltip,
+} from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import {
+  FaDownload,
+  FaEnvelope,
+  FaExclamationCircle,
+  FaEye,
+  FaLightbulb,
+  FaMedal,
+  FaPhone,
+  FaSearch,
+  FaTrophy,
+  FaUser,
+  FaUsers,
+} from "react-icons/fa";
+import { useSelector } from "react-redux";
 import "./CandidateListTab.scss";
-
-interface Candidate {
-  id: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  birthday?: string;
-  skillIds?: string[];
-  fileCV?: string;
-  gender: "M" | "F" | "";
-  status: string;
-  experience?: string;
-  createdAt?: string;
-  avatar?: string;
-}
+import ReportModal from "./ReportModal";
 
 interface CandidateListTabProps {
   jobId?: string;
-  interviewId?: string;
+  appointmentId?: string;
 }
 
 const statusConfig: Record<string, { text: string; color: string }> = {
-  APPLYING: { text: "Đang ứng tuyển", color: "blue" },
-  INTERVIEWING: { text: "Đang phỏng vấn", color: "orange" },
-  OFFERED: { text: "Đã nhận offer", color: "green" },
-  ONBOARDING: { text: "Đang nhận việc", color: "cyan" },
+  INTERVIEW_SCHEDULED: { text: "Đang phỏng vấn", color: "orange" },
+  JOB_SCHEDULED: { text: "Đang nhận việc", color: "green" },
   HIRED: { text: "Đã tuyển", color: "success" },
-  REJECTED: { text: "Từ chối", color: "red" },
+  INTERVIEW_REJECTED: { text: "Từ chối PV", color: "red" },
+  OFFER_REJECTED: { text: "Từ chối NV", color: "red" },
 };
 
-export default function CandidateListTab({ jobId, interviewId }: CandidateListTabProps) {
+export default function CandidateListTab({
+  jobId,
+  appointmentId,
+}: CandidateListTabProps) {
   const [loading, setLoading] = useState(false);
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [candidates, setCandidates] = useState<TuyenDungItem[]>([]);
   const [searchText, setSearchText] = useState("");
+
+  // new: modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] =
+    useState<TuyenDungItem | null>(null);
+
+  // report modal state
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportCandidate, setReportCandidate] = useState<TuyenDungItem | null>(
+    null
+  );
+  const { userProfile } = useSelector(selectAuthLogin);
+  const messageApi = useAntdMessage();
 
   useEffect(() => {
     fetchCandidates();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobId, interviewId]);
+  }, [jobId, appointmentId]);
 
   const fetchCandidates = async () => {
     setLoading(true);
     try {
-      // Try to fetch candidates from API. Endpoint attempts:
-      // 1. /v1/interview/{interviewId}/candidates
-      // 2. /v1/job/{jobId}/candidates
-      const { AxiosService } = await import("@/apis/axios.base");
-      const axiosService = AxiosService.getInstance();
-
-  let data: unknown[] = [];
-      if (typeof interviewId !== "undefined") {
-        try {
-          data = await axiosService.get(`/v1/interview/${interviewId}/candidates`);
-        } catch {
-          // fallback: try job endpoint if interview endpoint doesn't exist
-        }
-      }
-
-      if ((!data || data.length === 0) && typeof jobId !== "undefined") {
-        try {
-          data = await axiosService.get(`/v1/job/${jobId}/candidates`);
-        } catch {
-          // no-op, will fall back to empty
-        }
-      }
-
-      if (!data || data.length === 0) {
-        // fallback to empty array
-        data = [];
-      }
-
-      // Map API response to Candidate[] shape if necessary
-      const mapped: Candidate[] = (data as any[]).map((it) => ({
-        id: it.id || it.candidateId || String((it as any)._id || ""),
-        fullName: it.fullName || it.candidateName || "",
-        email: it.email || it.candidateEmail || "",
-        phone: it.phone || it.candidatePhone || "",
-        birthday: it.birthday || (it as any).dateOfBirth || undefined,
-        gender: it.gender || "",
-        experience: it.experience || (it as any).yearsOfExperience || undefined,
-        status: it.status || "",
-        fileCV: it.fileCV || (it as any).cvUrl || undefined,
-        skillIds: (it as any).skills || (it as any).skillIds || [],
-        createdAt: it.createdAt || (it as any).appliedAt || undefined,
-      }));
-
-      setCandidates(mapped);
+      const response = await QuanLyPhongVanServices.getUngVien([], undefined, {
+        appointmentId: appointmentId || "",
+      });
+      setCandidates(response.data || []);
     } catch (error) {
       console.error("Error fetching candidates:", error);
     } finally {
@@ -109,7 +90,7 @@ export default function CandidateListTab({ jobId, interviewId }: CandidateListTa
     }
   };
 
-  const columns: ColumnsType<Candidate> = [
+  const columns: ColumnsType<TuyenDungItem> = [
     {
       title: "Ứng viên",
       key: "candidate",
@@ -119,7 +100,7 @@ export default function CandidateListTab({ jobId, interviewId }: CandidateListTa
         <div className="candidate-info">
           <Avatar
             size={48}
-            src={record.avatar}
+            src={"../../../../../assets/images/default-avatar.png"}
             icon={<FaUser />}
             className="candidate-avatar"
           />
@@ -135,6 +116,128 @@ export default function CandidateListTab({ jobId, interviewId }: CandidateListTa
           </div>
         </div>
       ),
+    },
+    {
+      title: "Tỉ lệ phù hợp",
+      dataIndex: "analysisResult",
+      key: "analysis",
+      width: 120,
+      render: (analysisResult: any) => {
+        if (!analysisResult) return "-";
+        const score =
+          typeof analysisResult.matchScore === "number"
+            ? analysisResult.matchScore
+            : 0;
+
+        return (
+          <div
+            className="match-recommend-cell"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              justifyContent: "left",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Progress
+                type="circle"
+                percent={score}
+                width={64}
+                strokeWidth={8}
+                strokeColor={{
+                  "0%": "rgb(13, 71, 161)",
+                  "100%": "rgb(30, 136, 229)",
+                }}
+                format={(p) => (
+                  <span style={{ fontWeight: 700, color: "rgb(13,71,161)" }}>
+                    {p}%
+                  </span>
+                )}
+              />
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Khuyến nghị",
+      dataIndex: "analysisResult",
+      key: "analysis",
+      width: 120,
+      render: (analysisResult: any) => {
+        if (!analysisResult) return "-";
+        const getRecommendationBadge = (recommendation?: string) => {
+          switch (recommendation) {
+            case "Strongly Recommend":
+              return {
+                icon: <FaTrophy />,
+                className: "strongly-recommend",
+                text: "Khuyến nghị mạnh mẽ",
+              };
+            case "Recommend":
+              return {
+                icon: <FaMedal />,
+                className: "recommend",
+                text: "Khuyến nghị",
+              };
+            case "Consider":
+              return {
+                icon: <FaLightbulb />,
+                className: "consider",
+                text: "Cân nhắc",
+              };
+            default:
+              return {
+                icon: <FaExclamationCircle />,
+                className: "not-a-good-fit",
+                text: "Không phù hợp",
+              };
+          }
+        };
+
+        const badge = getRecommendationBadge(analysisResult.recommendation);
+
+        return (
+          <div
+            className="match-recommend-cell"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              justifyContent: "left",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+                minWidth: 120,
+              }}
+            >
+              <Tooltip title={analysisResult.recommendation}>
+                <div
+                  className={`rec-badge ${badge.className}`}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  {badge.icon} {badge.text}
+                </div>
+              </Tooltip>
+            </div>
+          </div>
+        );
+      },
     },
     {
       title: "Thông tin liên hệ",
@@ -162,29 +265,6 @@ export default function CandidateListTab({ jobId, interviewId }: CandidateListTa
         birthday ? dayjs(birthday).format("DD/MM/YYYY") : "-",
     },
     {
-      title: "Kinh nghiệm",
-      dataIndex: "experience",
-      key: "experience",
-      width: 120,
-      render: (exp) => exp || "-",
-    },
-    {
-      title: "Kỹ năng",
-      dataIndex: "skillIds",
-      key: "skills",
-      width: 200,
-      render: (skills: string[]) => (
-        <div className="skills-tags">
-          {skills?.slice(0, 3).map((skill, index) => (
-            <Tag key={index} color="blue">
-              {skill}
-            </Tag>
-          ))}
-          {skills?.length > 3 && <Tag>+{skills.length - 3}</Tag>}
-        </div>
-      ),
-    },
-    {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
@@ -200,13 +280,6 @@ export default function CandidateListTab({ jobId, interviewId }: CandidateListTa
           </Badge>
         );
       },
-    },
-    {
-      title: "Ngày ứng tuyển",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      width: 120,
-      render: (date) => (date ? dayjs(date).format("DD/MM/YYYY") : "-"),
     },
     {
       title: "CV",
@@ -243,13 +316,32 @@ export default function CandidateListTab({ jobId, interviewId }: CandidateListTa
     {
       title: "Thao tác",
       key: "actions",
-      width: 100,
+      width: 150,
       fixed: "right",
       align: "center",
-      render: () => (
-        <Button type="primary" size="small">
-          Chi tiết
-        </Button>
+      render: (_, record) => (
+        <Space>
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => {
+              setSelectedCandidate(record);
+              setModalOpen(true);
+            }}
+          >
+            Chi tiết
+          </Button>
+          <Button
+            type="default"
+            size="small"
+            onClick={() => {
+              setReportCandidate(record);
+              setReportOpen(true);
+            }}
+          >
+            Báo cáo
+          </Button>
+        </Space>
       ),
     },
   ];
@@ -262,6 +354,36 @@ export default function CandidateListTab({ jobId, interviewId }: CandidateListTa
       candidate.phone.includes(searchText)
     );
   });
+  const handleSubmitReport = async (payload: {
+    candidateId?: string;
+    status: CreateInterviewReportRequest["status"];
+    description: string;
+  }) => {
+    try {
+      if (!payload.candidateId) {
+        messageApi.error("Ứng viên không hợp lệ");
+        return;
+      }
+      if (!userProfile?.id) {
+        messageApi.error("Người dùng không hợp lệ");
+        return;
+      }
+
+      const data: CreateInterviewReportRequest = {
+        status: payload.status,
+        description: payload.description,
+        intervieweeId: payload.candidateId,
+        userId: String(userProfile.id),
+      };
+      await QuanLyPhongVanServices.createReport(data);
+      messageApi.success("Báo cáo ứng viên thành công");
+      // Refresh candidate list after report submission
+      fetchCandidates();
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      messageApi.error("Báo cáo ứng viên thất bại");
+    }
+  };
 
   return (
     <div className="candidate-list-tab">
@@ -303,6 +425,29 @@ export default function CandidateListTab({ jobId, interviewId }: CandidateListTa
           className="candidates-table"
         />
       </Card>
+
+      {/* AI Analysis Result Modal */}
+      <AIAnalysisResultModal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedCandidate(null);
+        }}
+        analysisResult={
+          selectedCandidate ? selectedCandidate.analysisResult ?? null : null
+        }
+      />
+
+      {/* Report Modal */}
+      <ReportModal
+        open={reportOpen}
+        onClose={() => {
+          setReportOpen(false);
+          setReportCandidate(null);
+        }}
+        candidate={reportCandidate}
+        onSubmit={handleSubmitReport}
+      />
     </div>
   );
 }

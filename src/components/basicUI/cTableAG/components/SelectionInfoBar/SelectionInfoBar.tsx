@@ -46,11 +46,19 @@ export const SelectionInfoBar: React.FC<SelectionInfoBarProps> = ({
 
       <div className={styles.buttons}>
         {actionButtons?.map((button, index) => {
+          // If the button requires confirmation, don't attach the onClick to the
+          // inner element; Popconfirm's onConfirm should call the handler. This
+          // prevents the handler from running immediately when the button is
+          // clicked and ensures it runs only after confirming.
+          const requiresConfirm = !!button.confirmMessage;
+          const onClickHandler = requiresConfirm ? undefined : button.onClick;
+
           const buttonElement = (
             <button
               key={index}
+              type="button"
               className={`${styles.btn} ${button.danger ? styles.danger : ""}`}
-              onClick={button.onClick}
+              onClick={onClickHandler}
               disabled={!!(loading || isSelectingAll)}
               aria-disabled={!!(loading || isSelectingAll)}
               title={button.title}

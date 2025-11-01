@@ -262,20 +262,13 @@
   }
 
   .info-card {
-    border-radius: 16px;
-    box-shadow: 0 6px 24px rgba(13, 71, 161, 0.15);
-    border: 2px solid transparent;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(21, 101, 192, 0.08);
+    border: 1px solid rgba(21, 101, 192, 0.12);
     overflow: hidden;
-    background: linear-gradient(#fff, #fff) padding-box,
-      linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 0.15),
-          rgba(30, 136, 229, 0.15),
-          rgba(13, 71, 161, 0.15)
-        )
-        border-box;
     position: relative;
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
 
     &::before {
       content: "";
@@ -283,159 +276,98 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
+      height: 3px;
       background: linear-gradient(
         45deg,
-        rgba(13, 71, 161, 0.6),
-        rgba(30, 136, 229, 0.6),
-        rgba(13, 71, 161, 0.6)
+        rgb(21, 101, 192),
+        rgb(66, 165, 245),
+        rgb(21, 101, 192),
+        rgb(66, 165, 245)
       );
+      background-size: 200% 100%;
+      animation: gradientShift 3s ease infinite;
     }
 
     &:hover {
-      box-shadow: 0 8px 32px rgba(13, 71, 161, 0.2);
+      box-shadow: 0 4px 20px rgba(21, 101, 192, 0.15);
       transform: translateY(-2px);
     }
 
     .ant-card-body {
-      padding: 12px;
+      padding: 14px;
     }
 
     .status-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 24px;
+      padding: 18px 20px;
       background: linear-gradient(
-        45deg,
-        rgba(13, 71, 161, 0.08),
-        rgba(30, 136, 229, 0.08),
-        rgba(13, 71, 161, 0.08)
+        135deg,
+        rgba(21, 101, 192, 0.06),
+        rgba(66, 165, 245, 0.06)
       );
       border-radius: 12px;
-      border: 2px solid transparent;
-      background-clip: padding-box;
-      position: relative;
-
-      &::before {
-        content: "";
-        position: absolute;
-        inset: -2px;
-        border-radius: 12px;
-        background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 0.3),
-          rgba(30, 136, 229, 0.3),
-          rgba(13, 71, 161, 0.3)
-        );
-        z-index: -1;
-      }
+      margin-bottom: 16px;
 
       h4 {
         margin: 0;
-        background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 1),
-          rgba(30, 136, 229, 1),
-          rgba(13, 71, 161, 1)
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: rgb(21, 101, 192);
         font-weight: 700;
-        font-size: 20px;
-        letter-spacing: 0.3px;
+        font-size: 18px;
       }
 
       .ant-tag {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
-        padding: 8px 18px;
-        border-radius: 10px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+        padding: 6px 14px;
+        border-radius: 14px;
         border: none;
       }
     }
 
     .ant-descriptions {
-      background: white;
-      border-radius: 12px;
+      background: #fff;
+      border-radius: 10px;
       overflow: hidden;
-      border: 2px solid transparent;
-      background: linear-gradient(#fff, #fff) padding-box,
-        linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.1),
-            rgba(30, 136, 229, 0.1),
-            rgba(13, 71, 161, 0.1)
-          )
-          border-box;
-
-      .ant-descriptions-view {
-        border-radius: 12px;
-      }
+      border: 1px solid rgba(21, 101, 192, 0.1);
 
       .ant-descriptions-row {
-        border-bottom: 2px solid;
-        border-image: linear-gradient(
-            90deg,
-            transparent,
-            rgba(13, 71, 161, 0.1),
-            rgba(30, 136, 229, 0.15),
-            rgba(13, 71, 161, 0.1),
-            transparent
-          )
-          1;
+        border-bottom: 1px solid rgba(21, 101, 192, 0.08);
+        transition: background 0.2s;
 
         &:last-child {
           border-bottom: none;
         }
+
+        &:hover {
+          background: rgba(21, 101, 192, 0.02);
+        }
       }
 
       .ant-descriptions-item-label {
-        font-weight: 700;
-        background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 0.06),
-          rgba(30, 136, 229, 0.06),
-          rgba(13, 71, 161, 0.06)
-        );
-        color: var(--text-color, $text-color);
-        padding: 16px 20px;
-        border-right: 2px solid;
-        border-image: linear-gradient(
-            180deg,
-            rgba(13, 71, 161, 0.1),
-            rgba(30, 136, 229, 0.15),
-            rgba(13, 71, 161, 0.1)
-          )
-          1;
+        font-weight: 600;
+        background: rgba(21, 101, 192, 0.04);
+        color: rgba(0, 0, 0, 0.85);
+        padding: 12px 16px;
+        border-right: 1px solid rgba(21, 101, 192, 0.1);
 
         span {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
 
         svg {
-          background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 1),
-            rgba(30, 136, 229, 1),
-            rgba(13, 71, 161, 1)
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          font-size: 18px;
-          filter: drop-shadow(0 2px 4px rgba(13, 71, 161, 0.2));
+          color: rgb(21, 101, 192);
+          font-size: 16px;
         }
       }
 
       .ant-descriptions-item-content {
-        color: var(--text-color-secondary, $text-color-secondary);
-        padding: 16px 20px;
-        background: white;
+        color: rgba(0, 0, 0, 0.7);
+        padding: 12px 16px;
+        background: #fff;
         font-weight: 500;
 
         .ant-typography {
@@ -447,62 +379,32 @@
     .allowance-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
 
       .allowance-tag {
         margin: 0;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
-        padding: 10px 18px;
+        padding: 8px 16px;
         background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 0.12),
-          rgba(30, 136, 229, 0.12),
-          rgba(13, 71, 161, 0.12)
+          135deg,
+          rgba(21, 101, 192, 0.1),
+          rgba(66, 165, 245, 0.1)
         );
-        border: 2px solid;
-        border-image: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.3),
-            rgba(30, 136, 229, 0.3),
-            rgba(13, 71, 161, 0.3)
-          )
-          1;
-        border-radius: 10px;
+        border: 1px solid rgba(21, 101, 192, 0.2);
+        border-radius: 16px;
+        color: rgb(21, 101, 192);
         transition: all 0.3s ease;
-        box-shadow: 0 3px 8px rgba(13, 71, 161, 0.15);
-        position: relative;
-        overflow: hidden;
-
-        &::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.3),
-            transparent
-          );
-          transition: left 0.5s ease;
-        }
 
         &:hover {
-          transform: translateY(-3px) scale(1.02);
-          box-shadow: 0 6px 16px rgba(13, 71, 161, 0.25);
+          transform: translateY(-2px);
           background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.18),
-            rgba(30, 136, 229, 0.18),
-            rgba(13, 71, 161, 0.18)
+            135deg,
+            rgba(21, 101, 192, 0.15),
+            rgba(66, 165, 245, 0.15)
           );
-
-          &::before {
-            left: 100%;
-          }
+          border-color: rgb(66, 165, 245);
+          box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
         }
       }
     }
@@ -512,143 +414,32 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 40px;
+      padding: 30px;
       background: linear-gradient(
-        45deg,
-        rgba(13, 71, 161, 0.08),
-        rgba(30, 136, 229, 0.08),
-        rgba(13, 71, 161, 0.08)
+        135deg,
+        rgba(21, 101, 192, 0.05),
+        rgba(66, 165, 245, 0.05)
       );
-      border-radius: 16px;
-      margin-top: 20px;
-      position: relative;
-      overflow: hidden;
-      border: 2px solid transparent;
-      background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.08),
-            rgba(30, 136, 229, 0.08),
-            rgba(13, 71, 161, 0.08)
-          )
-          padding-box,
-        linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.3),
-            rgba(30, 136, 229, 0.3),
-            rgba(13, 71, 161, 0.3)
-          )
-          border-box;
+      border-radius: 12px;
+      margin-top: 16px;
+      border: 1px dashed rgba(21, 101, 192, 0.3);
+      transition: all 0.3s;
 
-      &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 200%;
-        height: 100%;
+      &:hover {
         background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.2),
-          transparent
+          135deg,
+          rgba(21, 101, 192, 0.08),
+          rgba(66, 165, 245, 0.08)
         );
-        animation: shimmer 3s infinite;
+        border-color: rgb(66, 165, 245);
       }
 
       .ant-btn {
-        height: auto;
-        padding: 18px 40px;
-        font-size: 17px;
+        padding: 12px 32px;
+        font-size: 15px;
         font-weight: 700;
-        border-radius: 12px;
-        box-shadow: 0 6px 20px rgba(13, 71, 161, 0.25);
-        transition: all 0.4s ease;
-        position: relative;
-        z-index: 1;
-        background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 0.15),
-          rgba(30, 136, 229, 0.15),
-          rgba(13, 71, 161, 0.15)
-        );
-        border: 2px solid;
-        border-image: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.8),
-            rgba(30, 136, 229, 0.8),
-            rgba(13, 71, 161, 0.8)
-          )
-          1;
-
-        span {
-          background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 1),
-            rgba(30, 136, 229, 1),
-            rgba(13, 71, 161, 1)
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        &:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 8px 28px rgba(13, 71, 161, 0.35);
-          background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.25),
-            rgba(30, 136, 229, 0.25),
-            rgba(13, 71, 161, 0.25)
-          );
-        }
-      }
-    }
-
-    .file-contract-section {
-      .ant-btn-primary {
-        background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 0.4),
-          rgba(30, 136, 229, 0.4),
-          rgba(13, 71, 161, 0.4)
-        );
-        color: var(--primary-color-dark, $primary-color-dark);
-        border: 1px solid var(--primary-color, $primary-color);
-
-        &:hover {
-          background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.6),
-            rgba(30, 136, 229, 0.6),
-            rgba(13, 71, 161, 0.6)
-          );
-          color: var(--primary-color-dark, $primary-color-dark);
-        }
-      }
-    }
-
-    .upload-contract-section {
-      .ant-btn-dashed {
-        background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 0.3),
-          rgba(30, 136, 229, 0.3),
-          rgba(13, 71, 161, 0.3)
-        );
-        color: var(--primary-color-dark, $primary-color-dark);
-        border: 2px dashed var(--primary-color, $primary-color);
-
-        &:hover {
-          background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.5),
-            rgba(30, 136, 229, 0.5),
-            rgba(13, 71, 161, 0.5)
-          );
-          border-color: var(--primary-color-dark, $primary-color-dark);
-          color: var(--primary-color-dark, $primary-color-dark);
-        }
+        border-radius: 10px;
+        transition: all 0.3s ease;
       }
     }
 
@@ -684,180 +475,118 @@
     }
 
     .signature-card {
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 6px 20px rgba(13, 71, 161, 0.18);
-      border: 2px solid transparent;
-      background: linear-gradient(#fff, #fff) padding-box,
-        linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.3),
-            rgba(30, 136, 229, 0.3),
-            rgba(13, 71, 161, 0.3)
-          )
-          border-box;
-      transition: all 0.4s ease;
+      box-shadow: 0 2px 12px rgba(21, 101, 192, 0.1);
+      border: 1px solid rgba(21, 101, 192, 0.15);
+      transition: all 0.3s ease;
 
       &:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 32px rgba(13, 71, 161, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 20px rgba(21, 101, 192, 0.18);
       }
 
       .ant-card-head {
         background: linear-gradient(
           45deg,
-          rgba(13, 71, 161, 1),
-          rgba(30, 136, 229, 1),
-          rgba(13, 71, 161, 1)
+          rgb(21, 101, 192),
+          rgb(66, 165, 245),
+          rgb(21, 101, 192),
+          rgb(66, 165, 245)
         );
-        color: white;
-        border-radius: 16px 16px 0 0;
+        background-size: 200% 100%;
+        animation: gradientShift 3s ease infinite;
+        color: #fff;
         border: none;
-        padding: 18px 28px;
+        padding: 14px 20px;
         font-weight: 700;
-        font-size: 17px;
-        position: relative;
-
-        &::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 3px;
-          background: rgba(255, 255, 255, 0.3);
-        }
+        font-size: 15px;
 
         .ant-card-head-title {
-          color: white;
-          font-weight: 700;
-        }
-      }
-
-      .ant-card-body {
-        padding: 36px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 220px;
-        background: linear-gradient(
-          45deg,
-          rgba(248, 250, 252, 0.5),
-          rgba(255, 255, 255, 0.8),
-          rgba(248, 250, 252, 0.5)
-        );
-      }
-
-      .signature-image {
-        max-width: 100%;
-        height: auto;
-        border: 3px solid transparent;
-        background: linear-gradient(#fff, #fff) padding-box,
-          linear-gradient(
-              45deg,
-              rgba(13, 71, 161, 0.4),
-              rgba(30, 136, 229, 0.4),
-              rgba(13, 71, 161, 0.4)
-            )
-            border-box;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 6px 16px rgba(13, 71, 161, 0.15);
-        transition: all 0.4s ease;
-
-        &:hover {
-          transform: scale(1.08);
-          box-shadow: 0 10px 28px rgba(13, 71, 161, 0.25);
-        }
-      }
-    }
-
-    .id-card {
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 6px 20px rgba(13, 71, 161, 0.18);
-      border: 2px solid transparent;
-      background: linear-gradient(#fff, #fff) padding-box,
-        linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.3),
-            rgba(30, 136, 229, 0.3),
-            rgba(13, 71, 161, 0.3)
-          )
-          border-box;
-      transition: all 0.4s ease;
-
-      &:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 32px rgba(13, 71, 161, 0.3);
-      }
-
-      .ant-card-head {
-        background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 1),
-          rgba(30, 136, 229, 1),
-          rgba(13, 71, 161, 1)
-        );
-        color: white;
-        border-radius: 16px 16px 0 0;
-        border: none;
-        padding: 18px 28px;
-        font-weight: 700;
-        font-size: 17px;
-        position: relative;
-
-        &::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 3px;
-          background: rgba(255, 255, 255, 0.3);
-        }
-
-        .ant-card-head-title {
-          color: white;
+          color: #fff;
           font-weight: 700;
         }
       }
 
       .ant-card-body {
         padding: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 180px;
+        background: rgba(21, 101, 192, 0.02);
+      }
+
+      .signature-image {
+        max-width: 100%;
+        height: auto;
+        border: 2px solid rgba(21, 101, 192, 0.15);
+        border-radius: 10px;
+        padding: 12px;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 16px rgba(21, 101, 192, 0.2);
+        }
+      }
+    }
+
+    .id-card {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(21, 101, 192, 0.1);
+      border: 1px solid rgba(21, 101, 192, 0.15);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 20px rgba(21, 101, 192, 0.18);
+      }
+
+      .ant-card-head {
         background: linear-gradient(
           45deg,
-          rgba(248, 250, 252, 0.5),
-          rgba(255, 255, 255, 0.8),
-          rgba(248, 250, 252, 0.5)
+          rgb(21, 101, 192),
+          rgb(66, 165, 245),
+          rgb(21, 101, 192),
+          rgb(66, 165, 245)
         );
+        background-size: 200% 100%;
+        animation: gradientShift 3s ease infinite;
+        color: #fff;
+        border: none;
+        padding: 14px 20px;
+        font-weight: 700;
+        font-size: 15px;
+
+        .ant-card-head-title {
+          color: #fff;
+          font-weight: 700;
+        }
+      }
+
+      .ant-card-body {
+        padding: 16px;
+        background: rgba(21, 101, 192, 0.02);
       }
 
       .ant-image {
-        border-radius: 12px;
+        border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(13, 71, 161, 0.15);
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
+        border: 1px solid rgba(21, 101, 192, 0.1);
         transition: all 0.3s ease;
-        border: 2px solid transparent;
-        background: linear-gradient(#fff, #fff) padding-box,
-          linear-gradient(
-              45deg,
-              rgba(13, 71, 161, 0.2),
-              rgba(30, 136, 229, 0.2),
-              rgba(13, 71, 161, 0.2)
-            )
-            border-box;
 
         &:hover {
-          box-shadow: 0 6px 20px rgba(13, 71, 161, 0.25);
+          box-shadow: 0 4px 16px rgba(21, 101, 192, 0.2);
+          transform: scale(1.02);
         }
 
         img {
           transition: transform 0.3s ease;
-
-          &:hover {
-            transform: scale(1.03);
-          }
         }
       }
     }
@@ -997,292 +726,222 @@
   //     }
   //   }
 
-  // Appendix Card Styles
-  .appendix-card {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-
-    .ant-card-body {
-      padding: 0;
+  // Appendix List - Modern & Clean Design
+  .appendix-list-container {
+    .ant-list {
+      display: grid;
+      gap: 14px;
     }
 
-    .ant-list-item {
-      padding: 28px;
-      margin-bottom: 20px;
-      border-radius: 16px;
-      background: linear-gradient(
-        45deg,
-        rgba(255, 255, 255, 0.98),
-        rgba(248, 250, 252, 0.98),
-        rgba(255, 255, 255, 0.98)
-      );
-      border: 2px solid transparent;
-      background: linear-gradient(#fff, #f8fafc, #fff) padding-box,
-        linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 0.15),
-            rgba(30, 136, 229, 0.15),
-            rgba(13, 71, 161, 0.15)
-          )
-          border-box;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    .appendix-card {
+      background: #fff;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
+      border: 1px solid rgba(21, 101, 192, 0.12);
+      transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
 
+      // Top gradient border
       &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          45deg,
-          transparent,
-          rgba(13, 71, 161, 0.08),
-          rgba(30, 136, 229, 0.08),
-          rgba(13, 71, 161, 0.08),
-          transparent
-        );
-        transition: left 0.7s ease;
-      }
-
-      &::after {
         content: "";
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 4px;
+        height: 3px;
         background: linear-gradient(
           45deg,
-          rgba(13, 71, 161, 0.4),
-          rgba(30, 136, 229, 0.4),
-          rgba(13, 71, 161, 0.4)
+          rgb(21, 101, 192),
+          rgb(66, 165, 245),
+          rgb(21, 101, 192),
+          rgb(66, 165, 245)
         );
-        opacity: 0;
-        transition: opacity 0.3s ease;
+        background-size: 200% 100%;
+        animation: gradientShift 3s ease infinite;
       }
 
       &:hover {
-        box-shadow: 0 10px 32px rgba(13, 71, 161, 0.25);
-        transform: translateY(-6px);
+        box-shadow: 0 4px 20px rgba(21, 101, 192, 0.18);
+        transform: translateY(-3px);
+        border-color: rgba(66, 165, 245, 0.3);
 
-        &::before {
-          left: 100%;
-        }
-
-        &::after {
-          opacity: 1;
-        }
-
-        .appendix-number {
-          transform: scale(1.08);
-          box-shadow: 0 6px 16px rgba(13, 71, 161, 0.3);
+        .appendix-right button {
+          transform: scale(1.05);
+          box-shadow: 0 6px 24px rgba(21, 101, 192, 0.4) !important;
         }
       }
 
-      .appendix-number {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        padding: 24px;
-        background: linear-gradient(
-          45deg,
-          rgba(13, 71, 161, 0.12),
-          rgba(30, 136, 229, 0.12),
-          rgba(13, 71, 161, 0.12)
-        );
-        border-radius: 14px;
-        min-width: 100px;
-        transition: all 0.4s ease;
-        border: 2px solid transparent;
-        background: linear-gradient(
-              45deg,
-              rgba(13, 71, 161, 0.12),
-              rgba(30, 136, 229, 0.12),
-              rgba(13, 71, 161, 0.12)
-            )
-            padding-box,
-          linear-gradient(
-              45deg,
-              rgba(13, 71, 161, 0.3),
-              rgba(30, 136, 229, 0.3),
-              rgba(13, 71, 161, 0.3)
-            )
-            border-box;
-
-        svg {
-          background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 1),
-            rgba(30, 136, 229, 1),
-            rgba(13, 71, 161, 1)
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 3px 6px rgba(13, 71, 161, 0.3));
-        }
-
-        .ant-typography {
-          background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 1),
-            rgba(30, 136, 229, 1),
-            rgba(13, 71, 161, 1)
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          font-size: 16px;
-          font-weight: 700;
-        }
-      }
-
-      .appendix-title {
+      .appendix-card-main {
         display: flex;
         align-items: center;
-        gap: 14px;
-        margin-bottom: 18px;
-        flex-wrap: wrap;
-
-        .ant-typography {
-          background: linear-gradient(
-            45deg,
-            rgba(13, 71, 161, 1),
-            rgba(30, 136, 229, 1),
-            rgba(13, 71, 161, 1)
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          font-weight: 700;
-        }
-
-        .ant-tag {
-          font-weight: 600;
-          padding: 8px 16px;
-          border-radius: 8px;
-          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-          font-size: 13px;
-        }
+        gap: 18px;
+        padding: 14px 18px;
       }
 
-      .appendix-info {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        margin-top: 10px;
-
-        .info-row {
+      // Badge
+      .appendix-left {
+        .appendix-number-badge {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 12px 16px;
+          gap: 8px;
+          padding: 8px 14px;
           background: linear-gradient(
             45deg,
-            rgba(248, 250, 252, 0.7),
-            rgba(255, 255, 255, 0.9),
-            rgba(248, 250, 252, 0.7)
+            rgb(21, 101, 192),
+            rgb(66, 165, 245),
+            rgb(21, 101, 192),
+            rgb(66, 165, 245)
           );
-          border-radius: 10px;
-          border: 1px solid transparent;
-          background: linear-gradient(#f8fafc, #fff, #f8fafc) padding-box,
-            linear-gradient(
-                45deg,
-                rgba(13, 71, 161, 0.1),
-                rgba(30, 136, 229, 0.1),
-                rgba(13, 71, 161, 0.1)
-              )
-              border-box;
-          transition: all 0.3s ease;
+          background-size: 200% 100%;
+          border-radius: 20px;
+          color: #fff;
+          font-weight: 700;
+          font-size: 14px;
+          min-width: 70px;
+          justify-content: center;
+          animation: gradientShift 3s ease infinite;
+          box-shadow: 0 2px 8px rgba(21, 101, 192, 0.25);
 
-          &:hover {
-            transform: translateX(6px);
-            box-shadow: 0 4px 12px rgba(13, 71, 161, 0.15);
-            background: linear-gradient(
-                  45deg,
-                  rgba(13, 71, 161, 0.06),
-                  rgba(30, 136, 229, 0.06),
-                  rgba(13, 71, 161, 0.06)
-                )
-                padding-box,
-              linear-gradient(
-                  45deg,
-                  rgba(13, 71, 161, 0.2),
-                  rgba(30, 136, 229, 0.2),
-                  rgba(13, 71, 161, 0.2)
-                )
-                border-box;
-          }
-
-          .info-icon {
-            background: linear-gradient(
-              45deg,
-              rgba(13, 71, 161, 1),
-              rgba(30, 136, 229, 1),
-              rgba(13, 71, 161, 1)
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            min-width: 20px;
-            font-size: 18px;
-            filter: drop-shadow(0 2px 4px rgba(13, 71, 161, 0.2));
+          svg {
+            font-size: 16px;
           }
 
           .ant-typography {
-            flex: 1;
+            color: #fff;
             margin: 0;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 700;
+          }
+        }
+      }
+
+      // Info
+      .appendix-center {
+        flex: 1;
+        min-width: 0;
+
+        .appendix-title-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 10px;
+
+          .contract-type {
+            font-size: 16px;
+            color: rgb(21, 101, 192);
+            font-weight: 700;
+            margin: 0;
           }
 
-          a {
-            background: linear-gradient(
-              45deg,
-              rgba(13, 71, 161, 1),
-              rgba(30, 136, 229, 1),
-              rgba(13, 71, 161, 1)
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
+          .status-tag {
             font-weight: 600;
-            transition: all 0.3s ease;
+            padding: 5px 12px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.2;
+          }
+        }
+
+        .info-row-compact {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 14px;
+          align-items: center;
+
+          .info-item-inline {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
 
-            &:hover {
-              text-decoration: underline;
-              filter: drop-shadow(0 2px 4px rgba(13, 71, 161, 0.3));
+            .info-icon {
+              color: rgb(21, 101, 192);
+              font-size: 15px;
+            }
+
+            .ant-typography {
+              margin: 0;
+              color: rgba(0, 0, 0, 0.7);
+              font-size: 14px;
+            }
+
+            .salary-text {
+              color: rgb(21, 101, 192);
+              font-weight: 700;
+              font-size: 15px;
+            }
+
+            .pdf-link {
+              color: rgb(21, 101, 192);
+              font-weight: 600;
+              font-size: 14px;
+              text-decoration: none;
+              transition: color 0.2s;
+
+              &:hover {
+                color: rgb(66, 165, 245);
+                text-decoration: underline;
+              }
             }
           }
         }
       }
 
-      .ant-list-item-action {
-        margin-left: 24px;
-
-        .ant-btn {
-          box-shadow: 0 2px 8px rgba(13, 71, 161, 0.15);
+      // Button
+      .appendix-right {
+        button {
+          border-radius: 10px;
+          font-size: 15px;
+          font-weight: 700;
+          padding: 10px 22px;
+          background-size: 200% 100%;
+          animation: gradientShift 3s ease infinite;
+          white-space: nowrap;
           transition: all 0.3s ease;
 
-          &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(13, 71, 161, 0.25);
+          &:active {
+            transform: scale(0.95);
           }
         }
       }
     }
 
     .ant-list-empty-text {
-      padding: 40px;
-      color: var(--text-color-secondary, $text-color-secondary);
+      padding: 50px 20px;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 15px;
+    }
+  }
+
+  @keyframes gradientShift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .appendix-list-container {
+      .appendix-card {
+        .appendix-card-main {
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
+        .appendix-right {
+          width: 100%;
+
+          button {
+            width: 100%;
+          }
+        }
+      }
     }
   }
 

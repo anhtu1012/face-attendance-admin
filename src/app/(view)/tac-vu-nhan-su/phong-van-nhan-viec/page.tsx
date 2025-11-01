@@ -2,26 +2,21 @@
 "use client";
 
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Tabs } from "antd";
 import AppointmentWeeklyView from "@/components/ViewComponent/AppointmentWeeklyView";
-import FilterDropdown from "../_components/FilterDropdown/FilterDropdown";
+import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 import { JobOfferItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
+import { showError } from "@/hooks/useNotification";
 import InterviewServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/interview.service";
 import JobOfferServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.service";
-import { showError } from "@/hooks/useNotification";
-import { FilterValues } from "./_types/filter.types";
-import {
-  mockInterviewData,
-  mockJobOfferData,
-  filterInterviewData,
-  filterJobOfferData,
-} from "./_utils/mockData";
-import "./index.scss";
-import "../_components/FilterDropdown/FilterDropdown.scss";
-import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
+import { Tabs } from "antd";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import FilterDropdown from "../_components/FilterDropdown/FilterDropdown";
+import "../_components/FilterDropdown/FilterDropdown.scss";
+import { FilterValues } from "./_types/filter.types";
+import { mockInterviewData, mockJobOfferData } from "./_utils/mockData";
+import "./index.scss";
 
 dayjs.extend(isoWeek);
 
@@ -38,6 +33,13 @@ function Page() {
   const [jobOfferData, setJobOfferData] = useState<JobOfferItem[]>([]);
   const [loadingJobOffers, setLoadingJobOffers] = useState(false);
   const [jobOfferFilters, setJobOfferFilters] = useState<FilterValues>({});
+  console.log(
+    "a",
+    interviewData,
+    jobOfferData,
+    interviewFilters,
+    jobOfferFilters
+  );
 
   // Status options for filters
   const interviewStatusOptions = useMemo(
@@ -109,16 +111,6 @@ function Page() {
     fetchJobOffers();
   }, [fetchInterviews, fetchJobOffers]);
 
-  // Filter interview data
-  const filteredInterviewData = useMemo(() => {
-    return filterInterviewData(interviewData, interviewFilters);
-  }, [interviewData, interviewFilters]);
-
-  // Filter job offer data
-  const filteredJobOfferData = useMemo(() => {
-    return filterJobOfferData(jobOfferData, jobOfferFilters);
-  }, [jobOfferData, jobOfferFilters]);
-
   // Filter handlers
   const handleInterviewFilter = (filters: FilterValues) => {
     setInterviewFilters(filters);
@@ -154,46 +146,6 @@ function Page() {
     };
   }, [interviewFilters]);
 
-  // Map interview data to appointment format
-  const mappedInterviewData = useMemo(
-    () =>
-      filteredInterviewData.map((item) => ({
-        id: item.id || "",
-        candidateName: item.candidateName || "",
-        date: item.interviewDate || "",
-        startTime: item.startTime || "",
-        endTime: item.endTime || "",
-        status: item.status || "",
-        jobTitle: item.jobTitle,
-        department: item.department,
-        interviewType: item.interviewType,
-        location: item.location,
-        meetingLink: item.meetingLink,
-        interviewer: Array.isArray(item.interviewer)
-          ? item.interviewer.map((i) => i.interviewerName).join(", ")
-          : item.interviewer || "",
-        notes: item.notes,
-      })),
-    [filteredInterviewData]
-  );
-
-  // Map job offer data to appointment format
-  const mappedJobOfferData = useMemo(
-    () =>
-      filteredJobOfferData.map((item) => ({
-        id: item.id || "",
-        candidateName: item.candidateName || "",
-        date: item.offerDate || "",
-        startTime: item.startTime || "",
-        endTime: item.endTime || "",
-        status: item.status || "",
-        location: item.address,
-        guidePersonName: item.guidePersonName,
-        notes: item.notes,
-      })),
-    [filteredJobOfferData]
-  );
-
   const tabItems = [
     {
       key: "interview",
@@ -201,7 +153,7 @@ function Page() {
       children: (
         <div className="interview-tab-content">
           <AppointmentWeeklyView
-            data={mappedInterviewData}
+            data={[]}
             dateRange={dateRange}
             type="interview"
             onItemClick={handleInterviewClick}
@@ -223,7 +175,7 @@ function Page() {
       children: (
         <div className="job-offer-tab-content">
           <AppointmentWeeklyView
-            data={mappedJobOfferData}
+            data={[]}
             dateRange={dateRange}
             type="jobOffer"
             onItemClick={handleJobOfferClick}

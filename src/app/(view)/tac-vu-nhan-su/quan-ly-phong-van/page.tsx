@@ -2,24 +2,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import AppointmentWeeklyView from "@/components/ViewComponent/AppointmentWeeklyView";
-import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
+import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
 import { showError } from "@/hooks/useNotification";
-import InterviewServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/interview.service";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import FilterDropdown from "../_components/FilterDropdown";
 import { FilterValues } from "../phong-van-nhan-viec/_types/filter.types";
-import {
-  filterInterviewData,
-  mockInterviewData,
-} from "../phong-van-nhan-viec/_utils/mockData";
 import "./page.scss";
+import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/quan-ly-phong-van.service";
 function Page() {
-  // Use mock data (comment these out when API is ready)
-  const USE_MOCK_DATA = true;
-
   // Interview states
-  const [interviewData, setInterviewData] = useState<AppointmentItem[]>([]);
+  const [interviewData, setInterviewData] = useState<
+    AppointmentListWithInterview[]
+  >([]);
+  const { userProfile } = useSelector(selectAuthLogin);
   const [loadingInterviews, setLoadingInterviews] = useState(false);
   const [interviewFilters, setInterviewFilters] = useState<FilterValues>({});
 
@@ -38,15 +37,19 @@ function Page() {
   // Fetch interviews
   const fetchInterviews = useCallback(async () => {
     setLoadingInterviews(true);
+    if (!userProfile) {
+      setLoadingInterviews(false);
+      return;
+    }
     try {
-      if (USE_MOCK_DATA) {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setInterviewData(mockInterviewData);
-      } else {
-        const response = await InterviewServices.getInterviews();
-        setInterviewData(response.data || []);
-      }
+      const response = await TuyenDungServices.getDanhSachPhongVanWithParam(
+        [],
+        undefined,
+        {
+          interviewerId: String(userProfile.id),
+        }
+      );
+      setInterviewData(response.data || []);
     } catch (error: any) {
       showError(
         error.response?.data?.message || "Lỗi khi tải danh sách phỏng vấn"
@@ -54,20 +57,16 @@ function Page() {
     } finally {
       setLoadingInterviews(false);
     }
-  }, [USE_MOCK_DATA]);
+  }, []);
 
   useEffect(() => {
     fetchInterviews();
   }, [fetchInterviews]);
 
-  // Filter interview data
-  const filteredInterviewData = useMemo(() => {
-    return filterInterviewData(interviewData, interviewFilters);
-  }, [interviewData, interviewFilters]);
-
   // Filter handlers
   const handleInterviewFilter = (filters: FilterValues) => {
     setInterviewFilters(filters);
+    fetchInterviews();
   };
 
   // Handle interview item click
@@ -90,28 +89,35 @@ function Page() {
     };
   }, [interviewFilters]);
 
-  // Map interview data to appointment format
-  const mappedInterviewData = useMemo(
-    () =>
-      filteredInterviewData.map((item) => ({
-        id: item.id || "",
-        candidateName: item.candidateName || "",
-        date: item.interviewDate || "",
-        startTime: item.startTime || "",
-        endTime: item.endTime || "",
-        status: item.status || "",
-        jobTitle: item.jobTitle,
-        department: item.department,
-        interviewType: item.interviewType,
-        location: item.location,
-        meetingLink: item.meetingLink,
-        interviewer: Array.isArray(item.interviewer)
-          ? item.interviewer.map((i) => i.interviewerName).join(", ")
-          : item.interviewer || "",
-        notes: item.notes,
-      })),
-    [filteredInterviewData]
-  );
+  const handleAccept = async (value: AppointmentListWithInterview) => {
+    try {
+      await QuanLyPhongVanServices.updateLichPhongVan({
+        appointmentId: value.id,
+        listInterviewerId: userProfile ? [String(userProfile.id)] : [],
+        status: "ACCEPTED",
+      });
+      fetchInterviews();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleReject = async (
+    appointment: AppointmentListWithInterview,
+    reason: string
+  ) => {
+    try {
+      await QuanLyPhongVanServices.updateLichPhongVan({
+        appointmentId: appointment.id,
+        listInterviewerId: userProfile ? [String(userProfile.id)] : [],
+        status: "REJECTED",
+        reason: reason,
+      });
+      fetchInterviews();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div>
@@ -121,11 +127,13 @@ function Page() {
           <>
             {" "}
             <AppointmentWeeklyView
-              data={mappedInterviewData}
+              data={interviewData}
               dateRange={dateRange}
               type="interview"
               IsHumanPV
               onItemClick={handleInterviewClick}
+              onAccept={handleAccept}
+              onReject={handleReject}
               statusOptions={interviewStatusOptions}
               filterDropdown={
                 <FilterDropdown

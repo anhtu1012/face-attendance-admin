@@ -1,5 +1,5 @@
 import Cbutton from "@/components/basicUI/Cbutton";
-import { Card, List, Tag, Typography } from "antd";
+import { List, Tag, Typography } from "antd";
 import dayjs from "dayjs";
 import React from "react";
 import "./ContractDetailModal.scss";
@@ -41,91 +41,95 @@ const AppendixList: React.FC<AppendixListProps> = ({
   };
 
   return (
-    <Card className="info-card appendix-card">
+    <div className="appendix-list-container">
       <List
         dataSource={appendices}
         renderItem={(appendix, index) => (
-          <List.Item
-            key={appendix.id}
-            className="appendix-item"
-            actions={[
-              <Cbutton
-                key="view"
-                icon={<FaEye />}
-                size="middle"
-                onClick={() => onViewDetail(appendix.id)}
-                origin={{
-                  bgcolor: "transparent",
-                  color: "rgb(13, 71, 161)",
-                  hoverBgColor:
-                    "linear-gradient(45deg, rgba(13, 71, 161, 0.15), rgba(30, 136, 229, 0.15), rgba(13, 71, 161, 0.15))",
-                  border: "2px solid rgb(13, 71, 161)",
-                  hoverColor: "rgb(13, 71, 161)",
-                }}
-                style={{
-                  fontWeight: 600,
-                  boxShadow: "0 3px 10px rgba(13, 71, 161, 0.15)",
-                }}
-              >
-                Xem chi tiết
-              </Cbutton>,
-            ]}
-          >
-            <List.Item.Meta
-              avatar={
-                <div className="appendix-number">
-                  <FaFileContract size={24} />
+          <div key={appendix.id} className="appendix-card">
+            <div className="appendix-card-main">
+              <div className="appendix-left">
+                <div className="appendix-number-badge">
+                  <FaFileContract size={16} />
                   <Text strong>#{index + 1}</Text>
                 </div>
-              }
-              title={
-                <div className="appendix-title">
-                  <Text strong style={{ fontSize: "16px" }}>
+              </div>
+
+              <div className="appendix-center">
+                <div className="appendix-title-row">
+                  <Text strong className="contract-type">
                     {appendix.contractTypeName}
                   </Text>
-                  <Tag color={getStatusColor(appendix.status)}>
+                  <Tag
+                    color={getStatusColor(appendix.status)}
+                    className="status-tag"
+                  >
                     {getStatusText(appendix.status)}
                   </Tag>
                 </div>
-              }
-              description={
-                <div className="appendix-info">
-                  <div className="info-row">
+
+                <div className="info-row-compact">
+                  <div className="info-item-inline">
                     <FaIdCard className="info-icon" />
-                    <Text>Số HĐ: {appendix.contractNumber}</Text>
+                    <Text>{appendix.contractNumber}</Text>
                   </div>
-                  <div className="info-row">
+                  <div className="info-item-inline">
                     <FaCalendarAlt className="info-icon" />
                     <Text>
                       {formatDate(appendix.startDate)} →{" "}
                       {formatDate(appendix.endDate)}
                     </Text>
                   </div>
-                  <div className="info-row">
+                  <div className="info-item-inline">
                     <FaMoneyBillWave className="info-icon" />
-                    <Text strong style={{ color: "#52c41a" }}>
+                    <Text strong className="salary-text">
                       {formatCurrency(appendix.grossSalary)}
                     </Text>
                   </div>
                   {appendix.fileContract && (
-                    <div className="info-row">
+                    <div className="info-item-inline">
                       <FaFilePdf className="info-icon" />
                       <a
                         href={appendix.fileContract}
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="pdf-link"
                       >
-                        Xem file PDF
+                        PDF
                       </a>
                     </div>
                   )}
                 </div>
-              }
-            />
-          </List.Item>
+              </div>
+
+              <div className="appendix-right">
+                <Cbutton
+                  icon={<FaEye />}
+                  size="middle"
+                  onClick={() => onViewDetail(appendix.id)}
+                  origin={{
+                    bgcolor:
+                      "linear-gradient(45deg, rgb(21, 101, 192), rgb(66, 165, 245), rgb(21, 101, 192), rgb(66, 165, 245))",
+                    color: "#0889f1ff",
+                    hoverBgColor:
+                      "linear-gradient(45deg, rgb(21, 101, 192), rgb(66, 165, 245), rgb(21, 101, 192))",
+                    border: "none",
+                    hoverColor: "#fff",
+                  }}
+                  style={{
+                    fontWeight: 600,
+                    boxShadow: "0 4px 12px rgba(21, 101, 192, 0.3)",
+                    padding: "8px 20px",
+                    height: "auto",
+                  }}
+                >
+                  Xem chi tiết
+                </Cbutton>
+              </div>
+            </div>
+          </div>
         )}
       />
-    </Card>
+    </div>
   );
 };
 

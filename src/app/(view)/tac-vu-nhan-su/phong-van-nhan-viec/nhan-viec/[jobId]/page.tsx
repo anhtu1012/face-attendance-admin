@@ -136,7 +136,7 @@ export default function JobDetailPage() {
 
           <div className="page-content">
             <AppointmentDetailTabs
-              interview={jobAppointment}
+              interview={[] as any}
               onRefresh={fetchJobDetail}
               defaultTab="candidates"
             />

@@ -56,8 +56,8 @@ export interface CreateAppointmentRequest {
   startTime: string; // ISO date string
   endTime: string; // ISO date string
   jobId: string;
-  listIntervieweeId: string[];
-  interviewerId: string[];
+  listIntervieweeId: string[]; //ứng viên
+  listInterviewerId: string[]; //người phỏng vấn
   typeAppointment: "online" | "offline";
   linkMeet?: string;
   interviewerCount: number;

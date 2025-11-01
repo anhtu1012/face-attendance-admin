@@ -103,7 +103,7 @@ function Page() {
           : null,
       });
       // Update map with coordinates
-      updateMapUrl(companyInfo.lat, companyInfo.long);
+      updateMapUrl(companyInfo.lat ?? "", companyInfo.long ?? "");
     } catch (error: any) {
       const errorData = error.response?.data as ErrorResponse;
       console.log(errorData);

@@ -14,6 +14,7 @@ import {
   Select,
   Tabs,
 } from "antd";
+import dayjs from "dayjs";
 import React, { useState } from "react";
 import { FaBriefcase, FaCheck, FaInfoCircle, FaUsers } from "react-icons/fa";
 import { useSelector } from "react-redux";
@@ -98,10 +99,20 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
       const res = await JobServices.createJob(values);
       const jobId = res?.jobCode || "12345";
       const jobLink = `${window.location.origin}/apply/${jobId}`;
-
       messageApi.success("Tạo công việc thành công!");
       form.resetFields();
+      // Notify parent about success (existing behavior)
       onSuccess(jobLink);
+
+      // Dispatch a global event so other components (e.g., ListJob) can re-fetch job list
+      try {
+        const detail = res ?? { jobCode: jobId };
+        window.dispatchEvent(new CustomEvent("jobCreated", { detail }));
+      } catch (e) {
+        // ignore if environment doesn't support CustomEvent
+        // keep behavior best-effort
+        console.warn("Failed to dispatch jobCreated event", e);
+      }
     } catch (error: unknown) {
       console.error("Error creating job:", error);
       messageApi.error("Có lỗi xảy ra khi tạo công việc!");
@@ -366,6 +377,9 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                             className="custom-datepicker"
                             style={{ width: "100%" }}
                             format="DD/MM/YYYY"
+                            disabledDate={(current) =>
+                              !!current && current < dayjs().startOf("day")
+                            }
                           />
                         </Form.Item>
                       </div>

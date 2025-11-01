@@ -23,10 +23,11 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  // compute the default range: start of current month -> today
+  // compute the default range: start of current month -> end of current month
+  // (user expects default to cover the whole month)
   const defaultRange = useMemo<[Dayjs, Dayjs]>(() => {
     const start = dayjs().startOf("month");
-    const end = dayjs();
+    const end = dayjs().endOf("month");
     return [start, end];
   }, []);
 

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { MdSystemSecurityUpdateGood } from "react-icons/md";
 
 interface OTPModalProps {
   showOTPModal: boolean;
@@ -8,6 +9,8 @@ interface OTPModalProps {
   handleOTPSubmit: () => Promise<void>;
   handleCloseOTPModal: () => void;
   handleResendOTP: () => Promise<void>;
+  /** Initial countdown seconds for the OTP validity (defaults to 60) */
+  initialSeconds?: number;
 }
 
 const OTPModal: React.FC<OTPModalProps> = ({
@@ -18,8 +21,44 @@ const OTPModal: React.FC<OTPModalProps> = ({
   handleOTPSubmit,
   handleCloseOTPModal,
   handleResendOTP,
+  initialSeconds = 60,
 }) => {
+  const [secondsLeft, setSecondsLeft] = useState<number>(initialSeconds);
+
+  // Start or reset countdown whenever modal opens or initialSeconds changes
+  useEffect(() => {
+    if (!showOTPModal) return;
+    setSecondsLeft(initialSeconds);
+  }, [showOTPModal, initialSeconds]);
+
+  // Countdown effect
+  useEffect(() => {
+    if (!showOTPModal) return;
+    if (secondsLeft <= 0) return;
+    const timer = setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [showOTPModal, secondsLeft]);
+
   if (!showOTPModal) return null;
+
+  const onResendClick = async () => {
+    // Prevent spamming resend while timer running
+    if (secondsLeft > 0) return;
+    setSecondsLeft(initialSeconds);
+    try {
+      await handleResendOTP();
+    } catch (error) {
+      void error;
+    }
+  };
 
   return (
     <div className="modal-overlay">
@@ -32,7 +71,9 @@ const OTPModal: React.FC<OTPModalProps> = ({
         </div>
         <div className="modal-body">
           <div className="otp-icon">
-            <div className="security-icon">🔒</div>
+            <div className="security-icon">
+              <MdSystemSecurityUpdateGood size={65} />
+            </div>
           </div>
           <h4>Xác thực bảo mật</h4>
           <p>
@@ -96,14 +137,22 @@ const OTPModal: React.FC<OTPModalProps> = ({
 
           <div className="otp-info">
             <small>
-              Không nhận được mã?{" "}
-              <button
-                type="button"
-                className="resend-link"
-                onClick={handleResendOTP}
-              >
-                Gửi lại
-              </button>
+              {!secondsLeft ? (
+                <>
+                  Không nhận được mã?{" "}
+                  <button
+                    type="button"
+                    className={`resend-link`}
+                    onClick={onResendClick}
+                  >
+                    Gửi lại
+                  </button>
+                </>
+              ) : (
+                <>
+                  Mã còn: <strong>{secondsLeft}s</strong>
+                </>
+              )}
             </small>
           </div>
 

@@ -1,0 +1,360 @@
+// Notification Dropdown SCSS - Modern Gradient Theme
+// Color palette: rgb(21, 101, 192) and rgb(66, 165, 245)
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Bell Button
+.notification-bell-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 18px;
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(21, 101, 192, 0.1),
+      rgba(66, 165, 245, 0.1)
+    );
+    transform: scale(1.05);
+  }
+
+  .anticon {
+    font-size: 20px;
+  }
+}
+
+// Badge pulse animation
+.notification-badge-pulse {
+  .ant-badge-count {
+    animation: pulse 2s ease-in-out infinite;
+    background: linear-gradient(45deg, rgb(255, 77, 79), rgb(255, 120, 117));
+    box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+  }
+}
+
+// Drawer
+.notification-drawer {
+  .ant-drawer-header {
+    background: linear-gradient(
+      45deg,
+      rgb(21, 101, 192),
+      rgb(66, 165, 245),
+      rgb(21, 101, 192),
+      rgb(66, 165, 245)
+    );
+    background-size: 300% 300%;
+    animation: gradientShift 8s ease infinite;
+    border-bottom: none;
+    padding: 20px 24px;
+    box-shadow: 0 2px 8px rgba(21, 101, 192, 0.15);
+
+    .ant-drawer-title {
+      color: white;
+      font-weight: 600;
+    }
+
+    .ant-drawer-close {
+      color: white;
+      font-size: 18px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .ant-drawer-body {
+    padding: 16px;
+    background: #f5f7fa;
+  }
+
+  .ant-drawer-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e8e8e8;
+    background: white;
+  }
+}
+
+// Drawer Header
+.notification-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  h4 {
+    color: white !important;
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .ant-badge {
+    .ant-badge-count {
+      background: white;
+      color: rgb(21, 101, 192);
+      font-weight: 600;
+    }
+  }
+
+  .mark-all-read-btn {
+    color: white;
+    padding: 4px 12px;
+    font-size: 13px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+  }
+}
+
+// Loading State
+.notification-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+
+  .ant-spin {
+    .ant-spin-dot-item {
+      background: rgb(21, 101, 192);
+    }
+  }
+
+  .loading-text {
+    font-size: 14px;
+    color: #8c8c8c;
+  }
+}
+
+// Empty State
+.notification-empty {
+  padding: 60px 20px;
+
+  .ant-empty-description {
+    color: #8c8c8c;
+    font-size: 14px;
+  }
+}
+
+// Notification List
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// Notification Card
+.notification-card {
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  animation: slideInRight 0.3s ease;
+
+  &:hover {
+    transform: translateX(-4px);
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.15);
+    border-color: rgb(66, 165, 245);
+  }
+
+  &.unread {
+    background: linear-gradient(
+      135deg,
+      rgba(21, 101, 192, 0.03),
+      rgba(66, 165, 245, 0.03)
+    );
+    border-left: 3px solid rgb(21, 101, 192);
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(21, 101, 192, 0.06),
+        rgba(66, 165, 245, 0.06)
+      );
+    }
+  }
+
+  .ant-card-body {
+    padding: 16px;
+  }
+}
+
+// Card Content
+.notification-card-content {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+
+  .ant-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .anticon {
+      font-size: 24px;
+    }
+  }
+}
+
+.notification-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.notification-title {
+  font-size: 15px;
+  line-height: 1.4;
+  color: #262626;
+  font-weight: 600;
+  flex: 1;
+
+  .unread & {
+    color: rgb(21, 101, 192);
+  }
+}
+
+.unread-dot {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(45deg, rgb(21, 101, 192), rgb(66, 165, 245));
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+  box-shadow: 0 0 8px rgba(21, 101, 192, 0.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.notification-message {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #595959;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notification-time {
+  font-size: 12px;
+  font-style: italic;
+  color: #8c8c8c;
+}
+
+// Drawer Footer
+.notification-drawer-footer {
+  .ant-btn-primary {
+    background: linear-gradient(
+      45deg,
+      rgb(21, 101, 192),
+      rgb(66, 165, 245),
+      rgb(21, 101, 192),
+      rgb(66, 165, 245)
+    );
+    background-size: 300% 300%;
+    border: none;
+    height: 44px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      animation: gradientShift 3s ease infinite;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .notification-drawer {
+    .ant-drawer-content-wrapper {
+      width: 100% !important;
+    }
+  }
+
+  .notification-card-content {
+    gap: 10px;
+  }
+
+  .notification-icon {
+    .ant-avatar {
+      width: 36px;
+      height: 36px;
+
+      .anticon {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .notification-title {
+    font-size: 14px;
+  }
+
+  .notification-message {
+    font-size: 13px;
+  }
+}

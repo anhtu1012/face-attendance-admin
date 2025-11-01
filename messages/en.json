@@ -462,7 +462,8 @@
     "duration": "Duration",
     "status": "Status",
     "endDate": "End Date",
-    "positionName": "Position Name"
+    "positionName": "Position Name",
+    "departmentName": "Department Name"
   },
   "UserComponent": {
     "userName": "userName",

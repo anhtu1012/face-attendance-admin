@@ -134,48 +134,6 @@ export const mockJobOfferData: JobOfferItem[] = [
   },
 ];
 
-// Helper function to filter data
-export const filterInterviewData = (
-  data: AppointmentItem[],
-  filters: {
-    fromDate?: string;
-    toDate?: string;
-    status?: string | string[];
-    quickSearch?: string;
-  }
-): AppointmentItem[] => {
-  let filtered = [...data];
-
-  // Filter by date range
-  if (filters.fromDate) {
-    filtered = filtered.filter(
-      (item) =>
-        dayjs(item.interviewDate).isAfter(dayjs(filters.fromDate)) ||
-        dayjs(item.interviewDate).isSame(dayjs(filters.fromDate), "day")
-    );
-  }
-
-  if (filters.toDate) {
-    filtered = filtered.filter(
-      (item) =>
-        dayjs(item.interviewDate).isBefore(dayjs(filters.toDate)) ||
-        dayjs(item.interviewDate).isSame(dayjs(filters.toDate), "day")
-    );
-  }
-
-  // Filter by status (support single or multiple statuses)
-  if (filters.status) {
-    if (Array.isArray(filters.status)) {
-      const set = new Set(filters.status);
-      filtered = filtered.filter((item) => set.has(item.status));
-    } else {
-      filtered = filtered.filter((item) => item.status === filters.status);
-    }
-  }
-
-  return filtered;
-};
-
 // Export schedule templates derived from mockInterviewData
 export const mockScheduleTemplates = mockInterviewData.map((item) => {
   const baseDate = dayjs(item.interviewDate);

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NotificationItem } from "@/dtos/notification/notification.response.dto";
 import useSocket from "@/hooks/useSocket";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
@@ -15,9 +14,9 @@ import {
   Avatar,
   Badge,
   Button,
-  Dropdown,
+  Drawer,
   Empty,
-  List,
+  Card,
   Space,
   Spin,
   Typography,
@@ -29,6 +28,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import "./NotificationDropdown.scss";
 
 // Extend dayjs with plugins
 dayjs.extend(relativeTime);
@@ -40,9 +40,7 @@ interface NotificationDropdownProps {
   placement?: "bottomLeft" | "bottomRight" | "topLeft" | "topRight";
 }
 
-const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
-  placement = "bottomRight",
-}) => {
+const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -78,6 +76,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     if (userCode) {
       fetchNotifications();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userCode, socket]);
 
   // Listen for new notifications from WebSocket
@@ -106,11 +105,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     };
   }, [socket, userCode]);
 
-  // Refresh notifications when dropdown opens for latest data
+  // Refresh notifications when drawer opens for latest data
   useEffect(() => {
     if (userCode && visible) {
       fetchNotifications();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const getIcon = (type: string) => {
@@ -182,230 +182,127 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     return "#";
   };
   const renderNotificationItem = (notification: NotificationItem) => (
-    <List.Item
+    <Card
       key={notification.id}
-      style={{
-        backgroundColor: notification.isRead ? "transparent" : "#f0f9ff",
-        borderRadius: "6px",
-        marginBottom: "4px",
-        padding: "8px 12px",
-        border: notification.isRead ? "none" : "1px solid #e6f7ff",
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-      }}
+      className={`notification-card ${!notification.isRead ? "unread" : ""}`}
       onClick={() => handleReadOneNoti(notification)}
+      hoverable
     >
-      <List.Item.Meta
-        avatar={
+      <div className="notification-card-content">
+        <div className="notification-icon">
           <Avatar
             icon={getIcon(notification.type)}
             style={{
               backgroundColor: "transparent",
               border: "none",
             }}
-            size="small"
+            size={40}
           />
-        }
-        title={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-            }}
-          >
+        </div>
+        <div className="notification-body">
+          <div className="notification-header">
             <Text
               strong={!notification.isRead}
-              style={{
-                fontSize: "13px",
-                fontWeight: notification.isRead ? "normal" : "600",
-                color: notification.isRead ? "#595959" : "#262626",
-                lineHeight: "1.3",
-                maxWidth: "200px",
-              }}
+              className="notification-title"
               ellipsis={{ tooltip: notification.title }}
             >
               {notification.title}
             </Text>
-            {!notification.isRead && (
-              <div
-                style={{
-                  width: "6px",
-                  height: "6px",
-                  backgroundColor: "#1890ff",
-                  borderRadius: "50%",
-                  marginLeft: "8px",
-                  flexShrink: 0,
-                  marginTop: "2px",
-                }}
-              />
-            )}
+            {!notification.isRead && <div className="unread-dot" />}
           </div>
-        }
-        description={
-          <div>
-            <Text
-              style={{
-                fontSize: "12px",
-                color: "#8c8c8c",
-                lineHeight: "1.4",
-                display: "block",
-                marginBottom: "4px",
-              }}
-              ellipsis={{ tooltip: notification.message }}
-            >
-              {notification.message}
-            </Text>
-            <Text
-              type="secondary"
-              style={{
-                fontSize: "11px",
-                fontStyle: "italic",
-              }}
-            >
-              {getRelativeTime(notification.createdAt)}
-            </Text>
-          </div>
-        }
-      />
-    </List.Item>
-  );
-
-  const dropdownContent = (
-    <div
-      style={{
-        width: "320px",
-        maxHeight: "400px",
-        backgroundColor: "#fff",
-        borderRadius: "8px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-        border: "1px solid #f0f0f0",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: "12px 16px",
-          borderBottom: "1px solid #f0f0f0",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Space align="center">
-          <Title level={5} style={{ margin: 0, fontSize: "14px" }}>
-            Thông báo
-          </Title>
-          {unreadCount > 0 && (
-            <Badge
-              count={unreadCount}
-              size="small"
-              style={{ backgroundColor: "#ff4d4f" }}
-            />
-          )}
-        </Space>
-
-        {unreadCount > 0 && (
-          <Button
-            type="link"
-            size="small"
-            onClick={handleMarkAllAsRead}
-            loading={markingAsRead}
-            style={{ fontSize: "11px", padding: "0 4px" }}
+          <Text
+            className="notification-message"
+            ellipsis={{ tooltip: notification.message }}
           >
-            Đánh dấu tất cả đã đọc
-          </Button>
-        )}
+            {notification.message}
+          </Text>
+          <Text type="secondary" className="notification-time">
+            {getRelativeTime(notification.createdAt)}
+          </Text>
+        </div>
       </div>
-
-      {/* Notifications List */}
-      <div
-        style={{
-          maxHeight: "280px",
-          overflowY: "auto",
-          padding: "8px",
-        }}
-      >
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "20px 0" }}>
-            <Spin size="small" />
-            <div style={{ marginTop: 8, fontSize: "12px", color: "#8c8c8c" }}>
-              Đang tải thông báo...
-            </div>
-          </div>
-        ) : notifications.length > 0 ? (
-          <List
-            dataSource={notifications.slice(0, 5)} // Show only first 5 notifications
-            renderItem={renderNotificationItem}
-            style={{ margin: 0 }}
-            split={false}
-          />
-        ) : (
-          <Empty
-            description="Không có thông báo nào"
-            style={{ padding: "20px 0" }}
-            styles={{ image: { height: 40 } }}
-          />
-        )}
-      </div>
-
-      {/* Footer */}
-      <div
-        style={{
-          padding: "8px 16px",
-          borderTop: "1px solid #f0f0f0",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Link
-          href={getLinkNoti(authData.userProfile?.roleId || "")}
-          style={{ textDecoration: "none" }}
-        >
-          <Button
-            type="text"
-            size="small"
-            style={{ fontSize: "12px", color: "#1890ff" }}
-          >
-            Xem tất cả
-          </Button>
-        </Link>
-      </div>
-    </div>
+    </Card>
   );
 
   return (
-    <Dropdown
-      popupRender={() => dropdownContent}
-      placement={placement}
-      trigger={["click"]}
-      open={visible}
-      onOpenChange={setVisible}
-      overlayStyle={{ zIndex: 1050 }}
-    >
+    <>
       <Badge
         count={unreadCount}
         overflowCount={99}
         size="small"
-        style={{ backgroundColor: "#ff4d4f" }}
+        className={unreadCount > 0 ? "notification-badge-pulse" : ""}
       >
         <Button
           type="text"
           icon={<BellOutlined />}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "40px",
-            width: "40px",
-            borderRadius: "8px",
-            transition: "all 0.2s ease",
-          }}
-          className="icon-button help-button"
+          onClick={() => setVisible(true)}
+          className="notification-bell-button"
         />
       </Badge>
-    </Dropdown>
+
+      <Drawer
+        title={
+          <div className="notification-drawer-header">
+            <Space align="center">
+              <Title level={4} style={{ margin: 0 }}>
+                Thông báo
+              </Title>
+              {unreadCount > 0 && (
+                <Badge
+                  count={unreadCount}
+                  size="small"
+                  style={{ backgroundColor: "#ff4d4f" }}
+                />
+              )}
+            </Space>
+
+            {unreadCount > 0 && (
+              <Button
+                type="link"
+                onClick={handleMarkAllAsRead}
+                loading={markingAsRead}
+                className="mark-all-read-btn"
+              >
+                Đánh dấu tất cả đã đọc
+              </Button>
+            )}
+          </div>
+        }
+        placement="right"
+        width={450}
+        open={visible}
+        onClose={() => setVisible(false)}
+        className="notification-drawer"
+        footer={
+          <div className="notification-drawer-footer">
+            <Link
+              href={getLinkNoti(authData.userProfile?.roleId || "")}
+              style={{ textDecoration: "none", width: "100%" }}
+            >
+              <Button type="primary" block size="large">
+                Xem tất cả thông báo
+              </Button>
+            </Link>
+          </div>
+        }
+      >
+        {loading ? (
+          <div className="notification-loading">
+            <Spin size="large" />
+            <div className="loading-text">Đang tải thông báo...</div>
+          </div>
+        ) : notifications.length > 0 ? (
+          <div className="notification-list">
+            {notifications.map(renderNotificationItem)}
+          </div>
+        ) : (
+          <Empty
+            description="Không có thông báo nào"
+            className="notification-empty"
+          />
+        )}
+      </Drawer>
+    </>
   );
 };
 

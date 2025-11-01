@@ -57,6 +57,22 @@ export const handleBatchStatusChange = async ({
         successCount++;
       }
     }
+    // If status changed to INTERVIEW_REJECTED, decrement interview quantities
+    if (status === "INTERVIEW_REJECTED") {
+      setQuantityStatus((prev) => {
+        if (!prev) return prev;
+        const prevToInterview = Number(prev.toInterviewQuantity || 0);
+        return {
+          ...prev,
+          toInterviewQuantity: Math.max(prevToInterview - successCount, 0),
+        } as Record<string, number>;
+      });
+
+      setNewCounts((prev) => ({
+        ...prev,
+        PHONG_VAN: Math.max(Number(prev.PHONG_VAN || 0) - successCount, 0),
+      }));
+    }
 
     // Update quantity status based on status change
     if (status === "TO_INTERVIEW") {

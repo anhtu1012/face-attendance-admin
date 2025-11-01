@@ -1,32 +1,28 @@
 "use client";
 
 import { Button, Card, Modal, Tag } from "antd";
-import React, { useMemo } from "react";
-import { FaCalendarAlt, FaUser } from "react-icons/fa";
+import React from "react";
+import {
+  FaCalendarAlt,
+  FaMapMarkerAlt,
+  FaUserTie,
+  FaLaptop,
+  FaStickyNote,
+  FaBriefcase,
+} from "react-icons/fa";
 import "./InterviewListModal.scss";
-
-interface InterviewItem {
-  id: string;
-  date: string; // DD/MM/YYYY
-  startTime: string; // HH:mm
-  endTime: string; // HH:mm
-  status: "INTERVIEW_SCHEDULED" | "CONFIRMED" | "CANCELLED" | "PENDING";
-  interviewer: string;
-  interviewerEmail?: string;
-  location?: string;
-  meetingLink?: string;
-  notes?: string;
-}
-
+import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
+import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
+import dayjs from "dayjs";
 interface Props {
   open: boolean;
   onClose: () => void;
-  candidateId?: string;
+  intervieweeId?: string;
   candidateName?: string;
 }
 
 const statusColorMap: Record<string, string> = {
-  INTERVIEW_SCHEDULED: "#43A047",
+  ACCEPTED: "#43A047",
   CONFIRMED: "#1976D2",
   CANCELLED: "#E53935",
   PENDING: "#FB8C00",
@@ -35,41 +31,33 @@ const statusColorMap: Record<string, string> = {
 const InterviewListModal: React.FC<Props> = ({
   open,
   onClose,
-  candidateId,
+  intervieweeId,
   candidateName,
 }) => {
   // const messageApi = useAntdMessage();
-  console.log({ candidateId, candidateName });
+  console.log({ intervieweeId, candidateName });
+  const [interviews, setInterviews] = React.useState<
+    AppointmentListWithInterview[]
+  >([]);
 
-  // Mock data - replace with API integration
-  const interviews: InterviewItem[] = useMemo(
-    () => [
-      {
-        id: "iv1",
-        date: "12/10/2025",
-        startTime: "09:30",
-        endTime: "10:00",
-        status: "INTERVIEW_SCHEDULED",
-        interviewer: "Nguyễn Văn A - HR Manager",
-        interviewerEmail: "nguyen.van.a@company.com",
-        location: "Tầng 5, Tòa nhà ABC",
-        meetingLink: "https://meet.google.com/xxx-xxxx-xxx",
-        notes: "Chuẩn bị hồ sơ gốc",
-      },
-      {
-        id: "iv2",
-        date: "15/10/2025",
-        startTime: "14:00",
-        endTime: "14:30",
-        status: "CONFIRMED",
-        interviewer: "Trần Thị B - Technical Lead",
-        interviewerEmail: "tran.thi.b@company.com",
-        location: "Phòng họp 3",
-        notes: "Test kỹ thuật 30 phút",
-      },
-    ],
-    []
-  );
+  React.useEffect(() => {
+    if (!open || !intervieweeId) return;
+    const fetchInterviews = async () => {
+      try {
+        const response = await TuyenDungServices.getDanhSachPhongVanWithParam(
+          [],
+          undefined,
+          {
+            intervieweeId,
+          }
+        );
+        setInterviews(response.data);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    fetchInterviews();
+  }, [open, intervieweeId]);
 
   return (
     <Modal
@@ -87,31 +75,98 @@ const InterviewListModal: React.FC<Props> = ({
       <div className="interview-list">
         {interviews.map((it) => (
           <Card key={it.id} className="interview-card">
-            <div className="card-row">
-              <div className="card-main">
+            <div className="card-header">
+              <div className="card-title-row">
                 <div className="card-title">
-                  {it.date} • {it.startTime} - {it.endTime}
+                  <FaBriefcase size={18} style={{ marginRight: 8 }} />
+                  {it.jobInfor?.jobTitle || "Không có tiêu đề công việc"}
                 </div>
-                <div className="card-sub">{it.interviewer}</div>
-                {it.location && (
-                  <div className="card-sub small">
-                    <FaUser /> {it.location}
-                  </div>
-                )}
-              </div>
-              <div className="card-actions">
                 <Tag
                   style={{
                     background: statusColorMap[it.status],
                     color: "#fff",
                   }}
                 >
-                  {it.status}
+                  {it.status === "PENDING"
+                    ? "Chờ xác nhận"
+                    : it.status === "ACCEPTED"
+                    ? "Đã chấp nhận"
+                    : it.status === "COMPLETED"
+                    ? "Đã hoàn thành"
+                    : it.status === "CANCELLED"
+                    ? "Đã hủy"
+                    : it.status}
                 </Tag>
-                <Button type="primary" onClick={() => {}}>
-                  Gửi lại thư mời
-                </Button>
               </div>
+              <div className="card-datetime">
+                <FaCalendarAlt size={14} />
+                {dayjs(it.interviewDate).format("DD/MM/YYYY")} •{" "}
+                {dayjs(it.startTime).format("HH:mm")} -{" "}
+                {dayjs(it.endTime).format("HH:mm")}
+              </div>
+            </div>
+
+            <div className="card-body">
+              {it.address && (
+                <div className="card-info-row">
+                  <span className="info-label">
+                    <FaMapMarkerAlt /> Địa điểm:
+                  </span>
+                  <span className="info-value">{it.address}</span>
+                </div>
+              )}
+
+              {it.listInterviewers && it.listInterviewers.length > 0 && (
+                <div className="card-info-row">
+                  <span className="info-label">
+                    <FaUserTie /> Người phỏng vấn:
+                  </span>
+                  <div className="interviewers-list">
+                    {it.listInterviewers.map((interviewer, idx) => (
+                      <div key={idx} className="interviewer-item">
+                        <span className="interviewer-name">
+                          {interviewer.interviewerName}
+                        </span>
+                        {interviewer.interviewerEmail && (
+                          <span className="interviewer-email">
+                            ({interviewer.interviewerEmail})
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {it.typeAppointment && (
+                <div className="card-info-row">
+                  <span className="info-label">
+                    <FaLaptop /> Hình thức:
+                  </span>
+                  <Tag
+                    color={it.typeAppointment === "Online" ? "blue" : "green"}
+                  >
+                    {it.typeAppointment === "Online"
+                      ? "Trực tuyến"
+                      : "Trực tiếp"}
+                  </Tag>
+                </div>
+              )}
+
+              {it.notes && (
+                <div className="card-info-row">
+                  <span className="info-label">
+                    <FaStickyNote /> Ghi chú:
+                  </span>
+                  <span className="info-value">{it.notes}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="card-footer">
+              <Button type="primary" onClick={() => {}}>
+                Gửi lại thư mời
+              </Button>
             </div>
           </Card>
         ))}

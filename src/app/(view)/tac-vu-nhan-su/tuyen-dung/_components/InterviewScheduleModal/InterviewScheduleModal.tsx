@@ -223,9 +223,9 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
         startTime: startTimeStr,
         endTime: endTimeStr,
         listIntervieweeId: candidates.map((c) => c.id),
-        address: companyInformation.addressLine,
+        address: companyInformation.addressLine || "",
         jobId: jobId || "",
-        interviewerId: selectedInterviewers.map(
+        listInterviewerId: selectedInterviewers.map(
           (interviewer) => interviewer.value
         ),
         interviewerCount: selectedInterviewers.length,

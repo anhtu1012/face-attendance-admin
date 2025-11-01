@@ -16,6 +16,7 @@ export const CreateJobSchema = z.object({
   supervisorId: z.string().optional(),
   positionId: z.string().optional(),
   requireSkill: z.array(z.string()).optional(),
+  departmentId: z.string().optional(),
 });
 
 export type CreateJobRequest = z.infer<typeof CreateJobSchema>;

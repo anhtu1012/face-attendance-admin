@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import AIAnalysisResultModal from "@/components/AIAnalysisResultModal/AIAnalysisResultModal";
 import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { TuyenDungItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.dto";
@@ -24,7 +25,7 @@ import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTranslations } from "next-intl";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import AIAnalysisResultModal from "@/components/AIAnalysisResultModal/AIAnalysisResultModal";
+import { DiGoogleAnalytics } from "react-icons/di";
 import { FaPlusCircle } from "react-icons/fa";
 import { FcViewDetails } from "react-icons/fc";
 import { GoReport } from "react-icons/go";
@@ -40,13 +41,12 @@ import "./_components/LeaderReportModal/LeaderReportModal.scss";
 import ListJob from "./_components/ListJob/ListJob";
 import SuccessModal from "./_components/SuccessModal/SuccessModal";
 import "./_components/SuccessModal/SuccessModal.scss";
-import "./index.scss";
-import { DiGoogleAnalytics } from "react-icons/di";
-import { getSelectionActionButtons } from "./_helpers/selectionActionButtons";
 import {
   handleBatchStatusChange as batchStatusChange,
   handleBatchSchedule,
 } from "./_helpers/batchHandlers";
+import { getSelectionActionButtons } from "./_helpers/selectionActionButtons";
+import "./index.scss";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
@@ -73,8 +73,9 @@ function Page() {
   const [jobOfferModalOpen, setJobOfferModalOpen] = useState(false);
   const [leaderReportModalOpen, setLeaderReportModalOpen] = useState(false);
   const [aiAnalysisModalOpen, setAiAnalysisModalOpen] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] =
-    useState<TuyenDungItem | TuyenDungItem[] | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<
+    TuyenDungItem | TuyenDungItem[] | null
+  >(null);
   const messageApi = useAntdMessage();
   const [contractLink, setContractLink] = useState<string>("");
   const [jobId, setJobId] = useState<string>("");
@@ -288,7 +289,7 @@ function Page() {
       {
         field: "fullName",
         headerName: t("fullName"),
-        editable: true,
+        editable: false,
         width: 150,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
@@ -299,7 +300,7 @@ function Page() {
         field: "email",
         headerName: "Email",
         context: { typeColumn: "Text", inputType: "email", maxLength: 100 },
-        editable: true,
+        editable: false,
         width: 220,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
@@ -310,7 +311,7 @@ function Page() {
       {
         field: "gender",
         headerName: t("gender"),
-        editable: true,
+        editable: false,
         width: 150,
         context: {
           typeColumn: "Select",
@@ -320,7 +321,7 @@ function Page() {
       {
         field: "phone",
         headerName: t("phone"),
-        editable: true,
+        editable: false,
         width: 170,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
@@ -355,7 +356,7 @@ function Page() {
       {
         field: "birthday",
         headerName: t("birthDay"),
-        editable: true,
+        editable: false,
         width: 190,
         context: {
           typeColumn: "Date",
@@ -406,18 +407,6 @@ function Page() {
     setContractLink("");
   };
 
-  // PHONG_VAN modal handlers
-  // Used in batch handlers (handleBatchInterviewSchedule)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleOpenInterviewModal = (_params: any) => {
-    if (_params) {
-      setSelectedCandidate(_params.data);
-      setInterviewModalOpen(true);
-    } else {
-      messageApi.warning("Vui lòng chọn ứng viên để tạo lịch phỏng vấn!");
-    }
-  };
-
   const handleOpenInterviewListModal = (_params: any) => {
     if (_params) {
       // optionally set selected candidate for context
@@ -431,18 +420,6 @@ function Page() {
   const handleCloseInterviewModal = () => {
     setInterviewModalOpen(false);
     setSelectedCandidate(null);
-  };
-
-  // Job offer modal handlers
-  // Used in batch handlers (handleBatchJobOffer)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleOpenJobOfferModal = (_params: any) => {
-    if (_params) {
-      setSelectedCandidate(_params.data);
-      setJobOfferModalOpen(true);
-    } else {
-      messageApi.warning("Vui lòng chọn ứng viên để tạo lịch hẹn nhận việc!");
-    }
   };
 
   const handleCloseJobOfferModal = () => {
@@ -603,67 +580,7 @@ function Page() {
       setLoading(false);
     }
   };
-
-  // Single candidate status change handler
-  // Kept for direct single-row actions if needed in the future
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleChangeStatusToInterview = async (
-    _params: any,
-    status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED"
-  ) => {
-    if (!_params || !_params.data) {
-      messageApi.warning("Vui lòng chọn ứng viên!");
-      return;
-    }
-
-    const candidate = _params.data;
-    const id = candidate.id;
-    if (!id) {
-      messageApi.error("Không tìm thấy id ứng viên");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await TuyenDungServices.updateStatusUngVien(id, status);
-
-      // If moving from LIEN_HE -> PHONG_VAN (TO_INTERVIEW), update quantityStatus counts optimistically
-      if (status === "TO_INTERVIEW") {
-        setQuantityStatus((prev) => {
-          if (!prev) return prev;
-          const prevToContact = Number(prev.toContactQuantity || 0);
-          const prevToInterview = Number(prev.toInterviewQuantity || 0);
-          return {
-            ...prev,
-            toContactQuantity: Math.max(prevToContact - 1, 0),
-            toInterviewQuantity: prevToInterview + 1,
-          } as Record<string, number>;
-        });
-
-        // Also decrement newCounts for LIEN_HE and increment for PHONG_VAN (if applicable)
-        setNewCounts((prev) => ({
-          ...prev,
-          LIEN_HE: Math.max(Number(prev.LIEN_HE || 0) - 1, 0),
-          PHONG_VAN: Number(prev.PHONG_VAN || 0) + 1,
-        }));
-      }
-
-      const successMsg =
-        status === "CANNOT_CONTACT"
-          ? "Đã đánh dấu không liên hệ được"
-          : "Đã chuyển sang trạng thái phỏng vấn";
-      messageApi.success(successMsg);
-
-      // refresh current page
-      handleFetchUser(currentPage, pageSize, quickSearchText);
-    } catch (error: any) {
-      showError(error.response?.data?.message || mes("fetchError"));
-    } finally {
-      setLoading(false);
-    }
-  };
   const hanldeViewSuccess = () => {
-    // Update quantity status: decrement PHONG_VAN count
     setQuantityStatus((prev) => {
       if (!prev) return prev;
       const prevToInterview = Number(prev.toInterviewQuantity || 0);
@@ -672,14 +589,10 @@ function Page() {
         toInterviewQuantity: Math.max(prevToInterview - 1, 0),
       } as Record<string, number>;
     });
-
-    // Decrement newCounts for PHONG_VAN
     setNewCounts((prev) => ({
       ...prev,
       PHONG_VAN: Math.max(Number(prev.PHONG_VAN || 0) - 1, 0),
     }));
-
-    // Refresh the grid
     handleFetchUser(currentPage, pageSize, quickSearchText);
   };
 
@@ -847,6 +760,16 @@ function Page() {
                 mode: "multiRow",
                 enableClickSelection: true,
                 checkboxes: true,
+                isRowSelectable: (node: any) => {
+                  // Only allow selection for rows with TO_INTERVIEW status
+                  return (
+                    node.data?.status === "TO_INTERVIEW" ||
+                    node.data?.status === "JOB_OFFERED" ||
+                    node.data?.status === "NOT_SUITABLE" ||
+                    node.data?.status === "TO_CONTACT" ||
+                    node.data?.status === "CANNOT_CONTACT"
+                  );
+                },
               }}
               showSelectionInfoBar={true}
               selectionActionButtons={getSelectionActionButtons({
@@ -896,7 +819,7 @@ function Page() {
           <InterviewListModal
             open={listModalOpen}
             onClose={() => setListModalOpen(false)}
-            candidateId={
+            intervieweeId={
               selectedCandidate && !Array.isArray(selectedCandidate)
                 ? selectedCandidate.id
                 : undefined

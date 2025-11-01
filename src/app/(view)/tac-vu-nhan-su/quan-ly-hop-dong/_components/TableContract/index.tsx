@@ -26,12 +26,15 @@ import {
   TableContractRef,
 } from "../../_types/prop";
 import ContractDetailModal from "../ContractDetailModal/ContractDetailModal";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 
 const defaultPageSize = 20;
 const TableContract = forwardRef<TableContractRef, TableContractProps>(
   ({ filterRef, onAddAppendix, onTerminateContract }, ref) => {
     const mes = useTranslations("HandleNotion");
     const t = useTranslations("TableContract");
+    const { userProfile, companyInformation } = useSelector(selectAuthLogin);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalItem, setTotalItems] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(defaultPageSize);
@@ -92,6 +95,12 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           headerName: t("fullNameUser"),
           editable: false,
           width: 150,
+        },
+        {
+          field: "departmentName",
+          headerName: t("departmentName"),
+          editable: false,
+          width: 180,
         },
         {
           field: "positionName",
@@ -247,7 +256,11 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           />
         </Tooltip>
       );
-      if (_params.data.status === "ACTIVE") {
+      if (
+        _params.data.status === "DIRECTOR_SIGNED" &&
+        userProfile.id ===
+          companyInformation.representator?.legalRepresentativeId
+      ) {
         return (
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             {defaultViewButton}

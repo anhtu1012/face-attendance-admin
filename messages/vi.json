@@ -435,7 +435,8 @@
     "duration": "Thời gian",
     "status": "Trạng thái",
     "endDate": "Ngày kết thúc",
-    "positionName": "Chức vụ"
+    "positionName": "Chức vụ",
+    "departmentName": "Phòng ban"
   },
   "UserComponent": {
     "userName": "Tên đăng nhập",

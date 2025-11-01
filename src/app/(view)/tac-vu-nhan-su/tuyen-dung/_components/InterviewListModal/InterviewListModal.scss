@@ -15,41 +15,126 @@
   }
 
   .interview-card {
-    border-radius: 10px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    transition: transform 0.15s ease-in-out;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
   }
 
   .interview-card:hover {
     transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
 
-  .card-row {
+  .card-header {
+    background: linear-gradient(
+      45deg,
+      rgb(21, 101, 192),
+      rgb(66, 165, 245),
+      rgb(21, 101, 192),
+      rgb(66, 165, 245)
+    );
+    background-size: 300% 100%;
+    padding: 16px 20px;
+    color: white;
+    animation: gradientShift 3s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .card-title-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-  }
-
-  .card-main {
-    display: flex;
-    flex-direction: column;
+    margin-bottom: 8px;
   }
 
   .card-title {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px;
+    color: white;
+    flex: 1;
+    display: flex;
+    align-items: center;
   }
 
-  .card-sub {
-    color: rgba(0, 0, 0, 0.65);
-    margin-top: 4px;
-  }
-
-  .card-actions {
+  .card-datetime {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 14px;
+    opacity: 0.95;
+  }
+
+  .card-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-info-row {
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .info-label {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.65);
+    min-width: 160px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .info-value {
+    color: rgba(0, 0, 0, 0.85);
+    flex: 1;
+  }
+
+  .interviewers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .interviewer-item {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .interviewer-name {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  .interviewer-email {
+    color: rgba(0, 0, 0, 0.55);
+    font-size: 13px;
+  }
+
+  .card-footer {
+    padding: 12px 20px;
+    background: #fafafa;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .detail-content {

@@ -2,7 +2,10 @@ import { CreateAppointmentRequest } from "./../../../dtos/tac-vu-nhan-su/phong-v
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
-import { AppointmentResponseGetItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.response.dto";
+import {
+  AppointmentListWithInterviewGetItem,
+  AppointmentResponseGetItem,
+} from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.response.dto";
 import {
   CreateTuyenDungRequest,
   UpdateTuyenDungRequest,
@@ -46,6 +49,19 @@ class TuyenDungServicesBase extends AxiosService {
   ): Promise<AppointmentResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}/lich-hen/lich-hen-ung-vien`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
+
+  async getDanhSachPhongVanWithParam(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<AppointmentListWithInterviewGetItem> {
+    return this.getWithFilter(
+      `${this.basePath}/lich-hen/danh-sach-phong-van-ung-vien`,
       searchFilter,
       quickSearchText,
       params

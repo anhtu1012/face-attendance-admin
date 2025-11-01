@@ -1,6 +1,5 @@
 "use client";
 
-import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 import { Button, Card, Col, Descriptions, Row, Space, Tag } from "antd";
 import dayjs from "dayjs";
 import {
@@ -12,27 +11,34 @@ import {
   FaMapMarkerAlt,
   FaStickyNote,
   FaVideo,
+  FaUser,
+  FaUsers,
+  FaChartLine,
 } from "react-icons/fa";
 import "./AppointmentInfoTab.scss";
-
-// Extended interview type to include job-related fields
-type AppointmentWithJobDetails = AppointmentItem & {
-  requireExperience?: string;
-  fromSalary?: string;
-  toSalary?: string;
-  requireSkill?: string[];
-};
+import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
 
 interface AppointmentInfoTabProps {
-  interview: AppointmentItem;
+  interview: AppointmentListWithInterview;
   onRefresh: () => void;
 }
 
 export default function AppointmentInfoTab({
   interview,
 }: AppointmentInfoTabProps) {
-  const isOnline = interview.interviewType === "online";
-  const interviewWithJobDetails = interview as AppointmentWithJobDetails;
+  const isOnline = interview.interviewType === "Online";
+
+  const probationOptions = [
+    { value: "1_MONTH", label: "1 tháng" },
+    { value: "2_MONTHS", label: "2 tháng" },
+    { value: "3_MONTHS", label: "3 tháng" },
+    { value: "6_MONTHS", label: "6 tháng" },
+  ];
+
+  const trialLabel =
+    probationOptions.find(
+      (opt) => opt.value === interview.jobInfor?.trialPeriod
+    )?.label || "-";
 
   return (
     <div className="interview-info-tab">
@@ -57,7 +63,9 @@ export default function AppointmentInfoTab({
                 span={1.3}
               >
                 <strong>
-                  {dayjs(interview.interviewDate).format("DD/MM/YYYY (dddd)")}
+                  {interview.interviewDate
+                    ? dayjs(interview.interviewDate).format("DD/MM/YYYY (dddd)")
+                    : "-"}
                 </strong>
               </Descriptions.Item>
 
@@ -70,7 +78,8 @@ export default function AppointmentInfoTab({
                 span={0.7}
               >
                 <strong>
-                  {interview.startTime} - {interview.endTime}
+                  {dayjs(interview.startTime).format("HH:mm") || "-"} -{" "}
+                  {dayjs(interview.endTime).format("HH:mm") || "-"}
                 </strong>
               </Descriptions.Item>
 
@@ -110,21 +119,22 @@ export default function AppointmentInfoTab({
                 </Descriptions.Item>
               )}
 
-              {!isOnline && interview.location && (
-                <Descriptions.Item
-                  label={
-                    <span className="label-text">
-                      <FaMapMarkerAlt className="gradient-icon" /> Địa điểm
-                    </span>
-                  }
-                >
-                  {interview.location}
-                </Descriptions.Item>
-              )}
+              {!isOnline &&
+                (interview.address || interview.jobInfor?.address) && (
+                  <Descriptions.Item
+                    label={
+                      <span className="label-text">
+                        <FaMapMarkerAlt className="gradient-icon" /> Địa điểm
+                      </span>
+                    }
+                  >
+                    {interview.address || interview.jobInfor?.address}
+                  </Descriptions.Item>
+                )}
             </Descriptions>
           </Card>
         </Col>
-        <Col span={12}>
+        <Col span={24}>
           {/* Job Info Card */}
           <Card
             title={
@@ -135,31 +145,105 @@ export default function AppointmentInfoTab({
             className="info-card"
           >
             <Descriptions column={2} bordered>
-              <Descriptions.Item label="Kinh nghiệm yêu cầu">
-                <Tag color="orange">
-                  {interviewWithJobDetails.requireExperience || "Không yêu cầu"}
+              <Descriptions.Item label="Mã công việc">
+                <strong>{interview.jobInfor?.jobCode || "-"}</strong>
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Vị trí">
+                <strong>
+                  {interview.jobInfor?.positionName ||
+                    interview.jobInfor?.jobTitle ||
+                    "-"}
+                </strong>
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Trạng thái">
+                <Tag
+                  color={
+                    interview.jobInfor?.status === "OPEN" ? "green" : "default"
+                  }
+                >
+                  {interview.jobInfor?.status || "-"}
                 </Tag>
               </Descriptions.Item>
 
-              <Descriptions.Item label="Mức lương">
+              <Descriptions.Item label="Kinh nghiệm yêu cầu">
+                <Tag color="orange">
+                  {interview.jobInfor?.requireExperience || "Không yêu cầu"}
+                </Tag>
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Mức lương (triệu VNĐ)">
                 <Tag color="green">
-                  {interviewWithJobDetails.fromSalary &&
-                  interviewWithJobDetails.toSalary
-                    ? `${interviewWithJobDetails.fromSalary} - ${interviewWithJobDetails.toSalary}`
+                  {interview.jobInfor?.fromSalary &&
+                  interview.jobInfor?.toSalary
+                    ? `${interview.jobInfor.fromSalary} - ${interview.jobInfor.toSalary}`
                     : "Thương lượng"}
                 </Tag>
               </Descriptions.Item>
 
+              <Descriptions.Item label="Thời gian thử việc">
+                <div>{trialLabel}</div>
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Hạn nộp hồ sơ">
+                <div>
+                  {interview.jobInfor?.expirationDate
+                    ? dayjs(interview.jobInfor.expirationDate).format(
+                        "DD/MM/YYYY"
+                      )
+                    : "-"}
+                </div>
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Địa chỉ làm việc">
+                <div>
+                  {interview.jobInfor?.address || interview.address || "-"}
+                </div>
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Mô tả công việc" span={2}>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: interview.jobInfor?.jobDescription || "-",
+                  }}
+                />
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Tổng quan" span={2}>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: interview.jobInfor?.jobOverview || "-",
+                  }}
+                />
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Nhiệm vụ chính" span={2}>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: interview.jobInfor?.jobResponsibility || "-",
+                  }}
+                />
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Phúc lợi" span={2}>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: interview.jobInfor?.jobBenefit || "-",
+                  }}
+                />
+              </Descriptions.Item>
+
               <Descriptions.Item label="Kỹ năng yêu cầu" span={2}>
                 <div>
-                  {interviewWithJobDetails.requireSkill &&
-                  interviewWithJobDetails.requireSkill.length > 0 ? (
-                    interviewWithJobDetails.requireSkill.map(
+                  {interview.jobInfor?.listSkills &&
+                  interview.jobInfor.listSkills.length > 0 ? (
+                    interview.jobInfor.listSkills.map(
                       (skill: string, index: number) => (
                         <Tag
                           key={index}
                           color="blue"
-                          style={{ marginBottom: 4 }}
+                          style={{ marginBottom: 4, marginRight: 4 }}
                         >
                           {skill}
                         </Tag>
@@ -173,6 +257,126 @@ export default function AppointmentInfoTab({
             </Descriptions>
           </Card>
         </Col>
+
+        {/* Recruiter Info Card */}
+        {interview.jobInfor?.recruiter && (
+          <Col span={12}>
+            <Card
+              title={
+                <span>
+                  <FaUser className="gradient-icon" /> Nhà tuyển dụng
+                </span>
+              }
+              className="info-card"
+            >
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Họ tên">
+                  <strong>
+                    {interview.jobInfor.recruiter.fullName || "-"}
+                  </strong>
+                </Descriptions.Item>
+                <Descriptions.Item label="Vị trí">
+                  {interview.jobInfor.recruiter.recruiterPositionName || "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Email">
+                  {interview.jobInfor.recruiter.email || "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Số điện thoại">
+                  {interview.jobInfor.recruiter.phone || "-"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+          </Col>
+        )}
+
+        {/* Statistics Card */}
+        {interview.jobInfor?.statistics && (
+          <Col span={12}>
+            <Card
+              title={
+                <span>
+                  <FaChartLine className="gradient-icon" /> Thống kê tuyển dụng
+                </span>
+              }
+              className="info-card"
+            >
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Số ứng viên">
+                  <Tag color="blue">
+                    {interview.jobInfor.statistics.applicants || "0"}
+                  </Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Đã sơ tuyển">
+                  <Tag color="cyan">
+                    {interview.jobInfor.statistics.shortlisted || "0"}
+                  </Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Tỷ lệ phù hợp">
+                  <Tag color="green">
+                    {interview.jobInfor.statistics.properRatio || "0"}%
+                  </Tag>
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+          </Col>
+        )}
+
+        {/* Interviewers List Card */}
+        {interview.listInterviewers &&
+          interview.listInterviewers.length > 0 && (
+            <Col span={24}>
+              <Card
+                title={
+                  <span>
+                    <FaUsers className="gradient-icon" /> Danh sách người phỏng
+                    vấn
+                  </span>
+                }
+                className="info-card"
+              >
+                <Descriptions column={1} bordered>
+                  {interview.listInterviewers.map((interviewer, index) => (
+                    <Descriptions.Item
+                      key={index}
+                      label={`Người phỏng vấn ${index + 1}`}
+                    >
+                      <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: "100%" }}
+                      >
+                        <div>
+                          <strong>{interviewer.interviewerName}</strong>
+                          <Tag
+                            color={
+                              interviewer.status === "ACCEPTED"
+                                ? "green"
+                                : interviewer.status === "REJECTED"
+                                ? "red"
+                                : "gold"
+                            }
+                            style={{ marginLeft: 8 }}
+                          >
+                            {interviewer.status === "ACCEPTED"
+                              ? "Đã chấp nhận"
+                              : interviewer.status === "REJECTED"
+                              ? "Từ chối"
+                              : "Chờ xác nhận"}
+                          </Tag>
+                        </div>
+                        {interviewer.interviewerEmail && (
+                          <div>Email: {interviewer.interviewerEmail}</div>
+                        )}
+                        {interviewer.interviewerPhone && (
+                          <div>SĐT: {interviewer.interviewerPhone}</div>
+                        )}
+                      </Space>
+                    </Descriptions.Item>
+                  ))}
+                </Descriptions>
+              </Card>
+            </Col>
+          )}
       </Row>
 
       {/* Notes Card */}

@@ -5,7 +5,7 @@ import { JobItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.dto";
 import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
 import { buildQuicksearchParams } from "@/utils/client/buildQuicksearchParams/buildQuicksearchParams";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BsSearch } from "react-icons/bs";
 import {
   MdAttachMoney,
@@ -98,6 +98,23 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
       console.log("Error fetching jobs:", error);
     }
   };
+
+  // Listen for global 'jobCreated' events so this list can refresh automatically
+  useEffect(() => {
+    const handler = () => {
+      try {
+        // When a job is created elsewhere, re-fetch with current filters
+        fetchDataJobs(fromValue);
+      } catch (err) {
+        console.warn("Error handling jobCreated event", err);
+      }
+    };
+
+    window.addEventListener("jobCreated", handler);
+    return () => {
+      window.removeEventListener("jobCreated", handler);
+    };
+  }, [fromValue]);
   const toggleCollapse = (e: React.MouseEvent, jobId: number) => {
     // prevent card click/select when toggling
     e.stopPropagation();

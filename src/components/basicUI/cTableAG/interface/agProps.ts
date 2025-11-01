@@ -48,6 +48,7 @@ export interface AgGridComponentProps {
     mode: "singleRow" | "multiRow";
     enableClickSelection?: boolean;
     checkboxes?: boolean;
+    isRowSelectable?: (node: any) => boolean; // Callback để xác định row có thể select được hay không
   };
   rownumber?: boolean;
   gridOptions?: any;

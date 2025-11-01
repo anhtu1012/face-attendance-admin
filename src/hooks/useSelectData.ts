@@ -43,10 +43,6 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
   ]);
   const [selectStatusContract] = useState<SelectOption[]>([
     {
-      label: "Chờ xử lý",
-      value: "PENDING",
-    },
-    {
       label: "Chờ nhân viên ký",
       value: "USER_SIGNED",
     },
@@ -73,11 +69,18 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     { label: "Phỏng vấn", value: "TO_INTERVIEW" }, //2
     { label: "Rớt PV", value: "INTERVIEW_FAILED" }, //2
     { label: "Đã hẹn PV", value: "INTERVIEW_SCHEDULED" }, //2
+    { label: "Đã đầu PV Vòng 1", value: "TO_INTERVIEW_R1" }, //2
+    { label: "Đã đầu PV Vòng 2", value: "TO_INTERVIEW_R2" }, //2
+    { label: "Đã đầu PV Vòng 3", value: "TO_INTERVIEW_R3" }, //2
+    { label: "Đã đầu PV Vòng 4", value: "TO_INTERVIEW_R4" }, //2
+    { label: "Đã đầu PV Vòng 5", value: "TO_INTERVIEW_R5" }, //2
     { label: "Hẹn lại", value: "INTERVIEW_RESCHEDULED" }, //2
     { label: "Nhận việc", value: "JOB_OFFERED" }, //3
     { label: "Đã hẹn NV", value: "JOB_SCHEDULED" }, //3
     { label: "Làm Hợp đồng", value: "CONTRACT_SIGNING" }, //4
     { label: "Từ chối PV", value: "INTERVIEW_REJECTED" }, //5
+    { label: "Không đến PV", value: "NOT_COMING_INTERVIEW" }, //5
+    { label: "Không đến NV", value: "NOT_COMING_OFFER" }, //5
     { label: "Từ chối NV", value: "OFFER_REJECTED" }, //5
     { label: "Chưa phù hợp", value: "NOT_SUITABLE" }, //6
     { label: "Hoàn thành", value: "HOAN_THANH" }, //7

@@ -61,15 +61,17 @@ class QuanLyHopDongServicesBase extends AxiosService {
     });
   };
 
-  saveContractSignatures = async (
-    contractId: string,
-    data: {
-      directorSignature?: string;
-      userSignature?: string;
-      otpCode?: string;
-    }
-  ): Promise<any> => {
-    return this.put(`${this.basePath}/${contractId}/signatures`, data);
+  getOpt = async (data: {
+    userContractId: string;
+    gmail?: string;
+  }): Promise<any> => {
+    return this.post(`${this.basePath}/gui-otp`, data);
+  };
+
+  saveContractSignatures = async (formData: FormData): Promise<any> => {
+    return this.post(`${this.basePath}/xac-nhan-otp`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   };
 }
 

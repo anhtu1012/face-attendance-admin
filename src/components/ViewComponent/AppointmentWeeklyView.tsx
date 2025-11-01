@@ -10,38 +10,24 @@ import { Badge, Tag, Tooltip, Button, Popover, Input } from "antd";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { useRouter } from "next/navigation";
 import "./AppointmentWeeklyView.scss";
+import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
 
 dayjs.extend(isoWeek);
 
-interface AppointmentItem {
-  id: string;
-  candidateName: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  status: string;
-  jobTitle?: string;
-  department?: string;
-  interviewType?: "online" | "offline";
-  location?: string;
-  meetingLink?: string;
-  interviewer?: string;
-  guidePersonName?: string;
-  notes?: string;
-}
-
 interface AppointmentWeeklyViewProps {
-  data: AppointmentItem[];
+  data: AppointmentListWithInterview[];
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };
   type: "interview" | "jobOffer";
-  onItemClick?: (item: AppointmentItem) => void;
+  onItemClick?: (item: AppointmentListWithInterview) => void;
   statusOptions?: Array<{ label: string; value: string }>;
   filterDropdown?: React.ReactNode;
   IsHumanPV?: boolean;
-  onAccept?: (item: AppointmentItem) => void;
-  onReject?: (item: AppointmentItem, reason: string) => void;
+  onAccept?: (item: AppointmentListWithInterview) => void;
+  onReject?: (item: AppointmentListWithInterview, reason: string) => void;
 }
 
 const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
@@ -57,6 +43,7 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
 }) => {
   const { start, end } = dateRange;
   const router = useRouter();
+  const { userProfile } = useSelector(selectAuthLogin);
 
   // Generate array of days in the week
   const days = useMemo(() => {
@@ -73,10 +60,12 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
 
   // Group appointments by time slot
   const timeSlots = useMemo(() => {
-    const slots: Record<string, AppointmentItem[]> = {};
+    const slots: Record<string, AppointmentListWithInterview[]> = {};
 
     data.forEach((item) => {
-      const timeKey = `${item.startTime}-${item.endTime}`;
+      const timeKey = `${dayjs(item.startTime).format("HH:mm")}-${dayjs(
+        item.endTime
+      ).format("HH:mm")}`;
       if (!slots[timeKey]) {
         slots[timeKey] = [];
       }
@@ -117,11 +106,14 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
   const getAppointmentsForTimeSlot = (
     timeKey: string,
     date: dayjs.Dayjs
-  ): AppointmentItem[] => {
+  ): AppointmentListWithInterview[] => {
     return data.filter(
       (item) =>
-        `${item.startTime}-${item.endTime}` === timeKey &&
-        dayjs(item.date).format("YYYY-MM-DD") === date.format("YYYY-MM-DD")
+        `${dayjs(item.startTime).format("HH:mm")}-${dayjs(item.endTime).format(
+          "HH:mm"
+        )}` === timeKey &&
+        dayjs(item.interviewDate).format("YYYY-MM-DD") ===
+          date.format("YYYY-MM-DD")
     );
   };
 
@@ -134,7 +126,7 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
     return counts;
   }, [data]);
 
-  const getDetailPath = (item: AppointmentItem) => {
+  const getDetailPath = (item: AppointmentListWithInterview) => {
     // If IsHumanPV flag is set, use the human PV management route segment
     const baseSegment = IsHumanPV ? "quan-ly-phong-van" : "phong-van-nhan-viec";
     if (type === "interview") {
@@ -246,26 +238,46 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                 <div>
                                   <strong>{appointment.candidateName}</strong>
                                 </div>
-                                {appointment.jobTitle && (
-                                  <div>Vị trí: {appointment.jobTitle}</div>
-                                )}
-                                {appointment.department && (
-                                  <div>Phòng ban: {appointment.department}</div>
-                                )}
-                                {appointment.interviewer && (
+                                {appointment.jobInfor?.jobTitle && (
                                   <div>
-                                    Người phỏng vấn: {appointment.interviewer}
+                                    Vị trí: {appointment.jobInfor?.jobTitle}
                                   </div>
                                 )}
-                                {appointment.guidePersonName && (
+                                {/* {appointment. && (
+                                  <div>Phòng ban: {appointment.department}</div>
+                                )} */}
+                                {appointment.listInterviewers && (
+                                  <div>
+                                    <div>Người phỏng vấn:</div>
+                                    {Array.isArray(
+                                      appointment.listInterviewers
+                                    ) ? (
+                                      appointment.listInterviewers.length ? (
+                                        appointment.listInterviewers.map(
+                                          (iv, i) => (
+                                            <div key={i}>
+                                              {iv.interviewerName}
+                                            </div>
+                                          )
+                                        )
+                                      ) : (
+                                        <div>Chưa phân công</div>
+                                      )
+                                    ) : (
+                                      <div>{appointment.listInterviewers}</div>
+                                    )}
+                                  </div>
+                                )}
+                                {/* {appointment.guidePersonName && (
                                   <div>
                                     Người hướng dẫn:{" "}
                                     {appointment.guidePersonName}
                                   </div>
-                                )}
+                                )} */}
                                 <div>
-                                  Thời gian: {appointment.startTime} -{" "}
-                                  {appointment.endTime}
+                                  Thời gian:{" "}
+                                  {dayjs(appointment.startTime).format("HH:mm")}{" "}
+                                  - {dayjs(appointment.endTime).format("HH:mm")}
                                 </div>
                                 {appointment.notes && (
                                   <div>Ghi chú: {appointment.notes}</div>
@@ -284,28 +296,31 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                               {/* Card Header - Candidate Name & Status */}
                               <div className="appointment-header">
                                 <div className="candidate-name-header">
-                                  <UserOutlined />
-                                  <strong> {appointment.jobTitle}</strong>
+                                  <strong>
+                                    {" "}
+                                    {appointment.jobInfor?.jobTitle}
+                                  </strong>
                                 </div>
                               </div>
 
                               {/* Location/Meeting Info */}
                               {type === "interview" &&
-                                appointment.interviewType && (
+                                appointment.typeAppointment && (
                                   <div className="appointment-location">
-                                    {appointment.interviewType === "online" ? (
+                                    {appointment.typeAppointment ===
+                                    "Online" ? (
                                       <>
                                         <VideoCameraOutlined />
                                         <span>
                                           {appointment.meetingLink
-                                            ? "online Meeting"
+                                            ? "Phỏng vấn trực tuyến"
                                             : "Phỏng vấn trực tuyến"}
                                         </span>
                                       </>
                                     ) : (
                                       <>
                                         <EnvironmentOutlined />
-                                        <span>{"offline"}</span>
+                                        <span>{"Phỏng vấn tại công ty"}</span>
                                       </>
                                     )}
                                   </div>
@@ -314,20 +329,46 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                               {/* Handler Info */}
                               <div className="appointment-person">
                                 <UserOutlined />
-                                <span className="person-label">
-                                  {type === "interview" ? "PV:" : "HD:"}
-                                </span>
+                                {/* <span className="person-label">TT:</span> */}
                                 <span className="person-name">
-                                  {type === "interview"
-                                    ? appointment.interviewer ||
-                                      "Chưa phân công"
-                                    : appointment.guidePersonName ||
-                                      "Chưa phân công"}
+                                  {appointment.listInterviewers &&
+                                  appointment.listInterviewers.length > 0 ? (
+                                    appointment.listInterviewers.some(
+                                      (iv) => iv.status === "REJECTED"
+                                    ) ? (
+                                      <>Cập nhật PV mới</>
+                                    ) : appointment.listInterviewers.filter(
+                                        (iv) => iv.status === "ACCEPTED"
+                                      ).length > 0 ? (
+                                      <>
+                                        Đã xác nhận{" "}
+                                        {
+                                          appointment.listInterviewers.filter(
+                                            (iv) => iv.status === "ACCEPTED"
+                                          ).length
+                                        }
+                                        /{appointment.interviewerCount}
+                                      </>
+                                    ) : (
+                                      <>
+                                        Đã xác nhận 0/
+                                        {appointment.interviewerCount}
+                                      </>
+                                    )
+                                  ) : (
+                                    "Chưa phân công"
+                                  )}
                                 </span>
                               </div>
 
                               {IsHumanPV &&
-                                appointment.status === "PENDING" && (
+                                appointment.status === "PENDING" &&
+                                appointment.listInterviewers &&
+                                appointment.listInterviewers.some(
+                                  (iv) =>
+                                    iv.interviewerId === userProfile?.id &&
+                                    iv.status === "PENDING"
+                                ) && (
                                   <div
                                     className="appointment-actions"
                                     onClick={(e) => e.stopPropagation()}
@@ -367,8 +408,16 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                                 }
                                               }}
                                             />
-                                            <div className="reject-actions">
-                                              <Button size="small">Hủy</Button>
+                                            <div
+                                              className="reject-actions"
+                                              style={{ marginTop: "5px" }}
+                                            >
+                                              <Button
+                                                size="small"
+                                                style={{ marginRight: "5px" }}
+                                              >
+                                                Hủy
+                                              </Button>
                                               <Button
                                                 size="small"
                                                 danger

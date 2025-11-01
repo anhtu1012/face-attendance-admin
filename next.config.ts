@@ -59,8 +59,13 @@ const nextConfig = {
         pathname: "/**",
       },
       {
+        protocol: "http" as const,
+        hostname: "minio-api.faceattendance.dev",
+        pathname: "/**",
+      },
+      {
         protocol: "https" as const,
-        hostname: "thegioibut.com",
+        hostname: "minio-api.faceattendance.dev",
         pathname: "/**",
       },
     ],

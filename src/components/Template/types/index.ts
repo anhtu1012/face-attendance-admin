@@ -17,6 +17,7 @@ export interface PartyB {
 }
 
 export interface ContractData {
+  userContractId?: string;
   title?: string;
   city?: string;
   effectiveDate?: string;
