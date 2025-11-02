@@ -4,6 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import SignaturePad from "signature_pad";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 // Import components
 import { PdfPreview } from "@/components/Template/components/PdfPreview";
@@ -59,6 +61,9 @@ const ContractSignaturePage: React.FC = () => {
 
   // Print ref
   const printableRef = useRef<HTMLDivElement>(null);
+
+  // PDF file state
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   // --- FETCH CONTRACT DATA ---
   useEffect(() => {
@@ -220,10 +225,99 @@ const ContractSignaturePage: React.FC = () => {
         }
       }
     `,
-    onAfterPrint: () => {
+    onAfterPrint: async () => {
       console.log("Document printed successfully");
+      // Generate PDF file after printing
+      await generatePdfFile();
     },
   });
+
+  // Generate PDF file from the printable content and return it
+  const generatePdfFileAndReturn = async (): Promise<File | null> => {
+    try {
+      if (!printableRef.current) {
+        console.error("Printable ref is not available");
+        return null;
+      }
+
+      // Capture the HTML element as canvas
+      const canvas = await html2canvas(printableRef.current, {
+        useCORS: true,
+        logging: false,
+        width: printableRef.current.scrollWidth,
+        height: printableRef.current.scrollHeight,
+      });
+
+      // Calculate PDF dimensions (A4 size)
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      // Create PDF
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(
+        canvas.toDataURL("image/png"),
+        "PNG",
+        0,
+        position,
+        imgWidth,
+        imgHeight
+      );
+      heightLeft -= pageHeight;
+
+      // Add additional pages if content exceeds one page
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(
+          canvas.toDataURL("image/png"),
+          "PNG",
+          0,
+          position,
+          imgWidth,
+          imgHeight
+        );
+        heightLeft -= pageHeight;
+      }
+
+      // Convert PDF to Blob then to File
+      const pdfBlob = pdf.output("blob");
+      const fileName = `HopDong-${
+        contractDetail?.contractNumber || idContract
+      }-signed-${Date.now()}.pdf`;
+      const file = new File([pdfBlob], fileName, {
+        type: "application/pdf",
+      });
+
+      // Save to state
+      setPdfFile(file);
+      console.log("PDF file created:", fileName);
+      return file;
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      return null;
+    }
+  };
+
+  // Generate PDF file from the printable content (for print button)
+  const generatePdfFile = async () => {
+    try {
+      messageApi.info("Đang tạo file PDF...");
+      const file = await generatePdfFileAndReturn();
+      if (file) {
+        messageApi.success("Tạo file PDF thành công!");
+      } else {
+        messageApi.error("Không thể tạo file PDF. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      messageApi.error("Không thể tạo file PDF. Vui lòng thử lại.");
+    }
+  };
 
   // --- OTP HANDLERS ---
   const handleVerifySignature = async () => {
@@ -254,6 +348,7 @@ const ContractSignaturePage: React.FC = () => {
     setIsVerifying(true);
 
     try {
+      // Step 1: Save signatures
       const formData = new FormData();
       formData.append("userContractId", contractData?.userContractId || "");
       formData.append("otpCode", otpValue);
@@ -273,6 +368,41 @@ const ContractSignaturePage: React.FC = () => {
       formData.append("signatureType", "DIRECTOR");
       await QuanLyHopDongServices.saveContractSignatures(formData);
       messageApi.success("Xác thực OTP và lưu chữ ký thành công.");
+
+      // Step 2: Generate and upload PDF file
+      try {
+        messageApi.info("Đang tạo và upload file PDF...");
+
+        // Generate PDF if not already created
+        let pdfFileToUpload = pdfFile;
+        if (!pdfFileToUpload) {
+          pdfFileToUpload = await generatePdfFileAndReturn();
+        }
+
+        if (pdfFileToUpload) {
+          const uploadFormData = new FormData();
+          uploadFormData.append(
+            "fileContract",
+            pdfFileToUpload,
+            pdfFileToUpload.name
+          );
+          uploadFormData.append(
+            "userContractId",
+            contractData?.userContractId || ""
+          );
+
+          await QuanLyHopDongServices.uploadContractMultipart(uploadFormData);
+          messageApi.success("Upload file PDF thành công!");
+        } else {
+          messageApi.warning("Không thể tạo file PDF. Vui lòng thử lại.");
+        }
+      } catch (uploadErr) {
+        console.error("PDF generation/upload error:", uploadErr);
+        messageApi.warning(
+          "Lưu chữ ký thành công nhưng không thể upload PDF. Vui lòng upload thủ công sau."
+        );
+      }
+
       setShowOTPModal(false);
       setOtpValue("");
       setTimeout(() => {

@@ -43,6 +43,10 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
   ]);
   const [selectStatusContract] = useState<SelectOption[]>([
     {
+      label: "Chờ tải hợp đồng",
+      value: "PENDING",
+    },
+    {
       label: "Chờ nhân viên ký",
       value: "USER_SIGNED",
     },

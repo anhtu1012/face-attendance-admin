@@ -43,12 +43,14 @@ function ContractFormView({
   onMarkdownChange,
   onExportPdf,
   onContractTypeChange,
+  mode = "create",
 }: {
   selectedUser?: UserCreateContractItem | null;
   contractDetailData?: ContractWithUser | null;
   onMarkdownChange?: (markdown: string) => void;
   onExportPdf?: () => void;
   onContractTypeChange?: (contractTypeName: string) => void;
+  mode?: "create" | "appendix";
 }) {
   const messageApi = useAntdMessage();
   const [form] = Form.useForm<FormValues>();
@@ -122,6 +124,8 @@ function ContractFormView({
     setLoading(true);
     try {
       console.log("Form values:", values);
+
+      // Process dates
       if (values.startDate) {
         values.startDate = dayjs(values.startDate).toISOString();
       }
@@ -129,6 +133,8 @@ function ContractFormView({
       if (values.endDate) {
         values.endDate = dayjs(values.endDate).toISOString();
       }
+
+      // Process salary
       if (
         values.grossSalary !== undefined &&
         values.grossSalary !== null &&
@@ -139,8 +145,26 @@ function ContractFormView({
         values.grossSalary = amountVND.toLocaleString("vi-VN");
       }
 
-      await QuanLyHopDongServices.createQuanLyHopDong(values);
-      messageApi.success("Hợp đồng đã được tạo thành công!");
+      // Handle based on mode
+      if (mode === "appendix") {
+        // Creating an appendix for existing contract
+        if (!contractDetailData?.contract?.id) {
+          messageApi.error("Không tìm thấy hợp đồng gốc!");
+          return;
+        }
+
+        const appendixData = {
+          ...values,
+          userContractId: contractDetailData.contract.id,
+        };
+
+        await QuanLyHopDongServices.createPhucLucHopDong(appendixData);
+        messageApi.success("Phụ lục hợp đồng đã được tạo thành công!");
+      } else {
+        // Creating a new contract
+        await QuanLyHopDongServices.createQuanLyHopDong(values);
+        messageApi.success("Hợp đồng đã được tạo thành công!");
+      }
 
       // Clear/reset all fields and editor after successful creation
       form.resetFields();
@@ -153,6 +177,11 @@ function ContractFormView({
       onMarkdownChange?.("");
     } catch (error) {
       console.error("Error saving contract:", error);
+      messageApi.error(
+        mode === "appendix"
+          ? "Lỗi khi tạo phụ lục hợp đồng!"
+          : "Lỗi khi tạo hợp đồng!"
+      );
     } finally {
       setLoading(false);
     }
@@ -288,8 +317,20 @@ function ContractFormView({
         <div className="form-header">
           <div className="header-content">
             <Title level={2} className="form-title">
-              <FileTextOutlined /> Tạo hợp đồng mới
+              <FileTextOutlined />{" "}
+              {mode === "appendix"
+                ? "Tạo phụ lục hợp đồng"
+                : "Tạo hợp đồng mới"}
             </Title>
+            {mode === "appendix" && contractDetailData && (
+              <Text
+                type="secondary"
+                style={{ marginTop: "8px", display: "block" }}
+              >
+                Hợp đồng gốc: {contractDetailData.contract.contractNumber} -{" "}
+                {contractDetailData.contract.contractTypeName}
+              </Text>
+            )}
             <div className="progress-section">
               <Text className="progress-label">Tiến độ hoàn thành</Text>
               <Progress
@@ -671,7 +712,7 @@ function ContractFormView({
                 loading={loading}
                 icon={<CheckCircleOutlined />}
               >
-                Lưu hợp đồng
+                {mode === "appendix" ? "Lưu phụ lục" : "Lưu hợp đồng"}
               </Button>
             </div>
           </div>

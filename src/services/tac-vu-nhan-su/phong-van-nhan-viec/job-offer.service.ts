@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
-import {
-  CreateJobOfferRequest,
-  UpdateJobOfferRequest,
-} from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
+import { CreateJobOfferRequest } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
 
 class JobOfferServicesBase extends AxiosService {
   protected readonly basePath = "/v1/job-offer";
@@ -33,9 +30,9 @@ class JobOfferServicesBase extends AxiosService {
     return this.post(`${this.basePath}`, payload);
   }
 
-  async updateJobOffer(payload: UpdateJobOfferRequest): Promise<any> {
-    return this.put(`${this.basePath}/${payload.id}`, payload);
-  }
+  // async updateJobOffer(payload: UpdateJobOfferRequest): Promise<any> {
+  //   return this.put(`${this.basePath}/${payload.id}`, payload);
+  // }
 
   async deleteJobOffer(id: string): Promise<any> {
     return this.delete(`${this.basePath}/${id}`);

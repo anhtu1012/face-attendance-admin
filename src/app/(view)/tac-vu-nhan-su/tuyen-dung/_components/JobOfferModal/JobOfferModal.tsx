@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { JobOfferItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
-import { Button, Card, DatePicker, Form, Input, Modal } from "antd";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import JobOfferServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.service";
+import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
+import { generateUsernameFromFullName } from "@/utils/client/generateUsernameFromFullName";
+import { Button, Card, DatePicker, Form, Input, Modal, Select } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -15,12 +20,8 @@ import {
   FaTh,
   FaUser,
 } from "react-icons/fa";
-import "./JobOfferModal.scss";
-import { generateUsernameFromFullName } from "@/utils/client/generateUsernameFromFullName";
-import InfoInterviewLeader from "../../../_components/InfoInterviewLeader/InfoInterviewLeader";
-import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
 import { useSelector } from "react-redux";
-import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import "./JobOfferModal.scss";
 
 const { TextArea } = Input;
 
@@ -58,7 +59,10 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [showCandidateList, setShowCandidateList] = useState(true);
   const [displayMode, setDisplayMode] = useState<"list" | "chips">("chips");
-  const [selectedInterviewers, setSelectedInterviewers] = useState<any[]>([]);
+  const [scheduleTemplate, setScheduleTemplate] = useState<JobOfferItem[]>([]);
+  const [templateOptions, setTemplateOptions] = useState<any[]>([]);
+  const [isTemplateSelected, setIsTemplateSelected] = useState(false);
+
   const { userProfile } = useSelector(selectAuthLogin);
   const messageApi = useAntdMessage();
 
@@ -79,8 +83,57 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
       } else {
         form.setFieldsValue({ userName: "" });
       }
+      // reset any template selection state when opening modal
+      setIsTemplateSelected(false);
     }
   }, [open, candidateData, form, candidates]);
+
+  useEffect(() => {
+    const loadTemplates = async () => {
+      if (!open) return;
+      try {
+        const res = await JobOfferServices.getJobOffers([], undefined, {
+          jobId,
+        });
+        const data = res?.data || [];
+        setScheduleTemplate(data);
+        const opts = data.map((t: any) => ({
+          value: t.id,
+          label: `${t.date ? dayjs(t.date).format("DD/MM/YYYY HH:mm") : ""}`,
+        }));
+        setTemplateOptions(opts);
+      } catch (err) {
+        console.error("Failed to load job-offer templates:", err);
+      }
+    };
+
+    loadTemplates();
+  }, [open, jobId]);
+
+  const handleTemplateSelect = (templateId: string | undefined) => {
+    if (!templateId) {
+      setIsTemplateSelected(false);
+      form.setFieldsValue({
+        date: undefined,
+        note: undefined,
+      });
+      return;
+    }
+
+    const tpl = scheduleTemplate.find((m) => m.id === templateId);
+    if (!tpl) return;
+
+    setIsTemplateSelected(true);
+
+    const dateVal = tpl.date ? dayjs(tpl.date) : undefined;
+
+    form.setFieldsValue({
+      date: dateVal,
+      userName:
+        tpl.jobInfor?.recruiter?.fullName || tpl.jobInfor?.jobTitle || "",
+      note: tpl.notes || undefined,
+    });
+  };
 
   const handleSubmit = async (values: JobOfferFormData) => {
     if (candidates.length === 0) return;
@@ -94,10 +147,6 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
         jobId: jobId,
         userName: values.userName,
         hrId: userProfile ? String(userProfile.id) : "",
-        managedById:
-          selectedInterviewers.length > 0
-            ? selectedInterviewers[0].value
-            : undefined,
         listParticipantId: candidates.map((c) => c.id),
       });
       messageApi.success("Tạo lịch hẹn nhận việc thành công!");
@@ -152,7 +201,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
           {loading ? "Đang tạo lịch..." : "Tạo lịch hẹn nhận việc"}
         </Button>,
       ]}
-      width={1200}
+      width={900}
       className="job-offer-modal"
     >
       <div className="modal-content">
@@ -249,6 +298,16 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
                 Thông tin thời gian và địa điểm
               </div>
 
+              <Form.Item label="Các mẫu nhận việc" name="scheduleTemplate">
+                <Select
+                  placeholder="Chọn mẫu để tự động điền"
+                  size="large"
+                  onChange={handleTemplateSelect}
+                  options={templateOptions}
+                  allowClear
+                />
+              </Form.Item>
+
               <div className="form-row">
                 <div className="form-col-6">
                   <Form.Item
@@ -267,30 +326,8 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
                       style={{ width: "100%" }}
                       format="DD/MM/YYYY HH:mm"
                       disabledDate={disabledDate}
+                      disabled={isTemplateSelected}
                       size="large"
-                    />
-                  </Form.Item>
-                </div>
-                <div className="form-col-6">
-                  <Form.Item
-                    name="userName"
-                    label="Tên đăng nhập"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng nhận tên!",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Nhập tên đăng nhập"
-                      size="large"
-                      suffix={
-                        <>
-                          {" "}
-                          <FaUser />
-                        </>
-                      }
                     />
                   </Form.Item>
                 </div>
@@ -303,21 +340,6 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
                 />
               </Form.Item>
             </Form>
-          </div>
-          <div className="map-section">
-            <div className="map-header">
-              <FaUser />
-              Chọn người quản lý
-            </div>
-            <div>
-              <InfoInterviewLeader
-                jobId={jobId}
-                onSelectedChange={(selectInterviwer) => {
-                  setSelectedInterviewers(selectInterviwer);
-                }}
-                maxSelectable={1}
-              />
-            </div>
           </div>
         </div>
       </div>

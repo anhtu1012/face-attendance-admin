@@ -115,6 +115,7 @@ export const CreateContractFormSchema = z.object({
 // Lightweight Create Contract Request schema (matches frontend create payload)
 export const CreateContractRequestSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
+  userContractId: z.string().min(1, "User contract ID is required").optional(),
   contractTypeId: z.string().min(1, "Contract type ID is required"),
   positionId: z.string().min(1, "Position ID is required"),
   grossSalary: z.string().min(1, "Gross salary is required"),

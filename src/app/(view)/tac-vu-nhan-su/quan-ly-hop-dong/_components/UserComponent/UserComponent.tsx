@@ -86,11 +86,6 @@ function UserComponent({
         headerName: "Số điện thoại",
         editable: false,
       },
-      {
-        field: "fullNameManager",
-        headerName: "Người quản lý",
-        editable: false,
-      },
     ],
     [t]
   );

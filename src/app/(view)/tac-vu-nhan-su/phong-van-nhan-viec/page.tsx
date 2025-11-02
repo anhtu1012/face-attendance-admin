@@ -13,7 +13,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import FilterDropdown from "../_components/FilterDropdown/FilterDropdown";
 import "../_components/FilterDropdown/FilterDropdown.scss";
 import { FilterValues } from "./_types/filter.types";
-import { mockJobOfferData } from "./_utils/mockData";
 import "./index.scss";
 import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
 import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
@@ -95,7 +94,7 @@ function Page() {
       if (USE_MOCK_DATA) {
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 500));
-        setJobOfferData(mockJobOfferData);
+        setJobOfferData([]);
       } else {
         const response = await JobOfferServices.getJobOffers();
         setJobOfferData(response.data || []);

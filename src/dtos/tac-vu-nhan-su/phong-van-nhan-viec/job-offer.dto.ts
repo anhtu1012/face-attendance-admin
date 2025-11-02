@@ -1,42 +1,67 @@
 import { z } from "zod";
 
-// Job Offer Schema
-export const JobOfferItemSchema = z.object({
-  id: z.string().optional(),
-  candidateId: z.string(),
-  candidateName: z.string(),
-  candidateEmail: z.string().email(),
-  candidatePhone: z.string(),
-  // Job reference - link to Tuyển dụng module
-  jobId: z.string().optional(), // Reference to JobItem.id from tuyen-dung
-  // Job information (can be cached or fetched from jobId)
-  jobTitle: z.string().optional(), // Vị trí tuyển dụng
-  department: z.string().optional(), // Phòng ban
-  jobLevel: z.string().optional(), // Cấp bậc
-  // Offer details
-  offerDate: z.string(), // ISO date string
-  startTime: z.string(),
-  endTime: z.string(),
-  address: z.string(),
-  username: z.string(),
-  password: z.string().optional(),
-  appDownloadLink: z.string().optional(),
-  guidePersonName: z.string(),
-  guidePersonPhone: z.string(),
-  guidePersonEmail: z.string().email(),
-  status: z.enum([
-    "PENDING", // Chờ xác nhận
-    "ACCEPTED", // Chấp nhận
-    "REJECTED", // Từ chối
-    "COMPLETED", // Hoàn thành
-    "CANCELLED", // Hủy bỏ
-  ]),
-  notes: z.string().optional(),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
+export const RecruiterSchema = z.object({
+  fullName: z.string().optional(),
+  recruiterPositionName: z.string().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
 });
 
-export type JobOfferItem = z.infer<typeof JobOfferItemSchema>;
+export const inFoHrSchema = z.object({
+  fullName: z.string().optional(),
+  inFoHrPositionName: z.string().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+});
+
+export const StatisticsSchema = z.object({
+  applicants: z.string().optional(),
+  shortlisted: z.string().optional(),
+  properRatio: z.string().optional(),
+});
+
+export const JobInfoSchema = z.object({
+  jobId: z.string(),
+  jobTitle: z.string(),
+  jobDescription: z.string().optional(),
+  jobOverview: z.string().optional(),
+  jobResponsibility: z.string().optional(),
+  jobCode: z.string().optional(),
+  positionName: z.string().optional(),
+  jobBenefit: z.string().optional(),
+  address: z.string().optional(),
+  requireExperience: z.string().optional(),
+  listSkills: z.array(z.string()).optional(),
+  expirationDate: z.string().optional(),
+  round: z.union([z.string(), z.number()]).optional(),
+  isActive: z.boolean().optional(),
+  trialPeriod: z.string().optional(),
+  fromSalary: z.string().optional(),
+  toSalary: z.string().optional(),
+  status: z.string().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  recruiter: RecruiterSchema.optional(),
+  statistics: StatisticsSchema.optional(),
+});
+
+export const JobOfferSchema = z.object({
+  id: z.string(),
+  jobOfferId: z.string(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  date: z.string(),
+  address: z.string().optional(),
+  status: z.enum(["PENDING", "ACCEPTED", "COMPLETED", "CANCELLED"]),
+  notes: z.string().nullable().optional(),
+  jobInfor: JobInfoSchema.optional(),
+  inFoHr: inFoHrSchema,
+});
+
+export type Recruiter = z.infer<typeof RecruiterSchema>;
+export type Statistics = z.infer<typeof StatisticsSchema>;
+export type JobInfo = z.infer<typeof JobInfoSchema>;
+export type JobOfferItem = z.infer<typeof JobOfferSchema>;
 
 // For request
 export interface CreateJobOfferRequest {
@@ -45,22 +70,5 @@ export interface CreateJobOfferRequest {
   hrId?: string;
   jobId?: string;
   userName?: string;
-  managedById?: string;
   listParticipantId: string[];
-}
-
-export interface UpdateJobOfferRequest {
-  id: string;
-  offerDate?: string;
-  startTime?: string;
-  endTime?: string;
-  address?: string;
-  username?: string;
-  password?: string;
-  appDownloadLink?: string;
-  guidePersonName?: string;
-  guidePersonPhone?: string;
-  guidePersonEmail?: string;
-  status?: "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED" | "CANCELLED";
-  notes?: string;
 }

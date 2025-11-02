@@ -44,6 +44,10 @@ class QuanLyHopDongServicesBase extends AxiosService {
     return this.post(`${this.basePath}/tao-hop-dong`, data);
   };
 
+  createPhucLucHopDong = async (data: CreateContractRequest): Promise<any> => {
+    return this.post(`${this.basePath}/user-contract-extended`, data);
+  };
+
   updateQuanLyHopDong = async (data: UpdateCaLamRequest[]): Promise<any> => {
     const payload = {
       payload: data,

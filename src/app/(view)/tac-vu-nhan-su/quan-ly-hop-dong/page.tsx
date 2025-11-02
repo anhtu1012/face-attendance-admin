@@ -32,6 +32,7 @@ function Page() {
   const [markdown, setMarkdown] = useState<string>("");
   const [contractTitle, setContractTitle] =
     useState<string>("Hợp đồng lao động");
+  const [formMode, setFormMode] = useState<"create" | "appendix">("create");
   const scales = [0.2, 0.5, 0.75, 1];
   const [scaleIndex, setScaleIndex] = useState<number>(3);
   const { companyInformation } = useSelector(selectAuthLogin);
@@ -110,8 +111,8 @@ function Page() {
   }, [selected]);
 
   const handleAddAppendix = (contractData: ContractWithUser) => {
-    // Chuyển sang chế độ tạo hợp đồng với dữ liệu từ contract detail
     setContractDetailData(contractData);
+    setFormMode("appendix");
     setSelected("Tạo hợp đồng");
   };
 
@@ -150,6 +151,8 @@ function Page() {
                       }}
                       title="Tạo hợp đồng"
                       onClick={() => {
+                        setFormMode("create");
+                        setContractDetailData(null);
                         setModalOpen(true);
                       }}
                     />
@@ -190,6 +193,7 @@ function Page() {
                   onMarkdownChange={setMarkdown}
                   onExportPdf={handleExportPdf}
                   onContractTypeChange={setContractTitle}
+                  mode={formMode}
                 />
               </Col>
             )}
