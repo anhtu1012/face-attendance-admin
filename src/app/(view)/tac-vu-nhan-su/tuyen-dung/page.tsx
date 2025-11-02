@@ -580,19 +580,35 @@ function Page() {
       setLoading(false);
     }
   };
-  const hanldeViewSuccess = () => {
-    setQuantityStatus((prev) => {
-      if (!prev) return prev;
-      const prevToInterview = Number(prev.toInterviewQuantity || 0);
-      return {
+  const hanldeViewSuccess = (type: "interview" | "jobOffer" = "interview") => {
+    // Update counts depending on the success type
+    if (type === "interview") {
+      setQuantityStatus((prev) => {
+        if (!prev) return prev;
+        const prevToInterview = Number(prev.toInterviewQuantity || 0);
+        return {
+          ...prev,
+          toInterviewQuantity: Math.max(prevToInterview - 1, 0),
+        } as Record<string, number>;
+      });
+      setNewCounts((prev) => ({
         ...prev,
-        toInterviewQuantity: Math.max(prevToInterview - 1, 0),
-      } as Record<string, number>;
-    });
-    setNewCounts((prev) => ({
-      ...prev,
-      PHONG_VAN: Math.max(Number(prev.PHONG_VAN || 0) - 1, 0),
-    }));
+        PHONG_VAN: Math.max(Number(prev.PHONG_VAN || 0) - 1, 0),
+      }));
+    } else if (type === "jobOffer") {
+      setQuantityStatus((prev) => {
+        if (!prev) return prev;
+        const prevToJobOffered = Number(prev.toJobOfferedQuantity || 0);
+        return {
+          ...prev,
+          toJobOfferedQuantity: Math.max(prevToJobOffered - 1, 0),
+        } as Record<string, number>;
+      });
+      setNewCounts((prev) => ({
+        ...prev,
+        NHAN_VIEC: Math.max(Number(prev.NHAN_VIEC || 0) - 1, 0),
+      }));
+    }
     handleFetchUser(currentPage, pageSize, quickSearchText);
   };
 
@@ -619,6 +635,43 @@ function Page() {
     }
   };
 
+  const handleCheckRowActions = (node: any) => {
+    if (!node?.data || !node.data?.status) return false;
+    const selectableStatusMap: Record<string, string | string[] | undefined> = {
+      LIEN_HE: "TO_CONTACT",
+      PHONG_VAN: ["TO_INTERVIEW", "TO_INTERVIEW_R1"],
+      NHAN_VIEC: "JOB_OFFERED",
+      HOP_DONG: "CONTRACT_SIGNING",
+      HUY_HEN: undefined,
+      CHUA_PHU_HOP: undefined,
+      HOAN_THANH: undefined,
+    };
+
+    let allowed: string[] = [];
+
+    const mapped = selectableStatusMap[selectedStatus];
+    if (mapped) {
+      allowed = Array.isArray(mapped) ? mapped : [mapped];
+    } else if (
+      typeof selectedStatus === "string" &&
+      selectedStatus.length > 0
+    ) {
+      if (selectedStatus.includes("_")) {
+        allowed = [selectedStatus];
+      }
+    }
+    if (allowed.length === 0) return false;
+    const selectedRows: any[] = gridRef.current?.api?.getSelectedRows?.() ?? [];
+    if (selectedRows.length === 0) {
+      return allowed.includes(node.data.status);
+    }
+    const firstSelectedStatus = selectedRows[0]?.status;
+    return (
+      allowed.includes(node.data.status) &&
+      firstSelectedStatus === node.data.status
+    );
+  };
+
   const buttonProps = (_params: any) => {
     // Default view details button that appears in all cases
     const defaultViewButton = (
@@ -636,7 +689,14 @@ function Page() {
 
     // PHONG_VAN - INTERVIEW_SCHEDULED: Show interview details button
     if (
-      _params.data.status === "INTERVIEW_SCHEDULED" &&
+      (_params.data.status === "INTERVIEW_SCHEDULED" ||
+        _params.data.status === "TO_INTERVIEW_R1" ||
+        _params.data.status === "TO_INTERVIEW_R2" ||
+        _params.data.status === "TO_INTERVIEW_R3" ||
+        _params.data.status === "TO_INTERVIEW_R4" ||
+        _params.data.status === "TO_INTERVIEW_R5" ||
+        _params.data.status === "INTERVIEW_FAILED" ||
+        _params.data.status === "INTERVIEW_RESCHEDULED") &&
       selectedStatus === "PHONG_VAN"
     ) {
       return (
@@ -760,16 +820,7 @@ function Page() {
                 mode: "multiRow",
                 enableClickSelection: true,
                 checkboxes: true,
-                isRowSelectable: (node: any) => {
-                  // Only allow selection for rows with TO_INTERVIEW status
-                  return (
-                    node.data?.status === "TO_INTERVIEW" ||
-                    node.data?.status === "JOB_OFFERED" ||
-                    node.data?.status === "NOT_SUITABLE" ||
-                    node.data?.status === "TO_CONTACT" ||
-                    node.data?.status === "CANNOT_CONTACT"
-                  );
-                },
+                isRowSelectable: handleCheckRowActions,
               }}
               showSelectionInfoBar={true}
               selectionActionButtons={getSelectionActionButtons({
@@ -875,13 +926,14 @@ function Page() {
             : undefined
         }
         jobId={jobId}
-        onSuccess={hanldeViewSuccess}
+        onSuccess={() => hanldeViewSuccess("interview")}
       />
 
       {/* Job NHAN_VIEC Modal */}
       <JobOfferModal
         open={jobOfferModalOpen}
         onClose={handleCloseJobOfferModal}
+        jobId={jobId}
         candidateData={
           selectedCandidate && !Array.isArray(selectedCandidate)
             ? {
@@ -892,6 +944,10 @@ function Page() {
               }
             : undefined
         }
+        onSuccess={() => {
+          hanldeViewSuccess("jobOffer");
+          handleCloseJobOfferModal();
+        }}
       />
 
       {/* Leader Report Modal */}

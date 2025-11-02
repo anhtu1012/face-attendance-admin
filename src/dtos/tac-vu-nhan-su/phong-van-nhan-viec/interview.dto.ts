@@ -24,6 +24,7 @@ export const AppointmentItemSchema = z.object({
   interviewDate: z.string(),
   startTime: z.string(),
   endTime: z.string(),
+  date: z.string(),
   interviewType: z.enum(["online", "offline"]),
   meetingLink: z.string().optional(),
   location: z.string().optional(),

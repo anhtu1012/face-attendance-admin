@@ -93,7 +93,7 @@ function Page() {
     try {
       await QuanLyPhongVanServices.updateLichPhongVan({
         appointmentId: value.id,
-        listInterviewerId: userProfile ? [String(userProfile.id)] : [],
+        interviewerId: userProfile ? String(userProfile.id) : "",
         status: "ACCEPTED",
       });
       fetchInterviews();
@@ -109,7 +109,7 @@ function Page() {
     try {
       await QuanLyPhongVanServices.updateLichPhongVan({
         appointmentId: appointment.id,
-        listInterviewerId: userProfile ? [String(userProfile.id)] : [],
+        interviewerId: userProfile ? String(userProfile.id) : "",
         status: "REJECTED",
         reason: reason,
       });

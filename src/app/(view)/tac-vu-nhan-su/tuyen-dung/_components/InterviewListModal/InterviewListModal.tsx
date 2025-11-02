@@ -107,15 +107,6 @@ const InterviewListModal: React.FC<Props> = ({
             </div>
 
             <div className="card-body">
-              {it.address && (
-                <div className="card-info-row">
-                  <span className="info-label">
-                    <FaMapMarkerAlt /> Địa điểm:
-                  </span>
-                  <span className="info-value">{it.address}</span>
-                </div>
-              )}
-
               {it.listInterviewers && it.listInterviewers.length > 0 && (
                 <div className="card-info-row">
                   <span className="info-label">
@@ -146,10 +137,25 @@ const InterviewListModal: React.FC<Props> = ({
                   <Tag
                     color={it.typeAppointment === "Online" ? "blue" : "green"}
                   >
-                    {it.typeAppointment === "Online"
+                    {it.typeAppointment === "online"
                       ? "Trực tuyến"
                       : "Trực tiếp"}
                   </Tag>
+                </div>
+              )}
+              {it.address && (
+                <div className="card-info-row">
+                  <span className="info-label">
+                    <FaMapMarkerAlt />{" "}
+                    {it.typeAppointment === "online"
+                      ? "Link cuộc họp:"
+                      : "Địa điểm:"}
+                  </span>
+                  <span className="info-value">
+                    {it.typeAppointment === "online"
+                      ? it.meetingLink
+                      : it.address}
+                  </span>
                 </div>
               )}
 

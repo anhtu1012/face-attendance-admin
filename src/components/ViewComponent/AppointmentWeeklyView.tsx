@@ -308,7 +308,7 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                 appointment.typeAppointment && (
                                   <div className="appointment-location">
                                     {appointment.typeAppointment ===
-                                    "Online" ? (
+                                    "online" ? (
                                       <>
                                         <VideoCameraOutlined />
                                         <span>
@@ -335,7 +335,7 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                   appointment.listInterviewers.length > 0 ? (
                                     appointment.listInterviewers.some(
                                       (iv) => iv.status === "REJECTED"
-                                    ) ? (
+                                    ) && !IsHumanPV ? (
                                       <>Cập nhật PV mới</>
                                     ) : appointment.listInterviewers.filter(
                                         (iv) => iv.status === "ACCEPTED"
@@ -366,7 +366,8 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                 appointment.listInterviewers &&
                                 appointment.listInterviewers.some(
                                   (iv) =>
-                                    iv.interviewerId === userProfile?.id &&
+                                    iv.interviewerId ===
+                                      String(userProfile?.id) &&
                                     iv.status === "PENDING"
                                 ) && (
                                   <div
@@ -400,6 +401,7 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                                 const value = (
                                                   e.target as HTMLTextAreaElement
                                                 ).value?.trim();
+
                                                 if (value) {
                                                   onReject?.(
                                                     appointment,
@@ -430,7 +432,7 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                                   ) as HTMLElement | null;
                                                   const textarea =
                                                     pop?.querySelector(
-                                                      ".reject-input textarea"
+                                                      ".reject-input"
                                                     ) as HTMLTextAreaElement | null;
                                                   const value =
                                                     textarea?.value?.trim() ||

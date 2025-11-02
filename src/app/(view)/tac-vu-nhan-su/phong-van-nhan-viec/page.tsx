@@ -3,10 +3,8 @@
 
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import AppointmentWeeklyView from "@/components/ViewComponent/AppointmentWeeklyView";
-import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 import { JobOfferItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
 import { showError } from "@/hooks/useNotification";
-import InterviewServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/interview.service";
 import JobOfferServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.service";
 import { Tabs } from "antd";
 import dayjs from "dayjs";
@@ -15,8 +13,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import FilterDropdown from "../_components/FilterDropdown/FilterDropdown";
 import "../_components/FilterDropdown/FilterDropdown.scss";
 import { FilterValues } from "./_types/filter.types";
-import { mockInterviewData, mockJobOfferData } from "./_utils/mockData";
+import { mockJobOfferData } from "./_utils/mockData";
 import "./index.scss";
+import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
+import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
 
 dayjs.extend(isoWeek);
 
@@ -25,7 +25,9 @@ function Page() {
   const USE_MOCK_DATA = true;
 
   // Interview states
-  const [interviewData, setInterviewData] = useState<AppointmentItem[]>([]);
+  const [interviewData, setInterviewData] = useState<
+    AppointmentListWithInterview[]
+  >([]);
   const [loadingInterviews, setLoadingInterviews] = useState(false);
   const [interviewFilters, setInterviewFilters] = useState<FilterValues>({});
 
@@ -64,18 +66,15 @@ function Page() {
     []
   );
 
-  // Fetch interviews
   const fetchInterviews = useCallback(async () => {
     setLoadingInterviews(true);
+
     try {
-      if (USE_MOCK_DATA) {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setInterviewData(mockInterviewData);
-      } else {
-        const response = await InterviewServices.getInterviews();
-        setInterviewData(response.data || []);
-      }
+      const response = await TuyenDungServices.getDanhSachPhongVanWithParam(
+        [],
+        undefined
+      );
+      setInterviewData(response.data || []);
     } catch (error: any) {
       showError(
         error.response?.data?.message || "Lỗi khi tải danh sách phỏng vấn"
@@ -83,7 +82,11 @@ function Page() {
     } finally {
       setLoadingInterviews(false);
     }
-  }, [USE_MOCK_DATA]);
+  }, []);
+
+  useEffect(() => {
+    fetchInterviews();
+  }, [fetchInterviews]);
 
   // Fetch job offers
   const fetchJobOffers = useCallback(async () => {
@@ -152,20 +155,23 @@ function Page() {
       label: "Lịch phỏng vấn",
       children: (
         <div className="interview-tab-content">
-          <AppointmentWeeklyView
-            data={[]}
-            dateRange={dateRange}
-            type="interview"
-            onItemClick={handleInterviewClick}
-            statusOptions={interviewStatusOptions}
-            filterDropdown={
-              <FilterDropdown
-                onFilter={handleInterviewFilter}
-                statusOptions={interviewStatusOptions}
-                loading={loadingInterviews}
-              />
-            }
-          />
+          <>
+            {" "}
+            <AppointmentWeeklyView
+              data={interviewData}
+              dateRange={dateRange}
+              type="interview"
+              onItemClick={handleInterviewClick}
+              statusOptions={interviewStatusOptions}
+              filterDropdown={
+                <FilterDropdown
+                  onFilter={handleInterviewFilter}
+                  statusOptions={interviewStatusOptions}
+                  loading={loadingInterviews}
+                />
+              }
+            />
+          </>
         </div>
       ),
     },

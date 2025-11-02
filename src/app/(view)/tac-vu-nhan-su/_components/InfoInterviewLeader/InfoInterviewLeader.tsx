@@ -20,6 +20,7 @@ interface InfoInterviewLeaderProps {
   onSelectedChange?: (selectedUsers: any[]) => void;
   preSelectedEmails?: string[]; // Array of emails to pre-select
   disabled?: boolean; // Disable the entire component
+  maxSelectable?: number; // Maximum number of rows that can be selected
 }
 
 function InfoInterviewLeader({
@@ -27,6 +28,7 @@ function InfoInterviewLeader({
   onSelectedChange,
   preSelectedEmails = [],
   disabled = false,
+  maxSelectable,
 }: InfoInterviewLeaderProps) {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("InfoInterviewLeader");
@@ -79,23 +81,32 @@ function InfoInterviewLeader({
             nodesToSelect.push(node);
           }
         });
+
+        // If maxSelectable is provided, limit how many nodes we pre-select
+        const limitedNodes =
+          typeof maxSelectable === "number" && maxSelectable >= 0
+            ? nodesToSelect.slice(0, maxSelectable)
+            : nodesToSelect;
+
         // Select the nodes
         gridRef.current.api.setNodesSelected({
-          nodes: nodesToSelect,
+          nodes: limitedNodes,
           newValue: true,
         });
 
-        // Trigger selection change event
-        const selectedData = nodesToSelect.map((node) => node.data);
-        onSelectedChange?.(selectedData);
+        // Trigger selection change event with the selected data
+        const selectedData = limitedNodes.map((node) => node.data);
+        // Call callback asynchronously to avoid flushSync errors
+        Promise.resolve().then(() => onSelectedChange?.(selectedData));
       }, 100);
     }
-  }, [rowData, preSelectedEmails, onSelectedChange]);
+  }, [rowData, preSelectedEmails, onSelectedChange, maxSelectable]);
 
   const handleRowSelectionChanged = useCallback(() => {
     const selectedNodes = gridRef.current?.api?.getSelectedNodes() || [];
     const selectedData = selectedNodes.map((node) => node.data);
-    onSelectedChange?.(selectedData);
+    // Call parent callback asynchronously to avoid flushSync issues
+    Promise.resolve().then(() => onSelectedChange?.(selectedData));
   }, [onSelectedChange]);
 
   return (
@@ -112,6 +123,25 @@ function InfoInterviewLeader({
           mode: "multiRow",
           enableClickSelection: !disabled,
           checkboxes: true,
+          isRowSelectable(node) {
+            try {
+              if (disabled) return false;
+              if (typeof maxSelectable !== "number") return true;
+              const api = gridRef.current?.api;
+              const selectedNodes = api?.getSelectedNodes?.() || [];
+              const isAlreadySelected = selectedNodes.some(
+                (n: any) =>
+                  n.rowIndex === node.rowIndex ||
+                  n.data?.email === node.data?.email
+              );
+              // Allow deselecting already selected rows
+              if (isAlreadySelected) return true;
+              // Allow selecting only if under the limit
+              return selectedNodes.length < maxSelectable;
+            } catch {
+              return true;
+            }
+          },
         }}
         showSTT={false}
         rowData={rowData}

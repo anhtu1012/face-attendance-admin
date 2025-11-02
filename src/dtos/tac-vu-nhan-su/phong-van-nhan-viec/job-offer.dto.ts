@@ -40,18 +40,13 @@ export type JobOfferItem = z.infer<typeof JobOfferItemSchema>;
 
 // For request
 export interface CreateJobOfferRequest {
-  candidateId: string;
-  offerDate: string;
-  startTime: string;
-  endTime: string;
-  address: string;
-  username: string;
-  password?: string;
-  appDownloadLink?: string;
-  guidePersonName: string;
-  guidePersonPhone: string;
-  guidePersonEmail: string;
-  notes?: string;
+  date: string;
+  note?: string;
+  hrId?: string;
+  jobId?: string;
+  userName?: string;
+  managedById?: string;
+  listParticipantId: string[];
 }
 
 export interface UpdateJobOfferRequest {

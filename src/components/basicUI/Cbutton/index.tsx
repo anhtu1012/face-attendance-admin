@@ -1,6 +1,6 @@
 import type { ButtonProps } from "antd";
 import { Button } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import "./Cbutton.scss";
 
 interface CustomButtonProps extends ButtonProps {
@@ -26,8 +26,17 @@ const Cbutton: React.FC<CustomButtonProps> = ({
   className,
   disabled,
 }) => {
+  // Track hover state for origin-based inline styles
+  const [isHover, setIsHover] = useState(false);
+
   // Nếu có origin props, sử dụng style cũ (inline)
   if (origin) {
+    const hoverStyle = isHover
+      ? {
+          background: origin.hoverBgColor || origin.bgcolor || "#5DC9EF",
+          color: origin.hoverColor || origin.color || "white",
+        }
+      : {};
     return (
       <Button
         className={className}
@@ -35,14 +44,17 @@ const Cbutton: React.FC<CustomButtonProps> = ({
         disabled={disabled}
         type={type}
         onClick={onClick}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
         icon={icon}
         style={{
           color: origin.color || "white",
-          backgroundColor: origin.bgcolor || "#5DC9EF",
+          background: origin.bgcolor || "#5DC9EF",
           border: origin.border || "none",
-          borderRadius: "4px",
+          borderRadius: "8px",
           height: "36px",
           fontWeight: "bold",
+          ...hoverStyle,
           ...style,
         }}
       >

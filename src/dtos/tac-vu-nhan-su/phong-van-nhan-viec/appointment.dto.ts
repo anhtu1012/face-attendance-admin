@@ -60,14 +60,14 @@ export const JobInfoSchema = z.object({
 
 export const AppointmentListWithInterviewSchema = z.object({
   id: z.string(),
-  appointmentId: z.string().optional(),
+  appointmentId: z.string(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
   interviewDate: z.string().optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
-  typeAppointment: z.enum(["Online", "Offline"]),
-  interviewType: z.enum(["Online", "Offline"]),
+  typeAppointment: z.enum(["Online", "Offline", "online"]),
+  interviewType: z.enum(["Online", "Offline", "online"]),
   interviewerCount: z.union([z.string(), z.number()]).optional(),
   meetingLink: z.string().nullable().optional(),
   address: z.string().optional(),

@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import AIAnalysisResultModal from "@/components/AIAnalysisResultModal/AIAnalysisResultModal";
+import Cbutton from "@/components/basicUI/Cbutton";
 import { CreateInterviewReportRequest } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.request.dto";
 import { TuyenDungItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.dto";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/quan-ly-phong-van.service";
+import { RoleAdmin } from "@/types/enum";
 import {
   Avatar,
   Badge,
@@ -33,22 +35,16 @@ import {
   FaUser,
   FaUsers,
 } from "react-icons/fa";
+import { IoMdAnalytics } from "react-icons/io";
+import { TfiWrite } from "react-icons/tfi";
 import { useSelector } from "react-redux";
+import ReportListModal from "../ReportListModal/ReportListModal";
+import ReportModal from "../ReportModal/ReportModal";
 import "./CandidateListTab.scss";
-import ReportModal from "./ReportModal";
-
 interface CandidateListTabProps {
   jobId?: string;
   appointmentId?: string;
 }
-
-const statusConfig: Record<string, { text: string; color: string }> = {
-  INTERVIEW_SCHEDULED: { text: "Đang phỏng vấn", color: "orange" },
-  JOB_SCHEDULED: { text: "Đang nhận việc", color: "green" },
-  HIRED: { text: "Đã tuyển", color: "success" },
-  INTERVIEW_REJECTED: { text: "Từ chối PV", color: "red" },
-  OFFER_REJECTED: { text: "Từ chối NV", color: "red" },
-};
 
 export default function CandidateListTab({
   jobId,
@@ -68,6 +64,13 @@ export default function CandidateListTab({
   const [reportCandidate, setReportCandidate] = useState<TuyenDungItem | null>(
     null
   );
+
+  // report list modal state
+  const [reportListOpen, setReportListOpen] = useState(false);
+  const [reportListCandidate, setReportListCandidate] =
+    useState<TuyenDungItem | null>(null);
+  const [reportList, setReportList] = useState<any[]>([]);
+
   const { userProfile } = useSelector(selectAuthLogin);
   const messageApi = useAntdMessage();
 
@@ -87,6 +90,30 @@ export default function CandidateListTab({
       console.error("Error fetching candidates:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReportList = async (
+    candidateId?: string,
+    candidate?: TuyenDungItem
+  ) => {
+    if (!candidateId) return;
+    try {
+      const response = await QuanLyPhongVanServices.getReportDetail(
+        [],
+        undefined,
+        {
+          intervieweeId: candidateId,
+        }
+      );
+      setReportList(
+        Array.isArray(response.data) ? response.data : [response.data]
+      );
+      setReportListCandidate(candidate || null);
+      setReportListOpen(true);
+    } catch (error) {
+      console.error("Error fetching report list:", error);
+      messageApi.error("Không thể tải danh sách báo cáo");
     }
   };
 
@@ -265,23 +292,6 @@ export default function CandidateListTab({
         birthday ? dayjs(birthday).format("DD/MM/YYYY") : "-",
     },
     {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      width: 150,
-      render: (status) => {
-        const config = statusConfig[status] || {
-          text: status,
-          color: "default",
-        };
-        return (
-          <Badge status="processing" color={config.color}>
-            <span className="status-text">{config.text}</span>
-          </Badge>
-        );
-      },
-    },
-    {
       title: "CV",
       key: "cv",
       width: 100,
@@ -316,31 +326,68 @@ export default function CandidateListTab({
     {
       title: "Thao tác",
       key: "actions",
-      width: 150,
+      width: 250,
       fixed: "right",
       align: "center",
       render: (_, record) => (
         <Space>
-          <Button
+          <Cbutton
             type="primary"
             size="small"
+            icon={<IoMdAnalytics />}
+            origin={{
+              border: "1px solid rgb(21, 101, 192)",
+              color: "white",
+              bgcolor:
+                "linear-gradient(135deg, rgb(21, 101, 192), rgb(30, 136, 229))",
+            }}
             onClick={() => {
               setSelectedCandidate(record);
               setModalOpen(true);
             }}
           >
             Chi tiết
-          </Button>
-          <Button
+          </Cbutton>
+
+          {userProfile.roleId === RoleAdmin.DEPARTMENT_MANAGER && (
+            <Cbutton
+              type="default"
+              size="small"
+              icon={<TfiWrite />}
+              origin={{
+                color: "rgb(21, 101, 192)",
+                bgcolor: "white",
+                border: "1px solid rgb(21, 101, 192)",
+                hoverColor: "white",
+                hoverBgColor:
+                  "linear-gradient(135deg, rgb(21, 101, 192), rgb(30, 136, 229))",
+              }}
+              onClick={() => {
+                setReportCandidate(record);
+                setReportOpen(true);
+              }}
+            >
+              Báo cáo
+            </Cbutton>
+          )}
+          <Cbutton
             type="default"
+            origin={{
+              color: "rgb(21, 101, 192)",
+              bgcolor: "white",
+              border: "1px solid rgb(21, 101, 192)",
+              hoverColor: "white",
+              hoverBgColor:
+                "linear-gradient(135deg, rgb(21, 101, 192), rgb(30, 136, 229))",
+            }}
             size="small"
+            icon={<FaEye />}
             onClick={() => {
-              setReportCandidate(record);
-              setReportOpen(true);
+              fetchReportList(record.id, record);
             }}
           >
-            Báo cáo
-          </Button>
+            Xem BC
+          </Cbutton>
         </Space>
       ),
     },
@@ -379,6 +426,8 @@ export default function CandidateListTab({
       messageApi.success("Báo cáo ứng viên thành công");
       // Refresh candidate list after report submission
       fetchCandidates();
+      setReportOpen(false);
+      setReportCandidate(null);
     } catch (error) {
       console.error("Error submitting report:", error);
       messageApi.error("Báo cáo ứng viên thất bại");
@@ -447,6 +496,23 @@ export default function CandidateListTab({
         }}
         candidate={reportCandidate}
         onSubmit={handleSubmitReport}
+      />
+
+      {/* Report List Modal */}
+      <ReportListModal
+        open={reportListOpen}
+        onClose={() => {
+          setReportListOpen(false);
+          setReportListCandidate(null);
+          setReportList([]);
+        }}
+        reports={reportList}
+        candidateName={reportListCandidate?.fullName}
+        onViewDetail={(report) => {
+          // You can open another modal or navigate to detail page
+          console.log("View report detail:", report);
+          messageApi.info("Chi tiết báo cáo: " + report.id);
+        }}
       />
     </div>
   );

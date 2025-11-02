@@ -442,6 +442,15 @@
 
       .map-section {
         flex: 2;
+        .map-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+          color: rgb(21, 101, 192);
+          font-weight: 700;
+          font-size: 1.2rem;
+        }
 
         .form-section-title {
           display: flex;

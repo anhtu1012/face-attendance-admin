@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, Col, Descriptions, Row, Space, Tag } from "antd";
+import { Button, Card, Col, Descriptions, Modal, Row, Space, Tag } from "antd";
 import dayjs from "dayjs";
 import {
   FaBriefcase,
@@ -17,16 +17,35 @@ import {
 } from "react-icons/fa";
 import "./AppointmentInfoTab.scss";
 import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import Cbutton from "@/components/basicUI/Cbutton";
+import { RoleAdmin } from "@/types/enum";
+import InfoInterviewLeader from "@/app/(view)/tac-vu-nhan-su/_components/InfoInterviewLeader/InfoInterviewLeader";
+import { useState } from "react";
+import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/quan-ly-phong-van.service";
 
 interface AppointmentInfoTabProps {
   interview: AppointmentListWithInterview;
   onRefresh: () => void;
 }
 
+interface InterviewerSelection {
+  label: string;
+  email: string;
+  value: string;
+}
+
 export default function AppointmentInfoTab({
   interview,
+  onRefresh,
 }: AppointmentInfoTabProps) {
-  const isOnline = interview.interviewType === "Online";
+  const isOnline = interview.typeAppointment === "online";
+  const { userProfile } = useSelector(selectAuthLogin);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedInterviewers, setSelectedInterviewers] = useState<
+    InterviewerSelection[]
+  >([]);
 
   const probationOptions = [
     { value: "1_MONTH", label: "1 tháng" },
@@ -39,6 +58,35 @@ export default function AppointmentInfoTab({
     probationOptions.find(
       (opt) => opt.value === interview.jobInfor?.trialPeriod
     )?.label || "-";
+
+  const handleChange = (interview: AppointmentListWithInterview) => {
+    // Logic to handle the change action
+    console.log("Change action for interview:", interview);
+    setIsModalOpen(true);
+  };
+
+  const handleModalOk = async () => {
+    const payload = selectedInterviewers.map((i) => i.value);
+    try {
+      await QuanLyPhongVanServices.addInterviewer(interview.appointmentId, {
+        listInterviewerId: payload,
+      });
+      setIsModalOpen(false);
+      // Refresh parent data (fetchAppointmentDetail)
+      onRefresh();
+    } catch (error) {
+      console.log(error);
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSelectedChange = (selectedUsers: InterviewerSelection[]) => {
+    setSelectedInterviewers(selectedUsers);
+  };
 
   return (
     <div className="interview-info-tab">
@@ -345,31 +393,51 @@ export default function AppointmentInfoTab({
                         size="small"
                         style={{ width: "100%" }}
                       >
-                        <div>
-                          <strong>{interviewer.interviewerName}</strong>
-                          <Tag
-                            color={
-                              interviewer.status === "ACCEPTED"
-                                ? "green"
-                                : interviewer.status === "REJECTED"
-                                ? "red"
-                                : "gold"
-                            }
-                            style={{ marginLeft: 8 }}
-                          >
-                            {interviewer.status === "ACCEPTED"
-                              ? "Đã chấp nhận"
-                              : interviewer.status === "REJECTED"
-                              ? "Từ chối"
-                              : "Chờ xác nhận"}
-                          </Tag>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div>
+                            <div>
+                              <strong>{interviewer.interviewerName}</strong>
+                              <Tag
+                                color={
+                                  interviewer.status === "ACCEPTED"
+                                    ? "green"
+                                    : interviewer.status === "REJECTED"
+                                    ? "red"
+                                    : "gold"
+                                }
+                                style={{ marginLeft: 8 }}
+                              >
+                                {interviewer.status === "ACCEPTED"
+                                  ? "Đã chấp nhận"
+                                  : interviewer.status === "REJECTED"
+                                  ? "Từ chối"
+                                  : "Chờ xác nhận"}
+                              </Tag>
+                            </div>
+                            {interviewer.interviewerEmail && (
+                              <div>Email: {interviewer.interviewerEmail}</div>
+                            )}
+                            {interviewer.interviewerPhone && (
+                              <div>SĐT: {interviewer.interviewerPhone}</div>
+                            )}
+                          </div>
+                          <div>
+                            {userProfile.roleId === RoleAdmin.HR &&
+                              interviewer.status === "REJECTED" && (
+                                <Cbutton
+                                  onClick={() => handleChange(interview)}
+                                >
+                                  Thay Đổi
+                                </Cbutton>
+                              )}
+                          </div>
                         </div>
-                        {interviewer.interviewerEmail && (
-                          <div>Email: {interviewer.interviewerEmail}</div>
-                        )}
-                        {interviewer.interviewerPhone && (
-                          <div>SĐT: {interviewer.interviewerPhone}</div>
-                        )}
                       </Space>
                     </Descriptions.Item>
                   ))}
@@ -415,6 +483,32 @@ export default function AppointmentInfoTab({
           <Button danger>Hủy lịch hẹn</Button>
         </Space>
       </div>
+
+      {/* Modal for changing interviewers */}
+      <Modal
+        title="Chọn người phỏng vấn"
+        open={isModalOpen}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        width={800}
+        okText="Xác nhận"
+        cancelText="Hủy"
+      >
+        <InfoInterviewLeader
+          jobId={interview.jobInfor?.jobId}
+          onSelectedChange={handleSelectedChange}
+          preSelectedEmails={
+            interview.listInterviewers
+              ?.filter((i) => i.status !== "REJECTED")
+              .map((i) => i.interviewerEmail || "") || []
+          }
+          maxSelectable={
+            interview.interviewerCount
+              ? Number(interview.interviewerCount)
+              : undefined
+          }
+        />
+      </Modal>
     </div>
   );
 }

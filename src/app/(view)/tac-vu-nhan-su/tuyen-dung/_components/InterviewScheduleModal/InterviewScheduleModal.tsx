@@ -32,7 +32,7 @@ import {
 } from "react-icons/fa";
 import { InterviewFormData, InterviewScheduleModalProps } from ".";
 import "./InterviewScheduleModal.scss";
-import InfoInterviewLeader from "../InfoInterviewLeader/InfoInterviewLeader";
+import InfoInterviewLeader from "../../../_components/InfoInterviewLeader/InfoInterviewLeader";
 import { useSelector } from "react-redux";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 
@@ -106,7 +106,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
     setInterviewType(normalizedType as "online" | "offline");
 
     // tpl fields are ISO strings; convert to Dayjs for Antd DatePicker/TimePicker
-    const dateVal = tpl.interviewDate ? dayjs(tpl.interviewDate) : undefined;
+    const dateVal = tpl.date ? dayjs(tpl.date) : undefined;
     const startVal = tpl.startTime ? dayjs(tpl.startTime) : undefined;
     const endVal = tpl.endTime ? dayjs(tpl.endTime) : undefined;
 
@@ -166,7 +166,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
         setScheduleTemplate(resSh?.data);
         const data = resSh.data.map((t: AppointmentItem) => ({
           value: t.id as string,
-          label: `${dayjs(t.interviewDate).format("DD/MM/YYYY")} - ${dayjs(
+          label: `${dayjs(t.date).format("DD/MM/YYYY")} - ${dayjs(
             t.startTime
           ).format("HH:mm")} đến ${dayjs(t.endTime).format("HH:mm")}`,
         }));
@@ -616,7 +616,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
                   </Form.Item>
                 )}
 
-                <Form.Item name="notes" label="Ghi chú">
+                <Form.Item name="note" label="Ghi chú">
                   <TextArea
                     rows={4}
                     placeholder="Ghi chú thêm về buổi phỏng vấn (không bắt buộc)"

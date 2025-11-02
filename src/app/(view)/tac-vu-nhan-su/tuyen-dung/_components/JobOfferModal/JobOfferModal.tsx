@@ -1,24 +1,26 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
-import { Button, Card, DatePicker, Form, Input, Modal, TimePicker } from "antd";
+import { Button, Card, DatePicker, Form, Input, Modal } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   FaBuilding,
-  FaDownload,
-  FaEnvelope,
-  FaPhone,
-  FaUser,
   FaChevronDown,
   FaChevronUp,
+  FaEnvelope,
   FaList,
+  FaPhone,
   FaTh,
+  FaUser,
 } from "react-icons/fa";
-import { MdLocationOn } from "react-icons/md";
-import JobOfferInvitation from "./JobOfferInvitation";
 import "./JobOfferModal.scss";
-import { generateJobOfferHTML } from "./jobOfferTemplateHTML";
+import { generateUsernameFromFullName } from "@/utils/client/generateUsernameFromFullName";
+import InfoInterviewLeader from "../../../_components/InfoInterviewLeader/InfoInterviewLeader";
+import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 
 const { TextArea } = Input;
 
@@ -33,65 +35,31 @@ interface JobOfferModalProps {
   open: boolean;
   onClose: () => void;
   candidateData?: CandidateData | CandidateData[];
+  jobId: string;
+  onSuccess?: () => void;
 }
 
 interface JobOfferFormData {
   date: Dayjs | null;
-  startTime: Dayjs | null;
-  endTime: Dayjs | null;
-  address: string;
-  username: string;
-  password: string;
-  appDownloadLink: string;
-  guidePersonName: string;
-  guidePersonPhone: string;
-  guidePersonEmail: string;
-  notes?: string;
+  userName: string;
+  hrId: string;
+  managedById: string;
+  note?: string;
 }
-
-interface CompanyLocation {
-  id: string;
-  name: string;
-  address: string;
-  mapUrl: string;
-}
-
-interface JobOfferDetails {
-  candidate: {
-    id: string;
-    fullName: string;
-    email: string;
-    phone: string;
-  };
-  date: string;
-  startTime: string;
-  endTime: string;
-  address: string;
-  username: string;
-  password: string;
-  appDownloadLink: string;
-  guidePersonName: string;
-  guidePersonPhone: string;
-  guidePersonEmail: string;
-  notes: string;
-  fullDateTime: string;
-}
-
-export type { JobOfferDetails };
 
 const JobOfferModal: React.FC<JobOfferModalProps> = ({
   open,
   onClose,
   candidateData,
+  jobId,
+  onSuccess,
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [showInvitation, setShowInvitation] = useState(false);
-  const [jobOfferDetails, setJobOfferDetails] =
-    useState<JobOfferDetails | null>(null);
   const [showCandidateList, setShowCandidateList] = useState(true);
-  const [displayMode, setDisplayMode] = useState<"list" | "chips">("list");
-
+  const [displayMode, setDisplayMode] = useState<"list" | "chips">("chips");
+  const [selectedInterviewers, setSelectedInterviewers] = useState<any[]>([]);
+  const { userProfile } = useSelector(selectAuthLogin);
   const messageApi = useAntdMessage();
 
   // Normalize candidateData to array
@@ -100,63 +68,49 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
     return Array.isArray(candidateData) ? candidateData : [candidateData];
   }, [candidateData]);
 
-  // Company location (only one location)
-  const companyLocation: CompanyLocation = {
-    id: "hq",
-    name: "FaceAI Technology Solutions",
-    address: "Tầng 5, Tòa nhà ABC, 123 Đường XYZ, Quận Ba Đình, Hà Nội",
-    mapUrl: "https://maps.google.com/?q=123+Đường+XYZ+Quận+Ba+Đình+Hà+Nội",
-  };
-
   useEffect(() => {
     if (open && candidateData) {
       form.resetFields();
-      setShowInvitation(false);
-      setJobOfferDetails(null);
-      // Set default values
-      form.setFieldsValue({
-        address: companyLocation.address,
-        appDownloadLink: "https://faceai.app/download",
-      });
+      if (candidates.length === 1) {
+        const defaultUsername = generateUsernameFromFullName(
+          candidates[0].fullName
+        );
+        form.setFieldsValue({ userName: defaultUsername });
+      } else {
+        form.setFieldsValue({ userName: "" });
+      }
     }
-  }, [open, candidateData, form, companyLocation.address]);
+  }, [open, candidateData, form, candidates]);
 
   const handleSubmit = async (values: JobOfferFormData) => {
     if (candidates.length === 0) return;
+    console.log("selectedInterviewers", values);
 
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // For now, use the first candidate for details
-      // TODO: Handle multiple candidates properly
-      const firstCandidate = candidates[0];
-
-      const details: JobOfferDetails = {
-        candidate: firstCandidate,
-        date: values.date?.format("DD/MM/YYYY") || "",
-        startTime: values.startTime?.format("HH:mm") || "",
-        endTime: values.endTime?.format("HH:mm") || "",
-        address: values.address,
-        username: values.username,
-        password: values.password,
-        appDownloadLink: values.appDownloadLink,
-        guidePersonName: values.guidePersonName,
-        guidePersonPhone: values.guidePersonPhone,
-        guidePersonEmail: values.guidePersonEmail,
-        notes: values.notes || "",
-        fullDateTime: `${values.date?.format(
-          "DD/MM/YYYY"
-        )} từ ${values.startTime?.format("HH:mm")} đến ${values.endTime?.format(
-          "HH:mm"
-        )}`,
-      };
-
-      setJobOfferDetails(details);
-      setShowInvitation(true);
-
+      await TuyenDungServices.createOffer({
+        date: values.date ? values.date.toISOString() : "",
+        note: values.note,
+        jobId: jobId,
+        userName: values.userName,
+        hrId: userProfile ? String(userProfile.id) : "",
+        managedById:
+          selectedInterviewers.length > 0
+            ? selectedInterviewers[0].value
+            : undefined,
+        listParticipantId: candidates.map((c) => c.id),
+      });
       messageApi.success("Tạo lịch hẹn nhận việc thành công!");
+
+      if (onSuccess) {
+        try {
+          onSuccess();
+        } catch (err) {
+          console.warn("onSuccess callback failed:", err);
+        }
+      } else {
+        handleClose();
+      }
     } catch {
       messageApi.error("Có lỗi xảy ra khi tạo lịch hẹn nhận việc!");
     } finally {
@@ -164,101 +118,14 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
     }
   };
 
-  const handleDownloadInvitation = async () => {
-    if (!jobOfferDetails) return;
-
-    try {
-      // Dynamic import for html2canvas
-      const html2canvas = (await import("html2canvas")).default;
-
-      // Create a temporary div to render the invitation
-      const tempDiv = document.createElement("div");
-      tempDiv.style.width = "800px";
-      tempDiv.style.background = "white";
-      tempDiv.style.padding = "40px";
-      tempDiv.style.fontFamily = "Arial, sans-serif";
-      tempDiv.style.position = "absolute";
-      tempDiv.style.left = "-9999px";
-      document.body.appendChild(tempDiv);
-
-      // Create invitation HTML content using the template
-      tempDiv.innerHTML = generateJobOfferHTML(jobOfferDetails);
-
-      // Use html2canvas to convert to image
-      const canvas = await html2canvas(tempDiv, {
-        useCORS: true,
-        allowTaint: true,
-      });
-
-      // Convert canvas to blob and download
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = `Thu_moi_nhan_viec_${jobOfferDetails.candidate.fullName}.png`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-
-          messageApi.success("Đã tải ảnh thư mời nhận việc!");
-        }
-      }, "image/png");
-
-      // Clean up
-      document.body.removeChild(tempDiv);
-    } catch (error) {
-      console.error("Error generating invitation image:", error);
-      messageApi.error("Có lỗi xảy ra khi tạo ảnh thư mời!");
-    }
-  };
-
   const handleClose = () => {
     form.resetFields();
-    setShowInvitation(false);
-    setJobOfferDetails(null);
     onClose();
   };
 
   const disabledDate = (current: Dayjs) => {
-    return current && current < dayjs().startOf("day");
+    return current && current <= dayjs().startOf("day");
   };
-
-  if (showInvitation && jobOfferDetails) {
-    return (
-      <Modal
-        title={
-          <div className="modal-title">
-            <FaBuilding /> Thư mời nhận việc
-          </div>
-        }
-        open={open}
-        onCancel={handleClose}
-        centered={false}
-        footer={[
-          <Button key="close" onClick={handleClose}>
-            Đóng
-          </Button>,
-          <Button
-            key="download"
-            type="primary"
-            icon={<FaDownload />}
-            onClick={handleDownloadInvitation}
-            className="download-btn"
-          >
-            Tải ảnh thư mời
-          </Button>,
-        ]}
-        width={1500}
-        className="job-offer-invitation-modal"
-      >
-        <div className="invitation-content">
-          <JobOfferInvitation jobOfferDetails={jobOfferDetails} />
-        </div>
-      </Modal>
-    );
-  }
 
   return (
     <Modal
@@ -285,7 +152,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
           {loading ? "Đang tạo lịch..." : "Tạo lịch hẹn nhận việc"}
         </Button>,
       ]}
-      width={900}
+      width={1200}
       className="job-offer-modal"
     >
       <div className="modal-content">
@@ -395,9 +262,10 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
                     ]}
                   >
                     <DatePicker
+                      showTime
                       placeholder="Chọn ngày"
                       style={{ width: "100%" }}
-                      format="DD/MM/YYYY"
+                      format="DD/MM/YYYY HH:mm"
                       disabledDate={disabledDate}
                       size="large"
                     />
@@ -405,46 +273,51 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
                 </div>
                 <div className="form-col-6">
                   <Form.Item
-                    name="startTime"
-                    label="Giờ bắt đầu"
+                    name="userName"
+                    label="Tên đăng nhập"
                     rules={[
-                      { required: true, message: "Vui lòng chọn giờ bắt đầu!" },
+                      {
+                        required: true,
+                        message: "Vui lòng nhận tên!",
+                      },
                     ]}
                   >
-                    <TimePicker
-                      placeholder="Giờ bắt đầu"
-                      style={{ width: "100%" }}
-                      format="HH:mm"
+                    <Input
+                      placeholder="Nhập tên đăng nhập"
                       size="large"
+                      suffix={
+                        <>
+                          {" "}
+                          <FaUser />
+                        </>
+                      }
                     />
                   </Form.Item>
                 </div>
               </div>
 
-              <Form.Item
-                name="address"
-                label="Địa chỉ nhận việc"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng nhập địa chỉ nhận việc!",
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="Nhập địa chỉ chi tiết"
-                  size="large"
-                  prefix={<MdLocationOn />}
-                />
-              </Form.Item>
-
-              <Form.Item name="notes" label="Ghi chú">
+              <Form.Item name="note" label="Ghi chú">
                 <TextArea
                   rows={4}
                   placeholder="Ghi chú thêm về buổi nhận việc (không bắt buộc)"
                 />
               </Form.Item>
             </Form>
+          </div>
+          <div className="map-section">
+            <div className="map-header">
+              <FaUser />
+              Chọn người quản lý
+            </div>
+            <div>
+              <InfoInterviewLeader
+                jobId={jobId}
+                onSelectedChange={(selectInterviwer) => {
+                  setSelectedInterviewers(selectInterviwer);
+                }}
+                maxSelectable={1}
+              />
+            </div>
           </div>
         </div>
       </div>

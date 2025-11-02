@@ -2,7 +2,7 @@
 
 import { Tabs } from "antd";
 import { useState } from "react";
-import AppointmentInfoTab from "./components/AppointmentInfoTab";
+import AppointmentInfoTab from "./components/AppointmentInfoTab/AppointmentInfoTab";
 import "./AppointmentDetailTabs.scss";
 import { CandidateListTab } from "./components";
 import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";

@@ -6,6 +6,7 @@ import {
   AppointmentListWithInterviewGetItem,
   AppointmentResponseGetItem,
 } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.response.dto";
+import { CreateJobOfferRequest } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
 import {
   CreateTuyenDungRequest,
   UpdateTuyenDungRequest,
@@ -94,6 +95,13 @@ class TuyenDungServicesBase extends AxiosService {
 
   async createAppointment(data: CreateAppointmentRequest): Promise<any> {
     return this.post(`${this.basePath}/tuyen-dung/tao-cuoc-hen`, data);
+  }
+
+  async createOffer(data: CreateJobOfferRequest): Promise<any> {
+    return this.post(
+      `${this.basePath}/tuyen-dung/tao-lich-hen-nhan-viec`,
+      data
+    );
   }
 }
 

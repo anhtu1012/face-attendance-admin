@@ -46,7 +46,7 @@ export default function AppointmentDetailPage() {
       showError(
         error.response?.data?.message || "Lỗi khi tải thông tin phỏng vấn"
       );
-      router.push("/tac-vu-nhan-su/phong-van-nhan-viec");
+      router.push("/tac-vu-nhan-su/quan-ly-phong-van");
     } finally {
       setLoading(false);
     }

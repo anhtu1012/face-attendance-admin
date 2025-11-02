@@ -69,11 +69,11 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     { label: "Phỏng vấn", value: "TO_INTERVIEW" }, //2
     { label: "Rớt PV", value: "INTERVIEW_FAILED" }, //2
     { label: "Đã hẹn PV", value: "INTERVIEW_SCHEDULED" }, //2
-    { label: "Đã đầu PV Vòng 1", value: "TO_INTERVIEW_R1" }, //2
-    { label: "Đã đầu PV Vòng 2", value: "TO_INTERVIEW_R2" }, //2
-    { label: "Đã đầu PV Vòng 3", value: "TO_INTERVIEW_R3" }, //2
-    { label: "Đã đầu PV Vòng 4", value: "TO_INTERVIEW_R4" }, //2
-    { label: "Đã đầu PV Vòng 5", value: "TO_INTERVIEW_R5" }, //2
+    { label: "Đã đậu PV Vòng 1", value: "TO_INTERVIEW_R1" }, //2
+    { label: "Đã đậu PV Vòng 2", value: "TO_INTERVIEW_R2" }, //2
+    { label: "Đã đậu PV Vòng 3", value: "TO_INTERVIEW_R3" }, //2
+    { label: "Đã đậu PV Vòng 4", value: "TO_INTERVIEW_R4" }, //2
+    { label: "Đã đậu PV Vòng 5", value: "TO_INTERVIEW_R5" }, //2
     { label: "Hẹn lại", value: "INTERVIEW_RESCHEDULED" }, //2
     { label: "Nhận việc", value: "JOB_OFFERED" }, //3
     { label: "Đã hẹn NV", value: "JOB_SCHEDULED" }, //3
