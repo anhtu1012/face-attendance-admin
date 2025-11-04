@@ -9,11 +9,6 @@ import jsPDF from "jspdf";
 
 // Import components
 import { PdfPreview } from "@/components/Template/components/PdfPreview";
-import LoadingSpinner from "../_components/LoadingSpinner";
-import OTPModal from "../_components/OTPModal";
-import SignatureToolbox from "../_components/SignatureToolbox";
-import { PrintIcon } from "../_components/icons";
-
 // Import types
 import { ContractData, Signatures } from "@/components/Template/types";
 import { ContractDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
@@ -28,6 +23,10 @@ import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { useSelector } from "react-redux";
 import "./signature.scss";
 import { createFileFromDataUrl } from "../_utils/createFileFromDataUrl";
+import LoadingSpinner from "../_components/LoadingSpinner";
+import SignatureToolbox from "../_components/SignatureToolbox";
+import { PrintIcon } from "../_components/icons";
+import OTPModal from "../_components/OTPModal";
 
 const ContractSignaturePage: React.FC = () => {
   const params = useParams();

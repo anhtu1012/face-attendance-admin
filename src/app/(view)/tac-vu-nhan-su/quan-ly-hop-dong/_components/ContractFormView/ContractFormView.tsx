@@ -32,7 +32,7 @@ import {
   Typography,
 } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import FullscreenMarkdownEditor from "../FullscreenMarkdownEditor/FullscreenMarkdownEditor";
 import "./ContractFormView.scss";
 import { FormValues } from "./prop";
@@ -44,6 +44,7 @@ function ContractFormView({
   onExportPdf,
   onContractTypeChange,
   mode = "create",
+  pdfRef,
 }: {
   selectedUser?: UserCreateContractItem | null;
   contractDetailData?: ContractWithUser | null;
@@ -51,6 +52,7 @@ function ContractFormView({
   onExportPdf?: () => void;
   onContractTypeChange?: (contractTypeName: string) => void;
   mode?: "create" | "appendix";
+  pdfRef?: React.RefObject<HTMLDivElement | null>;
 }) {
   const messageApi = useAntdMessage();
   const [form] = Form.useForm<FormValues>();
@@ -142,7 +144,7 @@ function ContractFormView({
       ) {
         const grossNum = Number(values.grossSalary) || 0;
         const amountVND = Math.round(grossNum * 1_000_000);
-        values.grossSalary = amountVND.toLocaleString("vi-VN");
+        values.grossSalary = String(amountVND);
       }
 
       // Handle based on mode
@@ -158,8 +160,32 @@ function ContractFormView({
           userContractId: contractDetailData.contract.id,
         };
 
-        await QuanLyHopDongServices.createPhucLucHopDong(appendixData);
+        const response = await QuanLyHopDongServices.createPhucLucHopDong(
+          appendixData
+        );
         messageApi.success("Phụ lục hợp đồng đã được tạo thành công!");
+
+        // Upload the PDF file after successful creation
+        if (response?.id && pdfRef?.current) {
+          try {
+            // Generate PDF as File from pdfRef
+            const pdfFile = await generatePdfFileFromElement();
+
+            if (pdfFile) {
+              const formData = new FormData();
+              formData.append("userContractExtendedId", response.id);
+              formData.append("fileContract", pdfFile);
+
+              await QuanLyHopDongServices.uploadAppendixMultipart(formData);
+              messageApi.success("File phụ lục đã được tải lên thành công!");
+            }
+          } catch (uploadError) {
+            console.error("Error uploading appendix PDF:", uploadError);
+            messageApi.warning(
+              "Phụ lục đã được tạo nhưng không thể tải file lên!"
+            );
+          }
+        }
       } else {
         // Creating a new contract
         await QuanLyHopDongServices.createQuanLyHopDong(values);
@@ -184,6 +210,53 @@ function ContractFormView({
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Helper function to generate PDF as File object from pdfRef
+  const generatePdfFileFromElement = async (): Promise<File | null> => {
+    if (!pdfRef?.current) {
+      console.error("PDF generation failed: pdfRef not available");
+      return null;
+    }
+
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const jsPDF = (await import("jspdf")).default;
+
+      const element = pdfRef.current;
+
+      // Generate canvas from HTML
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        logging: false,
+        background: "#ffffff",
+        allowTaint: true,
+      });
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+      // Convert PDF to Blob then to File
+      const pdfBlob = pdf.output("blob");
+      const pdfFile = new File([pdfBlob], "phu-luc-hop-dong.pdf", {
+        type: "application/pdf",
+      });
+
+      return pdfFile;
+    } catch (error) {
+      console.error("Error generating PDF file:", error);
+      return null;
     }
   };
 
@@ -241,13 +314,18 @@ function ContractFormView({
   // Calculate form completion progress
   const calculateProgress = () => {
     const values = form.getFieldsValue() as Partial<FormValues>;
-    const requiredFields: (keyof FormValues)[] = [
-      "contractTypeId",
-      "startDate",
-      "positionId",
-      "grossSalary",
-      "content",
-    ];
+    // For appendix mode we don't require department/position to be filled
+    const requiredFields: (keyof FormValues)[] =
+      mode === "appendix"
+        ? ["contractTypeId", "startDate", "grossSalary", "content"]
+        : [
+            "contractTypeId",
+            "startDate",
+            "positionId",
+            "grossSalary",
+            "content",
+          ];
+
     const completedFields = requiredFields.filter((field) => {
       const v = values[field];
       return v !== undefined && v !== null && v !== "";
@@ -262,6 +340,10 @@ function ContractFormView({
       case "basic-time":
         return values.contractTypeId && values.startDate;
       case "work":
+        // In appendix mode we don't require department/position; only check salary
+        if (mode === "appendix") {
+          return Boolean(values.grossSalary);
+        }
         return (
           Boolean(values.positionId) &&
           Array.isArray(values.allowanceIds) &&
@@ -350,6 +432,7 @@ function ContractFormView({
           layout="vertical"
           onFinish={handleFormSubmit}
           onValuesChange={(changedValues) => {
+            // Keep duration up-to-date when dates change
             if (changedValues.startDate || changedValues.endDate) {
               const startDate =
                 changedValues.startDate || form.getFieldValue("startDate");
@@ -357,6 +440,15 @@ function ContractFormView({
                 changedValues.endDate || form.getFieldValue("endDate");
               const duration = calculateDuration(startDate, endDate);
               form.setFieldValue("duration", duration);
+            }
+            if (changedValues.contractTypeId) {
+              const selectedType = selectContractType?.find(
+                (opt) =>
+                  String(opt.value) === String(changedValues.contractTypeId)
+              );
+              if (selectedType && onContractTypeChange) {
+                onContractTypeChange(selectedType.label);
+              }
             }
           }}
           className="modern-form"
@@ -399,12 +491,19 @@ function ContractFormView({
                               options={selectContractType}
                               onChange={(value) => {
                                 fetchTemplate(value);
-                                // Find contract type name and notify parent
                                 const selectedType = selectContractType?.find(
-                                  (opt) => opt.value === value
+                                  (opt) => opt.value == (value as any)
                                 );
                                 if (selectedType && onContractTypeChange) {
                                   onContractTypeChange(selectedType.label);
+                                } else if (onContractTypeChange) {
+                                  // Fallback: try string match in case values are objects
+                                  const fallback = selectContractType?.find(
+                                    (opt) =>
+                                      String(opt.value) === String(value as any)
+                                  );
+                                  if (fallback)
+                                    onContractTypeChange(fallback.label);
                                 }
                               }}
                             />
@@ -424,69 +523,108 @@ function ContractFormView({
                       </div>
 
                       <Row gutter={[24, 24]}>
-                        <Col xs={24} md={8}>
-                          <Form.Item
-                            name="startDate"
-                            label="Ngày bắt đầu"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng chọn ngày bắt đầu!",
-                              },
-                            ]}
-                            getValueProps={(value) => ({
-                              value: value ? dayjs(value) : undefined,
-                            })}
-                          >
-                            <DatePicker
-                              style={{ width: "100%" }}
-                              format="DD/MM/YYYY"
-                              disabledDate={(current) => {
-                                return (
-                                  current && current < dayjs().startOf("day")
-                                );
-                              }}
-                              placeholder="Chọn ngày bắt đầu"
-                              size="large"
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                          <Form.Item
-                            name="endDate"
-                            label="Ngày kết thúc"
-                            getValueProps={(value) => ({
-                              value: value ? dayjs(value) : undefined,
-                            })}
-                          >
-                            <DatePicker
-                              style={{ width: "100%" }}
-                              format="DD/MM/YYYY"
-                              placeholder="Chọn ngày kết thúc"
-                              size="large"
-                              disabledDate={(current) => {
-                                const startDate =
-                                  form.getFieldValue("startDate");
-                                if (startDate) {
-                                  return current && current <= dayjs(startDate);
-                                }
-                                return (
-                                  current && current < dayjs().startOf("day")
-                                );
-                              }}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                          <Form.Item name="duration" label="Thời hạn hợp đồng">
-                            <Input
-                              disabled
-                              size="large"
-                              placeholder="Tự động tính toán"
-                              prefix={<ClockCircleOutlined />}
-                            />
-                          </Form.Item>
-                        </Col>
+                        {mode === "appendix" ? (
+                          <Col xs={24} md={24}>
+                            <Form.Item
+                              name="startDate"
+                              label="Ngày bắt đầu"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Vui lòng chọn ngày bắt đầu!",
+                                },
+                              ]}
+                              getValueProps={(value) => ({
+                                value: value ? dayjs(value) : undefined,
+                              })}
+                            >
+                              <DatePicker
+                                style={{ width: "100%" }}
+                                format="DD/MM/YYYY"
+                                disabledDate={(current) => {
+                                  return (
+                                    current && current < dayjs().startOf("day")
+                                  );
+                                }}
+                                placeholder="Chọn ngày bắt đầu"
+                                size="large"
+                              />
+                            </Form.Item>
+                          </Col>
+                        ) : (
+                          <>
+                            <Col xs={24} md={8}>
+                              <Form.Item
+                                name="startDate"
+                                label="Ngày bắt đầu"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "Vui lòng chọn ngày bắt đầu!",
+                                  },
+                                ]}
+                                getValueProps={(value) => ({
+                                  value: value ? dayjs(value) : undefined,
+                                })}
+                              >
+                                <DatePicker
+                                  style={{ width: "100%" }}
+                                  format="DD/MM/YYYY"
+                                  disabledDate={(current) => {
+                                    return (
+                                      current &&
+                                      current < dayjs().startOf("day")
+                                    );
+                                  }}
+                                  placeholder="Chọn ngày bắt đầu"
+                                  size="large"
+                                />
+                              </Form.Item>
+                            </Col>
+                            <Col xs={24} md={8}>
+                              <Form.Item
+                                name="endDate"
+                                label="Ngày kết thúc"
+                                getValueProps={(value) => ({
+                                  value: value ? dayjs(value) : undefined,
+                                })}
+                              >
+                                <DatePicker
+                                  style={{ width: "100%" }}
+                                  format="DD/MM/YYYY"
+                                  placeholder="Chọn ngày kết thúc"
+                                  size="large"
+                                  disabledDate={(current) => {
+                                    const startDate =
+                                      form.getFieldValue("startDate");
+                                    if (startDate) {
+                                      return (
+                                        current && current <= dayjs(startDate)
+                                      );
+                                    }
+                                    return (
+                                      current &&
+                                      current < dayjs().startOf("day")
+                                    );
+                                  }}
+                                />
+                              </Form.Item>
+                            </Col>
+                            <Col xs={24} md={8}>
+                              <Form.Item
+                                name="duration"
+                                label="Thời hạn hợp đồng"
+                              >
+                                <Input
+                                  disabled
+                                  size="large"
+                                  placeholder="Tự động tính toán"
+                                  prefix={<ClockCircleOutlined />}
+                                />
+                              </Form.Item>
+                            </Col>
+                          </>
+                        )}
                       </Row>
 
                       {/* Hidden fields */}
@@ -518,43 +656,48 @@ function ContractFormView({
                       </div>
 
                       <Row gutter={[24, 24]}>
-                        <Col xs={24} lg={12}>
-                          <Form.Item
-                            name="departmentId"
-                            label="Phòng ban"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng chọn phòng ban!",
-                              },
-                            ]}
-                          >
-                            <Select
-                              placeholder="Chọn phòng ban"
-                              options={selectDepartment}
-                              className="custom-select"
-                              onChange={handleDepartmentChange}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} lg={12}>
-                          <Form.Item
-                            name="positionId"
-                            label="Chức vụ"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng chọn chức vụ!",
-                              },
-                            ]}
-                          >
-                            <Select
-                              placeholder="Chọn chức vụ..."
-                              options={positionOptionsState}
-                              className="custom-select"
-                            />
-                          </Form.Item>
-                        </Col>
+                        {mode !== "appendix" && (
+                          <Col xs={24} lg={12}>
+                            <Form.Item
+                              name="departmentId"
+                              label="Phòng ban"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Vui lòng chọn phòng ban!",
+                                },
+                              ]}
+                            >
+                              <Select
+                                placeholder="Chọn phòng ban"
+                                options={selectDepartment}
+                                className="custom-select"
+                                onChange={handleDepartmentChange}
+                              />
+                            </Form.Item>
+                          </Col>
+                        )}
+
+                        {mode !== "appendix" && (
+                          <Col xs={24} lg={12}>
+                            <Form.Item
+                              name="positionId"
+                              label="Chức vụ"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Vui lòng chọn chức vụ!",
+                                },
+                              ]}
+                            >
+                              <Select
+                                placeholder="Chọn chức vụ..."
+                                options={positionOptionsState}
+                                className="custom-select"
+                              />
+                            </Form.Item>
+                          </Col>
+                        )}
                         <Col xs={24} lg={24}>
                           <Form.Item
                             name="grossSalary"

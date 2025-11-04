@@ -2,6 +2,7 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import { UpdateCaLamRequest } from "@/dtos/danhMuc/ca-lam/ca-lam.request.dto";
+import { QuanlyPhuLucResponseGetItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.response.dto";
 import { ContractWithUser } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 import { CreateContractRequest } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.request.dto";
 import { QuanlyHopDongResponseGetItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.response.dto";
@@ -44,10 +45,6 @@ class QuanLyHopDongServicesBase extends AxiosService {
     return this.post(`${this.basePath}/tao-hop-dong`, data);
   };
 
-  createPhucLucHopDong = async (data: CreateContractRequest): Promise<any> => {
-    return this.post(`${this.basePath}/user-contract-extended`, data);
-  };
-
   updateQuanLyHopDong = async (data: UpdateCaLamRequest[]): Promise<any> => {
     const payload = {
       payload: data,
@@ -64,6 +61,11 @@ class QuanLyHopDongServicesBase extends AxiosService {
       headers: { "Content-Type": "multipart/form-data" },
     });
   };
+  uploadAppendixMultipart = async (formData: FormData): Promise<any> => {
+    return this.post(`${this.basePath}/upload-phu-luc-hop-dong`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  };
 
   getOpt = async (data: {
     userContractId: string;
@@ -76,6 +78,24 @@ class QuanLyHopDongServicesBase extends AxiosService {
     return this.post(`${this.basePath}/xac-nhan-otp`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+  };
+
+  //Phục Lục
+  async getPhuLucHopDong(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<QuanlyPhuLucResponseGetItem> {
+    return this.getWithFilter(
+      `${this.basePath}/phu-luc-hop-dong`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
+
+  createPhucLucHopDong = async (data: CreateContractRequest): Promise<any> => {
+    return this.post(`${this.basePath}/tao-phu-luc-hop-dong`, data);
   };
 }
 

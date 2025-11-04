@@ -18,11 +18,13 @@ class ApplyServicesBase extends AxiosService {
 
   checkMailAndPhoneExist = async (
     email: string,
-    phone: string
+    phone: string,
+    jobId: string
   ): Promise<any> => {
     return this.post(`${this.basePath}/tuyen-dung/kiem-tra-mail-sdt`, {
       email,
       phone,
+      jobId,
     });
   };
 }

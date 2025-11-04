@@ -53,9 +53,10 @@
       .header-content {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
+        flex-direction: column;
         flex-wrap: wrap;
-        gap: 24px;
+        gap: 12px;
 
         .form-title {
           color: white !important;

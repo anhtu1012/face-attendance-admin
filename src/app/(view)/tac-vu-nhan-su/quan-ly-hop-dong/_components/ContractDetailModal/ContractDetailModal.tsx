@@ -15,8 +15,8 @@ import ContractInfo from "./ContractInfo";
 import UserInfo from "./UserInfo";
 import AppendixList from "./AppendixList";
 import AppendixDetailModal from "./AppendixDetailModal";
-import { fakeAppendices } from "./types";
 import { getStatusColor, getStatusText } from "./utils";
+import { AppendixDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.dto";
 
 const { TabPane } = Tabs;
 
@@ -42,6 +42,7 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
     null
   );
   const [appendixModalOpen, setAppendixModalOpen] = useState(false);
+  const [appendixList, setAppendixList] = useState<AppendixDetail[]>([]); // Replace 'any' with the actual type
 
   const fetchContractDetail = useCallback(async () => {
     if (!contractId) return;
@@ -51,6 +52,12 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
       const response = await QuanLyHopDongServices.getChiTietHopDong(
         contractId
       );
+      const responsePhuLuc = await QuanLyHopDongServices.getPhuLucHopDong(
+        [],
+        undefined,
+        { userContractId: contractId }
+      );
+      setAppendixList(responsePhuLuc.data);
       setData(response);
     } catch (error) {
       console.error("Error fetching contract detail:", error);
@@ -211,13 +218,13 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             <TabPane
               tab={
                 <span>
-                  <FaListAlt /> Phụ lục hợp đồng ({fakeAppendices.length})
+                  <FaListAlt /> Phụ lục hợp đồng ({appendixList.length})
                 </span>
               }
               key="3"
             >
               <AppendixList
-                appendices={fakeAppendices}
+                appendices={appendixList}
                 onViewDetail={handleViewAppendixDetail}
                 getStatusColor={getStatusColor}
                 getStatusText={getStatusText}
@@ -232,7 +239,7 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         onClose={closeAppendixModal}
         appendix={
           selectedAppendixId
-            ? fakeAppendices.find((a) => a.id === selectedAppendixId) || null
+            ? appendixList.find((a) => a.id === selectedAppendixId) || null
             : null
         }
         getStatusColor={getStatusColor}

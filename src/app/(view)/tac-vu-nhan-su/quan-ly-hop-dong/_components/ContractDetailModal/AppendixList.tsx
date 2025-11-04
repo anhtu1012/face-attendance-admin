@@ -11,12 +11,11 @@ import {
   FaMoneyBillWave,
   FaEye,
 } from "react-icons/fa";
-import { AppendixData } from "./types";
-
+import { AppendixDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.dto";
 const { Text } = Typography;
 
 interface AppendixListProps {
-  appendices: AppendixData[];
+  appendices: AppendixDetail[];
   onViewDetail: (appendixId: string) => void;
   getStatusColor: (status: string) => string;
   getStatusText: (status: string) => string;
@@ -36,7 +35,8 @@ const AppendixList: React.FC<AppendixListProps> = ({
     }).format(numValue);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string | null) => {
+    if (!dateString) return "";
     return dayjs(dateString).format("DD/MM/YYYY");
   };
 
@@ -57,7 +57,8 @@ const AppendixList: React.FC<AppendixListProps> = ({
               <div className="appendix-center">
                 <div className="appendix-title-row">
                   <Text strong className="contract-type">
-                    {appendix.contractTypeName}
+                    {/* {appendix.contractTypeName} */}
+                    Phụ lục hợp đồng
                   </Text>
                   <Tag
                     color={getStatusColor(appendix.status)}
@@ -76,7 +77,7 @@ const AppendixList: React.FC<AppendixListProps> = ({
                     <FaCalendarAlt className="info-icon" />
                     <Text>
                       {formatDate(appendix.startDate)} →{" "}
-                      {formatDate(appendix.endDate)}
+                      {formatDate(appendix.endDate) || "Không có thời hạn"}
                     </Text>
                   </div>
                   <div className="info-item-inline">
@@ -107,12 +108,11 @@ const AppendixList: React.FC<AppendixListProps> = ({
                   size="middle"
                   onClick={() => onViewDetail(appendix.id)}
                   origin={{
-                    bgcolor:
-                      "linear-gradient(45deg, rgb(21, 101, 192), rgb(66, 165, 245), rgb(21, 101, 192), rgb(66, 165, 245))",
+                    bgcolor: "#fff",
                     color: "#0889f1ff",
                     hoverBgColor:
                       "linear-gradient(45deg, rgb(21, 101, 192), rgb(66, 165, 245), rgb(21, 101, 192))",
-                    border: "none",
+                    border: "1px solid #0889f1ff",
                     hoverColor: "#fff",
                   }}
                   style={{

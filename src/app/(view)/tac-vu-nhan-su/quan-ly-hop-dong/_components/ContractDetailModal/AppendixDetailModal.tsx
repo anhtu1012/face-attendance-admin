@@ -1,4 +1,5 @@
 import Cbutton from "@/components/basicUI/Cbutton";
+import { AppendixDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.dto";
 import {
   Badge,
   Card,
@@ -18,14 +19,13 @@ import {
   FaIdCard,
   FaMoneyBillWave,
 } from "react-icons/fa";
-import { AppendixData } from "./types";
 
 const { Title, Text } = Typography;
 
 interface AppendixDetailModalProps {
   open: boolean;
   onClose: () => void;
-  appendix: AppendixData | null;
+  appendix: AppendixDetail | null;
   getStatusColor: (status: string) => string;
   getStatusText: (status: string) => string;
 }
@@ -45,7 +45,8 @@ const AppendixDetailModal: React.FC<AppendixDetailModalProps> = ({
     }).format(numValue);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "";
     return dayjs(dateString).format("DD/MM/YYYY");
   };
 
@@ -172,7 +173,9 @@ const AppendixDetailModal: React.FC<AppendixDetailModalProps> = ({
               </span>
             }
           >
-            <Text type="danger">{formatDate(appendix.endDate)}</Text>
+            <Text type="danger">
+              {formatDate(appendix.endDate) || " Không thời hạn"}
+            </Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Thời hạn" span={2}>

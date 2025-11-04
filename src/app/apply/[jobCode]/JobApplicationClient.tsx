@@ -405,8 +405,13 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
           formData.append(key, String(value));
         }
       });
+      if (!jobDetail?.id) return;
       // Check if email and phone exist
-      await ApplyServices.checkMailAndPhoneExist(values.email, values.phone);
+      await ApplyServices.checkMailAndPhoneExist(
+        values.email,
+        values.phone,
+        jobDetail.id
+      );
 
       // Determine whether user wanted immediate AI result from the form field
       const wantsAiResult = form.getFieldValue("receiveAiResult") ?? true;

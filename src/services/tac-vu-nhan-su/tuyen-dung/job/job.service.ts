@@ -47,7 +47,10 @@ class JobServicesBase extends AxiosService {
   };
 
   async updateJob(id: string, payload: UpdateJobRequest): Promise<any> {
-    return this.put(`${this.basePath}/job-application-form/${id}`, payload);
+    return this.put(
+      `${this.basePath}/tuyen-dung/cap-nhat-don-ung-tuyen/${id}`,
+      payload
+    );
   }
 
   async deleteJob(id: string): Promise<any> {

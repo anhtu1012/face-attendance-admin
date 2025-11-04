@@ -305,7 +305,7 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
             setPageSize(pageSize);
             fetchData(currentPage, pageSize, quickSearchText);
           }}
-          maxRowsVisible={13}
+          maxRowsVisible={15}
           columnFlex={0}
           onQuicksearch={dataGrid.handleQuicksearch}
           showActionButtons={false}

@@ -194,6 +194,7 @@ function Page() {
                   onExportPdf={handleExportPdf}
                   onContractTypeChange={setContractTitle}
                   mode={formMode}
+                  pdfRef={pdfRef}
                 />
               </Col>
             )}
