@@ -271,6 +271,7 @@ function Page() {
             CONTRACT_SIGNING: "#6A1B9A", // purple
             INTERVIEW_REJECTED: "#FF7043", // light red/orange
             OFFER_REJECTED: "#C62828", // dark red
+            REJECTED: "#C62828", // dark red
             NOT_SUITABLE: "#9E9E9E", // grey
             HOAN_THANH: "#2E7D32", // dark green
           },

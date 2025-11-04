@@ -30,10 +30,10 @@ const Filter = forwardRef<FilterRef, FilterProps>(
       fetchContractType: true,
     });
     const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(
-      dayjs().startOf("day")
+      dayjs().startOf("month")
     );
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(
-      dayjs().endOf("day")
+      dayjs().endOf("month")
     );
 
     // Handle form submission
@@ -62,8 +62,8 @@ const Filter = forwardRef<FilterRef, FilterProps>(
       },
       handleCreateNewOrder: () => {
         form.resetFields();
-        setStartDate(dayjs().startOf("day"));
-        setEndDate(dayjs().endOf("day"));
+        setStartDate(dayjs().startOf("month"));
+        setEndDate(dayjs().endOf("month"));
       },
     }));
 
@@ -76,7 +76,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(
           disabled={disabled}
           onFinish={handleFinish}
           initialValues={{
-            filterDateRange: [dayjs().startOf("day"), dayjs().endOf("day")],
+            filterDateRange: [dayjs().startOf("month"), dayjs().endOf("month")],
           }}
           style={{ padding: "15px 20px" }}
         >

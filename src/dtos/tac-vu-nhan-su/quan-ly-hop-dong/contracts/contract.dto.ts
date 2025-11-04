@@ -2,10 +2,12 @@ import { z } from "zod";
 
 // Contract Status Enum using Zod
 export const ContractStatusEnum = z.enum([
-  "ACTIVE",
+  "PENDING",
+  "USER_SIGNED",
+  "DIRECTOR_SIGNED",
   "INACTIVE",
   "EXPIRED",
-  "PENDING",
+  "ACTIVE",
 ]);
 
 export type ContractStatus = z.infer<typeof ContractStatusEnum>;

@@ -103,6 +103,11 @@ class TuyenDungServicesBase extends AxiosService {
       data
     );
   }
+
+  async checkMailExists(listParticipantIds: string[]): Promise<any> {
+    const payload = { participantIds: listParticipantIds };
+    return this.post(`${this.basePath}/lich-hen/check-mail-ung-vien`, payload);
+  }
 }
 
 const TuyenDungServices = new TuyenDungServicesBase();

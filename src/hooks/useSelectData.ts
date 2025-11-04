@@ -86,6 +86,7 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     { label: "Không đến PV", value: "NOT_COMING_INTERVIEW" }, //5
     { label: "Không đến NV", value: "NOT_COMING_OFFER" }, //5
     { label: "Từ chối NV", value: "OFFER_REJECTED" }, //5
+    { label: "HT Từ chối", value: "REJECTED" }, //5
     { label: "Chưa phù hợp", value: "NOT_SUITABLE" }, //6
     { label: "Hoàn thành", value: "HOAN_THANH" }, //7
   ]);

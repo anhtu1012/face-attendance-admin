@@ -57,8 +57,7 @@ const AppendixList: React.FC<AppendixListProps> = ({
               <div className="appendix-center">
                 <div className="appendix-title-row">
                   <Text strong className="contract-type">
-                    {/* {appendix.contractTypeName} */}
-                    Phụ lục hợp đồng
+                    {appendix.contractTypeName}
                   </Text>
                   <Tag
                     color={getStatusColor(appendix.status)}

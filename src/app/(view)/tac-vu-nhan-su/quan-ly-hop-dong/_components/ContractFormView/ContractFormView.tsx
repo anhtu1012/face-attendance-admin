@@ -168,18 +168,31 @@ function ContractFormView({
         // Upload the PDF file after successful creation
         if (response?.id && pdfRef?.current) {
           try {
+            // Wait a bit for DOM to fully render
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            messageApi.loading("Đang tạo file PDF...", 0);
+
             // Generate PDF as File from pdfRef
             const pdfFile = await generatePdfFileFromElement();
 
             if (pdfFile) {
+              messageApi.destroy();
+              messageApi.loading("Đang tải file lên...", 0);
+
               const formData = new FormData();
               formData.append("userContractExtendedId", response.id);
               formData.append("fileContract", pdfFile);
 
               await QuanLyHopDongServices.uploadAppendixMultipart(formData);
+              messageApi.destroy();
               messageApi.success("File phụ lục đã được tải lên thành công!");
+            } else {
+              messageApi.destroy();
+              messageApi.warning("Không thể tạo file PDF!");
             }
           } catch (uploadError) {
+            messageApi.destroy();
             console.error("Error uploading appendix PDF:", uploadError);
             messageApi.warning(
               "Phụ lục đã được tạo nhưng không thể tải file lên!"
@@ -226,12 +239,14 @@ function ContractFormView({
 
       const element = pdfRef.current;
 
-      // Generate canvas from HTML
+      // Generate canvas from HTML with better quality
       const canvas = await html2canvas(element, {
         useCORS: true,
         logging: false,
         background: "#ffffff",
         allowTaint: true,
+        height: element.scrollHeight, // Capture full height
+        width: element.scrollWidth, // Capture full width
       });
 
       // Create PDF
@@ -243,9 +258,29 @@ function ContractFormView({
 
       const imgData = canvas.toDataURL("image/png");
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      // Calculate the height of the image when scaled to fit page width
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = pdfWidth / imgWidth;
+      const scaledHeight = imgHeight * ratio;
+
+      // Add image to PDF, splitting into multiple pages if needed
+      let heightLeft = scaledHeight;
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, scaledHeight);
+      heightLeft -= pdfHeight;
+
+      // Add additional pages if content is longer than one page
+      while (heightLeft > 0) {
+        position = heightLeft - scaledHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, scaledHeight);
+        heightLeft -= pdfHeight;
+      }
 
       // Convert PDF to Blob then to File
       const pdfBlob = pdf.output("blob");
