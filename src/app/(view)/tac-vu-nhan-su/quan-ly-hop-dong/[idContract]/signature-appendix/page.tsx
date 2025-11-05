@@ -1,42 +1,42 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import SignaturePad from "signature_pad";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
 // Import components
 import { PdfPreview } from "@/components/Template/components/PdfPreview";
 // Import types
 import { ContractData, Signatures } from "@/components/Template/types";
-import { ContractDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 
 // Import service
 import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
 
 // Import styles
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
+import { AppendixDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.dto";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { useSelector } from "react-redux";
-import "./signature.scss";
-import { createFileFromDataUrl } from "../_utils/createFileFromDataUrl";
-import LoadingSpinner from "../_components/LoadingSpinner";
-import SignatureToolbox from "../_components/SignatureToolbox";
 import { PrintIcon } from "../_components/icons";
+import LoadingSpinner from "../_components/LoadingSpinner";
 import OTPModal from "../_components/OTPModal";
+import SignatureToolbox from "../_components/SignatureToolbox";
+import { createFileFromDataUrl } from "../_utils/createFileFromDataUrl";
+import "./signature.scss";
 
 const ContractSignaturePage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const idContract = params.idContract as string;
-  const { userProfile } = useSelector(selectAuthLogin);
+  const { userProfile, companyInformation } = useSelector(selectAuthLogin);
   const messageApi = useAntdMessage();
   // Data states
   const [contractData, setContractData] = useState<ContractData | null>(null);
-  const [contractDetail, setContractDetail] = useState<ContractDetail | null>(
+  const [contractDetail, setContractDetail] = useState<AppendixDetail | null>(
     null
   );
   // const [userInfo, setUserInfo] = useState<UserInfor | null>(null);
@@ -61,19 +61,87 @@ const ContractSignaturePage: React.FC = () => {
   // Print ref
   const printableRef = useRef<HTMLDivElement>(null);
 
-  // PDF file state
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  // Function to generate PDF from printableRef
+  const generatePDFFile = async (): Promise<File | null> => {
+    if (!printableRef.current) {
+      console.error("Printable ref is not available");
+      return null;
+    }
+
+    try {
+      const element = printableRef.current;
+
+      // Capture the element as canvas
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        logging: false,
+      });
+
+      // Calculate PDF dimensions (A4 size with padding)
+      const paddingTop = 10; // Padding top in mm
+      const paddingBottom = 10; // Padding bottom in mm
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const contentHeight = pageHeight - paddingTop - paddingBottom; // Available content height
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      // Add image to PDF
+      const imgData = canvas.toDataURL("image/png");
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        paddingTop + position,
+        imgWidth,
+        imgHeight
+      );
+      heightLeft -= contentHeight;
+
+      // Add extra pages if content is longer than one page
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(
+          imgData,
+          "PNG",
+          0,
+          paddingTop + position,
+          imgWidth,
+          imgHeight
+        );
+        heightLeft -= contentHeight;
+      }
+
+      // Convert PDF to Blob then to File
+      const pdfBlob = pdf.output("blob");
+      const fileName = `PhulucHopDong-${
+        contractDetail?.contractNumber || idContract
+      }-${Date.now()}.pdf`;
+      const pdfFile = new File([pdfBlob], fileName, {
+        type: "application/pdf",
+      });
+
+      return pdfFile;
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      return null;
+    }
+  };
 
   // --- FETCH CONTRACT DATA ---
   useEffect(() => {
     const fetchContractData = async () => {
       try {
         setIsLoading(true);
-        const response = await QuanLyHopDongServices.getChiTietHopDong(
+        const response = await QuanLyHopDongServices.getChiTietPhuLuc(
           idContract
         );
 
-        const contract = response.contract;
+        const contract = response.appendix;
         const user = response.userInfor;
 
         setContractDetail(contract);
@@ -99,13 +167,13 @@ const ContractSignaturePage: React.FC = () => {
         const transformedData: ContractData = {
           userContractId: contract.id,
           title: contract.contractTypeName || "HỢP ĐỒNG LAO ĐỘNG",
-          city: "Hà Nội", // Could be dynamic based on company info
+          city: companyInformation.city, // Could be dynamic based on company info
           effectiveDate: contract.startDate,
           partyA: {
-            companyName: "CÔNG TY CỔ PHẦN 9HK", // Should come from company settings
-            address:
-              "Tầng 12A, Tòa nhà Center Building, Hapulico Complex, số 01 Nguyễn Huy Tưởng, phường Thanh Xuân Trung, quận Thanh Xuân, Hà Nội", // Should come from company settings
-            representative: "Nguyễn Văn A", // Should come from director info
+            companyName: companyInformation.companyName, // Should come from company settings
+            address: companyInformation.addressLine || "", // Should come from company settings
+            representative:
+              companyInformation.representator?.legalRepresentativeName || "", // Should come from director info
             position: "Giám đốc",
             refNumber: contract.contractNumber || "001/2024/HĐLĐ",
           },
@@ -133,7 +201,14 @@ const ContractSignaturePage: React.FC = () => {
     if (idContract) {
       fetchContractData();
     }
-  }, [idContract, router]);
+  }, [
+    companyInformation.addressLine,
+    companyInformation.city,
+    companyInformation.companyName,
+    companyInformation.representator?.legalRepresentativeName,
+    idContract,
+    router,
+  ]);
 
   // --- INITIALIZE SIGNATURE PADS ---
   useEffect(() => {
@@ -224,99 +299,7 @@ const ContractSignaturePage: React.FC = () => {
         }
       }
     `,
-    onAfterPrint: async () => {
-      console.log("Document printed successfully");
-      // Generate PDF file after printing
-      await generatePdfFile();
-    },
   });
-
-  // Generate PDF file from the printable content and return it
-  const generatePdfFileAndReturn = async (): Promise<File | null> => {
-    try {
-      if (!printableRef.current) {
-        console.error("Printable ref is not available");
-        return null;
-      }
-
-      // Capture the HTML element as canvas
-      const canvas = await html2canvas(printableRef.current, {
-        useCORS: true,
-        logging: false,
-        width: printableRef.current.scrollWidth,
-        height: printableRef.current.scrollHeight,
-      });
-
-      // Calculate PDF dimensions (A4 size)
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-
-      // Create PDF
-      const pdf = new jsPDF("p", "mm", "a4");
-      let position = 0;
-
-      // Add first page
-      pdf.addImage(
-        canvas.toDataURL("image/png"),
-        "PNG",
-        0,
-        position,
-        imgWidth,
-        imgHeight
-      );
-      heightLeft -= pageHeight;
-
-      // Add additional pages if content exceeds one page
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(
-          canvas.toDataURL("image/png"),
-          "PNG",
-          0,
-          position,
-          imgWidth,
-          imgHeight
-        );
-        heightLeft -= pageHeight;
-      }
-
-      // Convert PDF to Blob then to File
-      const pdfBlob = pdf.output("blob");
-      const fileName = `HopDong-${
-        contractDetail?.contractNumber || idContract
-      }-signed-${Date.now()}.pdf`;
-      const file = new File([pdfBlob], fileName, {
-        type: "application/pdf",
-      });
-
-      // Save to state
-      setPdfFile(file);
-      console.log("PDF file created:", fileName);
-      return file;
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      return null;
-    }
-  };
-
-  // Generate PDF file from the printable content (for print button)
-  const generatePdfFile = async () => {
-    try {
-      messageApi.info("Đang tạo file PDF...");
-      const file = await generatePdfFileAndReturn();
-      if (file) {
-        messageApi.success("Tạo file PDF thành công!");
-      } else {
-        messageApi.error("Không thể tạo file PDF. Vui lòng thử lại.");
-      }
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      messageApi.error("Không thể tạo file PDF. Vui lòng thử lại.");
-    }
-  };
 
   // --- OTP HANDLERS ---
   const handleVerifySignature = async () => {
@@ -324,9 +307,9 @@ const ContractSignaturePage: React.FC = () => {
       alert("Vui lòng hoàn thành cả 2 chữ ký trước khi xác thực.");
       return;
     }
-    console.log("contractId", contractData?.userContractId);
+    console.log("contractId", contractData);
     await QuanLyHopDongServices.getOpt({
-      userContractId: contractData?.userContractId || "",
+      userContractExtendedId: contractData?.userContractId || "",
       gmail: userProfile.email || "",
     });
     setShowOTPModal(true);
@@ -349,7 +332,12 @@ const ContractSignaturePage: React.FC = () => {
     try {
       // Step 1: Save signatures
       const formData = new FormData();
-      formData.append("userContractId", contractData?.userContractId || "");
+      console.log("contractData", contractData);
+
+      formData.append(
+        "userContractExtendedId",
+        contractData?.userContractId || ""
+      );
       formData.append("otpCode", otpValue);
 
       const fileSignA = await createFileFromDataUrl(
@@ -365,18 +353,15 @@ const ContractSignaturePage: React.FC = () => {
       }
 
       formData.append("signatureType", "DIRECTOR");
+      console.log("formData", formData);
+
       await QuanLyHopDongServices.saveContractSignatures(formData);
       messageApi.success("Xác thực OTP và lưu chữ ký thành công.");
 
       // Step 2: Generate and upload PDF file
       try {
-        messageApi.info("Đang tạo và upload file PDF...");
-
-        // Generate PDF if not already created
-        let pdfFileToUpload = pdfFile;
-        if (!pdfFileToUpload) {
-          pdfFileToUpload = await generatePdfFileAndReturn();
-        }
+        // Generate PDF from printableRef
+        const pdfFileToUpload = await generatePDFFile();
 
         if (pdfFileToUpload) {
           const uploadFormData = new FormData();
@@ -386,11 +371,11 @@ const ContractSignaturePage: React.FC = () => {
             pdfFileToUpload.name
           );
           uploadFormData.append(
-            "userContractId",
+            "userContractExtendedId",
             contractData?.userContractId || ""
           );
 
-          await QuanLyHopDongServices.uploadContractMultipart(uploadFormData);
+          await QuanLyHopDongServices.uploadAppendixMultipart(uploadFormData);
           messageApi.success("Upload file PDF thành công!");
         } else {
           messageApi.warning("Không thể tạo file PDF. Vui lòng thử lại.");
@@ -425,7 +410,7 @@ const ContractSignaturePage: React.FC = () => {
   const handleResendOTP = async () => {
     try {
       await QuanLyHopDongServices.getOpt({
-        userContractId: contractData?.userContractId || "",
+        userContractExtendedId: contractData?.userContractId || "",
         gmail: userProfile.email || "",
       });
       messageApi.success("Đã gửi lại mã OTP thành công.");

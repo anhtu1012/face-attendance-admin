@@ -10,8 +10,8 @@
     min-height: 297mm !important;
     max-width: 210mm !important;
 
-    // Padding tối ưu cho in (nhỏ hơn để fit nhiều content hơn)
-    padding: 12mm 10mm !important;
+    // Padding tối ưu cho in với padding-top lớn hơn
+    padding: 20mm 10mm 12mm 10mm !important;
     margin: 0 !important;
     box-sizing: border-box !important;
 
@@ -420,10 +420,11 @@
     }
 
     .pdf-signature-image {
-      height: 15mm !important; // Tương đương 4rem gốc
-      width: auto !important;
+      width: 50mm !important; // Cố định width
+      height: 17mm !important; // Cố định height để 2 chữ ký bằng nhau
       margin-bottom: 2mm !important; // Tương đương 0.5rem gốc
       display: inline-block !important;
+      object-fit: contain !important; // Giữ tỷ lệ ảnh
     }
 
     .pdf-signature-name {

@@ -62,9 +62,6 @@ const ContractSignaturePage: React.FC = () => {
   // Print ref
   const printableRef = useRef<HTMLDivElement>(null);
 
-  // PDF file state
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
-
   // --- FETCH CONTRACT DATA ---
   useEffect(() => {
     const fetchContractData = async () => {
@@ -225,27 +222,20 @@ const ContractSignaturePage: React.FC = () => {
         }
       }
     `,
-    onAfterPrint: async () => {
-      console.log("Document printed successfully");
-      // Generate PDF file after printing
-      await generatePdfFile();
-    },
   });
+  const generatePDFFile = async (): Promise<File | null> => {
+    if (!printableRef.current) {
+      console.error("Printable ref is not available");
+      return null;
+    }
 
-  // Generate PDF file from the printable content and return it
-  const generatePdfFileAndReturn = async (): Promise<File | null> => {
     try {
-      if (!printableRef.current) {
-        console.error("Printable ref is not available");
-        return null;
-      }
+      const element = printableRef.current;
 
-      // Capture the HTML element as canvas
-      const canvas = await html2canvas(printableRef.current, {
+      // Capture the element as canvas
+      const canvas = await html2canvas(element, {
         useCORS: true,
         logging: false,
-        width: printableRef.current.scrollWidth,
-        height: printableRef.current.scrollHeight,
       });
 
       // Calculate PDF dimensions (A4 size)
@@ -254,68 +244,35 @@ const ContractSignaturePage: React.FC = () => {
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
 
-      // Create PDF
       const pdf = new jsPDF("p", "mm", "a4");
       let position = 0;
 
-      // Add first page
-      pdf.addImage(
-        canvas.toDataURL("image/png"),
-        "PNG",
-        0,
-        position,
-        imgWidth,
-        imgHeight
-      );
+      // Add image to PDF
+      const imgData = canvas.toDataURL("image/png");
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
-      // Add additional pages if content exceeds one page
+      // Add extra pages if content is longer than one page
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(
-          canvas.toDataURL("image/png"),
-          "PNG",
-          0,
-          position,
-          imgWidth,
-          imgHeight
-        );
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
 
       // Convert PDF to Blob then to File
       const pdfBlob = pdf.output("blob");
-      const fileName = `HopDong-${
+      const fileName = `PhulucHopDong-${
         contractDetail?.contractNumber || idContract
-      }-signed-${Date.now()}.pdf`;
-      const file = new File([pdfBlob], fileName, {
+      }-${Date.now()}.pdf`;
+      const pdfFile = new File([pdfBlob], fileName, {
         type: "application/pdf",
       });
 
-      // Save to state
-      setPdfFile(file);
-      console.log("PDF file created:", fileName);
-      return file;
+      return pdfFile;
     } catch (error) {
       console.error("Error generating PDF:", error);
       return null;
-    }
-  };
-
-  // Generate PDF file from the printable content (for print button)
-  const generatePdfFile = async () => {
-    try {
-      messageApi.info("Đang tạo file PDF...");
-      const file = await generatePdfFileAndReturn();
-      if (file) {
-        messageApi.success("Tạo file PDF thành công!");
-      } else {
-        messageApi.error("Không thể tạo file PDF. Vui lòng thử lại.");
-      }
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      messageApi.error("Không thể tạo file PDF. Vui lòng thử lại.");
     }
   };
 
@@ -371,13 +328,7 @@ const ContractSignaturePage: React.FC = () => {
 
       // Step 2: Generate and upload PDF file
       try {
-        messageApi.info("Đang tạo và upload file PDF...");
-
-        // Generate PDF if not already created
-        let pdfFileToUpload = pdfFile;
-        if (!pdfFileToUpload) {
-          pdfFileToUpload = await generatePdfFileAndReturn();
-        }
+        const pdfFileToUpload = await generatePDFFile();
 
         if (pdfFileToUpload) {
           const uploadFormData = new FormData();

@@ -2,10 +2,12 @@ import { z } from "zod";
 
 //  Appendix Status Enum using Zod
 export const AppendixStatusEnum = z.enum([
-  "ACTIVE",
+  "PENDING",
+  "USER_SIGNED",
+  "DIRECTOR_SIGNED",
   "INACTIVE",
   "EXPIRED",
-  "PENDING",
+  "ACTIVE",
 ]);
 
 export type AppendixStatus = z.infer<typeof AppendixStatusEnum>;
@@ -86,7 +88,7 @@ export type UserInfor = z.infer<typeof UserInforSchema>;
 
 // Combined payload schema: contract + userInfor
 export const AppendixWithUserSchema = z.object({
-  contract: AppendixDetailSchema,
+  appendix: AppendixDetailSchema,
   userInfor: UserInforSchema,
 });
 

@@ -8,7 +8,7 @@ export const TroCapItemSchema = z.object({
   updatedAt: z.string().optional(),
   allowanceCode: z.string(),
   allowanceName: z.string(),
-  allowanceAmount: z.number(),
+  allowanceAmount: z.string(),
   note: z.string(),
 });
 

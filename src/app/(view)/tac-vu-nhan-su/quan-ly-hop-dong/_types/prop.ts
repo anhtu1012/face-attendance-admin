@@ -6,6 +6,7 @@ export interface FormValues {
   position: string;
   userName: string;
   contractType: string;
+  department: string;
   status: string;
 }
 export interface FilterRef {

@@ -61,6 +61,9 @@ function Page() {
         headerName: "Số tiền trợ cấp",
         editable: true,
         width: 150,
+        context: {
+          typeColumn: "Number",
+        },
       },
       {
         field: "note",
@@ -111,7 +114,7 @@ function Page() {
       updatedAt: new Date().toISOString(),
       allowanceCode: "",
       allowanceName: "",
-      allowanceAmount: 0,
+      allowanceAmount: "",
       note: "",
     }),
     duplicateCheckField: "allowanceCode",
@@ -168,6 +171,11 @@ function Page() {
           pagination={true}
           paginationPageSize={pageSize}
           paginationCurrentPage={currentPage}
+          rowSelection={{
+            mode: "singleRow",
+            enableClickSelection: true,
+            checkboxes: false,
+          }}
           onChangePage={(currentPage, pageSize) => {
             setCurrentPage(currentPage);
             setPageSize(pageSize);

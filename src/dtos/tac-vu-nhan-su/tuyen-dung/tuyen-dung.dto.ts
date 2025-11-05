@@ -13,6 +13,8 @@ export const TuyenDungItemSchema = z.object({
   fileCV: z.string().optional(), // URL to the CV file
   gender: z.enum(["M", "F", ""]),
   status: z.string(),
+  isExisted: z.boolean().optional(),
+  reason: z.string().optional(),
   analysisResult: AnalysisResultSchema.optional(),
   experience: z.string().optional(),
   createdAt: z.string().optional(),

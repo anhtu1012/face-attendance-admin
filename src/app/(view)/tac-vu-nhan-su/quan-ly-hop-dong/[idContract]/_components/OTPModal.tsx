@@ -9,7 +9,6 @@ interface OTPModalProps {
   handleOTPSubmit: () => Promise<void>;
   handleCloseOTPModal: () => void;
   handleResendOTP: () => Promise<void>;
-  /** Initial countdown seconds for the OTP validity (defaults to 60) */
   initialSeconds?: number;
 }
 

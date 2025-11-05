@@ -4,7 +4,7 @@ import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import { CreateJobOfferRequest } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
 
 class JobOfferServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/job-offer";
+  protected readonly basePath = "/v1/recruitment";
 
   async getJobOffers(
     searchFilter: FilterQueryStringTypeItem[] = [],
@@ -12,7 +12,7 @@ class JobOfferServicesBase extends AxiosService {
     params?: Record<string, string | number | boolean>
   ): Promise<any> {
     return this.getWithFilter(
-      `${this.basePath}`,
+      `${this.basePath}/lich-hen/danh-sach-nhan-viec`,
       searchFilter,
       quickSearchText,
       params

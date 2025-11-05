@@ -26,6 +26,7 @@ interface ContractDetailModalProps {
   contractId: string | null;
   onAddAppendix?: (contractData: ContractWithUser) => void;
   onTerminateContract?: (contractData: ContractWithUser) => void;
+  onUploadSuccess?: () => void;
 }
 
 const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
@@ -34,6 +35,7 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
   contractId,
   onAddAppendix,
   onTerminateContract,
+  onUploadSuccess,
 }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<ContractWithUser | null>(null);
@@ -91,6 +93,14 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
       message.success("Upload PDF thành công!");
       // refresh data after upload
       await fetchContractDetail();
+      // notify parent to refresh table if provided
+      if (typeof onUploadSuccess === "function") {
+        try {
+          onUploadSuccess();
+        } catch (e) {
+          console.warn("onUploadSuccess callback threw:", e);
+        }
+      }
     } catch (error) {
       message.error("Upload PDF thất bại!");
       console.error("Error uploading PDF:", error);

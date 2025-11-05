@@ -2,6 +2,7 @@
 "use client";
 import AIAnalysisResultModal from "@/components/AIAnalysisResultModal/AIAnalysisResultModal";
 import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
+import IsExistedCellRenderer from "@/components/basicUI/cTableAG/components/IsExistedCellRenderer";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { TuyenDungItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.dto";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
@@ -10,6 +11,7 @@ import { showError } from "@/hooks/useNotification";
 import { useRecruitmentSocket } from "@/hooks/useRecruitmentSocket";
 import { useSelectData } from "@/hooks/useSelectData";
 import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
+import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/quan-ly-phong-van.service";
 import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
 import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
 import {
@@ -30,13 +32,13 @@ import { FaPlusCircle } from "react-icons/fa";
 import { FcViewDetails } from "react-icons/fc";
 import { GoReport } from "react-icons/go";
 import { useSelector } from "react-redux";
+import { ReportListModal } from "../_shared/AppointmentDetailTabs/components";
 import InterviewListModal from "./_components/InterviewListModal/InterviewListModal";
 import InterviewScheduleModal from "./_components/InterviewScheduleModal/InterviewScheduleModal";
 import JobCreationModal from "./_components/JobCreationModal/JobCreationModal";
 import "./_components/JobCreationModal/JobCreationModal.scss";
 import "./_components/JobDetailModal/JobDetailModal.scss";
 import JobOfferModal from "./_components/JobOfferModal/JobOfferModal";
-import LeaderReportModal from "./_components/LeaderReportModal/LeaderReportModal";
 import "./_components/LeaderReportModal/LeaderReportModal.scss";
 import ListJob from "./_components/ListJob/ListJob";
 import SuccessModal from "./_components/SuccessModal/SuccessModal";
@@ -81,6 +83,10 @@ function Page() {
   const [jobId, setJobId] = useState<string>("");
   const [listModalOpen, setListModalOpen] = useState(false);
   const [newJobIds, setNewJobIds] = useState<Set<string>>(new Set());
+  const [reportListCandidate, setReportListCandidate] =
+    useState<TuyenDungItem | null>(null);
+  const [reportList, setReportList] = useState<any[]>([]);
+
   // Track new count for each status tab
   const [newCounts, setNewCounts] = useState<Record<string, number>>({
     LIEN_HE: 0,
@@ -378,6 +384,15 @@ function Page() {
           typeColumn: "File",
         },
       },
+      {
+        field: "isExisted",
+        headerName: "TT Ứng Viên",
+        editable: false,
+        width: 150,
+        filter: false,
+        cellRenderer: IsExistedCellRenderer,
+        cellStyle: { display: "flex", justifyContent: "center" },
+      },
     ],
     [t, selectGender, selectCandidate, itemErrorCellStyle]
   );
@@ -427,12 +442,40 @@ function Page() {
     setJobOfferModalOpen(false);
     setSelectedCandidate(null);
   };
+  const fetchReportList = async (
+    candidateId?: string,
+    candidate?: TuyenDungItem
+  ) => {
+    if (!candidateId) return;
+    try {
+      const response = await QuanLyPhongVanServices.getReportDetail(
+        [],
+        undefined,
+        {
+          intervieweeId: candidateId,
+        }
+      );
+      setReportList(
+        Array.isArray(response.data) ? response.data : [response.data]
+      );
+      setReportListCandidate(candidate || null);
+    } catch (error) {
+      console.error("Error fetching report list:", error);
+      messageApi.error("Không thể tải danh sách báo cáo");
+    }
+  };
 
   // Leader report modal handlers
   const handleOpenLeaderReportModal = (_params: any) => {
-    if (_params) {
-      setSelectedCandidate(_params.data);
-      setLeaderReportModalOpen(true);
+    const data: TuyenDungItem = _params?.data;
+    if (data) {
+      if (data && data.id) {
+        fetchReportList(String(data.id), data);
+        setSelectedCandidate(data);
+        setLeaderReportModalOpen(true);
+      } else {
+        messageApi.warning("Vui lòng chọn nhân viên hợp lệ để xem báo cáo!");
+      }
     } else {
       messageApi.warning("Vui lòng chọn nhân viên để xem báo cáo!");
     }
@@ -441,6 +484,8 @@ function Page() {
   const handleCloseLeaderReportModal = () => {
     setLeaderReportModalOpen(false);
     setSelectedCandidate(null);
+    setReportListCandidate(null);
+    setReportList([]);
   };
 
   const dataGrid = useDataGridOperations<TuyenDungItem>({
@@ -951,20 +996,16 @@ function Page() {
         }}
       />
 
-      {/* Leader Report Modal */}
-      <LeaderReportModal
+      {/* Report List Modal */}
+      <ReportListModal
         open={leaderReportModalOpen}
         onClose={handleCloseLeaderReportModal}
-        candidateData={
-          selectedCandidate && !Array.isArray(selectedCandidate)
-            ? {
-                id: selectedCandidate.id || "",
-                fullName: selectedCandidate.fullName || "",
-                email: selectedCandidate.email || "",
-                phone: selectedCandidate.phone || "",
-              }
-            : undefined
-        }
+        reports={reportList}
+        candidateName={reportListCandidate?.fullName}
+        onViewDetail={(report) => {
+          console.log("View report detail:", report);
+          messageApi.info("Chi tiết báo cáo: " + report.id);
+        }}
       />
 
       {/* AI Analysis Result Modal */}

@@ -12,6 +12,9 @@ import {
   FaEye,
 } from "react-icons/fa";
 import { AppendixDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.dto";
+import { AiFillSignature } from "react-icons/ai";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 const { Text } = Typography;
 
 interface AppendixListProps {
@@ -34,6 +37,7 @@ const AppendixList: React.FC<AppendixListProps> = ({
       currency: "VND",
     }).format(numValue);
   };
+  const { userProfile, companyInformation } = useSelector(selectAuthLogin);
 
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return "";
@@ -102,6 +106,34 @@ const AppendixList: React.FC<AppendixListProps> = ({
               </div>
 
               <div className="appendix-right">
+                {appendix.status === "DIRECTOR_SIGNED" &&
+                  userProfile.id ===
+                    companyInformation.representator?.legalRepresentativeId && (
+                    <Cbutton
+                      icon={<AiFillSignature />}
+                      size="middle"
+                      onClick={() =>
+                        (window.location.href = `/tac-vu-nhan-su/quan-ly-hop-dong/${appendix.id}/signature-appendix`)
+                      }
+                      origin={{
+                        bgcolor: "#fff",
+                        color: "#0889f1ff",
+                        hoverBgColor:
+                          "linear-gradient(45deg, rgb(21, 101, 192), rgb(66, 165, 245), rgb(21, 101, 192))",
+                        border: "1px solid #0889f1ff",
+                        hoverColor: "#fff",
+                      }}
+                      style={{
+                        fontWeight: 600,
+                        boxShadow: "0 4px 12px rgba(21, 101, 192, 0.3)",
+                        padding: "8px 20px",
+                        height: "auto",
+                        marginRight: "8px",
+                      }}
+                    >
+                      Ký tên
+                    </Cbutton>
+                  )}
                 <Cbutton
                   icon={<FaEye />}
                   size="middle"
@@ -121,7 +153,7 @@ const AppendixList: React.FC<AppendixListProps> = ({
                     height: "auto",
                   }}
                 >
-                  Xem chi tiết
+                  Chi tiết
                 </Cbutton>
               </div>
             </div>

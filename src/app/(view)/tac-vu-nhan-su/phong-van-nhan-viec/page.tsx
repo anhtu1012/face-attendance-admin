@@ -20,10 +20,6 @@ import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nh
 dayjs.extend(isoWeek);
 
 function Page() {
-  // Use mock data (comment these out when API is ready)
-  const USE_MOCK_DATA = true;
-
-  // Interview states
   const [interviewData, setInterviewData] = useState<
     AppointmentListWithInterview[]
   >([]);
@@ -91,14 +87,8 @@ function Page() {
   const fetchJobOffers = useCallback(async () => {
     setLoadingJobOffers(true);
     try {
-      if (USE_MOCK_DATA) {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setJobOfferData([]);
-      } else {
-        const response = await JobOfferServices.getJobOffers();
-        setJobOfferData(response.data || []);
-      }
+      const response = await JobOfferServices.getJobOffers();
+      setJobOfferData(response.data || []);
     } catch (error: any) {
       showError(
         error.response?.data?.message || "Lỗi khi tải danh sách nhận việc"
@@ -106,7 +96,7 @@ function Page() {
     } finally {
       setLoadingJobOffers(false);
     }
-  }, [USE_MOCK_DATA]);
+  }, []);
 
   useEffect(() => {
     fetchInterviews();

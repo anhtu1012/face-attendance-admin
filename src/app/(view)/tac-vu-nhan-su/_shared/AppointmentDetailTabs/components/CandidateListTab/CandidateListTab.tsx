@@ -14,6 +14,7 @@ import {
   Button,
   Card,
   Input,
+  Popover,
   Progress,
   Space,
   Table,
@@ -41,6 +42,7 @@ import { useSelector } from "react-redux";
 import ReportListModal from "../ReportListModal/ReportListModal";
 import ReportModal from "../ReportModal/ReportModal";
 import "./CandidateListTab.scss";
+import { InfoCircleOutlined } from "@ant-design/icons";
 interface CandidateListTabProps {
   jobId?: string;
   appointmentId?: string;
@@ -140,6 +142,11 @@ export default function CandidateListTab({
                 ? "Nữ"
                 : ""}
             </div>
+            <div className="candidate-gender">
+              {record.birthday
+                ? dayjs(record.birthday).format("DD/MM/YYYY")
+                : ""}
+            </div>
           </div>
         </div>
       ),
@@ -197,7 +204,7 @@ export default function CandidateListTab({
       title: "Khuyến nghị",
       dataIndex: "analysisResult",
       key: "analysis",
-      width: 120,
+      width: 150,
       render: (analysisResult: any) => {
         if (!analysisResult) return "-";
         const getRecommendationBadge = (recommendation?: string) => {
@@ -269,7 +276,7 @@ export default function CandidateListTab({
     {
       title: "Thông tin liên hệ",
       key: "contact",
-      width: 280,
+      width: 240,
       render: (_, record) => (
         <div className="contact-info">
           <div className="contact-item">
@@ -284,12 +291,28 @@ export default function CandidateListTab({
       ),
     },
     {
-      title: "Ngày sinh",
-      dataIndex: "birthday",
-      key: "birthday",
-      width: 120,
-      render: (birthday) =>
-        birthday ? dayjs(birthday).format("DD/MM/YYYY") : "-",
+      title: "TT ứng viên",
+      dataIndex: "isExisted",
+      key: "isExisted",
+      width: 100,
+      render: (_, record) => (
+        <>
+          {" "}
+          <Popover
+            content={record.reason}
+            title={record.isExisted ? "Lý do (Nhân viên cũ)" : "Ghi chú"}
+            trigger="click"
+          >
+            <Button
+              size="small"
+              type={record.isExisted ? "primary" : "default"}
+              icon={<InfoCircleOutlined />}
+            >
+              {record.isExisted ? "Nhân viên cũ" : "Mới"}
+            </Button>
+          </Popover>
+        </>
+      ),
     },
     {
       title: "CV",

@@ -28,6 +28,7 @@ import {
 import ContractDetailModal from "../ContractDetailModal/ContractDetailModal";
 import { useSelector } from "react-redux";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import { MdOutlineEditNotifications } from "react-icons/md";
 
 const defaultPageSize = 20;
 const TableContract = forwardRef<TableContractRef, TableContractProps>(
@@ -208,6 +209,26 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
               filterValues.filterDateRange && filterValues.filterDateRange[1]
                 ? filterValues.filterDateRange[1].toISOString()
                 : undefined,
+            ...(filterValues.role ? { roleId: filterValues.role } : {}),
+            ...(filterValues.status ? { status: filterValues.status } : {}),
+            ...(filterValues.position
+              ? { positionId: filterValues.position }
+              : {}),
+            ...(filterValues.department
+              ? { positionId: filterValues.department }
+              : {}),
+            ...(filterValues.userName
+              ? { quicksearchCols: "fullNameUser" }
+              : {}),
+            ...(filterValues.userName
+              ? { quicksearch: filterValues.userName }
+              : {}),
+            ...(filterValues.contractType
+              ? { quicksearchCols: "contractTypeId" }
+              : {}),
+            ...(filterValues.contractType
+              ? { quicksearch: filterValues.contractType }
+              : {}),
           };
           const response = await QuanLyHopDongServices.getQuanLyHopDong(
             searchFilter,
@@ -276,6 +297,28 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           </div>
         );
       }
+      if (
+        _params.data.isSignature &&
+        userProfile.id ===
+          companyInformation.representator?.legalRepresentativeId
+      ) {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {defaultViewButton}
+            <Tooltip title="Có 1 phụ lục cần ký">
+              <MdOutlineEditNotifications
+                style={{ cursor: "pointer", color: "#ed060aff" }}
+                size={20}
+                onClick={() => {
+                  setSelectedContractId(_params.data.id);
+                  setModalOpen(true);
+                }}
+              />
+            </Tooltip>
+          </div>
+        );
+      }
+
       return defaultViewButton;
     };
 
@@ -320,6 +363,10 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
           contractId={selectedContractId}
           onAddAppendix={onAddAppendix}
           onTerminateContract={onTerminateContract}
+          onUploadSuccess={() => {
+            // Refresh table after successful upload
+            fetchData(currentPage, pageSize, quickSearchText);
+          }}
         />
       </div>
     );

@@ -2,6 +2,7 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import { UpdateCaLamRequest } from "@/dtos/danhMuc/ca-lam/ca-lam.request.dto";
+import { AppendixWithUser } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.dto";
 import { QuanlyPhuLucResponseGetItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.response.dto";
 import { ContractWithUser } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 import { CreateContractRequest } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.request.dto";
@@ -64,11 +65,15 @@ class QuanLyHopDongServicesBase extends AxiosService {
   uploadAppendixMultipart = async (formData: FormData): Promise<any> => {
     return this.post(`${this.basePath}/upload-phu-luc-hop-dong`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+      timeout: 120000,
     });
   };
 
   getOpt = async (data: {
-    userContractId: string;
+    userContractId?: string;
+    userContractExtendedId?: string;
     gmail?: string;
   }): Promise<any> => {
     return this.post(`${this.basePath}/gui-otp`, data);
@@ -92,6 +97,10 @@ class QuanLyHopDongServicesBase extends AxiosService {
       quickSearchText,
       params
     );
+  }
+
+  async getChiTietPhuLuc(id: string): Promise<AppendixWithUser> {
+    return this.getWithFilter(`${this.basePath}/chi-tiet-phu-luc/${id}`);
   }
 
   createPhucLucHopDong = async (data: CreateContractRequest): Promise<any> => {

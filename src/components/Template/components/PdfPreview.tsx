@@ -1,7 +1,6 @@
 "use client";
 
 import React, { forwardRef, useMemo } from "react";
-import Image from "next/image";
 import { ContractData, Signatures } from "../types";
 import "../styles/PdfPreview.scss";
 import dayjs from "dayjs";
@@ -39,8 +38,6 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
         year: adjustedDate.getFullYear(),
       };
     }, [data.effectiveDate]);
-
-    console.log("signatures", signatures.partyA);
 
     return (
       <div ref={ref} className="pdf-preview">
@@ -175,12 +172,14 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
               (Ký, đóng dấu và ghi rõ họ tên)
             </p>
             {signatures.partyA && (
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={signatures.partyA}
                 alt="Party A signature"
                 width={200}
                 height={64}
                 className="pdf-signature-image"
+                style={{ width: "200px", height: "64px", objectFit: "contain" }}
               />
             )}
             <p className="pdf-signature-name">{data.partyA.representative}</p>
@@ -194,12 +193,14 @@ export const PdfPreview = forwardRef<HTMLDivElement, PdfPreviewProps>(
               (Ký và ghi rõ họ tên)
             </p>
             {signatures.partyB && (
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={signatures.partyB}
                 alt="Party B signature"
                 width={200}
                 height={64}
                 className="pdf-signature-image"
+                style={{ width: "200px", height: "64px", objectFit: "contain" }}
               />
             )}
             <p className="pdf-signature-name">{data.partyB.name}</p>
