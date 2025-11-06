@@ -61,6 +61,7 @@ export const getStatusColor = (status: string) => {
     USER_SIGNED: "processing",
     DIRECTOR_SIGNED: "blue",
     INACTIVE: "default",
+    EXTENDED_PLUS: "success",
     EXPIRED: "error",
     ACTIVE: "success",
   };
@@ -74,6 +75,7 @@ export const getStatusText = (status: string) => {
     DIRECTOR_SIGNED: "Giám đốc đang ký",
     INACTIVE: "Không hoạt động",
     EXPIRED: "Hết hạn",
+    EXTENDED_PLUS: "Hoạt động+",
     ACTIVE: "Đang hoạt động",
   };
   return textMap[status] || status;

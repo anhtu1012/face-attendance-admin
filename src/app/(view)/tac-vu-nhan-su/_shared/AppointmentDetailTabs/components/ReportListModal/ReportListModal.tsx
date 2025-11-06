@@ -31,6 +31,7 @@ const statusColorMap: Record<string, { color: string; text: string }> = {
   TO_INTERVIEW_R5: { color: "#006064", text: "Vòng 5" },
   JOB_OFFERED: { color: "#43A047", text: "Đề xuất nhận việc" },
   INTERVIEW_REJECTED: { color: "#E53935", text: "Từ chối" },
+  INTERVIEW_FAILED: { color: "#E53935", text: "Rớt Phỏng vấn " },
   NOT_SUITABLE: { color: "#FB8C00", text: "Chưa phù hợp" },
 };
 

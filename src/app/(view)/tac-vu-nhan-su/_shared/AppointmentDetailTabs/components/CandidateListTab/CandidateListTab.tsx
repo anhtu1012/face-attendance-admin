@@ -43,14 +43,17 @@ import ReportListModal from "../ReportListModal/ReportListModal";
 import ReportModal from "../ReportModal/ReportModal";
 import "./CandidateListTab.scss";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import JobOfferServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.service";
 interface CandidateListTabProps {
   jobId?: string;
   appointmentId?: string;
+  type?: "interview" | "jobOffer";
 }
 
 export default function CandidateListTab({
   jobId,
   appointmentId,
+  type = "interview",
 }: CandidateListTabProps) {
   const [loading, setLoading] = useState(false);
   const [candidates, setCandidates] = useState<TuyenDungItem[]>([]);
@@ -84,10 +87,21 @@ export default function CandidateListTab({
   const fetchCandidates = async () => {
     setLoading(true);
     try {
-      const response = await QuanLyPhongVanServices.getUngVien([], undefined, {
-        appointmentId: appointmentId || "",
-      });
-      setCandidates(response.data || []);
+      if (type === "interview") {
+        const response = await QuanLyPhongVanServices.getUngVien(
+          [],
+          undefined,
+          {
+            appointmentId: appointmentId || "",
+          }
+        );
+        setCandidates(response.data || []);
+      } else {
+        const response = await JobOfferServices.getUngVien([], undefined, {
+          receiveJobId: appointmentId || "",
+        });
+        setCandidates(response.data || []);
+      }
     } catch (error) {
       console.error("Error fetching candidates:", error);
     } finally {
@@ -457,6 +471,14 @@ export default function CandidateListTab({
     }
   };
 
+  const cardTitle =
+    type === "jobOffer" ? "Danh sách ứng viên nhận việc" : "Danh sách ứng viên";
+
+  const searchPlaceholder =
+    type === "jobOffer"
+      ? "Tìm kiếm ứng viên nhận việc..."
+      : "Tìm kiếm ứng viên...";
+
   return (
     <div className="candidate-list-tab">
       <Card
@@ -464,7 +486,7 @@ export default function CandidateListTab({
           <div className="card-header">
             <div className="header-left">
               <FaUsers className="header-icon gradient-icon" />
-              <span className="header-title">Danh sách ứng viên</span>
+              <span className="header-title">{cardTitle}</span>
               <Badge
                 count={candidates.length}
                 showZero
@@ -472,7 +494,7 @@ export default function CandidateListTab({
               />
             </div>
             <Input
-              placeholder="Tìm kiếm ứng viên..."
+              placeholder={searchPlaceholder}
               prefix={<FaSearch className="gradient-icon" />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}

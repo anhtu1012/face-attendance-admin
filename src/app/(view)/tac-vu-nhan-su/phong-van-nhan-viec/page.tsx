@@ -16,6 +16,8 @@ import { FilterValues } from "./_types/filter.types";
 import "./index.scss";
 import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
 import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 
 dayjs.extend(isoWeek);
 
@@ -23,6 +25,7 @@ function Page() {
   const [interviewData, setInterviewData] = useState<
     AppointmentListWithInterview[]
   >([]);
+  const { userProfile } = useSelector(selectAuthLogin);
   const [loadingInterviews, setLoadingInterviews] = useState(false);
   const [interviewFilters, setInterviewFilters] = useState<FilterValues>({});
 
@@ -30,20 +33,12 @@ function Page() {
   const [jobOfferData, setJobOfferData] = useState<JobOfferItem[]>([]);
   const [loadingJobOffers, setLoadingJobOffers] = useState(false);
   const [jobOfferFilters, setJobOfferFilters] = useState<FilterValues>({});
-  console.log(
-    "a",
-    interviewData,
-    jobOfferData,
-    interviewFilters,
-    jobOfferFilters
-  );
 
   // Status options for filters
   const interviewStatusOptions = useMemo(
     () => [
       { label: "Chờ xác nhận", value: "PENDING" },
       { label: "Chấp nhận", value: "ACCEPTED" },
-      { label: "Từ chối", value: "REJECTED" },
       { label: "Hoàn thành", value: "COMPLETED" },
       { label: "Hủy bỏ", value: "CANCELLED" },
     ],
@@ -52,9 +47,7 @@ function Page() {
 
   const jobOfferStatusOptions = useMemo(
     () => [
-      { label: "Chờ xác nhận", value: "PENDING" },
-      { label: "Chấp nhận", value: "ACCEPTED" },
-      { label: "Từ chối", value: "REJECTED" },
+      { label: "Đang hoạt động", value: "ACTIVE" },
       { label: "Hoàn thành", value: "COMPLETED" },
       { label: "Hủy bỏ", value: "CANCELLED" },
     ],
@@ -62,12 +55,23 @@ function Page() {
   );
 
   const fetchInterviews = useCallback(async () => {
-    setLoadingInterviews(true);
+    if (!userProfile?.userName) return;
 
+    setLoadingInterviews(true);
     try {
+      const param = {
+        userName: userProfile.userName,
+        fromDate: interviewFilters.fromDate
+          ? dayjs(interviewFilters.fromDate).toISOString()
+          : dayjs().startOf("isoWeek").toISOString(),
+        toDate: interviewFilters.toDate
+          ? dayjs(interviewFilters.toDate).toISOString()
+          : dayjs().endOf("isoWeek").toISOString(),
+      };
       const response = await TuyenDungServices.getDanhSachPhongVanWithParam(
         [],
-        undefined
+        undefined,
+        param
       );
       setInterviewData(response.data || []);
     } catch (error: any) {
@@ -77,17 +81,28 @@ function Page() {
     } finally {
       setLoadingInterviews(false);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchInterviews();
-  }, [fetchInterviews]);
+  }, [userProfile, interviewFilters]);
 
   // Fetch job offers
   const fetchJobOffers = useCallback(async () => {
+    if (!userProfile?.id) return;
+
     setLoadingJobOffers(true);
     try {
-      const response = await JobOfferServices.getJobOffers();
+      const param = {
+        hrId: String(userProfile.id),
+        fromDate: jobOfferFilters.fromDate
+          ? dayjs(jobOfferFilters.fromDate).toISOString()
+          : dayjs().startOf("isoWeek").toISOString(),
+        toDate: jobOfferFilters.toDate
+          ? dayjs(jobOfferFilters.toDate).toISOString()
+          : dayjs().endOf("isoWeek").toISOString(),
+      };
+      const response = await JobOfferServices.getJobOffers(
+        [],
+        undefined,
+        param
+      );
       setJobOfferData(response.data || []);
     } catch (error: any) {
       showError(
@@ -96,7 +111,7 @@ function Page() {
     } finally {
       setLoadingJobOffers(false);
     }
-  }, []);
+  }, [userProfile, jobOfferFilters]);
 
   useEffect(() => {
     fetchInterviews();
@@ -125,7 +140,7 @@ function Page() {
   };
 
   // Compute date range from filters or default to current week
-  const dateRange = useMemo(() => {
+  const interviewDateRange = useMemo(() => {
     if (interviewFilters.fromDate && interviewFilters.toDate) {
       return {
         start: dayjs(interviewFilters.fromDate),
@@ -138,6 +153,19 @@ function Page() {
     };
   }, [interviewFilters]);
 
+  const jobOfferDateRange = useMemo(() => {
+    if (jobOfferFilters.fromDate && jobOfferFilters.toDate) {
+      return {
+        start: dayjs(jobOfferFilters.fromDate),
+        end: dayjs(jobOfferFilters.toDate),
+      };
+    }
+    return {
+      start: dayjs().startOf("isoWeek"),
+      end: dayjs().endOf("isoWeek"),
+    };
+  }, [jobOfferFilters]);
+
   const tabItems = [
     {
       key: "interview",
@@ -148,7 +176,7 @@ function Page() {
             {" "}
             <AppointmentWeeklyView
               data={interviewData}
-              dateRange={dateRange}
+              dateRange={interviewDateRange}
               type="interview"
               onItemClick={handleInterviewClick}
               statusOptions={interviewStatusOptions}
@@ -170,8 +198,8 @@ function Page() {
       children: (
         <div className="job-offer-tab-content">
           <AppointmentWeeklyView
-            data={[]}
-            dateRange={dateRange}
+            data={jobOfferData as any}
+            dateRange={jobOfferDateRange}
             type="jobOffer"
             onItemClick={handleJobOfferClick}
             statusOptions={jobOfferStatusOptions}

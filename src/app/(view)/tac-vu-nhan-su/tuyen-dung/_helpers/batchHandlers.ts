@@ -5,7 +5,11 @@ import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.s
 
 interface BatchStatusChangeParams {
   selectedRows: TuyenDungItem[];
-  status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED";
+  status:
+    | "TO_INTERVIEW"
+    | "CANNOT_CONTACT"
+    | "INTERVIEW_REJECTED"
+    | "HOAN_THANH";
   setLoading: (loading: boolean) => void;
   setQuantityStatus: React.Dispatch<
     React.SetStateAction<Record<string, number> | null>
@@ -99,6 +103,8 @@ export const handleBatchStatusChange = async ({
         ? "không liên hệ được"
         : status === "INTERVIEW_REJECTED"
         ? "từ chối phỏng vấn"
+        : status === "HOAN_THANH"
+        ? "đã ký hợp đồng"
         : "chuyển sang phỏng vấn";
 
     messageApi.success(`Đã ${statusMessage} ${successCount} ứng viên`);

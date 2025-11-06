@@ -34,20 +34,24 @@ function Page() {
     []
   );
 
-  // Fetch interviews
   const fetchInterviews = useCallback(async () => {
+    if (!userProfile?.userName) return;
+
     setLoadingInterviews(true);
-    if (!userProfile) {
-      setLoadingInterviews(false);
-      return;
-    }
     try {
+      const param = {
+        userName: userProfile.userName,
+        fromDate: interviewFilters.fromDate
+          ? dayjs(interviewFilters.fromDate).toISOString()
+          : dayjs().startOf("isoWeek").toISOString(),
+        toDate: interviewFilters.toDate
+          ? dayjs(interviewFilters.toDate).toISOString()
+          : dayjs().endOf("isoWeek").toISOString(),
+      };
       const response = await TuyenDungServices.getDanhSachPhongVanWithParam(
         [],
         undefined,
-        {
-          interviewerId: String(userProfile.id),
-        }
+        param
       );
       setInterviewData(response.data || []);
     } catch (error: any) {
@@ -57,7 +61,7 @@ function Page() {
     } finally {
       setLoadingInterviews(false);
     }
-  }, []);
+  }, [userProfile, interviewFilters]);
 
   useEffect(() => {
     fetchInterviews();

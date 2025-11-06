@@ -32,6 +32,22 @@ export const StatisticsSchema = z.object({
   properRatio: z.string().optional(),
 });
 
+// Position Info Schema for job offers
+export const PositionInfoSchema = z.object({
+  code: z.string().optional(),
+  positionName: z.string().optional(),
+  description: z.string().optional(),
+});
+
+// HR Info Schema for job offers
+export const HRInfoSchema = z.object({
+  recruiterPositionName: z.string().optional(),
+  hrName: z.string().optional(),
+  hrEmail: z.string().optional(),
+  hrPhone: z.string().optional(),
+  status: z.string().optional(),
+});
+
 // Job info nested object used in API responses
 export const JobInfoSchema = z.object({
   jobId: z.string(),
@@ -63,15 +79,16 @@ export const AppointmentListWithInterviewSchema = z.object({
   appointmentId: z.string(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
+  // Interview specific fields
   interviewDate: z.string().optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
-  typeAppointment: z.enum(["Online", "Offline", "online"]),
-  interviewType: z.enum(["Online", "Offline", "online"]),
+  typeAppointment: z.enum(["Online", "Offline", "online"]).optional(),
+  interviewType: z.enum(["Online", "Offline", "online"]).optional(),
   interviewerCount: z.union([z.string(), z.number()]).optional(),
   meetingLink: z.string().nullable().optional(),
   address: z.string().optional(),
-  status: z.enum(["PENDING", "ACCEPTED", "COMPLETED", "CANCELLED"]),
+  status: z.enum(["PENDING", "ACCEPTED", "COMPLETED", "CANCELLED", "ACTIVE"]),
   notes: z.string().nullable().optional(),
   listParticipants: z.array(CandidateSchema).optional(),
   listInterviewers: z.array(InterviewerSchema).optional(),
@@ -81,12 +98,20 @@ export const AppointmentListWithInterviewSchema = z.object({
   candidateEmail: z.string().email().optional(),
   candidatePhone: z.string().optional(),
   result: z.string().optional(),
+  // Job offer specific fields
+  receiveJobId: z.string().optional(),
+  date: z.string().optional(),
+  note: z.string().optional(),
+  positionInfor: PositionInfoSchema.optional(),
+  hrInfor: HRInfoSchema.optional(),
 });
 
 export type Candidate = z.infer<typeof CandidateSchema>;
 export type Interviewer = z.infer<typeof InterviewerSchema>;
 export type Recruiter = z.infer<typeof RecruiterSchema>;
 export type Statistics = z.infer<typeof StatisticsSchema>;
+export type PositionInfo = z.infer<typeof PositionInfoSchema>;
+export type HRInfo = z.infer<typeof HRInfoSchema>;
 export type JobInfo = z.infer<typeof JobInfoSchema>;
 export type AppointmentListWithInterview = z.infer<
   typeof AppointmentListWithInterviewSchema

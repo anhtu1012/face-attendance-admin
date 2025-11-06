@@ -82,7 +82,11 @@ class TuyenDungServicesBase extends AxiosService {
 
   async updateStatusUngVien(
     id: string,
-    status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED"
+    status:
+      | "TO_INTERVIEW"
+      | "CANNOT_CONTACT"
+      | "INTERVIEW_REJECTED"
+      | "HOAN_THANH"
   ): Promise<any> {
     return this.put(`${this.basePath}/tuyen-dung/update-status/${id}`, {
       status,
@@ -95,6 +99,17 @@ class TuyenDungServicesBase extends AxiosService {
 
   async createAppointment(data: CreateAppointmentRequest): Promise<any> {
     return this.post(`${this.basePath}/tuyen-dung/tao-cuoc-hen`, data);
+  }
+  async addCandidatesAppointment(
+    id: string,
+    data: {
+      listIntervieweeId: string[];
+    }
+  ): Promise<any> {
+    return this.post(
+      `${this.basePath}/tuyen-dung/them-ung-vien-lich-hen/${id}`,
+      data
+    );
   }
 
   async createOffer(data: CreateJobOfferRequest): Promise<any> {

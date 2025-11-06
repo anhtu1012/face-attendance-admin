@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { NotificationService } from "@/services/notification/notification.service";
 import { NotificationItem } from "@/dtos/notification/notification.response.dto";
@@ -22,7 +22,7 @@ import {
   Col,
   Badge,
   Tooltip,
-  Divider
+  Divider,
 } from "antd";
 import {
   CheckCircleOutlined,
@@ -32,7 +32,7 @@ import {
   SearchOutlined,
   ReloadOutlined,
   CheckOutlined,
-  BellOutlined
+  BellOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -120,12 +120,12 @@ function ViewAllNotification() {
     setMarkingAsRead(true);
     try {
       await NotificationService.markAllAsRead(userCode);
-  messageApi.success("Đã đánh dấu tất cả thông báo đã đọc");
+      messageApi.success("Đã đánh dấu tất cả thông báo đã đọc");
       // Refresh data
       getData(currentPage, pageSize, quickSearch);
     } catch (error) {
       console.error("Error marking all as read:", error);
-  messageApi.error("Không thể đánh dấu đã đọc");
+      messageApi.error("Không thể đánh dấu đã đọc");
     } finally {
       setMarkingAsRead(false);
     }
@@ -135,16 +135,16 @@ function ViewAllNotification() {
     setMarkingOneAsRead(notificationId);
     try {
       await NotificationService.markOneRead(notificationId);
-  messageApi.success("Đã đánh dấu thông báo đã đọc");
+      messageApi.success("Đã đánh dấu thông báo đã đọc");
       // Update local state
-      setNotifications(prev =>
-        prev.map(notif =>
+      setNotifications((prev) =>
+        prev.map((notif) =>
           notif.id === notificationId ? { ...notif, isRead: true } : notif
         )
       );
     } catch (error) {
       console.error("Error marking one as read:", error);
-  messageApi.error("Không thể đánh dấu đã đọc");
+      messageApi.error("Không thể đánh dấu đã đọc");
     } finally {
       setMarkingOneAsRead("");
     }
@@ -155,15 +155,23 @@ function ViewAllNotification() {
 
     switch (type) {
       case "SUCCESS":
-        return <CheckCircleOutlined style={{ ...iconStyle, color: "#52c41a" }} />;
+        return (
+          <CheckCircleOutlined style={{ ...iconStyle, color: "#52c41a" }} />
+        );
       case "NOTSUCCESS":
-        return <CloseCircleOutlined style={{ ...iconStyle, color: "#ff4d4f" }} />;
+        return (
+          <CloseCircleOutlined style={{ ...iconStyle, color: "#ff4d4f" }} />
+        );
       case "WARNING":
         return <WarningOutlined style={{ ...iconStyle, color: "#faad14" }} />;
       case "INFO":
-        return <InfoCircleOutlined style={{ ...iconStyle, color: "#1890ff" }} />;
+        return (
+          <InfoCircleOutlined style={{ ...iconStyle, color: "#1890ff" }} />
+        );
       default:
-        return <InfoCircleOutlined style={{ ...iconStyle, color: "#1890ff" }} />;
+        return (
+          <InfoCircleOutlined style={{ ...iconStyle, color: "#1890ff" }} />
+        );
     }
   };
 
@@ -186,7 +194,7 @@ function ViewAllNotification() {
     return dayjs(dateString).fromNow();
   };
 
-  const unreadCount = notifications.filter(notif => !notif.isRead).length;
+  const unreadCount = notifications.filter((notif) => !notif.isRead).length;
 
   return (
     <div style={{ padding: "24px" }}>
@@ -200,7 +208,10 @@ function ViewAllNotification() {
                 Tất cả thông báo
               </Title>
               {unreadCount > 0 && (
-                <Badge count={unreadCount} style={{ backgroundColor: "#ff4d4f" }} />
+                <Badge
+                  count={unreadCount}
+                  style={{ backgroundColor: "#ff4d4f" }}
+                />
               )}
             </Space>
           </Col>
@@ -259,12 +270,16 @@ function ViewAllNotification() {
                 <List.Item
                   key={notification.id}
                   style={{
-                    backgroundColor: notification.isRead ? "transparent" : "#f0f9ff",
+                    backgroundColor: notification.isRead
+                      ? "transparent"
+                      : "#f0f9ff",
                     borderRadius: "8px",
                     marginBottom: "8px",
                     padding: "16px",
-                    border: notification.isRead ? "1px solid #f0f0f0" : "1px solid #e6f7ff",
-                    transition: "all 0.2s ease"
+                    border: notification.isRead
+                      ? "1px solid #f0f0f0"
+                      : "1px solid #e6f7ff",
+                    transition: "all 0.2s ease",
                   }}
                   actions={[
                     !notification.isRead && (
@@ -287,7 +302,7 @@ function ViewAllNotification() {
                           icon={getIcon(notification.type)}
                           style={{
                             backgroundColor: "transparent",
-                            border: "none"
+                            border: "none",
                           }}
                           size="large"
                         />
@@ -299,7 +314,7 @@ function ViewAllNotification() {
                           strong={!notification.isRead}
                           style={{
                             fontSize: "16px",
-                            color: notification.isRead ? "#595959" : "#262626"
+                            color: notification.isRead ? "#595959" : "#262626",
                           }}
                         >
                           {notification.title}
@@ -315,20 +330,24 @@ function ViewAllNotification() {
                             color: "#8c8c8c",
                             lineHeight: "1.5",
                             display: "block",
-                            marginBottom: "8px"
+                            marginBottom: "8px",
                           }}
                         >
-                          {notification.message}
+                          {notification.description}
                         </Text>
                         <Space split={<Divider type="vertical" />}>
                           <Text type="secondary" style={{ fontSize: "12px" }}>
                             {getRelativeTime(notification.createdAt)}
                           </Text>
                           <Text type="secondary" style={{ fontSize: "12px" }}>
-                            {dayjs(notification.createdAt).format("DD/MM/YYYY HH:mm")}
+                            {dayjs(notification.createdAt).format(
+                              "DD/MM/YYYY HH:mm"
+                            )}
                           </Text>
                           {!notification.isRead && (
-                            <Text style={{ fontSize: "12px", color: "#1890ff" }}>
+                            <Text
+                              style={{ fontSize: "12px", color: "#1890ff" }}
+                            >
                               Chưa đọc
                             </Text>
                           )}

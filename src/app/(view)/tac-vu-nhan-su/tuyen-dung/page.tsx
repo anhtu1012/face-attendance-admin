@@ -538,7 +538,11 @@ function Page() {
   // Handle batch status change for selected candidates (wrapper)
   const handleBatchStatusChange = async (
     selectedRows: TuyenDungItem[],
-    status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED"
+    status:
+      | "TO_INTERVIEW"
+      | "CANNOT_CONTACT"
+      | "INTERVIEW_REJECTED"
+      | "HOAN_THANH"
   ) => {
     await batchStatusChange({
       selectedRows,

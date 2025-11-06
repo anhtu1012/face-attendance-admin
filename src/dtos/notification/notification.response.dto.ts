@@ -3,7 +3,7 @@ export interface NotificationItem {
   createdAt: string;
   updatedAt: string;
   title: string;
-  message: string;
+  description: string;
   type: "SUCCESS" | "NOTSUCCESS" | "WARNING" | "INFO";
   isRead: boolean;
   userCode: string;

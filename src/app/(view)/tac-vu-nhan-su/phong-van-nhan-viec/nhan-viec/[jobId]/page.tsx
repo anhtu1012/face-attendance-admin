@@ -2,77 +2,44 @@
 "use client";
 
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { AppointmentItem } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/interview.dto";
 import { showError } from "@/hooks/useNotification";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Spin, Tag } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import "./page.scss";
 import AppointmentDetailTabs from "../../../_shared/AppointmentDetailTabs";
+import "./page.scss";
+import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
+import JobOfferServices from "@/services/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.service";
 
 const statusConfig = {
-  PENDING: { text: "Chờ xác nhận", color: "orange" },
-  ACCEPTED: { text: "Đã chấp nhận", color: "green" },
-  REJECTED: { text: "Từ chối", color: "red" },
+  ACTIVE: { text: "Đang hoạt động", color: "cyan" },
   COMPLETED: { text: "Hoàn thành", color: "blue" },
   CANCELLED: { text: "Đã hủy", color: "default" },
 };
 
-export default function JobDetailPage() {
+export default function JobOfferDetailPage() {
   const params = useParams();
   const router = useRouter();
   const jobId = params.jobId as string;
 
   const [loading, setLoading] = useState(true);
-  const [jobAppointment, setJobAppointment] = useState<AppointmentItem | null>(
+  const [jobOffer, setJobOffer] = useState<AppointmentListWithInterview | null>(
     null
   );
 
-  const fetchJobDetail = async () => {
+  const fetchJobOfferDetail = async () => {
     setLoading(true);
     try {
-      // TODO: Replace with actual API call
-      // const response = await JobServices.getJobById(jobId);
-      // setJobAppointment(response.data);
-
-      // Mock data for now
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setJobAppointment({
-        id: jobId,
-        candidateId: "1",
-        candidateName: "Nguyễn Văn A",
-        candidateEmail: "nguyenvana@example.com",
-        candidatePhone: "0912345678",
-        jobId: jobId,
-        jobTitle: "Senior Frontend Developer",
-        department: "IT Department",
-        jobLevel: "Senior",
-        jobDescription:
-          "Tham gia phát triển sản phẩm web, làm việc với React, Next.js và TypeScript. Tham gia review code, tối ưu hiệu năng và kiến trúc frontend.",
-        jobResponsibility:
-          "Xây dựng giao diện, tích hợp API, đảm bảo chất lượng mã nguồn, viết unit/integration tests.",
-        jobBenefit:
-          "Bảo hiểm, lương tháng 13, du lịch hàng năm, training kỹ thuật.",
-        requireExperience: "3-5 năm",
-        fromSalary: "20,000,000 VND",
-        toSalary: "35,000,000 VND",
-        requireSkill: ["React", "TypeScript", "Next.js", "Unit Testing"],
-        interviewDate: "2025-01-20",
-        startTime: "14:00",
-        endTime: "16:00",
-        interviewType: "offline",
-        location: "Tòa nhà ABC, Quận 1",
-        interviewer: "Lê Thị C",
-        interviewerEmail: "lethic@company.com",
-        interviewerPhone: "0901234567",
-        status: "PENDING",
-        notes:
-          "Vị trí tuyển dụng quan trọng, cần đánh giá kỹ năng kỹ thuật và soft skills",
-      } as unknown as AppointmentItem);
+      const response = await JobOfferServices.getJobOffers([], undefined, {
+        receiveJobId: jobId,
+      });
+      setJobOffer(
+        response.data && response.data.length > 0 ? response.data[0] : null
+      );
     } catch (error: any) {
       showError(
-        error.response?.data?.message || "Lỗi khi tải thông tin công việc"
+        error.response?.data?.message || "Lỗi khi tải thông tin nhận việc"
       );
       router.push("/tac-vu-nhan-su/phong-van-nhan-viec");
     } finally {
@@ -81,7 +48,7 @@ export default function JobDetailPage() {
   };
 
   useEffect(() => {
-    fetchJobDetail();
+    fetchJobOfferDetail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId]);
 
@@ -91,13 +58,13 @@ export default function JobDetailPage() {
 
   if (loading) {
     return (
-      <div className="job-detail-loading">
+      <div className="job-offer-detail-loading">
         <Spin size="large" tip="Đang tải thông tin..." />
       </div>
     );
   }
 
-  if (!jobAppointment) {
+  if (!jobOffer) {
     return null;
   }
 
@@ -105,7 +72,7 @@ export default function JobDetailPage() {
     <LayoutContent
       layoutType={1}
       content1={
-        <div className="job-detail-page">
+        <div className="job-offer-detail-page">
           <div className="page-header">
             <Button
               type="text"
@@ -117,28 +84,31 @@ export default function JobDetailPage() {
             </Button>
             <div className="header-info">
               <div className="header-main">
-                <h1 className="page-title">{jobAppointment.jobTitle}</h1>
+                <h1 className="page-title">{jobOffer?.jobInfor?.jobTitle}</h1>
                 <div className="header-meta">
-                  <span className="position-name">
-                    {jobAppointment.department}
-                  </span>
                   <Tag
-                    color={statusConfig[jobAppointment.status].color}
+                    color={
+                      statusConfig[jobOffer.status as keyof typeof statusConfig]
+                        .color
+                    }
                     className="status-tag"
                   >
-                    {statusConfig[jobAppointment.status].text}
+                    {
+                      statusConfig[jobOffer.status as keyof typeof statusConfig]
+                        .text
+                    }
                   </Tag>
                 </div>
               </div>
-              <p className="page-subtitle">Chi tiết công việc nhân viên</p>
+              <p className="page-subtitle">Chi tiết lịch nhận việc</p>
             </div>
           </div>
 
           <div className="page-content">
             <AppointmentDetailTabs
-              interview={[] as any}
-              onRefresh={fetchJobDetail}
-              defaultTab="candidates"
+              interview={jobOffer}
+              onRefresh={fetchJobOfferDetail}
+              type="jobOffer"
             />
           </div>
         </div>

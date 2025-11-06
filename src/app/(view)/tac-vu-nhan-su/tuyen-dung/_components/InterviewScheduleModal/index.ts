@@ -20,6 +20,7 @@ export interface InterviewFormData {
   startTime: Dayjs | null | string;
   endTime: Dayjs | null | string;
   typeAppointment: "online" | "offline";
+  scheduleTemplate?: string;
   linkMeet?: string;
   interviewerId: string;
   interviewerEmail: string;

@@ -147,9 +147,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
       console.error("Error marking notifications as read:", error);
     }
   };
-  const getRelativeTime = (dateString: string) => {
-    return dayjs(dateString).fromNow();
-  };
+  // const getRelativeTime = (dateString: string) => {
+  //   return dayjs(dateString).fromNow();
+  // };
 
   const handleMarkAllAsRead = async () => {
     if (!userCode) return;
@@ -212,12 +212,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
           </div>
           <Text
             className="notification-message"
-            ellipsis={{ tooltip: notification.message }}
+            ellipsis={{ tooltip: notification.description }}
           >
-            {notification.message}
+            {notification.description}
           </Text>
           <Text type="secondary" className="notification-time">
-            {getRelativeTime(notification.createdAt)}
+            {dayjs(notification.createdAt).format("HH:mm DD/MM/YYYY")}
           </Text>
         </div>
       </div>

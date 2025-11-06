@@ -1,0 +1,466 @@
+@import "@/styles/inputs";
+
+.application-detail-modal-modern {
+  .ant-modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(13, 71, 161, 0.15);
+  }
+
+  .ant-modal-body {
+    padding: 0;
+    background: #f5f7fa;
+  }
+}
+
+.modern-detail-content {
+  // Header Section
+  .modal-header {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    padding: 24px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+
+    .header-left {
+      flex: 1;
+
+      .application-type {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: white;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+
+        .type-icon {
+          font-size: 26px;
+          opacity: 0.9;
+        }
+      }
+
+      .application-id {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'Courier New', monospace;
+      }
+    }
+
+    .header-right {
+      .status-badge-large {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+
+        .status-icon {
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+        }
+
+        &.pending {
+          background: rgba(251, 140, 0, 0.95);
+          color: white;
+        }
+
+        &.approved {
+          background: rgba(46, 125, 50, 0.95);
+          color: white;
+        }
+
+        &.rejected {
+          background: rgba(198, 40, 40, 0.95);
+          color: white;
+        }
+
+        &.cancelled {
+          background: rgba(117, 117, 117, 0.95);
+          color: white;
+        }
+      }
+    }
+  }
+
+  // Content Grid Layout
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 24px;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Info Cards
+  .info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(13, 71, 161, 0.08);
+    display: flex;
+    gap: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(30, 136, 229, 0.08);
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(13, 71, 161, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 24px;
+      background: linear-gradient(135deg, rgba(30, 136, 229, 0.1) 0%, rgba(13, 71, 161, 0.1) 100%);
+      color: #1e88e5;
+    }
+
+    .card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #546e7a;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+  }
+
+  // Submitter Card
+  .submitter-card {
+    .card-value-large {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0d47a1;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #78909c;
+      font-size: 14px;
+
+      svg {
+        font-size: 16px;
+        color: #1e88e5;
+      }
+    }
+  }
+
+  // Time Card
+  .time-card {
+    .time-range {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+
+      .time-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+
+        .time-label {
+          font-size: 11px;
+          font-weight: 600;
+          color: #78909c;
+          text-transform: uppercase;
+        }
+
+        .time-value {
+          font-size: 14px;
+          font-weight: 600;
+          color: #263238;
+          background: rgba(30, 136, 229, 0.06);
+          padding: 6px 10px;
+          border-radius: 6px;
+          text-align: center;
+        }
+      }
+
+      .time-arrow {
+        font-size: 20px;
+        color: #1e88e5;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+    }
+
+    .duration-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(30, 136, 229, 0.12) 0%, rgba(13, 71, 161, 0.12) 100%);
+      color: #0d47a1;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+
+      svg {
+        font-size: 16px;
+      }
+    }
+  }
+
+  // Reason Card
+  .reason-card {
+    .reason-content {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #37474f;
+      padding: 14px;
+      background: rgba(30, 136, 229, 0.04);
+      border-radius: 8px;
+      border-left: 4px solid #1e88e5;
+      font-weight: 400;
+    }
+  }
+
+  // Approval Card
+  .approval-card {
+    .card-icon {
+      background: linear-gradient(135deg, rgba(46, 125, 50, 0.12) 0%, rgba(27, 94, 32, 0.12) 100%);
+      color: #2e7d32;
+    }
+
+    &.rejected .card-icon {
+      background: linear-gradient(135deg, rgba(198, 40, 40, 0.12) 0%, rgba(183, 28, 28, 0.12) 100%);
+      color: #c62828;
+    }
+
+    .approval-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .approval-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(30, 136, 229, 0.04);
+      border-radius: 6px;
+
+      .approval-label {
+        font-size: 13px;
+        color: #546e7a;
+        font-weight: 500;
+      }
+
+      .approval-value {
+        font-size: 14px;
+        color: #263238;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Response Card
+  .response-card {
+    .card-icon {
+      font-size: 28px;
+    }
+
+    .response-input {
+      @extend .custom-textarea;
+      width: 100%;
+      min-height: 100px;
+      font-size: 14px;
+      line-height: 1.7;
+      resize: vertical;
+
+      &::placeholder {
+        color: rgba(0, 0, 0, 0.35);
+        font-style: italic;
+      }
+    }
+
+    .response-text {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #37474f;
+      padding: 14px;
+      background: rgba(30, 136, 229, 0.04);
+      border-radius: 8px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border-left: 4px solid #1e88e5;
+    }
+  }
+
+  // Files Card
+  .files-card {
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .file-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid rgba(30, 136, 229, 0.2);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(13, 71, 161, 0.25);
+        border-color: #1e88e5;
+
+        .file-number {
+          background: #1e88e5;
+          transform: scale(1.1);
+        }
+      }
+
+      .file-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .file-number {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(13, 71, 161, 0.85);
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  // Footer Actions
+  .modal-footer {
+    background: white;
+    padding: 20px 28px;
+    border-top: 1px solid rgba(13, 71, 161, 0.1);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+
+    .ant-btn {
+      height: 44px;
+      padding: 0 32px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      &.btn-cancel {
+        border: 2px solid rgba(13, 71, 161, 0.2);
+        color: #546e7a;
+        background: white;
+
+        &:hover {
+          border-color: rgba(13, 71, 161, 0.4);
+          color: #0d47a1;
+          background: rgba(30, 136, 229, 0.04);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(13, 71, 161, 0.15);
+        }
+      }
+
+      &.btn-reject {
+        background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+        border: none;
+        color: white;
+        box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
+
+        &:hover {
+          background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(198, 40, 40, 0.4);
+        }
+      }
+
+      &.btn-approve {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        border: none;
+        color: white;
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+
+        &:hover {
+          background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+        }
+      }
+    }
+  }
+}
+
+// Left/Right Column Specific
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Smooth animations
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.info-card {
+  animation: slideInUp 0.4s ease;
+}
+
+.left-column .info-card:nth-child(1) { animation-delay: 0.05s; }
+.left-column .info-card:nth-child(2) { animation-delay: 0.1s; }
+.left-column .info-card:nth-child(3) { animation-delay: 0.15s; }
+.right-column .info-card:nth-child(1) { animation-delay: 0.2s; }
+.right-column .info-card:nth-child(2) { animation-delay: 0.25s; }
+.right-column .info-card:nth-child(3) { animation-delay: 0.3s; }

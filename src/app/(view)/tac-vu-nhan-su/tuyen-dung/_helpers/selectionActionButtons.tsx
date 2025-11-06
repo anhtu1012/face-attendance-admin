@@ -7,7 +7,11 @@ interface GetSelectionActionButtonsParams {
   gridRef: React.RefObject<AgGridReact>;
   handleBatchStatusChange: (
     selectedRows: TuyenDungItem[],
-    status: "TO_INTERVIEW" | "CANNOT_CONTACT" | "INTERVIEW_REJECTED"
+    status:
+      | "TO_INTERVIEW"
+      | "CANNOT_CONTACT"
+      | "INTERVIEW_REJECTED"
+      | "HOAN_THANH"
   ) => Promise<void>;
   handleBatchInterviewSchedule: (
     selectedRows: TuyenDungItem[]
@@ -103,6 +107,21 @@ export const getSelectionActionButtons = ({
             if (handleBatchCancelJobOffer) {
               await handleBatchCancelJobOffer(selectedData);
             }
+          },
+        },
+      ];
+
+    case "HOP_DONG":
+      return [
+        {
+          title: "Hoàn tất hợp đồng",
+          label: "Done",
+          confirmMessage:
+            "Bạn có chắc muốn đánh dấu các hợp đồng này là đã ký?",
+          onClick: async () => {
+            const selectedData = getSelectedData();
+            // Set status to CONTRACT_SIGNING for selected candidates
+            await handleBatchStatusChange(selectedData, "HOAN_THANH");
           },
         },
       ];

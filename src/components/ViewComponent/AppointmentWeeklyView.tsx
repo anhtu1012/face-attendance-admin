@@ -58,8 +58,20 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
     return daysArray;
   }, [start, end]);
 
-  // Group appointments by time slot
+  // Group appointments by time slot (only for interviews)
   const timeSlots = useMemo(() => {
+    if (type === "jobOffer") {
+      // For job offers, return a single "all-day" slot
+      return [
+        {
+          startTime: "All Day",
+          endTime: "",
+          timeKey: "all-day",
+          appointments: data,
+        },
+      ];
+    }
+
     const slots: Record<string, AppointmentListWithInterview[]> = {};
 
     data.forEach((item) => {
@@ -85,10 +97,11 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
         timeKey,
         appointments,
       }));
-  }, [data]);
+  }, [data, type]);
 
   const getStatusColor = (status: string) => {
     const statusMap: Record<string, string> = {
+      ACTIVE: "cyan",
       PENDING: "gold",
       ACCEPTED: "blue",
       REJECTED: "red",
@@ -107,6 +120,15 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
     timeKey: string,
     date: dayjs.Dayjs
   ): AppointmentListWithInterview[] => {
+    if (type === "jobOffer") {
+      // For job offers, filter by date field only
+      return data.filter(
+        (item) =>
+          dayjs(item.date).format("YYYY-MM-DD") === date.format("YYYY-MM-DD")
+      );
+    }
+
+    // For interviews, filter by time slot and interview date
     return data.filter(
       (item) =>
         `${dayjs(item.startTime).format("HH:mm")}-${dayjs(item.endTime).format(
@@ -132,7 +154,10 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
     if (type === "interview") {
       return `/tac-vu-nhan-su/${baseSegment}/phong-van/${item.id}`;
     }
-    return `/tac-vu-nhan-su/${baseSegment}/nhan-viec/${item.id}`;
+    // For job offers, use receiveJobId instead of id
+    return `/tac-vu-nhan-su/${baseSegment}/nhan-viec/${
+      item.receiveJobId || item.id
+    }`;
   };
 
   return (
@@ -209,12 +234,18 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                 <tr key={slot.timeKey}>
                   <td className="time-slot">
                     <div className="time-cell">
-                      <ClockCircleOutlined />
-                      <div className="time-range">
-                        <div className="time-text">{slot.startTime}</div>
-                        <div className="time-divider">-</div>
-                        <div className="time-text">{slot.endTime}</div>
-                      </div>
+                      {type === "jobOffer" ? (
+                        <div className="all-day-label">Cả ngày</div>
+                      ) : (
+                        <>
+                          <ClockCircleOutlined />
+                          <div className="time-range">
+                            <div className="time-text">{slot.startTime}</div>
+                            <div className="time-divider">-</div>
+                            <div className="time-text">{slot.endTime}</div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </td>
                   {days.map((day) => {
@@ -235,36 +266,75 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                             key={appointment.id}
                             title={
                               <div className="appointment-tooltip">
-                                <div>
-                                  <strong>{appointment.candidateName}</strong>
-                                </div>
-                                {appointment.jobInfor?.jobTitle && (
-                                  <div>
-                                    Vị trí: {appointment.jobInfor?.jobTitle}
-                                  </div>
+                                {type === "interview" ? (
+                                  <>
+                                    <div>
+                                      <strong>
+                                        {appointment.candidateName}
+                                      </strong>
+                                    </div>
+                                    {appointment.jobInfor?.jobTitle && (
+                                      <div>
+                                        Vị trí: {appointment.jobInfor?.jobTitle}
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    <div>
+                                      <strong>
+                                        {appointment.jobInfor?.jobTitle}
+                                      </strong>
+                                    </div>
+                                    {appointment.positionInfor
+                                      ?.positionName && (
+                                      <div>
+                                        Vị trí:{" "}
+                                        {
+                                          appointment.positionInfor
+                                            ?.positionName
+                                        }
+                                      </div>
+                                    )}
+                                  </>
                                 )}
                                 {/* {appointment. && (
                                   <div>Phòng ban: {appointment.department}</div>
                                 )} */}
-                                {appointment.listInterviewers && (
-                                  <div>
-                                    <div>Người phỏng vấn:</div>
-                                    {Array.isArray(
-                                      appointment.listInterviewers
-                                    ) ? (
-                                      appointment.listInterviewers.length ? (
-                                        appointment.listInterviewers.map(
-                                          (iv, i) => (
-                                            <div key={i}>
-                                              {iv.interviewerName}
-                                            </div>
+                                {type === "interview" &&
+                                  appointment.listInterviewers && (
+                                    <div>
+                                      <div>Người phỏng vấn:</div>
+                                      {Array.isArray(
+                                        appointment.listInterviewers
+                                      ) ? (
+                                        appointment.listInterviewers.length ? (
+                                          appointment.listInterviewers.map(
+                                            (iv, i) => (
+                                              <div key={i}>
+                                                {iv.interviewerName}
+                                              </div>
+                                            )
                                           )
+                                        ) : (
+                                          <div>Chưa phân công</div>
                                         )
                                       ) : (
-                                        <div>Chưa phân công</div>
-                                      )
-                                    ) : (
-                                      <div>{appointment.listInterviewers}</div>
+                                        <div>
+                                          {appointment.listInterviewers}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                {type === "jobOffer" && appointment.hrInfor && (
+                                  <div>
+                                    <div>
+                                      HR phụ trách: {appointment.hrInfor.hrName}
+                                    </div>
+                                    {appointment.hrInfor.hrEmail && (
+                                      <div>
+                                        Email: {appointment.hrInfor.hrEmail}
+                                      </div>
                                     )}
                                   </div>
                                 )}
@@ -274,13 +344,25 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                     {appointment.guidePersonName}
                                   </div>
                                 )} */}
-                                <div>
-                                  Thời gian:{" "}
-                                  {dayjs(appointment.startTime).format("HH:mm")}{" "}
-                                  - {dayjs(appointment.endTime).format("HH:mm")}
-                                </div>
-                                {appointment.notes && (
-                                  <div>Ghi chú: {appointment.notes}</div>
+                                {type === "interview" ? (
+                                  <div>
+                                    Thời gian:{" "}
+                                    {dayjs(appointment.startTime).format(
+                                      "HH:mm"
+                                    )}{" "}
+                                    -{" "}
+                                    {dayjs(appointment.endTime).format("HH:mm")}
+                                  </div>
+                                ) : (
+                                  <div>
+                                    Ngày nhận việc:{" "}
+                                    {dayjs(appointment.date).format(
+                                      "DD/MM/YYYY"
+                                    )}
+                                  </div>
+                                )}
+                                {appointment.note && (
+                                  <div>Ghi chú: {appointment.note}</div>
                                 )}
                               </div>
                             }
@@ -331,32 +413,36 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                                 <UserOutlined />
                                 {/* <span className="person-label">TT:</span> */}
                                 <span className="person-name">
-                                  {appointment.listInterviewers &&
-                                  appointment.listInterviewers.length > 0 ? (
-                                    appointment.listInterviewers.some(
-                                      (iv) => iv.status === "REJECTED"
-                                    ) && !IsHumanPV ? (
-                                      <>Cập nhật PV mới</>
-                                    ) : appointment.listInterviewers.filter(
-                                        (iv) => iv.status === "ACCEPTED"
-                                      ).length > 0 ? (
-                                      <>
-                                        Đã xác nhận{" "}
-                                        {
-                                          appointment.listInterviewers.filter(
-                                            (iv) => iv.status === "ACCEPTED"
-                                          ).length
-                                        }
-                                        /{appointment.interviewerCount}
-                                      </>
+                                  {type === "interview" ? (
+                                    appointment.listInterviewers &&
+                                    appointment.listInterviewers.length > 0 ? (
+                                      appointment.listInterviewers.some(
+                                        (iv) => iv.status === "REJECTED"
+                                      ) && !IsHumanPV ? (
+                                        <>Cập nhật PV mới</>
+                                      ) : appointment.listInterviewers.filter(
+                                          (iv) => iv.status === "ACCEPTED"
+                                        ).length > 0 ? (
+                                        <>
+                                          Đã xác nhận{" "}
+                                          {
+                                            appointment.listInterviewers.filter(
+                                              (iv) => iv.status === "ACCEPTED"
+                                            ).length
+                                          }
+                                          /{appointment.interviewerCount}
+                                        </>
+                                      ) : (
+                                        <>
+                                          Đã xác nhận 0/
+                                          {appointment.interviewerCount}
+                                        </>
+                                      )
                                     ) : (
-                                      <>
-                                        Đã xác nhận 0/
-                                        {appointment.interviewerCount}
-                                      </>
+                                      "Chưa phân công"
                                     )
                                   ) : (
-                                    "Chưa phân công"
+                                    appointment.hrInfor?.hrName || "Chưa có HR"
                                   )}
                                 </span>
                               </div>

@@ -117,6 +117,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       typeAppointment: normalizedType,
       linkMeet: tpl.meetingLink || undefined,
     });
+    console.log("tpl.interviewer", tpl.interviewer);
 
     // Auto-select interviewers based on template
     if (tpl.interviewer && Array.isArray(tpl.interviewer)) {
@@ -132,6 +133,8 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
       const emails = tpl.interviewer.map(
         (interviewer: any) => interviewer.interviewerEmail
       );
+      console.log("emails", emails);
+
       setTemplatePreSelectedEmails(emails);
     }
   };
@@ -259,6 +262,24 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
           ? String(error.response.data.message)
           : "Có lỗi xảy ra khi tạo lịch phỏng vấn!";
       messageApi.error(errMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddCandidate = async (values: InterviewFormData) => {
+    if (!isTemplateSelected) return;
+    setLoading(true);
+    try {
+      const payload = {
+        listIntervieweeId: candidates.map((c) => c.id),
+      };
+      await TuyenDungServices.addCandidatesAppointment(
+        values.scheduleTemplate as string,
+        payload
+      );
+    } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -465,7 +486,9 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
               <Form
                 form={form}
                 layout="vertical"
-                onFinish={handleSubmit}
+                onFinish={
+                  isTemplateSelected ? handleAddCandidate : handleSubmit
+                }
                 className="interview-form"
                 onValuesChange={(changedValues) => {
                   if (

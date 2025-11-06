@@ -66,6 +66,10 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
       label: "Hoạt động",
       value: "ACTIVE",
     },
+    {
+      label: "Hoạt động (PL+)",
+      value: "ACTIVE_EXTENDED",
+    },
   ]);
   const [selectCandidate] = useState<SelectOption[]>([
     { label: "Liên hệ", value: "TO_CONTACT" }, //1

@@ -4,51 +4,84 @@ import { Tabs } from "antd";
 import { useState } from "react";
 import AppointmentInfoTab from "./components/AppointmentInfoTab/AppointmentInfoTab";
 import "./AppointmentDetailTabs.scss";
-import { CandidateListTab } from "./components";
+import { CandidateListTab, JobInfoTab } from "./components";
 import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
 
 interface AppointmentDetailTabsProps {
   interview: AppointmentListWithInterview;
   onRefresh: () => void;
   defaultTab?: string;
+  type?: "interview" | "jobOffer";
 }
 
 export default function AppointmentDetailTabs({
   interview,
   onRefresh,
   defaultTab = "info",
+  type = "interview",
 }: AppointmentDetailTabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
-  const tabItems = [
-    {
-      key: "info",
-      label: (
-        <span className="tab-label">
-          <span className="tab-icon"></span>
-          Thông tin buổi hẹn
-        </span>
-      ),
-      children: (
-        <AppointmentInfoTab interview={interview} onRefresh={onRefresh} />
-      ),
-    },
-    {
-      key: "candidates",
-      label: (
-        <span className="tab-label">
-          <span className="tab-icon"></span>
-          Danh sách ứng viên
-        </span>
-      ),
-      children: (
-        <CandidateListTab
-          jobId={interview.jobInfor?.jobId}
-          appointmentId={interview.id}
-        />
-      ),
-    },
-  ];
+  const tabItems =
+    type === "jobOffer"
+      ? [
+          {
+            key: "info",
+            label: (
+              <span className="tab-label">
+                <span className="tab-icon"></span>
+                Thông tin nhận việc
+              </span>
+            ),
+            children: <JobInfoTab jobOffer={interview} onRefresh={onRefresh} />,
+          },
+          {
+            key: "candidates",
+            label: (
+              <span className="tab-label">
+                <span className="tab-icon"></span>
+                Danh sách ứng viên
+              </span>
+            ),
+            children: (
+              <CandidateListTab
+                jobId={interview.jobInfor?.jobId}
+                appointmentId={interview.id}
+                type="jobOffer"
+              />
+            ),
+          },
+        ]
+      : [
+          {
+            key: "info",
+            label: (
+              <span className="tab-label">
+                <span className="tab-icon"></span>
+                Thông tin buổi hẹn
+              </span>
+            ),
+            children: (
+              <AppointmentInfoTab interview={interview} onRefresh={onRefresh} />
+            ),
+          },
+          {
+            key: "candidates",
+            label: (
+              <span className="tab-label">
+                <span className="tab-icon"></span>
+                Danh sách ứng viên
+              </span>
+            ),
+            children: (
+              <CandidateListTab
+                jobId={interview.jobInfor?.jobId}
+                appointmentId={interview.id}
+                type="interview"
+              />
+            ),
+          },
+        ];
 
   return (
     <div className="interview-detail-tabs-wrapper">

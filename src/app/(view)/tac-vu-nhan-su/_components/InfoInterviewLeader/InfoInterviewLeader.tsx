@@ -125,7 +125,13 @@ function InfoInterviewLeader({
           checkboxes: true,
           isRowSelectable(node) {
             try {
-              if (disabled) return false;
+              if (disabled) {
+                try {
+                  return preSelectedEmails.includes(node.data?.email);
+                } catch {
+                  return false;
+                }
+              }
               if (typeof maxSelectable !== "number") return true;
               const api = gridRef.current?.api;
               const selectedNodes = api?.getSelectedNodes?.() || [];
