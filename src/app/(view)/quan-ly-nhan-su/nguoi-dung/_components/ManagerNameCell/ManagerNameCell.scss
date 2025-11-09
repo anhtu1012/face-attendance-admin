@@ -1,0 +1,36 @@
+.update-manager-btn {
+  background: linear-gradient(
+    45deg,
+    rgb(21, 101, 192),
+    rgb(66, 165, 245),
+    rgb(21, 101, 192),
+    rgb(66, 165, 245)
+  );
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(21, 101, 192, 0.3);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: linear-gradient(
+      45deg,
+      rgb(18, 88, 168),
+      rgb(56, 148, 220),
+      rgb(18, 88, 168),
+      rgb(56, 148, 220)
+    );
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(21, 101, 192, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(21, 101, 192, 0.3);
+  }
+}

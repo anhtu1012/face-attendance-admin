@@ -100,7 +100,7 @@ export default function CandidateListTab({
         const response = await JobOfferServices.getUngVien([], undefined, {
           receiveJobId: appointmentId || "",
         });
-        setCandidates(response.data || []);
+        setCandidates(response.data[0].listCandidates || []);
       }
     } catch (error) {
       console.error("Error fetching candidates:", error);
@@ -218,7 +218,7 @@ export default function CandidateListTab({
       title: "Khuyến nghị",
       dataIndex: "analysisResult",
       key: "analysis",
-      width: 150,
+      width: 170,
       render: (analysisResult: any) => {
         if (!analysisResult) return "-";
         const getRecommendationBadge = (recommendation?: string) => {

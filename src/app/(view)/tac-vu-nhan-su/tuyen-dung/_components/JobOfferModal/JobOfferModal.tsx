@@ -93,7 +93,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
       if (!open) return;
       try {
         const res = await JobOfferServices.getJobOffers([], undefined, {
-          receiveJobId: jobId,
+          jobId: jobId,
         });
         const data = res?.data || [];
         setScheduleTemplate(data);

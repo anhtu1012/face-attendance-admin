@@ -1,6 +1,16 @@
 "use client";
 
-import { Button, Card, Col, Descriptions, Modal, Row, Space, Tag } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Descriptions,
+  Modal,
+  Row,
+  Space,
+  Tag,
+  message,
+} from "antd";
 import dayjs from "dayjs";
 import {
   FaBriefcase,
@@ -27,7 +37,7 @@ import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/
 
 interface AppointmentInfoTabProps {
   interview: AppointmentListWithInterview;
-  onRefresh: () => void;
+  onRefresh: () => void | Promise<void>;
 }
 
 interface InterviewerSelection {
@@ -72,12 +82,16 @@ export default function AppointmentInfoTab({
         listInterviewerId: payload,
       });
       setIsModalOpen(false);
-      // Refresh parent data (fetchAppointmentDetail)
-      onRefresh();
+      try {
+        await Promise.resolve(onRefresh());
+      } catch (refreshErr) {
+        console.error("Refresh failed:", refreshErr);
+      }
+      message.success("Cập nhật người phỏng vấn thành công");
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      message.error("Cập nhật người phỏng vấn thất bại");
     }
-    setIsModalOpen(false);
   };
 
   const handleModalCancel = () => {

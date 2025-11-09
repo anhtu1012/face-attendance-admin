@@ -369,7 +369,18 @@ const AppointmentWeeklyView: React.FC<AppointmentWeeklyViewProps> = ({
                             placement="top"
                           >
                             <div
-                              className={`appointment-item status-${appointment.status}`}
+                              className={`appointment-item status-${
+                                appointment.status
+                              } ${
+                                appointment.listInterviewers &&
+                                appointment.listInterviewers.length > 0
+                                  ? appointment.listInterviewers.some(
+                                      (iv) => iv.status === "REJECTED"
+                                    ) && !IsHumanPV
+                                    ? "TD_REJECTED"
+                                    : ""
+                                  : ""
+                              }`}
                               onClick={() => {
                                 onItemClick?.(appointment);
                                 router.push(getDetailPath(appointment));

@@ -35,12 +35,12 @@ function Page() {
   );
 
   const fetchInterviews = useCallback(async () => {
-    if (!userProfile?.userName) return;
+    if (!userProfile?.id) return;
 
     setLoadingInterviews(true);
     try {
       const param = {
-        userName: userProfile.userName,
+        interviewerId: String(userProfile.id),
         fromDate: interviewFilters.fromDate
           ? dayjs(interviewFilters.fromDate).toISOString()
           : dayjs().startOf("isoWeek").toISOString(),

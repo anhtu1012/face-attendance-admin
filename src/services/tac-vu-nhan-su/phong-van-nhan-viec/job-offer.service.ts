@@ -2,7 +2,7 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import { CreateJobOfferRequest } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/job-offer.dto";
-import { TuyenDungResponseGetItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.response.dto";
+import { ReceiveJobListResponse } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/receive-job.dto";
 
 class JobOfferServicesBase extends AxiosService {
   protected readonly basePath = "/v1/recruitment";
@@ -23,7 +23,7 @@ class JobOfferServicesBase extends AxiosService {
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,
     params?: Record<string, string | number | boolean>
-  ): Promise<TuyenDungResponseGetItem> {
+  ): Promise<ReceiveJobListResponse> {
     return this.getWithFilter(
       `${this.basePath}/lich-hen/danh-sach-ung-vien-lich-nhan-viec`,
       searchFilter,

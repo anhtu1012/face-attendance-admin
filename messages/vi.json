@@ -117,7 +117,9 @@
     "fullName": "Họ và tên",
     "skills": "Kĩ năng",
     "experience": "Kinh nghiệm",
-    "createdAt": "Thời gian nộp"
+    "createdAt": "Thời gian nộp",
+    "Department": "Phòng ban",
+    "manageByUserName": "Người quản lý"
   },
   "NhomNguoiDung": {
     "roleCode": "Mã vai trò",

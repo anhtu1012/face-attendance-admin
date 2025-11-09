@@ -309,6 +309,84 @@
       border-left: 6px solid #faad14;
       box-shadow: inset 0 0 0 1px rgba(250, 173, 20, 0.16);
       filter: saturate(1.05);
+      &.TD_REJECTED {
+        border-left: 5px solid #ff4d4f !important;
+        box-shadow: inset 0 0 0 1px rgba(255, 77, 79, 0.12);
+
+        // Chasing border effect (runs around the card)
+        &:before {
+          content: "";
+          position: absolute;
+          /* expand slightly so the animated border sits outside the card edge */
+          inset: -4px;
+          border-radius: 14px;
+          padding: 4px;
+          /* horizontal gradient that will slide to create a chase */
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 77, 79, 0.95) 20%,
+            rgba(255, 77, 79, 0.6) 50%,
+            rgba(255, 77, 79, 0.95) 80%,
+            transparent
+          );
+          background-size: 200% 100%;
+          /* mask to show only the border (hollow center) */
+          -webkit-mask: linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          animation: td-reject-border-chase 1.8s linear infinite;
+          pointer-events: none;
+          z-index: -1;
+          opacity: 0.95;
+          filter: blur(2px);
+        }
+
+        // Rotating inner highlight (subtle, non-obtrusive)
+        &:after {
+          content: "";
+          position: absolute;
+          /* expand slightly so the glow sits behind the card border */
+          inset: -6px;
+          border-radius: 14px;
+          /* conic gradient gives a circular rotating highlight */
+          background: conic-gradient(
+            from 0deg,
+            rgba(255, 77, 79, 0.18),
+            rgba(255, 77, 79, 0.06),
+            rgba(255, 77, 79, 0.18)
+          );
+          pointer-events: none;
+          filter: blur(6px);
+          z-index: 0;
+          animation: rotate-highlight 3s linear infinite;
+          mix-blend-mode: screen;
+          opacity: 0.9;
+        }
+
+        /* keep card content above the animated highlight */
+        > * {
+          position: relative;
+          z-index: 1;
+        }
+
+        @keyframes rotate-highlight {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes td-reject-border-chase {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+      }
     }
     &.status-ACCEPTED {
       border-left: 6px solid rgb(66, 165, 245);

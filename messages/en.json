@@ -142,7 +142,9 @@
     "fullName": "Full Name",
     "skills": "Skills",
     "experience": "Experience",
-    "createdAt": "CreatedAt"
+    "createdAt": "CreatedAt",
+    "Department": "Department",
+    "manageByUserName": "Manage By User Name"
   },
   "NhomNguoiDung": {
     "roleCode": "Role Code",

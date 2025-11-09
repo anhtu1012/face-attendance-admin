@@ -77,6 +77,11 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     { label: "Phỏng vấn", value: "TO_INTERVIEW" }, //2
     { label: "Rớt PV", value: "INTERVIEW_FAILED" }, //2
     { label: "Đã hẹn PV", value: "INTERVIEW_SCHEDULED" }, //2
+    { label: "Đã hẹn PV1", value: "INTERVIEW_SCHEDULED_R1" }, //2
+    { label: "Đã hẹn PV2", value: "INTERVIEW_SCHEDULED_R2" }, //2
+    { label: "Đã hẹn PV3", value: "INTERVIEW_SCHEDULED_R3" }, //2
+    { label: "Đã hẹn PV4", value: "INTERVIEW_SCHEDULED_R4" }, //2
+    { label: "Đã hẹn PV5", value: "INTERVIEW_SCHEDULED_R5" }, //2
     { label: "Đã đậu PV Vòng 1", value: "TO_INTERVIEW_R1" }, //2
     { label: "Đã đậu PV Vòng 2", value: "TO_INTERVIEW_R2" }, //2
     { label: "Đã đậu PV Vòng 3", value: "TO_INTERVIEW_R3" }, //2

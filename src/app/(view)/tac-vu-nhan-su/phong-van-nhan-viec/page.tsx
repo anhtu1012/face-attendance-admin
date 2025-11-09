@@ -40,6 +40,7 @@ function Page() {
       { label: "Chờ xác nhận", value: "PENDING" },
       { label: "Chấp nhận", value: "ACCEPTED" },
       { label: "Hoàn thành", value: "COMPLETED" },
+      { label: "Người PV Từ chối", value: "REJECTED" },
       { label: "Hủy bỏ", value: "CANCELLED" },
     ],
     []

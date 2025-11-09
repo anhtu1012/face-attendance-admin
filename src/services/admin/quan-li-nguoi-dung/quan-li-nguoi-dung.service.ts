@@ -25,6 +25,12 @@ class QlNguoiDungServicesBase extends AxiosService {
   async getUserByCode(userCode: string): Promise<any> {
     return this.get(`/v1/business/get-user-by-management?userCode=${userCode}`);
   }
+  async updateUserManager(data: {
+    userId: string;
+    managedByUserId: string;
+  }): Promise<any> {
+    return this.post(`/v1/sa/user/update-user-manager`, data);
+  }
 
   async updateUser(
     id: string | undefined,
@@ -33,6 +39,7 @@ class QlNguoiDungServicesBase extends AxiosService {
     await ValidateBaseClass.validate(formData, UserRequestChangePasswordSchema);
     return this.put(`${this.basePath}/${id}`, formData);
   }
+
   async deleteUser(id: string): Promise<any> {
     return this.delete(`${this.basePath}/${id}`);
   }

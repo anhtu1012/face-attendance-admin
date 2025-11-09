@@ -1,296 +1,152 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
-import LayoutContent from "@/components/LayoutContentForder/layoutContent";
-import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
-import { useDataGridOperations } from "@/hooks/useDataGridOperations";
-import { showError } from "@/hooks/useNotification";
-import { useSelectData } from "@/hooks/useSelectData";
-import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
-import NguoiDungServices from "@/services/admin/quan-tri-he-thong/nguoi-dung.service";
-import {
-  getItemId,
-  useHasItemFieldError,
-  useItemErrorCellStyle,
-} from "@/utils/client/validationHelpers";
-import { CellStyle, ColDef } from "@ag-grid-community/core";
+
+import { useEffect, useRef, useState } from "react";
 import { AgGridReact } from "@ag-grid-community/react";
-import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import LayoutContent from "@/components/LayoutContentForder/layoutContent";
+import { useNguoiDungColumns } from "./_hooks/useNguoiDungColumns";
+import { useNguoiDungData } from "./_hooks/useNguoiDungData";
+import { useNguoiDungGrid } from "./_hooks/useNguoiDungGrid";
+import { NguoiDungTable } from "./_components/TableUser/NguoiDungTable";
+import {
+  ChangePasswordModal,
+  UpdateManagerModal,
+  UpdateAccountStatusModal,
+} from "./_modals";
 
 function Page() {
-  const mes = useTranslations("HandleNotion");
-  const t = useTranslations("NguoiDung");
   const gridRef = useRef<AgGridReact>({} as AgGridReact);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalItems, setTotalItems] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(20);
-  const [loading, setLoading] = useState(false);
-  const [rowData, setRowData] = useState<NguoiDungItem[]>([]);
-  const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
-    undefined
-  );
-  const itemErrorsFromRedux = useSelector(selectAllItemErrors);
-  const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
-  const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-  const { selectRole, selectGender } = useSelectData({ fetchRole: true });
-  const handleFetchUser = useCallback(
-    async (page = currentPage, limit = pageSize, quickSearch?: string) => {
-      setLoading(true);
-      try {
-        const searchFilter: any = [
-          { key: "limit", type: "=", value: limit },
-          { key: "offset", type: "=", value: (page - 1) * limit },
-        ];
-        const response = await NguoiDungServices.getNguoiDung(
-          searchFilter,
-          quickSearch
-        );
-        setRowData(response.data);
-        setTotalItems(response.count);
-      } catch (error: any) {
-        showError(error.response?.data?.message || mes("fetchError"));
-      } finally {
-        setLoading(false);
-      }
-    },
-    [currentPage, mes, pageSize]
-  );
 
-  useEffect(() => {
-    handleFetchUser(currentPage, pageSize);
-  }, [currentPage, handleFetchUser, pageSize]);
+  // Modal states
+  const [changePasswordModal, setChangePasswordModal] = useState<{
+    open: boolean;
+    userData: any;
+  }>({ open: false, userData: null });
 
-  const centerStyle: CellStyle = useMemo(
-    () => ({ paddingLeft: 0, display: "flex", justifyContent: "center" }),
-    []
-  );
+  const [updateManagerModal, setUpdateManagerModal] = useState<{
+    open: boolean;
+    userData: any;
+  }>({ open: false, userData: null });
 
-  const columnDefs: ColDef[] = useMemo(
-    () => [
-      {
-        field: "roleCode",
-        headerName: t("roleCode"),
-        editable: true,
-        width: 180,
-        context: {
-          typeColumn: "Select",
-          selectOptions: selectRole,
-        },
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "roleCode", params);
-        },
-      },
-      {
-        field: "userName",
-        headerName: t("userName"),
-        editable: true,
-        width: 180,
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "userName", params);
-        },
-      },
-      {
-        field: "lastName",
-        headerName: t("lastName"),
-        editable: true,
-        width: 150,
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "lastName", params);
-        },
-      },
-      {
-        field: "firstName",
-        headerName: t("firstName"),
-        editable: true,
-        width: 150,
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "firstName", params);
-        },
-      },
-      {
-        field: "password",
-        headerName: t("password"),
-        valueFormatter: () => "*****",
-        editable: false,
-        width: 150,
-      },
-      {
-        field: "email",
-        headerName: "Email",
-        editable: true,
-        width: 180,
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "email", params);
-        },
-      },
-      {
-        field: "faceImg",
-        headerName: t("faceImg"),
-        editable: true,
-        width: 150,
-      },
-      {
-        field: "birthday",
-        headerName: t("birthDay"),
-        editable: true,
-        width: 190,
-        context: {
-          typeColumn: "Date",
-        },
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "birthday", params);
-        },
-      },
-      {
-        field: "gender",
-        headerName: t("gender"),
-        editable: true,
-        width: 150,
-        context: {
-          typeColumn: "Select",
-          selectOptions: selectGender,
-        },
-      },
-      {
-        field: "phone",
-        headerName: t("phone"),
-        editable: true,
-        width: 170,
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "phone", params);
-        },
-      },
-      {
-        field: "address",
-        headerName: t("address"),
-        editable: true,
-        width: 150,
-      },
-      {
-        field: "isActive",
-        headerName: t("isActive"),
-        editable: true,
-        width: 150,
-        cellStyle: centerStyle,
-      },
-    ],
-    [t, selectRole, selectGender, centerStyle, itemErrorCellStyle]
-  );
+  const [updateStatusModal, setUpdateStatusModal] = useState<{
+    open: boolean;
+    userData: any;
+  }>({ open: false, userData: null });
 
-  const handlePageChange = (page: number, size: number) => {
-    setCurrentPage(page);
-    setPageSize(size);
-    handleFetchUser(page, size);
+  // Modal handlers
+  const handleChangePassword = (data: any) => {
+    setChangePasswordModal({ open: true, userData: data });
   };
 
-  const dataGrid = useDataGridOperations<NguoiDungItem>({
-    gridRef,
-    createNewItem: (i) => ({
-      unitKey: `${Date.now()}_${i}`,
-      userName: "",
-      password: "123",
-      roleCode: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      birthDay: new Date(),
-      gender: "",
-      phone: "",
-      isActive: true,
-      address: "",
-      faceImg: "",
-    }),
-    duplicateCheckField: "userName",
-    mes,
+  const handleUpdateManager = (data: any) => {
+    setUpdateManagerModal({ open: true, userData: data });
+  };
+
+  const handleUpdateAccountStatus = (data: any) => {
+    setUpdateStatusModal({ open: true, userData: data });
+  };
+
+  // Custom hooks for modularity
+  const { columnDefs, actionCellRenderer } = useNguoiDungColumns({
+    onChangePassword: handleChangePassword,
+    onUpdateManager: handleUpdateManager,
+    onUpdateAccountStatus: handleUpdateAccountStatus,
+  });
+
+  const {
+    currentPage,
+    totalItems,
+    pageSize,
+    loading,
     rowData,
-    setRowData,
-    requiredFields: [
-      { field: "userName", label: t("userName") },
-      { field: "password", label: t("password") },
-      { field: "roleCode", label: t("roleCode") },
-      { field: "firstName", label: t("firstName") },
-      { field: "lastName", label: t("lastName") },
-      { field: "email", label: "Email" },
-      { field: "birthDay", label: t("birthDay") },
-      { field: "gender", label: t("gender") },
-      { field: "phone", label: t("phone") },
-      { field: "isActive", label: t("isActive") },
-    ],
-    t,
-    // Quicksearch parameters
+    quickSearchText,
     setCurrentPage,
     setPageSize,
     setQuickSearchText,
-    fetchData: handleFetchUser,
+    setRowData,
+    handleFetchUser,
+    handlePageChange,
+  } = useNguoiDungData();
+
+  const { dataGrid, handleSave, handleDelete } = useNguoiDungGrid({
+    gridRef,
+    rowData,
+    setRowData,
     columnDefs,
+    setCurrentPage,
+    setPageSize,
+    setQuickSearchText,
+    handleFetchUser,
+    currentPage,
+    pageSize,
+    quickSearchText,
   });
 
-  // Create save handler (chờ API service được implement)
-  const handleSave = dataGrid.createSaveHandler(
-    NguoiDungServices.createNguoiDung,
-    NguoiDungServices.updateNguoiDung,
-    () => handleFetchUser(currentPage, pageSize, quickSearchText)
-  );
-
-  // Create delete handler (chờ API service được implement)
-  const handleDelete = dataGrid.createDeleteHandler(
-    NguoiDungServices.deleteNguoiDung,
-    () => handleFetchUser(currentPage, pageSize, quickSearchText)
-  );
+  // Fetch data on mount and when pagination changes
+  useEffect(() => {
+    handleFetchUser(currentPage, pageSize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, pageSize]);
 
   if (!dataGrid.isClient) {
     return null;
   }
 
   return (
-    <div>
+    <>
       <LayoutContent
         layoutType={1}
         content1={
-          <AgGridComponentWrapper
-            showSearch={true}
+          <NguoiDungTable
             rowData={rowData}
             loading={loading}
             columnDefs={columnDefs}
+            actionCellRenderer={actionCellRenderer}
             gridRef={gridRef}
-            total={totalItems}
-            paginationPageSize={pageSize}
-            rowSelection={{
-              mode: "singleRow",
-              enableClickSelection: true,
-              checkboxes: false,
-            }}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            currentPage={currentPage}
             onCellValueChanged={dataGrid.onCellValueChanged}
-            paginationCurrentPage={currentPage}
-            pagination={true}
-            maxRowsVisible={10}
             onChangePage={handlePageChange}
             onQuicksearch={dataGrid.handleQuicksearch}
-            columnFlex={0}
-            showActionButtons={true}
-            actionButtonsProps={{
-              onSave: handleSave,
-              onDelete: handleDelete,
-              rowSelected: dataGrid.rowSelected,
-              showAddRowsModal: true,
-              modalInitialCount: 1,
-              onModalOk: dataGrid.handleModalOk,
-              hasDuplicates: dataGrid.duplicateIDs.length > 0,
-              hasErrors: dataGrid.hasValidationErrors,
-            }}
+            onSave={handleSave}
+            onDelete={handleDelete}
+            rowSelected={dataGrid.rowSelected}
+            hasDuplicates={dataGrid.duplicateIDs.length > 0}
+            hasErrors={dataGrid.hasValidationErrors}
+            onModalOk={dataGrid.handleModalOk}
           />
         }
       />
-    </div>
+
+      {/* Modals */}
+      <ChangePasswordModal
+        open={changePasswordModal.open}
+        onCancel={() => setChangePasswordModal({ open: false, userData: null })}
+        userData={changePasswordModal.userData}
+        onSuccess={() =>
+          handleFetchUser(currentPage, pageSize, quickSearchText)
+        }
+      />
+
+      <UpdateManagerModal
+        open={updateManagerModal.open}
+        onCancel={() => setUpdateManagerModal({ open: false, userData: null })}
+        userData={updateManagerModal.userData}
+        onSuccess={() =>
+          handleFetchUser(currentPage, pageSize, quickSearchText)
+        }
+      />
+
+      <UpdateAccountStatusModal
+        open={updateStatusModal.open}
+        onCancel={() => setUpdateStatusModal({ open: false, userData: null })}
+        userData={updateStatusModal.userData}
+        onSuccess={() =>
+          handleFetchUser(currentPage, pageSize, quickSearchText)
+        }
+      />
+    </>
   );
 }
 

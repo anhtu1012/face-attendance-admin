@@ -24,6 +24,14 @@ class SelectServicesBase extends AxiosService {
     }
     return this.get(`${this.basePath}/dropdown-branch`);
   }
+  async getSelectManagerUser(
+    roleId: string,
+    departmentId: string
+  ): Promise<PaginatedSelectOptionsResponse> {
+    return this.get(
+      `${this.basePath}/leader?departmentId=${departmentId}&roleId=${roleId}`
+    );
+  }
 
   async getSelectPosition(): Promise<SelectOptionsArray[]> {
     return this.get(`${this.basePath}/dropdown-position`);
