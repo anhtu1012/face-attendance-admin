@@ -278,6 +278,15 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
         values.scheduleTemplate as string,
         payload
       );
+      try {
+        if (onSuccess) {
+          onSuccess();
+        }
+        handleClose();
+      } catch (err) {
+        // swallow errors from parent callback
+        console.warn("onSuccess callback failed:", err);
+      }
     } catch (error) {
       console.log(error);
     } finally {

@@ -653,7 +653,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                     <div className="form-col-12">
                       <Form.Item
                         name="fullName"
-                        label="Họ và tên"
+                        label="Họ và tên *"
                         rules={[
                           {
                             required: true,
@@ -679,7 +679,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                     <div className="form-col-6">
                       <Form.Item
                         name="email"
-                        label="Email"
+                        label="Email *"
                         rules={[
                           {
                             required: true,
@@ -702,7 +702,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                     <div className="form-col-6">
                       <Form.Item
                         name="phone"
-                        label="Số điện thoại"
+                        label="Số điện thoại *"
                         rules={[
                           {
                             required: true,
@@ -729,7 +729,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                     <div className="form-col-6">
                       <Form.Item
                         name="birthday"
-                        label="Ngày sinh"
+                        label="Ngày sinh *"
                         validateTrigger={["onChange", "onBlur"]}
                         rules={[
                           {
@@ -793,7 +793,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
                     <div className="form-col-6">
                       <Form.Item
                         name="gender"
-                        label="Giới tính"
+                        label="Giới tính *"
                         rules={[
                           {
                             required: true,

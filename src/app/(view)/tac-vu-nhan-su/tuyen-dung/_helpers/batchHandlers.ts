@@ -9,6 +9,7 @@ interface BatchStatusChangeParams {
     | "TO_INTERVIEW"
     | "CANNOT_CONTACT"
     | "INTERVIEW_REJECTED"
+    | "CONTRACT_SIGNING"
     | "HOAN_THANH";
   setLoading: (loading: boolean) => void;
   setQuantityStatus: React.Dispatch<
@@ -103,6 +104,8 @@ export const handleBatchStatusChange = async ({
         ? "không liên hệ được"
         : status === "INTERVIEW_REJECTED"
         ? "từ chối phỏng vấn"
+        : status === "CONTRACT_SIGNING"
+        ? "chuyển sang làm hợp đồng"
         : status === "HOAN_THANH"
         ? "đã ký hợp đồng"
         : "chuyển sang phỏng vấn";

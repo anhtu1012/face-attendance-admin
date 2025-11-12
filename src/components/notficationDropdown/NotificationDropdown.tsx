@@ -14,9 +14,9 @@ import {
   Avatar,
   Badge,
   Button,
+  Card,
   Drawer,
   Empty,
-  Card,
   Space,
   Spin,
   Typography,
@@ -24,7 +24,6 @@ import {
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -50,17 +49,19 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
 
   // Get user data from Redux
   const authData = useSelector(selectAuthLogin);
-  const userCode = authData.userProfile?.code;
+  const userId = authData.userProfile?.id;
 
   const unreadCount = notifications.filter((notif) => !notif.isRead).length;
 
   // Fetch notifications when component mounts or when dropdown opens
   const fetchNotifications = async () => {
-    if (!userCode) return;
+    if (!userId) return;
 
     setLoading(true);
     try {
-      const response = await NotificationService.getMyNotification(userCode);
+      const response = await NotificationService.getMyNotification(
+        String(userId)
+      );
 
       setNotifications(response.data?.reverse() || []);
     } catch (error) {
@@ -71,13 +72,13 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
     }
   };
 
-  // Fetch notifications immediately when userCode is available
+  // Fetch notifications immediately when userId  is available
   useEffect(() => {
-    if (userCode) {
+    if (userId) {
       fetchNotifications();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userCode, socket]);
+  }, [userId, socket]);
 
   // Listen for new notifications from WebSocket
   useEffect(() => {
@@ -96,18 +97,18 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
       });
       setNotifications((prev) => [notification, ...prev]);
     };
-    // Listen for notifications with dynamic key using userCode
-    // const notificationKey = `NOTIFICATION_CREATED_${userCode}`;
+    // Listen for notifications with dynamic key using userId
+    // const notificationKey = `NOTIFICATION_CREATED_${userId }`;
     socket.on("NEW_CANDIDATE_APPLY", handleNewNotification);
 
     return () => {
       socket.off("NEW_CANDIDATE_APPLY", handleNewNotification);
     };
-  }, [socket, userCode]);
+  }, [socket, userId]);
 
   // Refresh notifications when drawer opens for latest data
   useEffect(() => {
-    if (userCode && visible) {
+    if (userId && visible) {
       fetchNotifications();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -152,11 +153,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
   // };
 
   const handleMarkAllAsRead = async () => {
-    if (!userCode) return;
+    if (!userId) return;
 
     setMarkingAsRead(true);
     try {
-      await NotificationService.markAllAsRead(userCode);
+      await NotificationService.markAllAsRead(String(userId));
       // message.success('Đã đánh dấu tất cả thông báo đã đọc');
       // Refresh notifications
       await fetchNotifications();
@@ -168,19 +169,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
     }
   };
 
-  const getLinkNoti = (roleCode: string) => {
-    switch (roleCode) {
-      case "R2":
-        return "/hr/thong-bao";
-      case "R3":
-        return "/manager/thong-bao";
-      case "R1":
-        return "/admin/thong-bao";
-      default:
-        break;
-    }
-    return "#";
-  };
   const renderNotificationItem = (notification: NotificationItem) => (
     <Card
       key={notification.id}
@@ -275,14 +263,17 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
         className="notification-drawer"
         footer={
           <div className="notification-drawer-footer">
-            <Link
-              href={getLinkNoti(authData.userProfile?.roleId || "")}
-              style={{ textDecoration: "none", width: "100%" }}
+            <Button
+              type="primary"
+              onClick={fetchNotifications}
+              block
+              size="large"
             >
-              <Button type="primary" block size="large">
-                Xem tất cả thông báo
-              </Button>
-            </Link>
+              Tải lại thông báo
+            </Button>
+            <Button type="dashed" block size="large">
+              Xóa tất cả thông báo
+            </Button>
           </div>
         }
       >

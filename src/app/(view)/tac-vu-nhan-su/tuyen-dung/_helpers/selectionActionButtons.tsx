@@ -86,30 +86,66 @@ export const getSelectionActionButtons = ({
         },
       ];
 
-    case "NHAN_VIEC":
-      return [
-        {
-          title: "Hẹn nhận việc",
-          label: "Hẹn nhận việc",
-          onClick: async () => {
-            const selectedData = getSelectedData();
-            await handleBatchJobOffer(selectedData);
+    case "NHAN_VIEC": {
+      // Get currently selected rows once
+      const selectedData = getSelectedData();
+
+      // If any selected row has status 'JOB_SCHEDULED', we treat it specially
+      const hasJobScheduled =
+        selectedData &&
+        selectedData.length > 0 &&
+        selectedData.some((d: TuyenDungItem) => d.status === "JOB_SCHEDULED");
+
+      const actions: SelectionActionButton[] = [];
+
+      // When there is NO JOB_SCHEDULED among selected rows, show job-offer actions
+      if (!hasJobScheduled) {
+        actions.push(
+          {
+            title: "Hẹn nhận việc",
+            label: "Hẹn nhận việc",
+            onClick: async () => {
+              const sd = getSelectedData();
+              await handleBatchJobOffer(sd);
+            },
           },
-        },
-        {
-          title: "Hủy nhận việc",
-          label: "Hủy nhận việc",
-          danger: true,
+          {
+            title: "Hủy nhận việc",
+            label: "Hủy nhận việc",
+            danger: true,
+            confirmMessage:
+              "Bạn có chắc muốn hủy nhận việc cho các ứng viên này?",
+            onClick: async () => {
+              const sd = getSelectedData();
+              if (handleBatchCancelJobOffer) {
+                await handleBatchCancelJobOffer(sd);
+              }
+            },
+          }
+        );
+      }
+
+      // When at least one selected row is JOB_SCHEDULED, show "Chuyển sang làm hợp đồng"
+      if (hasJobScheduled) {
+        actions.push({
+          title: "Chuyển sang làm hợp đồng",
+          label: "Chuyển sang  làm hợp đồng",
           confirmMessage:
-            "Bạn có chắc muốn hủy nhận việc cho các ứng viên này?",
+            "Bạn có chắc muốn chuyển các ứng viên này sang  làm hợp đồng?",
           onClick: async () => {
-            const selectedData = getSelectedData();
-            if (handleBatchCancelJobOffer) {
-              await handleBatchCancelJobOffer(selectedData);
-            }
+            const sd = getSelectedData();
+            const castedHandle = handleBatchStatusChange as unknown as (
+              rows: TuyenDungItem[],
+              status: string
+            ) => Promise<void>;
+
+            await castedHandle(sd, "CONTRACT_SIGNING");
           },
-        },
-      ];
+        });
+      }
+
+      return actions;
+    }
 
     case "HOP_DONG":
       return [

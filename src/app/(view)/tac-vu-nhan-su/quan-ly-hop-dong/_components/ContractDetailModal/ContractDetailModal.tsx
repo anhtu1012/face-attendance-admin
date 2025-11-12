@@ -194,7 +194,7 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
       width={1200}
       className="contract-detail-modal"
     >
-      <Spin spinning={loading}>
+      <Spin spinning={loading || uploadLoading}>
         {data && (
           <Tabs defaultActiveKey="1" className="contract-tabs">
             <TabPane

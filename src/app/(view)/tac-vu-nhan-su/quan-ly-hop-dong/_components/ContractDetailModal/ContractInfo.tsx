@@ -8,9 +8,10 @@ import {
   Tag,
   Typography,
   Upload,
+  Modal,
 } from "antd";
 import dayjs from "dayjs";
-import React from "react";
+import React, { useState } from "react";
 import {
   FaBuilding,
   FaCalendarAlt,
@@ -18,6 +19,8 @@ import {
   FaIdCard,
   FaMoneyBillWave,
   FaUpload,
+  FaCheck,
+  FaTimes,
 } from "react-icons/fa";
 
 const { Title, Text } = Typography;
@@ -37,6 +40,10 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
   uploadLoading,
   onUploadPdf,
 }) => {
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+
   const formatCurrency = (value: string | number) => {
     const numValue = typeof value === "string" ? parseFloat(value) : value;
     return new Intl.NumberFormat("vi-VN", {
@@ -88,6 +95,29 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
     }
 
     return `${mins} phút`;
+  };
+
+  const handleFileSelect = (file: File) => {
+    setPreviewFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    setPreviewModalOpen(true);
+  };
+
+  const handleConfirmUpload = () => {
+    if (previewFile) {
+      onUploadPdf(previewFile);
+      handleClosePreview();
+    }
+  };
+
+  const handleClosePreview = () => {
+    setPreviewModalOpen(false);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl("");
+    setPreviewFile(null);
   };
 
   return (
@@ -219,7 +249,7 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
             accept=".pdf"
             showUploadList={false}
             beforeUpload={(file) => {
-              onUploadPdf(file as File);
+              handleFileSelect(file as File);
               return false;
             }}
           >
@@ -237,6 +267,72 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
           </Upload>
         </div>
       )}
+
+      {/* Modal xem trước PDF */}
+      <Modal
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <FaFilePdf style={{ color: "#ff4d4f" }} />
+            <span>Xem trước file PDF</span>
+          </div>
+        }
+        open={previewModalOpen}
+        onCancel={handleClosePreview}
+        width="80%"
+        style={{ top: 20 }}
+        footer={[
+          <Cbutton
+            key="cancel"
+            icon={<FaTimes />}
+            onClick={handleClosePreview}
+            origin={{
+              bgcolor: "transparent",
+              color: "#ff4d4f",
+              hoverBgColor: "rgba(255, 77, 79, 0.1)",
+              border: "2px solid #ff4d4f",
+              hoverColor: "#ff4d4f",
+            }}
+            size="large"
+            style={{
+              fontWeight: 600,
+            }}
+          >
+            Hủy
+          </Cbutton>,
+          <Cbutton
+            key="confirm"
+            icon={<FaCheck />}
+            onClick={handleConfirmUpload}
+            loading={uploadLoading}
+            origin={{
+              bgcolor: "#52c41a",
+              color: "white",
+              hoverBgColor: "#73d13d",
+              border: "2px solid #52c41a",
+            }}
+            size="large"
+            style={{
+              fontWeight: 600,
+            }}
+          >
+            Xác nhận upload
+          </Cbutton>,
+        ]}
+      >
+        {previewUrl && (
+          <div style={{ height: "80vh" }}>
+            <iframe
+              src={previewUrl}
+              style={{
+                width: "100%",
+                height: "100%",
+                border: "none",
+              }}
+              title="PDF Preview"
+            />
+          </div>
+        )}
+      </Modal>
     </Card>
   );
 };

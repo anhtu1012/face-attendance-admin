@@ -86,6 +86,7 @@ class TuyenDungServicesBase extends AxiosService {
       | "TO_INTERVIEW"
       | "CANNOT_CONTACT"
       | "INTERVIEW_REJECTED"
+      | "CONTRACT_SIGNING"
       | "HOAN_THANH"
   ): Promise<any> {
     return this.put(`${this.basePath}/tuyen-dung/update-status/${id}`, {

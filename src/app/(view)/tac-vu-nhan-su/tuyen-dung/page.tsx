@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import AIAnalysisResultModal from "@/components/AIAnalysisResultModal/AIAnalysisResultModal";
+import Cbutton from "@/components/basicUI/Cbutton";
 import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
 import IsExistedCellRenderer from "@/components/basicUI/cTableAG/components/IsExistedCellRenderer";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
@@ -52,6 +53,7 @@ import "./index.scss";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
+import { GrPowerReset } from "react-icons/gr";
 function Page() {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("NguoiDung");
@@ -102,7 +104,8 @@ function Page() {
         key && quantityStatus && quantityStatus[key] !== undefined
           ? ` (${quantityStatus[key]})`
           : "";
-      return `${label}${count}`;
+      console.log("count", count);
+      return `${label}`;
     };
 
     // Helper to create label with badge
@@ -690,7 +693,7 @@ function Page() {
     const selectableStatusMap: Record<string, string | string[] | undefined> = {
       LIEN_HE: "TO_CONTACT",
       PHONG_VAN: ["TO_INTERVIEW", "TO_INTERVIEW_R1"],
-      NHAN_VIEC: "JOB_OFFERED",
+      NHAN_VIEC: ["JOB_OFFERED", "JOB_SCHEDULED"],
       HOP_DONG: "CONTRACT_SIGNING",
       HUY_HEN: undefined,
       CHUA_PHU_HOP: undefined,
@@ -782,6 +785,24 @@ function Page() {
 
     // Default: Only show view details button for all other cases
     return defaultViewButton;
+  };
+  const resetButton = {
+    return: (
+      <>
+        <Cbutton
+          onClick={() => {
+            handleFetchUser(currentPage, pageSize, quickSearchText);
+          }}
+          icon={
+            <>
+              <GrPowerReset />
+            </>
+          }
+        >
+          Làm mới
+        </Cbutton>
+      </>
+    ),
   };
 
   if (!dataGrid.isClient) {
@@ -897,6 +918,8 @@ function Page() {
                 hideAdd: selectedStatus !== "LIEN_HE" ? true : false,
                 hideDelete: selectedStatus !== "LIEN_HE" ? true : false,
                 hideDivider: selectedStatus !== "LIEN_HE" ? true : false,
+                hideSave: selectedStatus !== "LIEN_HE" ? true : false,
+                buttonProps: resetButton,
                 onSave: handleSave,
                 onDelete: handleDelete,
                 rowSelected: dataGrid.rowSelected,

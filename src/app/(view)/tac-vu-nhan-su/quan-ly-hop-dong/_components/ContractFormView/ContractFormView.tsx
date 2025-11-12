@@ -125,8 +125,6 @@ function ContractFormView({
   const handleFormSubmit = async (values: any) => {
     setLoading(true);
     try {
-      console.log("Form values:", values);
-
       // Process dates
       if (values.startDate) {
         values.startDate = dayjs(values.startDate).toISOString();
@@ -200,7 +198,7 @@ function ContractFormView({
           }
         }
       } else {
-        // Creating a new contract
+        await onExportPdf?.();
         await QuanLyHopDongServices.createQuanLyHopDong(values);
         messageApi.success("Hợp đồng đã được tạo thành công!");
       }
@@ -282,9 +280,11 @@ function ContractFormView({
         heightLeft -= pdfHeight;
       }
 
-      // Convert PDF to Blob then to File
+      // Convert PDF to Blob then to File with appropriate name
       const pdfBlob = pdf.output("blob");
-      const pdfFile = new File([pdfBlob], "phu-luc-hop-dong.pdf", {
+      const fileName =
+        mode === "appendix" ? "phu-luc-hop-dong.pdf" : "hop-dong.pdf";
+      const pdfFile = new File([pdfBlob], fileName, {
         type: "application/pdf",
       });
 
@@ -389,6 +389,32 @@ function ContractFormView({
         return content && content.trim().length > 0;
       default:
         return true;
+    }
+  };
+
+  // Check if form is ready to submit
+  const isFormValid = () => {
+    const values = form.getFieldsValue();
+
+    if (mode === "appendix") {
+      // For appendix: contractTypeId, startDate, grossSalary, content
+      return (
+        values.contractTypeId &&
+        values.startDate &&
+        values.grossSalary &&
+        content &&
+        content.trim().length > 0
+      );
+    } else {
+      // For new contract: contractTypeId, startDate, positionId, grossSalary, content
+      return (
+        values.contractTypeId &&
+        values.startDate &&
+        values.positionId &&
+        values.grossSalary &&
+        content &&
+        content.trim().length > 0
+      );
     }
   };
   const fetchPositions = async (departmentId?: string) => {
@@ -888,6 +914,7 @@ function ContractFormView({
                 size="large"
                 htmlType="submit"
                 loading={loading}
+                disabled={!isFormValid()}
                 icon={<CheckCircleOutlined />}
               >
                 {mode === "appendix" ? "Lưu phụ lục" : "Lưu hợp đồng"}
