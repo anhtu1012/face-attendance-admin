@@ -99,10 +99,10 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
     };
     // Listen for notifications with dynamic key using userId
     // const notificationKey = `NOTIFICATION_CREATED_${userId }`;
-    socket.on("NEW_CANDIDATE_APPLY", handleNewNotification);
+    socket.on("NOTIFICATION_SENT", handleNewNotification);
 
     return () => {
-      socket.off("NEW_CANDIDATE_APPLY", handleNewNotification);
+      socket.off("NOTIFICATION_SENT", handleNewNotification);
     };
   }, [socket, userId]);
 

@@ -19,7 +19,7 @@ export function ManagerNameCell({
         className="update-manager-btn"
         onClick={() => onUpdateManager?.(data)}
       >
-        Cập nhật người QL
+        Cập nhật
       </button>
     );
   }

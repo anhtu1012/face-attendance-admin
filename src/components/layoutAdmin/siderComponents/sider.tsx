@@ -3,7 +3,7 @@ import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { createCategoriesData } from "@/utils/client/createCategoriesData";
 import { uppercase } from "@/utils/client/string";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, {
   JSX,
   useLayoutEffect,
@@ -156,6 +156,7 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
   const [isManualGroupSelection, setIsManualGroupSelection] =
     useState<boolean>(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const { categoriesData, moduleData } = createCategoriesData({
     permission: permissions,
@@ -312,19 +313,36 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
   }, []);
 
   // Xử lý khi click vào một mục
-  const handleClick = (index: number, category: Category) => {
-    // Xóa các trạng thái activeIndex cũ từ localStorage
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith("activeIndex_")) {
-        localStorage.removeItem(key);
-      }
-    });
-    // Cập nhật trạng thái mới
-    document.cookie = `_url=${category.link}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
-    // Gửi sự kiện cập nhật localStorage
-    const storageEvent = new Event("localStorageUpdate");
-    window.dispatchEvent(storageEvent);
-  };
+  const handleClick = useCallback(
+    (index: number, category: Category) => {
+      // Xóa các trạng thái activeIndex cũ từ localStorage
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("activeIndex_")) {
+          localStorage.removeItem(key);
+        }
+      });
+      // Cập nhật trạng thái mới
+      document.cookie = `_url=${category.link}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
+      // Gửi sự kiện cập nhật localStorage
+      const storageEvent = new Event("localStorageUpdate");
+      window.dispatchEvent(storageEvent);
+
+      // Sử dụng router.push để chuyển trang nhanh hơn
+      setActiveCategoryIndex(index);
+      setOpenMenu(false);
+      router.push(category.link);
+    },
+    [router, setOpenMenu]
+  );
+
+  // Prefetch các link khi component mount để tăng tốc độ
+  useEffect(() => {
+    if (activeGroupKey && categoriesData[activeGroupKey]) {
+      categoriesData[activeGroupKey].forEach((category) => {
+        router.prefetch(category.link);
+      });
+    }
+  }, [activeGroupKey, categoriesData, router]);
 
   return (
     <div className="sider-container">
@@ -411,15 +429,15 @@ const SiderComponents: React.FC<SiderComponentsProps> = ({ setOpenMenu }) => {
                                 "--item-index": categoryIndex,
                               } as React.CSSProperties
                             }
-                            onClick={() => {
-                              setOpenMenu(false);
+                            onClick={(e) => {
+                              e.preventDefault();
                               handleClick(categoryIndex, category);
-                              setActiveCategoryIndex(categoryIndex);
                             }}
                           >
                             <Link
                               href={category.link}
                               className="item__content-title"
+                              prefetch={true}
                             >
                               <div className="category-content">
                                 <div className="category-icon">

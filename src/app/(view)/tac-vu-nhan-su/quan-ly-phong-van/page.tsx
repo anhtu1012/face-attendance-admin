@@ -4,7 +4,9 @@ import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import AppointmentWeeklyView from "@/components/ViewComponent/AppointmentWeeklyView";
 import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
 import { showError } from "@/hooks/useNotification";
+import useSocket from "@/hooks/useSocket";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/quan-ly-phong-van.service";
 import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -12,7 +14,6 @@ import { useSelector } from "react-redux";
 import FilterDropdown from "../_components/FilterDropdown";
 import { FilterValues } from "../phong-van-nhan-viec/_types/filter.types";
 import "./page.scss";
-import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/quan-ly-phong-van.service";
 function Page() {
   // Interview states
   const [interviewData, setInterviewData] = useState<
@@ -21,7 +22,7 @@ function Page() {
   const { userProfile } = useSelector(selectAuthLogin);
   const [loadingInterviews, setLoadingInterviews] = useState(false);
   const [interviewFilters, setInterviewFilters] = useState<FilterValues>({});
-
+  const socket = useSocket();
   // Status options for filters
   const interviewStatusOptions = useMemo(
     () => [
@@ -33,6 +34,18 @@ function Page() {
     ],
     []
   );
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewNotification = (data: AppointmentListWithInterview) => {
+      setInterviewData((prev) => [data, ...prev]);
+    };
+    socket.on("NEW_APPOINTMENT", handleNewNotification);
+
+    return () => {
+      socket.off("NEW_APPOINTMENT", handleNewNotification);
+    };
+  }, [socket]);
 
   const fetchInterviews = useCallback(async () => {
     if (!userProfile?.id) return;
