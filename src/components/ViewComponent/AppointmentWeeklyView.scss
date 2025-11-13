@@ -372,11 +372,11 @@
           z-index: 1;
         }
 
-        @keyframes rotate-highlight {
-          to {
-            transform: rotate(360deg);
-          }
-        }
+        // @keyframes rotate-highlight {
+        //   to {
+        //     transform: rotate(360deg);
+        //   }
+        // }
 
         @keyframes td-reject-border-chase {
           0% {

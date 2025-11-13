@@ -38,6 +38,8 @@ function Page() {
     if (!socket) return;
 
     const handleNewNotification = (data: AppointmentListWithInterview) => {
+      console.log("NEW_APPOINTMENT received:", data);
+
       setInterviewData((prev) => [data, ...prev]);
     };
     socket.on("NEW_APPOINTMENT", handleNewNotification);

@@ -128,6 +128,8 @@ class SocketRoomManager {
     // 3. Join room dựa trên roleId - theo logic backend
     if (roleId && userIdStr) {
       const roleIdNum = Number(roleId);
+      console.log("roleIdNum", roleIdNum);
+      console.log("userIdStr", userIdStr);
 
       switch (roleIdNum) {
         case 2: // DEPARTMENT

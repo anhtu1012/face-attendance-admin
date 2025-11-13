@@ -15,9 +15,13 @@ import "../_components/FilterDropdown/FilterDropdown.scss";
 import { FilterValues } from "./_types/filter.types";
 import "./index.scss";
 import TuyenDungServices from "@/services/tac-vu-nhan-su/tuyen-dung/tuyen-dung.service";
-import { AppointmentListWithInterview } from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
+import {
+  AppointmentListWithInterview,
+  Interviewer,
+} from "@/dtos/tac-vu-nhan-su/phong-van-nhan-viec/appointment.dto";
 import { useSelector } from "react-redux";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import useSocket from "@/hooks/useSocket";
 
 dayjs.extend(isoWeek);
 
@@ -33,6 +37,59 @@ function Page() {
   const [jobOfferData, setJobOfferData] = useState<JobOfferItem[]>([]);
   const [loadingJobOffers, setLoadingJobOffers] = useState(false);
   const [jobOfferFilters, setJobOfferFilters] = useState<FilterValues>({});
+  const socket = useSocket();
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewNotification = (payload: any) => {
+      console.log("INTERVIEWER_APPOINTMENT_UPDATED received:", payload);
+
+      const appointmentId = payload?.appointmentId;
+      const incomingInterviewer =
+        payload?.interviewer && typeof payload.interviewer === "object"
+          ? payload.interviewer
+          : payload;
+
+      // Nếu không có appointmentId thì không xử lý
+      if (!appointmentId) return;
+
+      if (!incomingInterviewer || !incomingInterviewer.interviewerId) return;
+
+      setInterviewData((prev) =>
+        prev.map((appt) => {
+          if (String(appt.appointmentId) !== String(appointmentId)) return appt;
+          if (!appt.listInterviewers || appt.listInterviewers.length === 0)
+            return appt;
+
+          // chỉ thay interviewer có id trùng, giữ nguyên các phần tử khác
+          let matched = false;
+          const newList = appt.listInterviewers.map((iv) => {
+            if (
+              String(iv.interviewerId) ===
+              String(incomingInterviewer.interviewerId)
+            ) {
+              matched = true;
+              // merge để giữ các trường cũ nếu cần
+              return { ...iv, ...(incomingInterviewer as Interviewer) };
+            }
+            return iv;
+          });
+
+          if (!matched) return appt;
+
+          return {
+            ...appt,
+            listInterviewers: newList,
+          };
+        })
+      );
+    };
+    socket.on("INTERVIEWER_APPOINTMENT_UPDATED", handleNewNotification);
+
+    return () => {
+      socket.off("INTERVIEWER_APPOINTMENT_UPDATED", handleNewNotification);
+    };
+  }, [socket]);
 
   // Status options for filters
   const interviewStatusOptions = useMemo(

@@ -12,6 +12,11 @@ const createSocketInstance = (): Socket => {
   }
 
   const token = getCookie("token");
+  console.log(
+    "process.env.NEXT_PUBLIC_SOCKET_URL",
+    process.env.NEXT_PUBLIC_SOCKET_URL
+  );
+
   const s = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
     transports: ["websocket"],
     reconnection: true,
