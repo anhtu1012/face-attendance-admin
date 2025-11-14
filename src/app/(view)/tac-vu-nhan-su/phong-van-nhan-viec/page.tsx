@@ -45,6 +45,7 @@ function Page() {
       console.log("INTERVIEWER_APPOINTMENT_UPDATED received:", payload);
 
       const appointmentId = payload?.appointmentId;
+      const appointmentStatus = payload?.status;
       const incomingInterviewer =
         payload?.interviewer && typeof payload.interviewer === "object"
           ? payload.interviewer
@@ -79,6 +80,10 @@ function Page() {
 
           return {
             ...appt,
+            // nếu payload có status thì cập nhật vào appointment
+            ...(appointmentStatus !== undefined
+              ? { status: appointmentStatus }
+              : {}),
             listInterviewers: newList,
           };
         })

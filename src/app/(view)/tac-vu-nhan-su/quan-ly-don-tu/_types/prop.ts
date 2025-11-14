@@ -22,7 +22,7 @@ export interface ApplicationItem {
 export interface FormValues {
   filterDateRange?: [Dayjs, Dayjs];
   status?: string;
-  formCategory?: string;
+  approvedName?: string;
   submittedName?: string;
 }
 
@@ -41,4 +41,3 @@ export interface TableApplicationProps {
 export interface FilterProps {
   onSubmit: () => void;
 }
-

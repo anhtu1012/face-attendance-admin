@@ -10,6 +10,7 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FilterProps, FormValues } from "../../_types/prop";
 import "./Filter.scss";
+import CInputLabel from "@/components/basicUI/CInputLabel";
 
 const Filter = forwardRef<
   { getFormValues: () => Partial<FormValues> },
@@ -23,16 +24,7 @@ const Filter = forwardRef<
   const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(
     dayjs().endOf("month")
   );
-  const {
-    selectRole,
-    selectContractType,
-    selectDepartment,
-    selectStatusContract,
-  } = useSelectData({
-    fetchRole: true,
-    fetchDepartment: true,
-    fetchContractType: true,
-  });
+  const { selectStatusForm } = useSelectData({});
   useImperativeHandle(ref, () => ({
     getFormValues: () => {
       const values = form.getFieldsValue();
@@ -80,35 +72,23 @@ const Filter = forwardRef<
                   </Form.Item>
                 </Col>
                 <Col span={24}>
-                  <Form.Item name="role">
-                    <Cselect label="Vai trò" allowClear options={selectRole} />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item name="department">
-                    <Cselect
-                      label="Phòng ban"
-                      allowClear
-                      options={selectDepartment}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item name="contractType">
-                    <Cselect
-                      label="Loại hợp đồng"
-                      allowClear
-                      options={selectContractType}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
                   <Form.Item name="status">
                     <Cselect
-                      label="Trang thái"
+                      label="Trạng thái đơn từ"
                       allowClear
-                      options={selectStatusContract}
+                      options={selectStatusForm}
                     />
+                  </Form.Item>
+                </Col>
+
+                <Col span={24}>
+                  <Form.Item name="submittedName">
+                    <CInputLabel label="Tên người gữi" allowClear />
+                  </Form.Item>
+                </Col>
+                <Col span={24}>
+                  <Form.Item name="approvedName">
+                    <CInputLabel label="Tên người duyệt" allowClear />
                   </Form.Item>
                 </Col>
               </>

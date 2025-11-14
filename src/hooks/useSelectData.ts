@@ -132,6 +132,14 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     { value: "10", label: "10+ năm" },
   ]);
 
+  const selectStatusForm = [
+    { label: "Đang xử lý", value: "PENDING" },
+    { label: "Đã duyệt", value: "APPROVED" },
+    { label: "Từ chối", value: "REJECTED" },
+    { label: "Hủy", value: "CANCELLED" },
+    { label: "Không hoạt động", value: "INACTIVE" },
+  ];
+
   // Run only once on mount (guarded) — prevent duplicate calls in Strict Mode
   useEffect(() => {
     // guard to avoid double-fetch in Strict Mode / development
@@ -184,5 +192,6 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     selectContractType,
     selectAllowance,
     selectStatusContract,
+    selectStatusForm,
   };
 };

@@ -27,7 +27,13 @@ import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTranslations } from "next-intl";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { DiGoogleAnalytics } from "react-icons/di";
 import { FaPlusCircle } from "react-icons/fa";
 import { FcViewDetails } from "react-icons/fc";
@@ -54,6 +60,7 @@ dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
 import { GrPowerReset } from "react-icons/gr";
+import useSocket from "@/hooks/useSocket";
 function Page() {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("NguoiDung");
@@ -88,7 +95,7 @@ function Page() {
   const [reportListCandidate, setReportListCandidate] =
     useState<TuyenDungItem | null>(null);
   const [reportList, setReportList] = useState<any[]>([]);
-
+  const socket = useSocket();
   // Track new count for each status tab
   const [newCounts, setNewCounts] = useState<Record<string, number>>({
     LIEN_HE: 0,
@@ -219,6 +226,18 @@ function Page() {
     fetchRole: true,
     fetchDepartment: true,
   });
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewNotification = (data: any) => {
+      console.log("NEW_IN received:", data);
+    };
+    socket.on("NEW_IN", handleNewNotification);
+
+    return () => {
+      socket.off("NEW_IN", handleNewNotification);
+    };
+  }, [socket]);
   const handleFetchUser = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
       setLoading(true);

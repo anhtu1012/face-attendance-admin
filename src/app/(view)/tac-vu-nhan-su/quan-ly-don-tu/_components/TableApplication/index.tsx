@@ -14,13 +14,12 @@ import {
   useState,
 } from "react";
 import { FaEye } from "react-icons/fa";
-import { filterApplications, mockApplications } from "../../_services/mockData";
-import {
-  ApplicationItem,
-  TableApplicationProps,
-  TableApplicationRef,
-} from "../../_types/prop";
+import { TableApplicationProps, TableApplicationRef } from "../../_types/prop";
 import ApplicationDetailModal from "../ApplicationDetailModal/ApplicationDetailModal";
+import QuanLyDonTuServices from "@/services/tac-vu-nhan-su/quan-ly-don-tu/quan-ly-don-tu.service";
+import { FilterOperationType } from "@chax-at/prisma-filter-common";
+import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
+import { ApplicationItem } from "@/dtos/tac-vu-nhan-su/quan-ly-don-tu/application.dto";
 
 const defaultPageSize = 20;
 
@@ -162,33 +161,38 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
       ) => {
         setLoading(true);
         try {
-          // Simulate API call delay
-          await new Promise((resolve) => setTimeout(resolve, 300));
-
           const filterValues = filterRef.current?.getFormValues() || {};
-
           const filters = {
-            dateRange: filterValues.filterDateRange
-              ? [
-                  filterValues.filterDateRange[0].toISOString(),
-                  filterValues.filterDateRange[1].toISOString(),
-                ]
-              : undefined,
-            status: filterValues.status,
-            formCategory: filterValues.formCategory,
-            submittedName: filterValues.submittedName,
-            quicksearch: quickSearchText,
+            ...(filterValues.filterDateRange
+              ? {
+                  fromDate: filterValues.filterDateRange[0].toISOString(),
+                  toDate: filterValues.filterDateRange[1].toISOString(),
+                }
+              : {}),
+            ...(filterValues.status ? { status: filterValues.status } : {}),
+            ...(filterValues.submittedName
+              ? { submittedBy: filterValues.submittedName }
+              : {}),
+            ...(filterValues.approvedName
+              ? { approvedName: filterValues.approvedName }
+              : {}),
           };
+          const searchFilter: FilterQueryStringTypeItem[] = [
+            { key: "limit", type: FilterOperationType.Eq, value: pageSize },
+            {
+              key: "offset",
+              type: FilterOperationType.Eq,
+              value: (currentPage - 1) * pageSize,
+            },
+          ];
+          const res = await QuanLyDonTuServices.getQuanLyDonTu(
+            searchFilter,
+            quickSearchText,
+            filters
+          );
 
-          const filtered = filterApplications(mockApplications, filters as any);
-
-          // Pagination
-          const start = (currentPage - 1) * pageSize;
-          const end = start + pageSize;
-          const paginatedData = filtered.slice(start, end);
-
-          setRowData(paginatedData);
-          setTotalItems(filtered.length);
+          setRowData(res.data);
+          setTotalItems(res.count || 0);
         } catch (error) {
           console.log(error);
           message.error("Có lỗi xảy ra khi tải dữ liệu");

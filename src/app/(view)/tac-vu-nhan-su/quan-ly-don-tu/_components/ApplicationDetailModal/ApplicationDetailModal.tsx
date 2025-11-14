@@ -2,7 +2,6 @@ import { Button, Image, message, Modal, Spin } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { ApplicationItem } from "../../_types/prop";
-import { mockApplications } from "../../_services/mockData";
 import {
   AiOutlineClockCircle,
   AiOutlineFileText,
@@ -16,6 +15,7 @@ import {
 } from "react-icons/bs";
 import { MdAttachFile } from "react-icons/md";
 import "./ApplicationDetailModal.scss";
+import QuanLyDonTuServices from "@/services/tac-vu-nhan-su/quan-ly-don-tu/quan-ly-don-tu.service";
 
 interface ApplicationDetailModalProps {
   open: boolean;
@@ -54,8 +54,10 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
   const fetchApplicationDetail = async () => {
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const found = mockApplications.find((app) => app.id === applicationId);
+      const data = await QuanLyDonTuServices.getQuanLyDonTuById(
+        applicationId as string
+      );
+      const found = data as ApplicationItem;
       if (found) {
         setApplication(found);
         setResponse(found.response || "");
