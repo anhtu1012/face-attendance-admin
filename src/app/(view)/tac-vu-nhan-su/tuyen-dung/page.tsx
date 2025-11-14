@@ -27,13 +27,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTranslations } from "next-intl";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { DiGoogleAnalytics } from "react-icons/di";
 import { FaPlusCircle } from "react-icons/fa";
 import { FcViewDetails } from "react-icons/fc";
@@ -60,7 +54,6 @@ dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
 import { GrPowerReset } from "react-icons/gr";
-import useSocket from "@/hooks/useSocket";
 function Page() {
   const mes = useTranslations("HandleNotion");
   const t = useTranslations("NguoiDung");
@@ -95,7 +88,7 @@ function Page() {
   const [reportListCandidate, setReportListCandidate] =
     useState<TuyenDungItem | null>(null);
   const [reportList, setReportList] = useState<any[]>([]);
-  const socket = useSocket();
+
   // Track new count for each status tab
   const [newCounts, setNewCounts] = useState<Record<string, number>>({
     LIEN_HE: 0,
@@ -207,6 +200,76 @@ function Page() {
           setRowData((prev) => [candidateInfo, ...prev]);
           setTotalItems((prev) => prev + 1);
         }
+
+        // If we're on HOP_DONG tab and status is CONTRACT_SIGNING, add to grid
+        if (
+          selectedStatus === "HOP_DONG" &&
+          candidateInfo.status === "CONTRACT_SIGNING"
+        ) {
+          // Update quantity status
+          setQuantityStatus((prev) => {
+            if (!prev) return { toContractQuantity: 1 };
+            return {
+              ...prev,
+              toContractQuantity: Number(prev.toContractQuantity || 0) + 1,
+            };
+          });
+
+          // Increment new count for HOP_DONG tab
+          setNewCounts((prev) => ({
+            ...prev,
+            HOP_DONG: Number(prev.HOP_DONG || 0) + 1,
+          }));
+
+          setRowData((prev) => [candidateInfo, ...prev]);
+          setTotalItems((prev) => prev + 1);
+        }
+
+        // If we're on PHONG_VAN tab and status is interview-related, update existing row
+        if (selectedStatus === "PHONG_VAN") {
+          const interviewStatuses = [
+            "TO_INTERVIEW_R1",
+            "TO_INTERVIEW_R2",
+            "TO_INTERVIEW_R3",
+            "TO_INTERVIEW_R4",
+            "TO_INTERVIEW_R5",
+            "INTERVIEW_RESCHEDULED",
+            "INTERVIEW_FAILED",
+            "NOT_COMING_INTERVIEW",
+          ];
+
+          if (interviewStatuses.includes(candidateInfo.status)) {
+            setRowData((prev) =>
+              prev.map((row) =>
+                row.id === candidateInfo.id ? candidateInfo : row
+              )
+            );
+          }
+        }
+
+        // If we're on NHAN_VIEC tab and status is JOB_OFFERED, add to grid
+        if (
+          selectedStatus === "NHAN_VIEC" &&
+          candidateInfo.status === "JOB_OFFERED"
+        ) {
+          // Update quantity status
+          setQuantityStatus((prev) => {
+            if (!prev) return { toJobOfferedQuantity: 1 };
+            return {
+              ...prev,
+              toJobOfferedQuantity: Number(prev.toJobOfferedQuantity || 0) + 1,
+            };
+          });
+
+          // Increment new count for NHAN_VIEC tab
+          setNewCounts((prev) => ({
+            ...prev,
+            NHAN_VIEC: Number(prev.NHAN_VIEC || 0) + 1,
+          }));
+
+          setRowData((prev) => [candidateInfo, ...prev]);
+          setTotalItems((prev) => prev + 1);
+        }
       }
     },
   });
@@ -226,18 +289,7 @@ function Page() {
     fetchRole: true,
     fetchDepartment: true,
   });
-  useEffect(() => {
-    if (!socket) return;
 
-    const handleNewNotification = (data: any) => {
-      console.log("NEW_IN received:", data);
-    };
-    socket.on("NEW_IN", handleNewNotification);
-
-    return () => {
-      socket.off("NEW_IN", handleNewNotification);
-    };
-  }, [socket]);
   const handleFetchUser = useCallback(
     async (page = currentPage, limit = pageSize, quickSearch?: string) => {
       setLoading(true);

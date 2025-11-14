@@ -13,13 +13,6 @@ interface UseRecruitmentSocketProps {
   jobId: string;
   selectedStatus: string;
   onNewCandidate?: (jobId: string, candidateInfo: TuyenDungItem) => void;
-  onCandidateStatusChanged?: (
-    jobId: string,
-    candidateId: string,
-    newStatus: string
-  ) => void;
-  onInterviewScheduled?: (jobId: string, candidateId: string) => void;
-  onJobOfferSent?: (jobId: string, candidateId: string) => void;
 }
 
 /**
@@ -30,9 +23,6 @@ export const useRecruitmentSocket = ({
   jobId,
   selectedStatus,
   onNewCandidate,
-  onCandidateStatusChanged,
-  onInterviewScheduled,
-  onJobOfferSent,
 }: UseRecruitmentSocketProps) => {
   const socket = useSocket();
 
@@ -64,7 +54,7 @@ export const useRecruitmentSocket = ({
 
     // Handler cho event ứng viên mới
     const handleNewCandidate = (socketData: RecruitmentSocketData) => {
-      console.log("✅✅✅ [NEW_CANDIDATE] Received:", socketData);
+      console.log("[NEW_CANDIDATE] Received:", socketData);
 
       const { jobId: newJobId, inFo } = socketData?.data || {};
       if (!newJobId || !inFo) {
@@ -75,98 +65,15 @@ export const useRecruitmentSocket = ({
       onNewCandidate?.(String(newJobId), inFo);
     };
 
-    // Handler cho event thay đổi trạng thái ứng viên
-    const handleCandidateStatusChanged = (socketData: {
-      data?: { jobId?: string; candidateId?: string; newStatus?: string };
-    }) => {
-      console.log("[Socket] Candidate status changed:", socketData);
-
-      const {
-        jobId: affectedJobId,
-        candidateId,
-        newStatus,
-      } = socketData?.data || {};
-      if (!affectedJobId || !candidateId || !newStatus) {
-        console.warn(" [Socket] Invalid status change data:", socketData);
-        return;
-      }
-
-      onCandidateStatusChanged?.(
-        String(affectedJobId),
-        String(candidateId),
-        newStatus
-      );
-    };
-
-    // Handler cho event lịch phỏng vấn được tạo
-    const handleInterviewScheduled = (socketData: {
-      data?: { jobId?: string; candidateId?: string };
-    }) => {
-      console.log("[Socket] Interview scheduled:", socketData);
-
-      const { jobId: affectedJobId, candidateId } = socketData?.data || {};
-      if (!affectedJobId || !candidateId) {
-        console.warn(" [Socket] Invalid interview schedule data:", socketData);
-        return;
-      }
-
-      onInterviewScheduled?.(String(affectedJobId), String(candidateId));
-    };
-
-    // Handler cho event gửi job offer
-    const handleJobOfferSent = (socketData: {
-      data?: { jobId?: string; candidateId?: string };
-    }) => {
-      console.log("[Socket] Job offer sent:", socketData);
-
-      const { jobId: affectedJobId, candidateId } = socketData?.data || {};
-      if (!affectedJobId || !candidateId) {
-        console.warn("[Socket] Invalid job offer data:", socketData);
-        return;
-      }
-
-      onJobOfferSent?.(String(affectedJobId), String(candidateId));
-    };
-    // Lắng nghe các sự kiện từ room hr_16
-    const handleHrNotification = (data: unknown) => {
-      console.log("📩 [Socket] ✅ NHẬN ĐƯỢC HR NOTIFICATION từ hr_16:", data);
-      // Xử lý thông báo từ HR department
-    };
-
-    const handleHrAttendance = (data: unknown) => {
-      console.log("⏰ [Socket] ✅ NHẬN ĐƯỢC HR ATTENDANCE từ hr_16:", data);
-      // Xử lý cập nhật điểm danh
-    };
-
-    socket.on("hr:notification", handleHrNotification);
-    socket.on("hr:attendance", handleHrAttendance);
-
     // Thử TẤT CẢ các variant của NEW_CANDIDATE event
     socket.on("NEW_CANDIDATE", handleNewCandidate);
-
-    socket.on("candidate:status:changed", handleCandidateStatusChanged);
-    socket.on("interview:scheduled", handleInterviewScheduled);
-    socket.on("job-offer:sent", handleJobOfferSent);
 
     // Cleanup khi component unmount
     return () => {
       // Cleanup tất cả variants của NEW_CANDIDATE
       socket.off("NEW_CANDIDATE", handleNewCandidate);
-
-      socket.off("candidate:status:changed", handleCandidateStatusChanged);
-      socket.off("interview:scheduled", handleInterviewScheduled);
-      socket.off("job-offer:sent", handleJobOfferSent);
     };
-  }, [
-    socket,
-    socket?.connected, // ⚠️ CRITICAL: Re-run khi socket connect/disconnect
-    jobId,
-    selectedStatus,
-    onNewCandidate,
-    onCandidateStatusChanged,
-    onInterviewScheduled,
-    onJobOfferSent,
-  ]);
+  }, [socket, socket.connected, jobId, selectedStatus, onNewCandidate]);
 
   // Return socket instance để có thể emit events nếu cần
   return { socket };
