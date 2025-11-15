@@ -132,13 +132,13 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     { value: "10", label: "10+ năm" },
   ]);
 
-  const selectStatusForm = [
+  const [selectStatusForm] = useState<SelectOption[]>([
     { label: "Đang xử lý", value: "PENDING" },
-    { label: "Đã duyệt", value: "APPROVED" },
+    { label: "Đã duyệt", value: "ACCEPTED" },
     { label: "Từ chối", value: "REJECTED" },
-    { label: "Hủy", value: "CANCELLED" },
-    { label: "Không hoạt động", value: "INACTIVE" },
-  ];
+    // { label: "Hủy", value: "CANCELLED" },
+    { label: "Hủy", value: "INACTIVE" },
+  ]);
 
   // Run only once on mount (guarded) — prevent duplicate calls in Strict Mode
   useEffect(() => {

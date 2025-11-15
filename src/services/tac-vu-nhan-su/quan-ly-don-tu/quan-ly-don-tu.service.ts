@@ -22,6 +22,17 @@ class QuanLyDonTuServicesBase extends AxiosService {
   async getQuanLyDonTuById(id: string): Promise<any> {
     return this.get<any>(`${this.basePath}/danh-sach-don/${id}`);
   }
+
+  async approveQuanLyDonTu(
+    id: string,
+    body: {
+      status: string;
+      response?: string;
+      dow: string;
+    }
+  ): Promise<any> {
+    return this.put(`${this.basePath}/cap-nhat-trang-thai-don/${id}`, body);
+  }
 }
 
 const QuanLyDonTuServices = new QuanLyDonTuServicesBase();

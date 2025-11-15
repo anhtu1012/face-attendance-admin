@@ -1,41 +1,40 @@
-import { Button, Image, message, Modal, Spin } from "antd";
+import { Button, Col, Image, Modal, Row } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { ApplicationItem } from "../../_types/prop";
 import {
   AiOutlineClockCircle,
   AiOutlineFileText,
   AiOutlineUser,
 } from "react-icons/ai";
 import {
-  BsCheckCircleFill,
-  BsXCircleFill,
   BsCalendar2Check,
+  BsCheckCircleFill,
   BsHourglassSplit,
+  BsXCircleFill,
 } from "react-icons/bs";
 import { MdAttachFile } from "react-icons/md";
+
+import { ApplicationItem } from "@/dtos/tac-vu-nhan-su/quan-ly-don-tu/application.dto";
 import "./ApplicationDetailModal.scss";
-import QuanLyDonTuServices from "@/services/tac-vu-nhan-su/quan-ly-don-tu/quan-ly-don-tu.service";
 
 interface ApplicationDetailModalProps {
   open: boolean;
   onClose: () => void;
-  applicationId: string | null;
-  onApprove: (id: string, response: string) => void;
-  onReject: (id: string, response: string) => void;
+  application: ApplicationItem | null;
+  onApprove: (id: string, response: string, status: "ACCEPTED") => void;
+  onReject: (id: string, response: string, status: "REJECTED") => void;
   onRefresh: () => void;
+  processing?: boolean;
 }
 
 const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
   open,
   onClose,
-  applicationId,
+  application,
   onApprove,
   onReject,
-  onRefresh,
+  processing = false,
 }) => {
-  const [application, setApplication] = useState<ApplicationItem | null>(null);
-  const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
   const [showResponseInput, setShowResponseInput] = useState(false);
   const [actionType, setActionType] = useState<"approve" | "reject" | null>(
@@ -43,33 +42,12 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
   );
 
   useEffect(() => {
-    if (open && applicationId) {
-      fetchApplicationDetail();
+    if (open && application) {
       setShowResponseInput(false);
       setActionType(null);
       setResponse("");
     }
-  }, [open, applicationId]);
-
-  const fetchApplicationDetail = async () => {
-    setLoading(true);
-    try {
-      const data = await QuanLyDonTuServices.getQuanLyDonTuById(
-        applicationId as string
-      );
-      const found = data as ApplicationItem;
-      if (found) {
-        setApplication(found);
-        setResponse(found.response || "");
-      }
-    } catch (error) {
-      console.log(error);
-
-      message.error("Có lỗi xảy ra khi tải thông tin đơn");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [open, application]);
 
   const handleApproveClick = () => {
     setActionType("approve");
@@ -82,34 +60,12 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
   };
 
   const handleConfirmAction = () => {
-    if (!applicationId || !actionType) return;
-    if (!response.trim()) {
-      message.warning("Vui lòng nhập phản hồi");
-      return;
+    if (!application || !actionType) return;
+    if (actionType === "approve") {
+      onApprove(application.id, response, "ACCEPTED");
+    } else {
+      onReject(application.id, response, "REJECTED");
     }
-
-    Modal.confirm({
-      title:
-        actionType === "approve"
-          ? "Xác nhận duyệt đơn"
-          : "Xác nhận từ chối đơn",
-      content:
-        actionType === "approve"
-          ? "Bạn có chắc chắn muốn duyệt đơn này?"
-          : "Bạn có chắc chắn muốn từ chối đơn này?",
-      okText: actionType === "approve" ? "Duyệt" : "Từ chối",
-      cancelText: "Hủy",
-      okButtonProps: { danger: actionType === "reject" },
-      onOk: () => {
-        if (actionType === "approve") {
-          onApprove(applicationId, response);
-        } else {
-          onReject(applicationId, response);
-        }
-        onRefresh();
-        onClose();
-      },
-    });
   };
 
   const handleCancelAction = () => {
@@ -125,7 +81,7 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
         label: "Chờ duyệt",
         icon: <BsHourglassSplit />,
       },
-      APPROVED: {
+      ACCEPTED: {
         class: "approved",
         label: "Đã duyệt",
         icon: <BsCheckCircleFill />,
@@ -168,46 +124,41 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
       width={1000}
       footer={null}
       className="application-detail-modal-modern"
-      destroyOnClose
+      destroyOnHidden
       closeIcon={null}
     >
-      {loading ? (
-        <div style={{ textAlign: "center", padding: "60px 0" }}>
-          <Spin size="large" />
-        </div>
-      ) : (
-        application && (
-          <div className="modern-detail-content">
-            {/* Header với Status */}
-            <div className="modal-header">
-              <div className="header-left">
-                <div className="application-type">
-                  <AiOutlineFileText className="type-icon" />
-                  <span>{application.formCategoryTitle}</span>
-                </div>
-                <div className="application-id">Mã đơn: #{application.id}</div>
+      {application && (
+        <div className="modern-detail-content">
+          {/* Header với Status */}
+          <div className="modal-header">
+            <div className="header-left">
+              <div className="application-type">
+                <AiOutlineFileText className="type-icon" />
+                <span>{application.formCategoryTitle}</span>
               </div>
-              <div className="header-right">
-                <div
-                  className={`status-badge-large ${
-                    getStatusInfo(application.status).class
-                  }`}
-                >
-                  <span className="status-icon">
-                    {getStatusInfo(application.status).icon}
-                  </span>
-                  <span className="status-text">
-                    {getStatusInfo(application.status).label}
-                  </span>
-                </div>
+              <div className="application-id">Mã đơn: #{application.id}</div>
+            </div>
+            <div className="header-right">
+              <div
+                className={`status-badge-large ${
+                  getStatusInfo(application.status).class
+                }`}
+              >
+                <span className="status-icon">
+                  {getStatusInfo(application.status).icon}
+                </span>
+                <span className="status-text">
+                  {getStatusInfo(application.status).label}
+                </span>
               </div>
             </div>
+          </div>
 
-            {/* Main Content Grid */}
-            <div className="content-grid">
-              {/* Left Column - Main Info */}
-              <div className="left-column">
-                {/* Submitter Card */}
+          {/* Main Content Grid */}
+          <div className="content-grid">
+            <Row gutter={[20, 20]}>
+              {/* Submitter Card */}
+              <Col xs={24} md={12}>
                 <div className="info-card submitter-card">
                   <div className="card-icon">
                     <AiOutlineUser />
@@ -227,8 +178,10 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
                     </div>
                   </div>
                 </div>
+              </Col>
 
-                {/* Time Period Card */}
+              {/* Time Period Card */}
+              <Col xs={24} md={12}>
                 <div className="info-card time-card">
                   <div className="card-icon">
                     <BsCalendar2Check />
@@ -266,26 +219,14 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
                     </div> */}
                   </div>
                 </div>
+              </Col>
 
-                {/* Reason Card */}
-                <div className="info-card reason-card">
-                  <div className="card-icon">
-                    <AiOutlineFileText />
-                  </div>
-                  <div className="card-content">
-                    <div className="card-label">Lý do</div>
-                    {application.reason}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column - Additional Info */}
-              <div className="right-column">
-                {/* Approval Info */}
-                {application.approvedName && (
+              {/* Approval Info - Full width */}
+              {application.approvedName && (
+                <Col xs={24}>
                   <div className="info-card approval-card">
                     <div className="card-icon">
-                      {application.status === "APPROVED" ? (
+                      {application.status === "ACCEPTED" ? (
                         <BsCheckCircleFill />
                       ) : (
                         <BsXCircleFill />
@@ -311,12 +252,27 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
                       </div>
                     </div>
                   </div>
-                )}
+                </Col>
+              )}
 
-                {/* Response Card */}
-                {(application.status !== "PENDING" ||
-                  showResponseInput ||
-                  application.response) && (
+              {/* Reason Card - Full width */}
+              <Col xs={24}>
+                <div className="info-card reason-card">
+                  <div className="card-icon">
+                    <AiOutlineFileText />
+                  </div>
+                  <div className="card-content">
+                    <div className="card-label">Lý do</div>
+                    <div className="reason-content">{application.reason}</div>
+                  </div>
+                </div>
+              </Col>
+
+              {/* Response Card - Full width */}
+              {(application.status !== "PENDING" ||
+                showResponseInput ||
+                application.response) && (
+                <Col xs={24}>
                   <div className="info-card response-card">
                     <div className="card-icon">💬</div>
                     <div className="card-content">
@@ -345,21 +301,23 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
                       )}
                     </div>
                   </div>
-                )}
+                </Col>
+              )}
 
-                {/* Files Card */}
-                {application.files && application.files.length > 0 && (
+              {/* Files Card - Full width */}
+              {application.file && application.file.length > 0 && (
+                <Col xs={24}>
                   <div className="info-card files-card">
                     <div className="card-icon">
                       <MdAttachFile />
                     </div>
                     <div className="card-content">
                       <div className="card-label">
-                        Tài liệu đính kèm ({application.files.length})
+                        Tài liệu đính kèm ({application.file.length})
                       </div>
                       <Image.PreviewGroup>
                         <div className="files-grid">
-                          {application.files.map((file, index) => (
+                          {application.file.map((file, index) => (
                             <div key={index} className="file-item">
                               <Image
                                 src={file}
@@ -373,61 +331,65 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
                       </Image.PreviewGroup>
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
+                </Col>
+              )}
+            </Row>
+          </div>
 
-            {/* Footer Actions */}
-            <div className="modal-footer">
-              {showResponseInput ? (
-                <>
-                  <Button
-                    className="btn-cancel"
-                    size="large"
-                    onClick={handleCancelAction}
-                  >
-                    Hủy
-                  </Button>
-                  <Button
-                    className={
-                      actionType === "approve" ? "btn-approve" : "btn-reject"
-                    }
-                    size="large"
-                    onClick={handleConfirmAction}
-                  >
-                    {actionType === "approve"
-                      ? "Xác nhận duyệt"
-                      : "Xác nhận từ chối"}
-                  </Button>
-                </>
-              ) : application.status === "PENDING" ? (
-                <>
-                  <Button className="btn-cancel" size="large" onClick={onClose}>
-                    Đóng
-                  </Button>
-                  <Button
-                    className="btn-reject"
-                    size="large"
-                    onClick={handleRejectClick}
-                  >
-                    Từ chối
-                  </Button>
-                  <Button
-                    className="btn-approve"
-                    size="large"
-                    onClick={handleApproveClick}
-                  >
-                    Duyệt đơn
-                  </Button>
-                </>
-              ) : (
+          {/* Footer Actions */}
+          <div className="modal-footer">
+            {showResponseInput ? (
+              <>
+                <Button
+                  className="btn-cancel"
+                  size="large"
+                  onClick={handleCancelAction}
+                  disabled={processing}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  className={
+                    actionType === "approve" ? "btn-approve" : "btn-reject"
+                  }
+                  size="large"
+                  onClick={handleConfirmAction}
+                  loading={processing}
+                >
+                  {actionType === "approve"
+                    ? "Xác nhận duyệt"
+                    : "Xác nhận từ chối"}
+                </Button>
+              </>
+            ) : application.status === "PENDING" ? (
+              <>
                 <Button className="btn-cancel" size="large" onClick={onClose}>
                   Đóng
                 </Button>
-              )}
-            </div>
+                <Button
+                  className="btn-reject"
+                  size="large"
+                  onClick={handleRejectClick}
+                  disabled={processing}
+                >
+                  Từ chối
+                </Button>
+                <Button
+                  className="btn-approve"
+                  size="large"
+                  onClick={handleApproveClick}
+                  disabled={processing}
+                >
+                  Duyệt đơn
+                </Button>
+              </>
+            ) : (
+              <Button className="btn-cancel" size="large" onClick={onClose}>
+                Đóng
+              </Button>
+            )}
           </div>
-        )
+        </div>
       )}
     </Modal>
   );

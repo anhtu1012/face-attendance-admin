@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import AgGridComponentWrapper from "@/components/basicUI/cTableAG";
+import { ApplicationItem } from "@/dtos/tac-vu-nhan-su/quan-ly-don-tu/application.dto";
 import { useDataGridOperations } from "@/hooks/useDataGridOperations";
+import { useSelectData } from "@/hooks/useSelectData";
+import QuanLyDonTuServices from "@/services/tac-vu-nhan-su/quan-ly-don-tu/quan-ly-don-tu.service";
+import { getDowFromDate } from "@/utils/client/getDowFromDate";
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
-import { message, Tooltip } from "antd";
+import { FilterOperationType } from "@chax-at/prisma-filter-common";
+import { Tooltip } from "antd";
 import { useTranslations } from "next-intl";
 import {
   forwardRef,
@@ -16,10 +22,7 @@ import {
 import { FaEye } from "react-icons/fa";
 import { TableApplicationProps, TableApplicationRef } from "../../_types/prop";
 import ApplicationDetailModal from "../ApplicationDetailModal/ApplicationDetailModal";
-import QuanLyDonTuServices from "@/services/tac-vu-nhan-su/quan-ly-don-tu/quan-ly-don-tu.service";
-import { FilterOperationType } from "@chax-at/prisma-filter-common";
-import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
-import { ApplicationItem } from "@/dtos/tac-vu-nhan-su/quan-ly-don-tu/application.dto";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 
 const defaultPageSize = 20;
 
@@ -36,12 +39,14 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
     const [quickSearchText, setQuickSearchText] = useState<string | undefined>(
       undefined
     );
+    const { selectStatusForm } = useSelectData();
+    const messageApi = useAntdMessage();
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedApplicationId, setSelectedApplicationId] = useState<
-      string | null
-    >(null);
+    const [selectedApplication, setSelectedApplication] =
+      useState<ApplicationItem | null>(null);
+    const [actionLoading, setActionLoading] = useState(false);
 
     useImperativeHandle(ref, () => ({
       refetch: () => fetchData(1, pageSize, quickSearchText),
@@ -56,19 +61,15 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
           width: 130,
           context: {
             typeColumn: "Tag",
-            selectOptions: [
-              { label: "Chờ duyệt", value: "PENDING" },
-              { label: "Đã duyệt", value: "APPROVED" },
-              { label: "Từ chối", value: "REJECTED" },
-              { label: "Đã hủy", value: "CANCELLED" },
-            ],
+            selectOptions: selectStatusForm,
           },
           cellRendererParams: {
             colorMap: {
               PENDING: "#FB8C00",
-              APPROVED: "#2E7D32",
+              ACCEPTED: "#2E7D32",
               REJECTED: "#C62828",
               CANCELLED: "#757575",
+              INACTIVE: "#757575",
             },
           },
         },
@@ -88,7 +89,7 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
           field: "reason",
           headerName: "Lý do",
           editable: false,
-          width: 250,
+          width: 400,
           cellRenderer: (params: any) => {
             const text = params.value || "";
             return (
@@ -150,7 +151,7 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
           },
         },
       ],
-      []
+      [selectStatusForm]
     );
 
     const fetchData = useCallback(
@@ -195,7 +196,7 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
           setTotalItems(res.count || 0);
         } catch (error) {
           console.log(error);
-          message.error("Có lỗi xảy ra khi tải dữ liệu");
+          messageApi.error("Có lỗi xảy ra khi tải dữ liệu");
         } finally {
           setLoading(false);
         }
@@ -212,7 +213,6 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
       rowData,
       setRowData,
       requiredFields: [],
-
       setCurrentPage,
       setPageSize,
       setQuickSearchText,
@@ -228,13 +228,57 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
               style={{ cursor: "pointer", color: "#0288D1" }}
               size={20}
               onClick={() => {
-                setSelectedApplicationId(params.data.id);
+                setSelectedApplication(params.data);
                 setModalOpen(true);
               }}
             />
           </Tooltip>
         </div>
       );
+    };
+
+    const handleUpdateStatus = async (
+      id: string,
+      response: string | undefined,
+      status: "ACCEPTED" | "REJECTED"
+    ) => {
+      try {
+        setActionLoading(true);
+        // Use the selected application's startTime to derive dow (weekday)
+        const dow = getDowFromDate(selectedApplication?.startTime || undefined);
+        const res = await QuanLyDonTuServices.approveQuanLyDonTu(id, {
+          status,
+          response,
+          dow,
+        });
+        messageApi.success(
+          status === "ACCEPTED"
+            ? "Duyệt đơn thành công"
+            : "Từ chối đơn thành công"
+        );
+        // Update local state
+        const updatedData = rowData.map((item) =>
+          item.id === res.id
+            ? {
+                ...item,
+                status: res.status,
+                approvedBy: res.approvedBy,
+                approvedName: res.approvedName,
+                approvedTime: res.approvedTime,
+                response: response,
+              }
+            : item
+        );
+        setRowData(updatedData);
+        setModalOpen(false);
+        setSelectedApplication(null);
+        setActionLoading(false);
+      } catch (error) {
+        console.log(error);
+        messageApi.error("Có lỗi xảy ra khi cập nhật trạng thái đơn");
+      } finally {
+        setActionLoading(false);
+      }
     };
 
     return (
@@ -273,45 +317,12 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
           open={modalOpen}
           onClose={() => {
             setModalOpen(false);
-            setSelectedApplicationId(null);
+            setSelectedApplication(null);
           }}
-          applicationId={selectedApplicationId}
-          onApprove={(id, response) => {
-            // Update with response
-            const updatedData = rowData.map((item) =>
-              item.id === id
-                ? {
-                    ...item,
-                    status: "APPROVED" as const,
-                    approvedBy: "current_user_id",
-                    approvedName: "Nguyễn Văn B",
-                    approvedTime: new Date().toISOString(),
-                    response: response,
-                  }
-                : item
-            );
-            setRowData(updatedData);
-            message.success("Duyệt đơn thành công");
-            setModalOpen(false);
-          }}
-          onReject={(id, response) => {
-            // Update with response
-            const updatedData = rowData.map((item) =>
-              item.id === id
-                ? {
-                    ...item,
-                    status: "REJECTED" as const,
-                    approvedBy: "current_user_id",
-                    approvedName: "Nguyễn Văn B",
-                    approvedTime: new Date().toISOString(),
-                    response: response,
-                  }
-                : item
-            );
-            setRowData(updatedData);
-            message.success("Từ chối đơn thành công");
-            setModalOpen(false);
-          }}
+          application={selectedApplication}
+          onApprove={handleUpdateStatus}
+          onReject={handleUpdateStatus}
+          processing={actionLoading}
           onRefresh={() => fetchData(currentPage, pageSize, quickSearchText)}
         />
       </div>

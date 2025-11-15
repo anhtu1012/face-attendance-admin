@@ -15,8 +15,8 @@ export const zApplicationItem = z.object({
   startTime: z.string(),
   endTime: z.string(),
   approvedTime: z.string().optional(),
-  files: z.array(z.string()),
-  status: z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED", "INACTIVE"]),
+  file: z.array(z.string()),
+  status: z.enum(["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "INACTIVE"]),
 });
 
 export type ApplicationItem = z.infer<typeof zApplicationItem>;
