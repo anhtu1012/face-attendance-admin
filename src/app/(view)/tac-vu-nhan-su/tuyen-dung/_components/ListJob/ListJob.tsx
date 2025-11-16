@@ -300,7 +300,9 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
                 <div className="job-info-item">
                   <MdAttachMoney className="job-info-icon" />
                   <span className="job-info-text">
-                    {job.fromSalary}-{job.toSalary} Triệu VNĐ
+                    {Number(job.fromSalary) === 0 && Number(job.toSalary) === 0
+                      ? "Lương thỏa thuận"
+                      : `${job.fromSalary}-${job.toSalary} Triệu VNĐ`}
                   </span>
                 </div>
               </div>
@@ -313,7 +315,7 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
                 <div className="job-info-item">
                   <MdCalendarToday className="job-info-icon" />
                   <span className="job-info-text">
-                    {dayjs(job.createdAt).format("DD/MM/YYYY")}
+                    {dayjs(job.expirationDate).format("DD/MM/YYYY")}
                   </span>
                 </div>
               </div>

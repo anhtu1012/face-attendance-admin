@@ -6,8 +6,6 @@ export const KyNangItemSchema = z.object({
   unitKey: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
-  skillCode: z.string(),
-  userSkillCode: z.string(),
   title: z.string(),
 });
 

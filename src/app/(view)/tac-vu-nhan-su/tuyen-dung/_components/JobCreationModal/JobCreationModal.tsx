@@ -318,7 +318,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                             placeholder="15"
                             className="custom-input-number"
                             style={{ width: "100%" }}
-                            min={1}
+                            min={0}
                             max={200}
                           />
                         </Form.Item>
@@ -338,7 +338,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                             placeholder="25"
                             className="custom-input-number"
                             style={{ width: "100%" }}
-                            min={1}
+                            min={0}
                             max={200}
                           />
                         </Form.Item>

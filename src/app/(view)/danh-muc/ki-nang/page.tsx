@@ -41,26 +41,14 @@ function Page() {
   const columnDefs: ColDef[] = useMemo(
     () => [
       {
-        field: "skillCode",
-        headerName: "Mã kỹ năng",
-        editable: true,
-        width: 150,
-        cellStyle: (params) => {
-          const itemId = params.data ? getItemId(params.data) : "";
-          return itemErrorCellStyle(itemId, "skillCode", params);
-        },
-      },
-      {
-        field: "userSkillCode",
-        headerName: "Mã kỹ năng người dùng",
-        editable: true,
-        width: 180,
-      },
-      {
         field: "title",
         headerName: "Tiêu đề",
         editable: true,
         width: 200,
+        cellStyle: (params) => {
+          const itemId = params.data ? getItemId(params.data) : "";
+          return itemErrorCellStyle(itemId, "title", params);
+        },
       },
     ],
     [itemErrorCellStyle]
@@ -101,20 +89,12 @@ function Page() {
     gridRef,
     createNewItem: (i) => ({
       unitKey: `${Date.now()}_${i}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      skillCode: "",
-      userSkillCode: "",
       title: "",
     }),
-    duplicateCheckField: "skillCode",
     mes,
     rowData,
     setRowData,
-    requiredFields: [
-      { field: "skillCode", label: "Mã kỹ năng" },
-      { field: "title", label: "Tiêu đề" },
-    ],
+    requiredFields: [{ field: "title", label: "Tiêu đề" }],
     t,
     // Quicksearch parameters
     setCurrentPage,
@@ -169,6 +149,11 @@ function Page() {
           columnFlex={1}
           onQuicksearch={dataGrid.handleQuicksearch}
           showActionButtons={true}
+          rowSelection={{
+            mode: "singleRow",
+            enableClickSelection: true,
+            checkboxes: false,
+          }}
           actionButtonsProps={{
             onSave: handleSave,
             onDelete: handleDelete,
