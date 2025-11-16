@@ -1,0 +1,53 @@
+.salary-filter-container {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+  border: 1px solid #f0f0f0;
+
+  .salary-filter-form {
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+
+    .filter-submit-btn {
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(21, 101, 192, 0.3);
+        transform: translateY(-1px);
+        background: linear-gradient(
+          45deg,
+          rgb(66, 165, 245),
+          rgb(21, 101, 192)
+        ) !important;
+      }
+
+      .loading-icon {
+        animation: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .salary-filter-container {
+    padding: 16px;
+
+    .salary-filter-form {
+      .ant-col {
+        margin-bottom: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .filter-submit-btn {
+        margin-top: 0 !important;
+      }
+    }
+  }
+}
+

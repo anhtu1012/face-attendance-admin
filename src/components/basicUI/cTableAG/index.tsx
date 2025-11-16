@@ -81,6 +81,8 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
   domLayout = "normal" as "normal" | "autoHeight" | "print",
   onRowClicked = () => {},
   getRowClass = () => "",
+  rowHeight,
+  getRowHeight,
   // Search props
   showSearch = false,
   inputSearchProps = {},
@@ -692,8 +694,9 @@ const AgGridComponent: React.FC<AgGridComponentProps> = ({
           getRowStyle={getRowStyle}
           rowSelection={normalizedRowSelection as any}
           domLayout={domLayout as "normal" | "autoHeight" | "print"}
-          rowHeight={40}
           headerHeight={headerHeight}
+          rowHeight={rowHeight}
+          getRowHeight={getRowHeight}
           stopEditingWhenCellsLoseFocus={true}
           suppressCellFocus={false} // Cho phép focus để hiển thị fill handle
           singleClickEdit={false} // Ngăn single click mở cell editor

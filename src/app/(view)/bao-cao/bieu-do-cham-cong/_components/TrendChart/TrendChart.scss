@@ -1,0 +1,35 @@
+.trend-chart-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  height: 100%;
+  border: 1px solid #f0f0f0;
+
+  .ant-card-head {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 24px;
+
+    .ant-card-head-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #262626;
+    }
+  }
+
+  .ant-card-body {
+    padding: 24px;
+  }
+
+  .chart-container {
+    height: 350px;
+    position: relative;
+  }
+}
+
+@media (max-width: 768px) {
+  .trend-chart-card {
+    .chart-container {
+      height: 300px;
+    }
+  }
+}
+

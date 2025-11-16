@@ -99,6 +99,11 @@ export interface AgGridComponentProps {
   onFillChanges?: (
     changes: { id: string; data: Record<string, any> }[]
   ) => void; // Prop để xử lý fill operation
+  // Row height controls
+  /** Fixed row height in pixels. If omitted, grid will use default row height or per-column autoHeight. */
+  rowHeight?: number;
+  /** Custom callback to compute row height per row. Return a number (px) or null/undefined. */
+  getRowHeight?: (params: any) => number | null | undefined;
   // Infinite scroll props
   enableInfiniteScroll?: boolean; // Bật tính năng infinite scroll
   onLoadMore?: (currentPage: number, pageSize: number) => void; // Callback khi cần load thêm dữ liệu

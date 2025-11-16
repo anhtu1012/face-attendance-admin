@@ -1,0 +1,48 @@
+.timekeeping-detail-modal {
+  .ant-modal-header {
+    background: linear-gradient(135deg, #015c92, #0179b8);
+    border-bottom: none;
+    padding: 16px 24px;
+
+    .ant-modal-title {
+      color: #ffffff;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 20px;
+    background: #fafafa;
+  }
+
+  .ag-theme-quartz {
+    --ag-header-background-color: #015c92 !important;
+    --ag-header-foreground-color: #ffffff !important;
+    --ag-row-height: 40px;
+    --ag-header-height: 42px;
+    --ag-font-size: 13px;
+    --ag-border-color: #e8e8e8;
+
+    .ag-header-cell {
+      font-weight: 600;
+      padding: 0 8px;
+    }
+
+    .ag-cell {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+
+    .ag-row-even {
+      background-color: #fafafa;
+    }
+
+    .ag-row-odd {
+      background-color: #ffffff;
+    }
+
+    .ag-row:hover {
+      background-color: rgba(1, 92, 146, 0.05) !important;
+    }
+  }
+}
