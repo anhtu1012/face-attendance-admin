@@ -1,7 +1,10 @@
 "use client";
 
 import { initializeTheme } from "@/utils/theme-utils";
-import { Breadcrumb, Layout } from "antd";
+import { Breadcrumb, Layout, ConfigProvider } from "antd";
+import viVN from "antd/locale/vi_VN";
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -50,6 +53,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   useEffect(() => {
     // Initialize theme from localStorage or system preference
     initializeTheme();
+    // Set Vietnamese locale for dayjs globally
+    dayjs.locale("vi");
 
     // Check if window width is small enough to collapse sidebar by default
     const handleResize = () => {
@@ -64,41 +69,43 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   }, []);
   // Render the layout with a stable structure for both server and client
   return (
-    <Layout
-      style={{ height: "100vh" }}
-      className={collapsed ? "layout-collapsed" : ""}
-    >
-      <ClientOnly>
-        <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} />
-        <SiderMain openMenu={collapsed} setOpenMenu={setCollapsed} />
-      </ClientOnly>
-
+    <ConfigProvider locale={viVN}>
       <Layout
-        style={{
-          height: "90vh",
-          marginTop: 54,
-          transition: "margin 0.2s",
-        }}
+        style={{ height: "100vh" }}
+        className={collapsed ? "layout-collapsed" : ""}
       >
-        <Content className="admin-content-wrapper">
-          {/* Breadcrumb navigation */}
-          <div className="">
-            <Breadcrumb
-              className=""
-              items={items.map((item) => ({
-                title: item.href ? (
-                  <Link href={item.href}>{item.title}</Link>
-                ) : (
-                  item.title
-                ),
-              }))}
-            />
-          </div>
-          {children}
-          {/* <div className="content-container"></div> */}
-        </Content>
+        <ClientOnly>
+          <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} />
+          <SiderMain openMenu={collapsed} setOpenMenu={setCollapsed} />
+        </ClientOnly>
+
+        <Layout
+          style={{
+            height: "90vh",
+            marginTop: 54,
+            transition: "margin 0.2s",
+          }}
+        >
+          <Content className="admin-content-wrapper">
+            {/* Breadcrumb navigation */}
+            <div className="">
+              <Breadcrumb
+                className=""
+                items={items.map((item) => ({
+                  title: item.href ? (
+                    <Link href={item.href}>{item.title}</Link>
+                  ) : (
+                    item.title
+                  ),
+                }))}
+              />
+            </div>
+            {children}
+            {/* <div className="content-container"></div> */}
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </ConfigProvider>
   );
 };
 

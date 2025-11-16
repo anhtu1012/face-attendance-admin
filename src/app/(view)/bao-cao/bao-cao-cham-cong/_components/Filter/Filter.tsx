@@ -1,15 +1,15 @@
 "use client";
 import Cbutton from "@/components/basicUI/Cbutton";
-import CRangePicker from "@/components/basicUI/CrangePicker";
 import Cselect from "@/components/Cselect";
 import { useSelectData } from "@/hooks/useSelectData";
 import { Col, Form, Row } from "antd";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FilterProps, FilterRef, FormValues } from "../../_types/prop";
 import "./Filter.scss";
+import CdatePicker from "@/components/basicUI/CdatePicker";
 
 const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
   const t = useTranslations("Filter");
@@ -19,12 +19,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
     fetchRole: true,
   });
 
-  const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(
-    dayjs().startOf("month")
-  );
-  const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(
-    dayjs().endOf("month")
-  );
+  // Use a single month picker (one month selection)
 
   useImperativeHandle(ref, () => ({
     getFormValues: () => {
@@ -41,7 +36,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
         className="fiter-form"
         onFinish={onSubmit}
         initialValues={{
-          month: [dayjs().startOf("month"), dayjs().endOf("month")],
+          month: dayjs().startOf("month"),
         }}
         style={{ padding: "15px 20px" }}
       >
@@ -50,18 +45,11 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
             <Row gutter={[6, 6]}>
               <Col span={24}>
                 <Form.Item name="month" style={{ width: "100%" }}>
-                  <CRangePicker
-                    label={["Từ ngày", "Đến ngày"]}
-                    placeholder={["", ""]}
+                  <CdatePicker
+                    picker="month"
+                    label="Chọn tháng"
                     style={{ width: "100%", height: "36px" }}
-                    format={"DD/MM/YYYY"}
-                    value={startDate && endDate ? [startDate, endDate] : null}
-                    onChange={(dates) => {
-                      if (dates) {
-                        setStartDate(dates[0]);
-                        setEndDate(dates[1]);
-                      }
-                    }}
+                    format={"MM/YYYY"}
                   />
                 </Form.Item>
               </Col>
@@ -72,19 +60,13 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
                     label="Phòng ban"
                     allowClear
                     options={selectDepartment}
-                    placeholder="Chọn phòng ban"
                   />
                 </Form.Item>
               </Col>
 
               <Col span={24}>
                 <Form.Item name="positionId">
-                  <Cselect
-                    label="Chức vụ"
-                    allowClear
-                    options={selectRole}
-                    placeholder="Chọn chức vụ"
-                  />
+                  <Cselect label="Chức vụ" allowClear options={selectRole} />
                 </Form.Item>
               </Col>
 
@@ -94,7 +76,6 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
                     label="Trạng thái"
                     allowClear
                     options={selectStatusForm}
-                    placeholder="Chọn trạng thái"
                   />
                 </Form.Item>
               </Col>

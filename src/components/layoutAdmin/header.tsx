@@ -175,7 +175,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({
               fill="currentColor"
             />
           </svg>
-          <span className="logo-text">AttendEase</span>
+          <span className="logo-text">IT-HUMAN</span>
         </Link>
       </div>
 
