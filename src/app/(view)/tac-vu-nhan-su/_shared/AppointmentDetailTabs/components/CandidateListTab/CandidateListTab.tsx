@@ -386,27 +386,35 @@ export default function CandidateListTab({
             Chi tiết
           </Cbutton>
 
-          {userProfile.roleId === RoleAdmin.DEPARTMENT_MANAGER && (
-            <Cbutton
-              type="default"
-              size="small"
-              icon={<TfiWrite />}
-              origin={{
-                color: "rgb(21, 101, 192)",
-                bgcolor: "white",
-                border: "1px solid rgb(21, 101, 192)",
-                hoverColor: "white",
-                hoverBgColor:
-                  "linear-gradient(135deg, rgb(21, 101, 192), rgb(30, 136, 229))",
-              }}
-              onClick={() => {
-                setReportCandidate(record);
-                setReportOpen(true);
-              }}
-            >
-              Báo cáo
-            </Cbutton>
-          )}
+          {userProfile.roleId === RoleAdmin.DEPARTMENT_MANAGER &&
+            [
+              "INTERVIEW_SCHEDULED",
+              "INTERVIEW_SCHEDULED_R1",
+              "INTERVIEW_SCHEDULED_R2",
+              "INTERVIEW_SCHEDULED_R3",
+              "INTERVIEW_SCHEDULED_R4",
+              "INTERVIEW_SCHEDULED_R5",
+            ].includes(record.status) && (
+              <Cbutton
+                type="default"
+                size="small"
+                icon={<TfiWrite />}
+                origin={{
+                  color: "rgb(21, 101, 192)",
+                  bgcolor: "white",
+                  border: "1px solid rgb(21, 101, 192)",
+                  hoverColor: "white",
+                  hoverBgColor:
+                    "linear-gradient(135deg, rgb(21, 101, 192), rgb(30, 136, 229))",
+                }}
+                onClick={() => {
+                  setReportCandidate(record);
+                  setReportOpen(true);
+                }}
+              >
+                Báo cáo
+              </Cbutton>
+            )}
           <Cbutton
             type="default"
             origin={{
