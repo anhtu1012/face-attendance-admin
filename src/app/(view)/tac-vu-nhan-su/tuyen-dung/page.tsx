@@ -814,6 +814,11 @@ function Page() {
     // PHONG_VAN - INTERVIEW_SCHEDULED: Show interview details button
     if (
       (_params.data.status === "INTERVIEW_SCHEDULED" ||
+        _params.data.status === "INTERVIEW_SCHEDULED_R1" ||
+        _params.data.status === "INTERVIEW_SCHEDULED_R2" ||
+        _params.data.status === "INTERVIEW_SCHEDULED_R3" ||
+        _params.data.status === "INTERVIEW_SCHEDULED_R4" ||
+        _params.data.status === "INTERVIEW_SCHEDULED_R5" ||
         _params.data.status === "TO_INTERVIEW_R1" ||
         _params.data.status === "TO_INTERVIEW_R2" ||
         _params.data.status === "TO_INTERVIEW_R3" ||

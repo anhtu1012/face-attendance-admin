@@ -143,7 +143,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
 
     try {
       await NotificationService.markOneRead(noti.id);
-      await fetchNotifications();
+      setNotifications((prev) =>
+        prev.map((item) =>
+          item.id === noti.id ? { ...item, isRead: true } : item
+        )
+      );
     } catch (error) {
       console.error("Error marking notifications as read:", error);
     }
@@ -271,7 +275,16 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = () => {
             >
               Tải lại thông báo
             </Button>
-            <Button type="dashed" block size="large">
+            <Button
+              type="dashed"
+              block
+              size="large"
+              onClick={async () => {
+                if (!userId) return;
+                await NotificationService.deleteNotification(String(userId));
+                setNotifications([]);
+              }}
+            >
               Xóa tất cả thông báo
             </Button>
           </div>

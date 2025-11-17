@@ -35,14 +35,14 @@ class NotificationServiceBase extends AxiosService {
 
   /**
    * Mark all notifications as read for a user
-   * @param userCode - The user code to mark notifications as read
+   * @param userId - The user code to mark notifications as read
    * @returns Promise<MarkAllReadResponse>
    */
-  async markAllAsRead(userCode: string): Promise<MarkAllReadResponse> {
+  async markAllAsRead(userId: string): Promise<MarkAllReadResponse> {
     try {
-      const requestBody: MarkAllReadRequest = { userCode };
+      const requestBody: MarkAllReadRequest = { userId };
       const response = await this.post<MarkAllReadResponse, MarkAllReadRequest>(
-        `${this.pathUrl}/mark-all-read`,
+        `/v1/time-keeping/doc-tat-ca-thong-bao`,
         requestBody
       );
       return response;
@@ -52,9 +52,13 @@ class NotificationServiceBase extends AxiosService {
     }
   }
   async markOneRead(notificationId: string) {
-    return await this.put(`${this.pathUrl}/${notificationId}`, {
-      isRead: true,
+    return await this.post(`/v1/time-keeping/cap-nhat-trang-thai-thong-bao`, {
+      listNotificationIds: [notificationId],
     });
+  }
+
+  async deleteNotification(userId: string) {
+    return await this.delete(`/v1/time-keeping/xoa-thong-bao`, { userId });
   }
 }
 

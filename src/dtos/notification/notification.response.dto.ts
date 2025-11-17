@@ -17,7 +17,7 @@ export interface NotificationResponse {
 }
 
 export interface MarkAllReadRequest {
-  userCode: string;
+  userId: string;
 }
 
 export interface MarkAllReadResponse {
