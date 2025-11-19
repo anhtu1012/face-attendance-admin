@@ -74,7 +74,7 @@ export function NguoiDungTable({
       onCellValueChanged={onCellValueChanged}
       paginationCurrentPage={currentPage}
       pagination={true}
-      maxRowsVisible={15}
+      maxRowsVisible={13}
       onChangePage={onChangePage}
       onQuicksearch={onQuicksearch}
       columnFlex={0}

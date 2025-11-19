@@ -175,7 +175,46 @@ function Page() {
     selectedStatus,
     onNewCandidate: (newJobId, candidateInfo) => {
       setNewJobIds((prev) => new Set(prev).add(String(newJobId)));
-      // If this is the currently selected job, update the quantity and add to grid
+
+      // Increment new count for the appropriate tab depending on candidate status
+      setNewCounts((prev) => {
+        const next = { ...(prev || {}) } as Record<string, number>;
+        // map single statuses to tab keys
+        const statusMap: Record<string, string> = {
+          TO_CONTACT: "LIEN_HE",
+          CONTRACT_SIGNING: "HOP_DONG",
+          JOB_OFFERED: "NHAN_VIEC",
+        };
+
+        // interview-related statuses map to PHONG_VAN
+        const interviewStatuses = [
+          "TO_INTERVIEW",
+          "TO_INTERVIEW_R1",
+          "TO_INTERVIEW_R2",
+          "TO_INTERVIEW_R3",
+          "TO_INTERVIEW_R4",
+          "TO_INTERVIEW_R5",
+          "INTERVIEW_RESCHEDULED",
+          "INTERVIEW_FAILED",
+          "NOT_COMING_INTERVIEW",
+          "INTERVIEW_SCHEDULED",
+          "INTERVIEW_SCHEDULED_R1",
+          "INTERVIEW_SCHEDULED_R2",
+          "INTERVIEW_SCHEDULED_R3",
+          "INTERVIEW_SCHEDULED_R4",
+          "INTERVIEW_SCHEDULED_R5",
+        ];
+
+        let key = statusMap[candidateInfo.status];
+        if (!key && interviewStatuses.includes(candidateInfo.status)) {
+          key = "PHONG_VAN";
+        }
+
+        if (!key) return next; // nothing to increment for other statuses
+
+        next[key] = Number(next[key] || 0) + 1;
+        return next;
+      });
       if (String(jobId) === String(newJobId)) {
         // If we're on LIEN_HE tab and status is TO_CONTACT, add to grid
         if (
@@ -191,21 +230,6 @@ function Page() {
           selectedStatus === "HOP_DONG" &&
           candidateInfo.status === "CONTRACT_SIGNING"
         ) {
-          // Update quantity status
-          setQuantityStatus((prev) => {
-            if (!prev) return { toContractQuantity: 1 };
-            return {
-              ...prev,
-              toContractQuantity: Number(prev.toContractQuantity || 0) + 1,
-            };
-          });
-
-          // Increment new count for HOP_DONG tab
-          setNewCounts((prev) => ({
-            ...prev,
-            HOP_DONG: Number(prev.HOP_DONG || 0) + 1,
-          }));
-
           setRowData((prev) => [candidateInfo, ...prev]);
           setTotalItems((prev) => prev + 1);
         }
@@ -237,21 +261,6 @@ function Page() {
           selectedStatus === "NHAN_VIEC" &&
           candidateInfo.status === "JOB_OFFERED"
         ) {
-          // Update quantity status
-          setQuantityStatus((prev) => {
-            if (!prev) return { toJobOfferedQuantity: 1 };
-            return {
-              ...prev,
-              toJobOfferedQuantity: Number(prev.toJobOfferedQuantity || 0) + 1,
-            };
-          });
-
-          // Increment new count for NHAN_VIEC tab
-          setNewCounts((prev) => ({
-            ...prev,
-            NHAN_VIEC: Number(prev.NHAN_VIEC || 0) + 1,
-          }));
-
           setRowData((prev) => [candidateInfo, ...prev]);
           setTotalItems((prev) => prev + 1);
         }
