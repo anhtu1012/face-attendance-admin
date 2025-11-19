@@ -8,7 +8,7 @@ export const FormItemSchema = z.object({
   updatedAt: z.string(),
   title: z.string(),
   description: z.string(),
-  roleCode: z.string(),
+  roleId: z.string(),
 });
 
 export type FormItem = z.infer<typeof FormItemSchema>;

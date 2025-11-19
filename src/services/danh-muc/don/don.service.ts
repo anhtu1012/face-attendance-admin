@@ -8,7 +8,7 @@ import {
 import { FormResponseGetItem } from "@/dtos/danhMuc/don/don.response.dto";
 
 class DanhMucDonServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/category/form";
+  protected readonly basePath = "/v1/category/form-category";
 
   async getDanhMucDon(
     searchFilter: FilterQueryStringTypeItem[] = [],

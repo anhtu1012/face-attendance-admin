@@ -18,6 +18,7 @@ import {
 import { useSelector } from "react-redux";
 import { selectAllItemErrors } from "@/lib/store/slices/validationErrorsSlice";
 import DanhMucDonServices from "@/services/danh-muc/don/don.service";
+import { useSelectData } from "@/hooks/useSelectData";
 
 const defaultPageSize = 20;
 
@@ -36,7 +37,9 @@ function Page() {
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
   const hasItemFieldError = useHasItemFieldError(itemErrorsFromRedux);
   const itemErrorCellStyle = useItemErrorCellStyle(hasItemFieldError);
-
+  const { selectRole } = useSelectData({
+    fetchRole: true,
+  });
   // Define columnDefs first before dataGrid hook
   const columnDefs: ColDef[] = useMemo(
     () => [
@@ -57,13 +60,14 @@ function Page() {
         width: 250,
       },
       {
-        field: "roleCode",
+        field: "roleId",
         headerName: t("nguoiDuyet"),
         editable: true,
         width: 150,
+        context: { typeColumn: "Select", selectOptions: selectRole },
       },
     ],
-    [itemErrorCellStyle, t]
+    [itemErrorCellStyle, selectRole, t]
   );
 
   const fetchData = useCallback(
@@ -105,7 +109,7 @@ function Page() {
       updatedAt: new Date().toISOString(),
       title: "",
       description: "",
-      roleCode: "",
+      roleId: "",
     }),
     duplicateCheckField: "title",
     mes,
@@ -114,7 +118,7 @@ function Page() {
     requiredFields: [
       { field: "title", label: t("tieuDe") },
       { field: "description", label: t("moTa") },
-      { field: "roleCode", label: t("nguoiDuyet") },
+      { field: "roleId", label: t("nguoiDuyet") },
     ],
     t,
     // Quicksearch parameters
@@ -126,7 +130,7 @@ function Page() {
   });
   useEffect(() => {
     fetchData(1, defaultPageSize, "");
-  }, [fetchData]);
+  }, []);
 
   // Create save handler (chờ API service được implement)
   const handleSave = dataGrid.createSaveHandler(
@@ -151,6 +155,11 @@ function Page() {
       content1={
         <AgGridComponentWrapper
           showSearch={true}
+          rowSelection={{
+            mode: "singleRow",
+            enableClickSelection: true,
+            checkboxes: false,
+          }}
           rowData={dataGrid.rowData}
           loading={loading}
           columnDefs={columnDefs}

@@ -177,21 +177,6 @@ function Page() {
       setNewJobIds((prev) => new Set(prev).add(String(newJobId)));
       // If this is the currently selected job, update the quantity and add to grid
       if (String(jobId) === String(newJobId)) {
-        // Update quantity status
-        setQuantityStatus((prev) => {
-          if (!prev) return { toContactQuantity: 1 };
-          return {
-            ...prev,
-            toContactQuantity: Number(prev.toContactQuantity || 0) + 1,
-          };
-        });
-
-        // Increment new count for LIEN_HE tab
-        setNewCounts((prev) => ({
-          ...prev,
-          LIEN_HE: Number(prev.LIEN_HE || 0) + 1,
-        }));
-
         // If we're on LIEN_HE tab and status is TO_CONTACT, add to grid
         if (
           selectedStatus === "LIEN_HE" &&
@@ -763,7 +748,15 @@ function Page() {
     if (!node?.data || !node.data?.status) return false;
     const selectableStatusMap: Record<string, string | string[] | undefined> = {
       LIEN_HE: "TO_CONTACT",
-      PHONG_VAN: ["TO_INTERVIEW", "TO_INTERVIEW_R1"],
+      PHONG_VAN: [
+        "TO_INTERVIEW",
+        "TO_INTERVIEW_R1",
+        "TO_INTERVIEW_R2",
+        "TO_INTERVIEW_R3",
+        "TO_INTERVIEW_R4",
+        "TO_INTERVIEW_R5",
+        "INTERVIEW_RESCHEDULED",
+      ],
       NHAN_VIEC: ["JOB_OFFERED", "JOB_SCHEDULED"],
       HOP_DONG: "CONTRACT_SIGNING",
       HUY_HEN: undefined,

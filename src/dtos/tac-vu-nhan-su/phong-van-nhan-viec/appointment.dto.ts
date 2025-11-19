@@ -79,7 +79,7 @@ export const AppointmentListWithInterviewSchema = z.object({
   appointmentId: z.string(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
-  // Interview specific fields
+  // Interview
   interviewDate: z.string().optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
@@ -98,7 +98,7 @@ export const AppointmentListWithInterviewSchema = z.object({
   candidateEmail: z.string().email().optional(),
   candidatePhone: z.string().optional(),
   result: z.string().optional(),
-  // Job offer specific fields
+  // Job offer
   receiveJobId: z.string().optional(),
   date: z.string().optional(),
   note: z.string().optional(),
