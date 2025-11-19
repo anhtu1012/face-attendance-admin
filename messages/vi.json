@@ -119,7 +119,8 @@
     "experience": "Kinh nghiệm",
     "createdAt": "Thời gian nộp",
     "Department": "Phòng ban",
-    "manageByUserName": "Người quản lý"
+    "manageByUserName": "Người quản lý",
+    "positionName": "Tên chức vụ"
   },
   "NhomNguoiDung": {
     "roleCode": "Mã vai trò",

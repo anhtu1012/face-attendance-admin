@@ -242,7 +242,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         const base64 = await fileToBase64(file);
         payload.inlineData = { data: base64, mimeType: file.type };
 
-        const resp = await fetch("/api/analyze-cv", {
+        const resp = await fetch("", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),

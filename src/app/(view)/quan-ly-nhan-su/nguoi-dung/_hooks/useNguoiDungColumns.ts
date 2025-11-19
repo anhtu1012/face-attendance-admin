@@ -134,7 +134,7 @@ export function useNguoiDungColumns({
       },
       {
         field: "positionName",
-        headerName: t("fullName"),
+        headerName: t("positionName"),
         editable: false,
         width: 150,
       },

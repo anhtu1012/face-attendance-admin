@@ -144,7 +144,8 @@
     "experience": "Experience",
     "createdAt": "CreatedAt",
     "Department": "Department",
-    "manageByUserName": "Manage By User Name"
+    "manageByUserName": "Manage By User Name",
+    "positionName": "Position Name"
   },
   "NhomNguoiDung": {
     "roleCode": "Role Code",
