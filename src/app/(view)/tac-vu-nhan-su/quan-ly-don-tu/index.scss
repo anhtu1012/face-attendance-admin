@@ -1,9 +1,9 @@
 .application-content-main {
   min-height: 600px;
-  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
-  padding: 20px;
+  // background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+  // padding: 20px;
   border-radius: 12px;
-  
+
   .icon-wrapper {
     cursor: pointer;
     transition: all 0.3s ease;
@@ -12,12 +12,12 @@
     justify-content: center;
     padding: 8px;
     border-radius: 50%;
-    
+
     &:hover {
       transform: scale(1.15) rotate(10deg);
       background: rgba(255, 255, 255, 0.2);
     }
-    
+
     &:active {
       transform: scale(1.05);
     }
@@ -29,12 +29,16 @@
   .ant-card {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(13, 71, 161, 0.08);
-    
+
     .ant-card-head {
-      background: linear-gradient(135deg, rgba(30, 136, 229, 0.05) 0%, rgba(13, 71, 161, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba(30, 136, 229, 0.05) 0%,
+        rgba(13, 71, 161, 0.05) 100%
+      );
       border-bottom: 2px solid rgba(30, 136, 229, 0.1);
       border-radius: 12px 12px 0 0;
-      
+
       .ant-card-head-title {
         font-weight: 600;
         color: #0d47a1;
@@ -43,4 +47,3 @@
     }
   }
 }
-

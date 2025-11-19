@@ -307,7 +307,7 @@ const TableApplication = forwardRef<TableApplicationRef, TableApplicationProps>(
             setPageSize(pageSize);
             fetchData(currentPage, pageSize, quickSearchText);
           }}
-          maxRowsVisible={15}
+          maxRowsVisible={14}
           columnFlex={0}
           onQuicksearch={dataGrid.handleQuicksearch}
           showActionButtons={false}

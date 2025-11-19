@@ -6,9 +6,10 @@ import { ClockCircleOutlined } from "@ant-design/icons";
 import { AgGridReact } from "@ag-grid-community/react";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import { ExtendedColDef } from "@/components/basicUI/cTableAG/interface/agProps";
-import { TimekeepingDetailItem } from "../../_types/prop";
+
 import dayjs from "dayjs";
 import "./TimekeepingDetailModal.scss";
+import { TimekeepingDetailItem } from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
 
 const { Text } = Typography;
 
@@ -16,7 +17,7 @@ interface TimekeepingDetailModalProps {
   open: boolean;
   onClose: () => void;
   userName: string;
-  data?: TimekeepingDetailItem[];
+  data: TimekeepingDetailItem[];
 }
 
 export default function TimekeepingDetailModal({
@@ -32,6 +33,7 @@ export default function TimekeepingDetailModal({
       headerName: "Ngày",
       field: "date",
       width: 180,
+      editable: false,
       pinned: "left",
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
@@ -51,7 +53,8 @@ export default function TimekeepingDetailModal({
     {
       headerName: "Giờ vào",
       field: "checkinTime",
-      width: 100,
+      width: 90,
+      editable: false,
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
         const time = params.data.checkinTime;
@@ -71,7 +74,8 @@ export default function TimekeepingDetailModal({
     {
       headerName: "Giờ ra",
       field: "checkoutTime",
-      width: 100,
+      width: 90,
+      editable: false,
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
         const time = params.data.checkoutTime;
@@ -91,7 +95,8 @@ export default function TimekeepingDetailModal({
     {
       headerName: "Giờ làm",
       field: "totalWorkHour",
-      width: 100,
+      width: 90,
+      editable: false,
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
         const hours = params.data.totalWorkHour;
@@ -107,7 +112,8 @@ export default function TimekeepingDetailModal({
     {
       headerName: "Tăng ca",
       field: "hasOT",
-      width: 100,
+      width: 90,
+      editable: false,
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
         return params.data.hasOT ? (
@@ -124,16 +130,21 @@ export default function TimekeepingDetailModal({
     {
       headerName: "Trạng thái",
       field: "status",
-      width: 120,
+      width: 150,
+      editable: false,
       pinned: "right",
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
         const status = params.data.status;
         const statusConfig: Record<string, { color: string; text: string }> = {
-          END: { color: "success", text: "Hoàn thành" },
-          PENDING: { color: "processing", text: "Đang xử lý" },
-          ABSENT: { color: "error", text: "Vắng mặt" },
-          LATE: { color: "warning", text: "Đi muộn" },
+          PENDING: { color: "processing", text: "Chưa bắt đầu" },
+          START_ONTIME: { color: "success", text: "Đã check-in" },
+          START_LATE: { color: "warning", text: "Check-in muộn" },
+          END_ONTIME: { color: "success", text: "Hoàn thành" },
+          END_EARLY: { color: "warning", text: "Về sớm" },
+          END_LATE: { color: "warning", text: "Đi trễ" },
+          NOT_WORK: { color: "default", text: "Không có chấm công" },
+          FORGET_LOG: { color: "error", text: "Quên chấm công" },
         };
         const config = statusConfig[status] || {
           color: "default",
@@ -160,7 +171,7 @@ export default function TimekeepingDetailModal({
       }
       open={open}
       onCancel={onClose}
-      width={1000}
+      width={1100}
       footer={null}
       className="timekeeping-detail-modal"
     >

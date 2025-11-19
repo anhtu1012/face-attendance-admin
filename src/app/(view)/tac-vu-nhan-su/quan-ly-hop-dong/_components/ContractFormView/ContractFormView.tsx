@@ -88,6 +88,7 @@ function ContractFormView({
         userId: contract.userId,
         contractTypeId: contract.contractTypeId,
         positionId: contract.positionId,
+        departmentId: contract.departmentId,
         grossSalary: parseFloat(contract.grossSalary) / 1_000_000, // Convert to millions
         allowanceIds: contract.allowanceInfors?.map((a) => a.allowanceId),
       });

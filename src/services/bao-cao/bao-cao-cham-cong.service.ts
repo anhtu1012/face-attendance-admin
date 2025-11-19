@@ -1,18 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
-import { TuyenDungResponseGetItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.response.dto";
-
+import {
+  TimekeepingDetailReportResponse,
+  TimekeepingReportResponse,
+} from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.response.dto";
 class BaoCaoChamCongServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/recruitment";
+  protected readonly basePath = "/v1/report";
 
   async getTimekeepingReport(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,
     params?: Record<string, string | number | boolean>
-  ): Promise<TuyenDungResponseGetItem> {
+  ): Promise<TimekeepingReportResponse> {
     return this.getWithFilter(
-      `${this.basePath}/lich-hen/danh-sach-ung-vien-buoi-phong-van`,
+      `${this.basePath}/bao-cao-cham-cong`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
+  async getTimekeepingReportDetail(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<TimekeepingDetailReportResponse> {
+    return this.getWithFilter(
+      `/v1/time-keeping/danh-sach-cham-cong`,
       searchFilter,
       quickSearchText,
       params
