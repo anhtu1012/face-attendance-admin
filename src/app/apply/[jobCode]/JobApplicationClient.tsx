@@ -148,7 +148,10 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
               try {
                 const resp = await fetch("/api/views", {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
+                  headers: {
+                    "Content-Type": "application/json",
+                    Referer: window.location.href,
+                  },
                   credentials: "include",
                   body: JSON.stringify({ jobCode: id }),
                 });
@@ -244,21 +247,24 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
 
         const resp = await fetch("/api/analyze-cv", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Referer: window.location.href,
+          },
           body: JSON.stringify(payload),
         });
 
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({}));
-          
+
           // Handle specific error types
-          if (err?.errorType === 'QUOTA_EXCEEDED') {
+          if (err?.errorType === "QUOTA_EXCEEDED") {
             throw new Error(err.message || "API quota exceeded");
           }
-          if (err?.errorType === 'RATE_LIMIT') {
+          if (err?.errorType === "RATE_LIMIT") {
             throw new Error(err.message || "Rate limit exceeded");
           }
-          
+
           throw new Error(err?.error || err?.message || "Analysis API failed");
         }
 
@@ -376,22 +382,27 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         console.error("Lỗi khi phân tích CV:", e);
         if (showModalOnComplete) {
           const errorMsg = e instanceof Error ? e.message : String(e);
-          
+
           // Show user-friendly error message
-          if (errorMsg.includes('quota') || errorMsg.includes('QUOTA')) {
+          if (errorMsg.includes("quota") || errorMsg.includes("QUOTA")) {
             messageApi.error({
-              content: "Hệ thống AI đã đạt giới hạn sử dụng hôm nay. Vui lòng thử lại sau hoặc liên hệ quản trị viên.",
-              duration: 5
+              content:
+                "Hệ thống AI đã đạt giới hạn sử dụng hôm nay. Vui lòng thử lại sau hoặc liên hệ quản trị viên.",
+              duration: 5,
             });
-          } else if (errorMsg.includes('rate limit') || errorMsg.includes('quá tải')) {
+          } else if (
+            errorMsg.includes("rate limit") ||
+            errorMsg.includes("quá tải")
+          ) {
             messageApi.error({
-              content: "Hệ thống AI đang quá tải, vui lòng thử lại sau vài phút.",
-              duration: 5
+              content:
+                "Hệ thống AI đang quá tải, vui lòng thử lại sau vài phút.",
+              duration: 5,
             });
           } else {
             messageApi.error({
               content: errorMsg || "Không thể phân tích CV. Vui lòng thử lại.",
-              duration: 5
+              duration: 5,
             });
           }
         }
@@ -451,6 +462,9 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
           try {
             const deferredResp = await fetch("/api/deferred-apply", {
               method: "POST",
+              headers: {
+                Referer: window.location.href,
+              },
               body: formData,
             });
 
