@@ -242,7 +242,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         const base64 = await fileToBase64(file);
         payload.inlineData = { data: base64, mimeType: file.type };
 
-        const resp = await fetch("", {
+        const resp = await fetch("/api/analyze-cv", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -250,7 +250,16 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
 
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({}));
-          throw new Error(err?.error || "Analysis API failed");
+          
+          // Handle specific error types
+          if (err?.errorType === 'QUOTA_EXCEEDED') {
+            throw new Error(err.message || "API quota exceeded");
+          }
+          if (err?.errorType === 'RATE_LIMIT') {
+            throw new Error(err.message || "Rate limit exceeded");
+          }
+          
+          throw new Error(err?.error || err?.message || "Analysis API failed");
         }
 
         const json = await resp.json();
@@ -366,9 +375,25 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
       } catch (e) {
         console.error("Lỗi khi phân tích CV:", e);
         if (showModalOnComplete) {
-          messageApi.error(
-            "Hệ thống AI đang quá tải, vui lòng thử lại sau vài phút"
-          );
+          const errorMsg = e instanceof Error ? e.message : String(e);
+          
+          // Show user-friendly error message
+          if (errorMsg.includes('quota') || errorMsg.includes('QUOTA')) {
+            messageApi.error({
+              content: "Hệ thống AI đã đạt giới hạn sử dụng hôm nay. Vui lòng thử lại sau hoặc liên hệ quản trị viên.",
+              duration: 5
+            });
+          } else if (errorMsg.includes('rate limit') || errorMsg.includes('quá tải')) {
+            messageApi.error({
+              content: "Hệ thống AI đang quá tải, vui lòng thử lại sau vài phút.",
+              duration: 5
+            });
+          } else {
+            messageApi.error({
+              content: errorMsg || "Không thể phân tích CV. Vui lòng thử lại.",
+              duration: 5
+            });
+          }
         }
       } finally {
         if (stepInterval) clearInterval(stepInterval);

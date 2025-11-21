@@ -131,7 +131,9 @@ export async function POST(req: Request) {
     const duration = Date.now() - startTime;
 
     console.log(
-      `[Analysis] Completed in ${duration}ms ${customSettings ? "(with custom settings)" : "(default)"}`
+      `[Analysis] Completed in ${duration}ms ${
+        customSettings ? "(with custom settings)" : "(default)"
+      }`
     );
 
     // Store result in cache (if KV is available)
@@ -160,6 +162,34 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("Error in /api/analyze-cv:", err);
     const message = err instanceof Error ? err.message : String(err);
+
+    // Check for quota exhaustion
+    if (message.includes("RESOURCE_EXHAUSTED") || message.includes("429")) {
+      return NextResponse.json(
+        {
+          error: "API quota exceeded",
+          errorType: "QUOTA_EXCEEDED",
+          message: "Hệ thống AI đã đạt giới hạn sử dụng. Vui lòng thử lại sau.",
+        },
+        { status: 429 }
+      );
+    }
+
+    // Check for rate limiting
+    if (
+      message.includes("rate limit") ||
+      message.includes("Too many requests")
+    ) {
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded",
+          errorType: "RATE_LIMIT",
+          message: "Hệ thống AI đang quá tải, vui lòng thử lại sau vài phút.",
+        },
+        { status: 429 }
+      );
+    }
+
     return NextResponse.json(
       { error: message || "Unknown error" },
       { status: 500 }
