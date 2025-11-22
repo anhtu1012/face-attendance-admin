@@ -494,7 +494,13 @@ export default function CandidateListTab({
           <div className="card-header">
             <div className="header-left">
               <FaUsers className="header-icon gradient-icon" />
-              <span className="header-title">{cardTitle}</span>
+              <span
+                className="header-title"
+                style={{ cursor: "pointer" }}
+                onClick={() => fetchCandidates()}
+              >
+                {cardTitle}
+              </span>
               <Badge
                 count={candidates.length}
                 showZero

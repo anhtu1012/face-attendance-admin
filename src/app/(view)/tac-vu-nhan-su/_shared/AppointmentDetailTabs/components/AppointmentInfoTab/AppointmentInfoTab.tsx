@@ -490,14 +490,15 @@ export default function AppointmentInfoTab({
       )}
 
       {/* Actions */}
-      <div className="actions-section">
-        <Space>
-          <Button type="primary">Cập nhật thông tin</Button>
-          <Button>Gửi email nhắc nhở</Button>
-          <Button danger>Hủy lịch hẹn</Button>
-        </Space>
-      </div>
-
+      {userProfile.roleId === RoleAdmin.HR && (
+        <div className="actions-section">
+          <Space>
+            <Button type="primary">Cập nhật thông tin</Button>
+            <Button>Gửi email nhắc nhở</Button>
+            <Button danger>Hủy lịch hẹn</Button>
+          </Space>
+        </div>
+      )}
       {/* Modal for changing interviewers */}
       <Modal
         title="Chọn người phỏng vấn"

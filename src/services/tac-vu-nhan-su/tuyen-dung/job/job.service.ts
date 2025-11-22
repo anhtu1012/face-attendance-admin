@@ -8,6 +8,14 @@ import {
   UpdateJobRequest,
 } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.request.dto";
 import { JobResponseGetItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.response.dto";
+import {
+  HRUser,
+  ShareJobRequest,
+  ShareJobResponse,
+  JobShareRequest,
+  AcceptShareRequest,
+  RejectShareRequest,
+} from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-share.dto";
 
 class JobServicesBase extends AxiosService {
   protected readonly basePath = "/v1/recruitment";
@@ -55,6 +63,34 @@ class JobServicesBase extends AxiosService {
 
   async deleteJob(id: string): Promise<any> {
     return this.delete(`${this.basePath}/job-application-form/${id}`);
+  }
+
+  // Job Share Methods
+  async getHRUsers(): Promise<HRUser[]> {
+    return this.get(`${this.basePath}/hr-users`);
+  }
+
+  async shareJob(data: ShareJobRequest): Promise<ShareJobResponse> {
+    return this.post(`${this.basePath}/tuyen-dung/share-job`, data);
+  }
+
+  async getShareRequests(jobCode?: string): Promise<JobShareRequest[]> {
+    const query = jobCode ? `?jobCode=${jobCode}` : "";
+    return this.get(`${this.basePath}/tuyen-dung/share-requests${query}`);
+  }
+
+  async cancelShareRequest(requestId: string): Promise<any> {
+    return this.delete(
+      `${this.basePath}/tuyen-dung/share-requests/${requestId}`
+    );
+  }
+
+  async acceptShareRequest(data: AcceptShareRequest): Promise<any> {
+    return this.post(`${this.basePath}/tuyen-dung/share-requests/accept`, data);
+  }
+
+  async rejectShareRequest(data: RejectShareRequest): Promise<any> {
+    return this.post(`${this.basePath}/tuyen-dung/share-requests/reject`, data);
   }
 }
 

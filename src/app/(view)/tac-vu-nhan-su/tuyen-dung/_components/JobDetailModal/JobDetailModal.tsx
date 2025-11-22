@@ -23,6 +23,7 @@ import {
 } from "react-icons/fa";
 import { MdAutoDelete, MdEmail, MdPhone } from "react-icons/md";
 import { getStatusColor, getStatusText } from "../../_utils/status";
+import JobShareModal from "../JobShareModal/JobShareModal";
 import "./JobDetailModal.scss";
 
 interface JobDetailModalProps {
@@ -38,6 +39,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
 }) => {
   const [jobDetails, setJobDetails] = useState<JobDetail>();
   const [viewsLoading, setViewsLoading] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const messageApi = useAntdMessage();
   const companyInfo = {
     companyName: "FaceAI Technology Solutions",
@@ -124,8 +126,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
   };
 
   const handleShareJob = () => {
-    // Handle share job logic
-    console.log("Share job:", jobDetails);
+    setShareModalOpen(true);
   };
 
   const tabItems = [
@@ -522,6 +523,17 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Job Share Modal */}
+      <JobShareModal
+        open={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        jobCode={jobDetails.jobCode ?? ""}
+        jobTitle={jobDetails.jobTitle ?? ""}
+        onShareSuccess={() => {
+          messageApi.success("Đã gửi yêu cầu chia sẻ công việc!");
+        }}
+      />
     </Modal>
   );
 };

@@ -327,7 +327,7 @@ function Page() {
         field: "status",
         headerName: t("isActive"),
         editable: false,
-        width: 150,
+        width: 170,
         filter: false,
         context: {
           typeColumn: "Tag",
@@ -365,7 +365,7 @@ function Page() {
         field: "fullName",
         headerName: t("fullName"),
         editable: false,
-        width: 150,
+        width: 170,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
           return itemErrorCellStyle(itemId, "fullName", params);
@@ -376,7 +376,7 @@ function Page() {
         headerName: "Email",
         context: { typeColumn: "Text", inputType: "email", maxLength: 100 },
         editable: false,
-        width: 220,
+        width: 250,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
           return itemErrorCellStyle(itemId, "email", params);

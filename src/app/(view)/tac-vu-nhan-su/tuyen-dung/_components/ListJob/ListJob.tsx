@@ -14,9 +14,12 @@ import {
   MdLocationOn,
   MdWork,
 } from "react-icons/md";
+import { FaUserCheck } from "react-icons/fa";
+import { Badge } from "antd";
 import { getStatusClass, getStatusText } from "../../_utils/status";
 import FilterDropdown, { FilterValues } from "../FilterDropdown";
 import JobDetailModal from "../JobDetailModal/JobDetailModal";
+import ShareRequestsModal from "../ShareRequestsModal/ShareRequestsModal";
 import { columnDefs } from "./column";
 import "./ListJob.scss";
 
@@ -38,6 +41,8 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
   const [fromValue, setFromValue] = useState<FilterValues | undefined>(
     undefined
   );
+  const [shareRequestsOpen, setShareRequestsOpen] = useState(false);
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   // track collapsed state per job id
   const [collapsedJobs, setCollapsedJobs] = useState<Set<number>>(new Set());
 
@@ -98,6 +103,25 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
       console.log("Error fetching jobs:", error);
     }
   };
+
+  const fetchPendingRequestsCount = async () => {
+    try {
+      const requests = await JobServices.getShareRequests();
+      const pendingCount = requests.filter((req) => req.status === "pending").length;
+      setPendingRequestsCount(pendingCount);
+    } catch (error) {
+      console.log("Error fetching share requests count:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch pending requests count when component mounts
+    fetchPendingRequestsCount();
+
+    // Refresh count every 30 seconds
+    const interval = setInterval(fetchPendingRequestsCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Listen for global 'jobCreated' events so this list can refresh automatically
   useEffect(() => {
@@ -243,6 +267,18 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
             <MdExpandMore />
           </Cbutton>
         </div>
+
+        <div>
+          <Badge count={pendingRequestsCount} offset={[-5, 5]}>
+            <Cbutton
+              className="share-requests-button"
+              onClick={() => setShareRequestsOpen(true)}
+              title="Yêu cầu chia sẻ công việc"
+            >
+              <FaUserCheck />
+            </Cbutton>
+          </Badge>
+        </div>
       </div>
       <div className="job-list">
         {dataJobs.map((job) => (
@@ -356,6 +392,18 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
         open={jobDetailOpen}
         onClose={handleCloseJobDetail}
         jobCode={selectedJob?.jobCode ?? ""}
+      />
+
+      {/* Share Requests Modal */}
+      <ShareRequestsModal
+        open={shareRequestsOpen}
+        onClose={() => setShareRequestsOpen(false)}
+        onRequestUpdate={() => {
+          // Refresh pending requests count
+          fetchPendingRequestsCount();
+          // Optionally refresh job list when requests are updated
+          fetchDataJobs(fromValue);
+        }}
       />
     </div>
   );

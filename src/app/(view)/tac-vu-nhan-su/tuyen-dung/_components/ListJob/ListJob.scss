@@ -11,6 +11,35 @@
     display: flex;
     justify-content: space-between;
     gap: 10px;
+
+    // .share-requests-button {
+    //   width: 44px;
+    //   height: 42px;
+
+    //   display: flex;
+    //   align-items: center;
+    //   justify-content: center;
+    //   cursor: pointer;
+    //   transition: all 0.3s ease;
+    //   box-shadow: 0 4px 12px rgba(13, 71, 161, 0.2);
+
+    //   svg {
+    //     font-size: 20px;
+    //   }
+
+    //   &:active {
+    //     transform: translateY(0);
+    //     box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+    //   }
+    // }
+
+    .ant-badge {
+      .ant-badge-count {
+        background: #ff4d4f;
+        box-shadow: 0 2px 8px rgba(255, 77, 79, 0.4);
+        font-weight: 600;
+      }
+    }
   }
 
   &::before {
@@ -213,8 +242,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 42px;
   border-radius: 8px;
   border: none;
   background: transparent;
@@ -241,8 +270,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 42px;
   padding: 0;
   border-radius: 8px;
   background: transparent;

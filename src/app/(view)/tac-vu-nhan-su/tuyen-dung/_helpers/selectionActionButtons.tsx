@@ -151,7 +151,7 @@ export const getSelectionActionButtons = ({
       return [
         {
           title: "Hoàn tất hợp đồng",
-          label: "Done",
+          label: "Hoàn thành",
           confirmMessage:
             "Bạn có chắc muốn đánh dấu các hợp đồng này là đã ký?",
           onClick: async () => {
