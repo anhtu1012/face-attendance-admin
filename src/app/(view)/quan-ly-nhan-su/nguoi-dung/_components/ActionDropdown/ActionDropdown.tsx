@@ -5,9 +5,11 @@ import { IoSettingsOutline } from "react-icons/io5";
 import "./ActionDropdown.scss";
 import { FcKey } from "react-icons/fc";
 import { RiUserCommunityFill } from "react-icons/ri";
+import { FaEye } from "react-icons/fa";
 
 interface ActionDropdownProps {
   data: any;
+  onViewDetail?: (data: any) => void;
   onChangePassword: (data: any) => void;
   onUpdateManager: (data: any) => void;
   onUpdateAccountStatus: (data: any) => void;
@@ -15,6 +17,7 @@ interface ActionDropdownProps {
 
 export function ActionDropdown({
   data,
+  onViewDetail,
   onChangePassword,
   onUpdateManager,
   onUpdateAccountStatus,
@@ -22,6 +25,22 @@ export function ActionDropdown({
   const [open, setOpen] = useState(false);
 
   const items: MenuProps["items"] = [
+    ...(onViewDetail
+      ? [
+          {
+            key: "viewDetail",
+            label: "Xem chi tiết",
+            icon: <FaEye />,
+            onClick: () => {
+              setOpen(false);
+              onViewDetail(data);
+            },
+          },
+          {
+            type: "divider" as const,
+          },
+        ]
+      : []),
     {
       key: "changePassword",
       label: "Đổi mật khẩu",

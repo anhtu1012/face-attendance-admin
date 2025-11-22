@@ -1,0 +1,225 @@
+.timekeeping-table-wrapper {
+  .ag-theme-alpine {
+    --ag-header-height: 56px;
+    --ag-row-height: 50px;
+    --ag-header-background-color: #f8f9fa;
+    --ag-header-foreground-color: #1f2937;
+    --ag-odd-row-background-color: #ffffff;
+    --ag-row-hover-color: #f3f4f6;
+    --ag-border-color: #e5e7eb;
+    --ag-cell-horizontal-border: solid #e5e7eb;
+    
+    .ag-header-cell {
+      font-weight: 600;
+      font-size: 13px;
+      border-right: 1px solid #e5e7eb;
+      
+      .ag-header-cell-label {
+        justify-content: center;
+      }
+    }
+
+    .ag-pinned-left-header,
+    .ag-pinned-left-cols-container {
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .ag-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid #f0f0f0;
+      padding: 8px 12px;
+      
+      &:focus {
+        outline: none;
+        border-color: #1890ff !important;
+      }
+    }
+
+    .ag-row {
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+    }
+  }
+}
+
+.metric-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  
+  &.success {
+    background-color: #f6ffed;
+    color: #52c41a;
+    border: 1px solid #b7eb8f;
+  }
+  
+  &.warning {
+    background-color: #fffbe6;
+    color: #faad14;
+    border: 1px solid #ffe58f;
+  }
+  
+  &.danger {
+    background-color: #fff1f0;
+    color: #ff4d4f;
+    border: 1px solid #ffa39e;
+  }
+  
+  &.info {
+    background-color: #e6f7ff;
+    color: #1890ff;
+    border: 1px solid #91d5ff;
+  }
+  
+  &.purple {
+    background-color: #f9f0ff;
+    color: #722ed1;
+    border: 1px solid #d3adf7;
+  }
+  
+  &.orange {
+    background-color: #fff7e6;
+    color: #fa8c16;
+    border: 1px solid #ffd591;
+  }
+  
+  &.neutral {
+    background-color: #fafafa;
+    color: #8c8c8c;
+    border: 1px solid #d9d9d9;
+  }
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.employee-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  width: 100%;
+  
+  .employee-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+    line-height: 1.4;
+  }
+  
+  .employee-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.4;
+    
+    .separator {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background-color: #d1d5db;
+    }
+  }
+}
+
+.progress-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  
+  .progress-text {
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.3px;
+  }
+  
+  .progress-bar-container {
+    width: 100%;
+    height: 4px;
+    background-color: #f0f0f0;
+    border-radius: 2px;
+    overflow: hidden;
+    
+    .progress-bar {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      
+      &.high {
+        background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%);
+      }
+      
+      &.medium {
+        background: linear-gradient(90deg, #faad14 0%, #ffc53d 100%);
+      }
+      
+      &.low {
+        background: linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%);
+      }
+    }
+  }
+}
+
+.stat-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  
+  .stat-icon {
+    font-size: 16px;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.money-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 0.3px;
+  
+  &.has-fine {
+    background: linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%);
+    color: #cf1322;
+    border: 1px solid #ffa39e;
+    box-shadow: 0 2px 4px rgba(207, 19, 34, 0.1);
+  }
+  
+  &.no-fine {
+    background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+  }
+}
+

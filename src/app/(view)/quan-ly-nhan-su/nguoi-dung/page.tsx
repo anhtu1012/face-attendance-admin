@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AgGridReact } from "@ag-grid-community/react";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { useNguoiDungColumns } from "./_hooks/useNguoiDungColumns";
@@ -15,6 +16,7 @@ import {
 } from "./_modals";
 
 function Page() {
+  const router = useRouter();
   const gridRef = useRef<AgGridReact>({} as AgGridReact);
 
   // Modal states
@@ -34,6 +36,12 @@ function Page() {
   }>({ open: false, userData: null });
 
   // Modal handlers
+  const handleViewDetail = (data: any) => {
+    if (data?.id) {
+      router.push(`/quan-ly-nhan-su/nguoi-dung/${data.id}`);
+    }
+  };
+
   const handleChangePassword = (data: any) => {
     setChangePasswordModal({ open: true, userData: data });
   };
@@ -48,6 +56,7 @@ function Page() {
 
   // Custom hooks for modularity
   const { columnDefs, actionCellRenderer } = useNguoiDungColumns({
+    onViewDetail: handleViewDetail,
     onChangePassword: handleChangePassword,
     onUpdateManager: handleUpdateManager,
     onUpdateAccountStatus: handleUpdateAccountStatus,

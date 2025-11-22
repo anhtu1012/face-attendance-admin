@@ -41,7 +41,7 @@ const TimekeepingTable = forwardRef<TableTimekeepingRef, TableTimekeepingProps>(
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalItem, setTotalItems] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(defaultPageSize);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [rowData, setRowData] = useState<TimekeepingReportData[]>([]);
     const [selectedUser, setSelectedUser] = useState<TimekeepingReportData>();
     const gridRef = useRef<AgGridReact<TimekeepingReportData>>(null);
@@ -173,7 +173,7 @@ const TimekeepingTable = forwardRef<TableTimekeepingRef, TableTimekeepingProps>(
     );
 
     return (
-      <div>
+      <div className="timekeeping-table-wrapper">
         <TimekeepingDetailModal
           open={modalOpen}
           onClose={handleCloseModal}

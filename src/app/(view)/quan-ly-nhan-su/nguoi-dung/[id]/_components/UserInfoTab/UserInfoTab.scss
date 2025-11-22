@@ -1,0 +1,205 @@
+.user-info-tab {
+  .profile-card {
+    margin-bottom: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e8f4f8;
+    overflow: hidden;
+
+    :global(.ant-card-body) {
+      padding: 32px;
+    }
+
+    .avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 10%;
+        height: 80%;
+        width: 1px;
+        background: linear-gradient(to bottom, transparent, #e8f4f8, transparent);
+      }
+
+      .user-avatar {
+        margin-bottom: 20px;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 16px rgba(21, 101, 192, 0.15);
+        position: relative;
+
+        &::after {
+          content: "";
+          position: absolute;
+          inset: -4px;
+          border-radius: 50%;
+          padding: 4px;
+          background: linear-gradient(135deg, #1565c0, #42a5f5);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+        }
+      }
+
+      .quick-info {
+        h3 {
+          margin: 12px 0 8px 0;
+          font-size: 20px;
+          font-weight: 700;
+          color: #1565c0;
+          letter-spacing: -0.3px;
+        }
+
+        .user-code {
+          color: #64748b;
+          font-size: 14px;
+          margin-bottom: 12px;
+          font-weight: 500;
+        }
+
+        :global(.ant-tag) {
+          margin: 6px 4px;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-weight: 500;
+          border: none;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+      }
+    }
+
+    :global(.ant-descriptions-item-label) {
+      font-weight: 600;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #475569;
+      padding: 12px 16px;
+    }
+
+    :global(.ant-descriptions-item-content) {
+      padding: 12px 16px;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    :global(.ant-descriptions-bordered) {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+  }
+
+  .info-card {
+    margin-bottom: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e8f4f8;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 20px rgba(21, 101, 192, 0.12);
+      transform: translateY(-2px);
+    }
+
+    :global(.ant-card-head) {
+      background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+      border-bottom: none;
+      padding: 16px 24px;
+    }
+
+    :global(.ant-card-head-title) {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      :global(.anticon) {
+        font-size: 20px;
+      }
+    }
+
+    :global(.ant-card-body) {
+      padding: 24px;
+    }
+
+    :global(.ant-descriptions-item-label) {
+      font-weight: 600;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #475569;
+      width: 180px;
+      padding: 12px 16px;
+    }
+
+    :global(.ant-descriptions-item-content) {
+      padding: 12px 16px;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    :global(.ant-descriptions-bordered) {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .additional-info {
+      margin-top: 16px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 8px;
+      border-left: 4px solid #1565c0;
+
+      p {
+        margin: 10px 0;
+        font-size: 14px;
+        color: #1e293b;
+        font-weight: 500;
+
+        strong {
+          color: #475569;
+          margin-right: 8px;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 992px) {
+    .avatar-section {
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .profile-card {
+      :global(.ant-card-body) {
+        padding: 20px;
+      }
+
+      :global(.ant-descriptions) {
+        :global(.ant-descriptions-item-label) {
+          width: 120px !important;
+          padding: 10px 12px;
+        }
+
+        :global(.ant-descriptions-item-content) {
+          padding: 10px 12px;
+        }
+      }
+    }
+
+    .info-card {
+      :global(.ant-card-body) {
+        padding: 16px;
+      }
+    }
+  }
+}
+

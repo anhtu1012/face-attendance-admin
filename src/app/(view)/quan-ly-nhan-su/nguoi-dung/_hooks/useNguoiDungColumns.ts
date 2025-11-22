@@ -15,12 +15,14 @@ import { ActionCellRenderer } from "../_components/ActionCellRenderer/ActionCell
 import { ManagerNameCell } from "../_components/ManagerNameCell";
 
 interface UseNguoiDungColumnsParams {
+  onViewDetail?: (data: any) => void;
   onChangePassword?: (data: any) => void;
   onUpdateManager?: (data: any) => void;
   onUpdateAccountStatus?: (data: any) => void;
 }
 
 export function useNguoiDungColumns({
+  onViewDetail,
   onChangePassword,
   onUpdateManager,
   onUpdateAccountStatus,
@@ -163,13 +165,14 @@ export function useNguoiDungColumns({
       return React.createElement(ActionCellRenderer, {
         data: params.data,
         context: {
+          onViewDetail,
           onChangePassword,
           onUpdateManager,
           onUpdateAccountStatus,
         },
       });
     };
-  }, [onChangePassword, onUpdateManager, onUpdateAccountStatus]);
+  }, [onViewDetail, onChangePassword, onUpdateManager, onUpdateAccountStatus]);
 
   return {
     columnDefs,
