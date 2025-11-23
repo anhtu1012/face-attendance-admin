@@ -99,17 +99,16 @@ export const getSalaryTableColumn = (): ExtendedColDef[] => {
                   ? formatCurrency(params.data.totalSalary)
                   : "--"}
               </div>
-              {params.data.totalFine > 0 && (
-                <div
-                  style={{
-                    fontSize: "11px",
-                    color: "#f44336",
-                    fontWeight: 600,
-                  }}
-                >
-                  Thực nhận: {formatCurrency(params.data.totalSalary)}
-                </div>
-              )}
+
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "#f44336",
+                  fontWeight: 600,
+                }}
+              >
+                Thực nhận: {formatCurrency(params.data.totalSalary)}
+              </div>
             </div>
           </Tooltip>
         );

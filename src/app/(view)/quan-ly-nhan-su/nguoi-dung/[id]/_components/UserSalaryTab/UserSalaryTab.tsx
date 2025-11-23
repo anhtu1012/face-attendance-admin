@@ -4,13 +4,13 @@
 import { SalaryReportItem } from "@/dtos/bao-cao/bao-cao-luong/bao-cao-luong.response.dto";
 import { DailySalaryDetail } from "@/dtos/bao-cao/bao-cao-luong/daily-salary-detail.dto";
 import BaoCaoSalaryServices from "@/services/bao-cao/bao-cao-luong.service";
+import { formatCurrency } from "@/utils/client/formatCurrency";
 import {
   BankOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   DollarOutlined,
-  DownloadOutlined,
   FallOutlined,
   FireOutlined,
   RiseOutlined,
@@ -20,9 +20,9 @@ import { Button, Card, DatePicker, Table, Tag, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
 import { useCallback, useEffect, useState } from "react";
-import "./UserSalaryTab.scss";
+import { BiReset } from "react-icons/bi";
 import { PiPersonSimpleRun } from "react-icons/pi";
-import { formatCurrency } from "@/utils/client/formatCurrency";
+import "./UserSalaryTab.scss";
 
 interface UserSalaryTabProps {
   userId: string;
@@ -118,8 +118,7 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
   }, [fetchSalaryData]);
 
   const handleExport = () => {
-    // Export logic here
-    console.log("Exporting salary data...");
+    fetchSalaryData();
   };
 
   // Render status attendance icon
@@ -415,17 +414,16 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
               >
                 {formatCurrency(value)}
               </div>
-              {record.totalFine > 0 && (
-                <div
-                  style={{
-                    fontSize: "11px",
-                    color: "#f44336",
-                    fontWeight: 600,
-                  }}
-                >
-                  Thực nhận: {formatCurrency(record.totalSalary)}
-                </div>
-              )}
+
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "#f44336",
+                  fontWeight: 600,
+                }}
+              >
+                Thực nhận: {formatCurrency(record.totalSalary)}
+              </div>
             </div>
           </Tooltip>
         );
@@ -605,12 +603,12 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
         />
         <Button
           type="primary"
-          icon={<DownloadOutlined />}
+          icon={<BiReset />}
           size="large"
           onClick={handleExport}
           className="export-button"
         >
-          Xuất Excel
+          Làm mới
         </Button>
       </div>
 

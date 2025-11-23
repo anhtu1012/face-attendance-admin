@@ -2,11 +2,15 @@
 "use client";
 
 import {
+  TimekeepingDetailItem,
+  TimekeepingReportData,
+} from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
+import BaoCaoChamCongServices from "@/services/bao-cao/bao-cao-cham-cong.service";
+import {
   CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
-  DownloadOutlined,
   FieldTimeOutlined,
   FireOutlined,
 } from "@ant-design/icons";
@@ -14,12 +18,8 @@ import { Button, Card, Col, DatePicker, Row, Table, Tag, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
 import { useCallback, useEffect, useState } from "react";
+import { BiReset } from "react-icons/bi";
 import "./UserTimekeepingTab.scss";
-import BaoCaoChamCongServices from "@/services/bao-cao/bao-cao-cham-cong.service";
-import {
-  TimekeepingDetailItem,
-  TimekeepingReportData,
-} from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
 
 interface UserTimekeepingTabProps {
   userId: string;
@@ -313,8 +313,7 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
   ];
 
   const handleExport = () => {
-    // Export logic here
-    console.log("Exporting data...");
+    fetchTimekeepingData();
   };
 
   return (
@@ -332,12 +331,12 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
         />
         <Button
           type="primary"
-          icon={<DownloadOutlined />}
+          icon={<BiReset />}
           size="large"
           onClick={handleExport}
           className="export-button"
         >
-          Xuất Excel
+          Làm mới
         </Button>
       </div>
 
