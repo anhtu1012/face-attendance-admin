@@ -1,17 +1,25 @@
 "use client";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 // import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
-import { Avatar, Badge, Button, Empty, List, Modal, Spin, Tabs, Tag, Tooltip } from "antd";
-import React, { useEffect, useState } from "react";
 import {
-  FaCheck,
-  FaClock,
-  FaTimes,
-  FaUser,
-  FaUserCheck,
-} from "react-icons/fa";
-import { JobShareRequest } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-share.dto";
+  Avatar,
+  Badge,
+  Button,
+  Empty,
+  List,
+  Modal,
+  Spin,
+  Tabs,
+  Tag,
+  Tooltip,
+} from "antd";
+import React, { useEffect, useState } from "react";
+import { FaCheck, FaClock, FaTimes, FaUser, FaUserCheck } from "react-icons/fa";
 import "./ShareRequestsModal.scss";
+import { JobShareRequest } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-share.dto";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import { useSelector } from "react-redux";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 
 interface ShareRequestsModalProps {
   open: boolean;
@@ -24,161 +32,26 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
   onClose,
   onRequestUpdate,
 }) => {
-  const [activeTab, setActiveTab] = useState("pending");
-  const [shareRequests, setShareRequests] = useState<JobShareRequest[]>([
-    // Fake data for testing
-    {
-      id: "1",
-      jobCode: "JOB001",
-      jobTitle: "Senior Frontend Developer (React/Next.js)",
-      fromUser: {
-        id: "user1",
-        fullName: "Nguyễn Văn Minh",
-        email: "minh.nguyen@company.com",
-        avatar: "",
-      },
-      toUser: {
-        id: "user2",
-        fullName: "Trần Thị Hương",
-        email: "huong.tran@company.com",
-        avatar: "",
-      },
-      status: "pending",
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-      message: "Nhờ bạn hỗ trợ quản lý công việc tuyển dụng vị trí này. Cần người có kinh nghiệm về React.",
-    },
-    {
-      id: "2",
-      jobCode: "JOB002",
-      jobTitle: "Backend Developer (Node.js, NestJS)",
-      fromUser: {
-        id: "user1",
-        fullName: "Nguyễn Văn Minh",
-        email: "minh.nguyen@company.com",
-        avatar: "",
-      },
-      toUser: {
-        id: "user3",
-        fullName: "Lê Hoàng Nam",
-        email: "nam.le@company.com",
-        avatar: "",
-      },
-      status: "pending",
-      createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
-      message: "Bạn có kinh nghiệm về backend, nhờ bạn phụ trách vị trí này nhé!",
-    },
-    {
-      id: "3",
-      jobCode: "JOB003",
-      jobTitle: "UI/UX Designer",
-      fromUser: {
-        id: "user4",
-        fullName: "Phạm Thu Thảo",
-        email: "thao.pham@company.com",
-        avatar: "",
-      },
-      toUser: {
-        id: "user2",
-        fullName: "Trần Thị Hương",
-        email: "huong.tran@company.com",
-        avatar: "",
-      },
-      status: "pending",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-      message: "",
-    },
-    {
-      id: "4",
-      jobCode: "JOB004",
-      jobTitle: "Full Stack Developer (MERN Stack)",
-      fromUser: {
-        id: "user1",
-        fullName: "Nguyễn Văn Minh",
-        email: "minh.nguyen@company.com",
-        avatar: "",
-      },
-      toUser: {
-        id: "user5",
-        fullName: "Võ Minh Tuấn",
-        email: "tuan.vo@company.com",
-        avatar: "",
-      },
-      status: "accepted",
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-      message: "Vị trí này phù hợp với chuyên môn của bạn, nhờ bạn đảm nhận nhé!",
-    },
-    {
-      id: "5",
-      jobCode: "JOB005",
-      jobTitle: "DevOps Engineer",
-      fromUser: {
-        id: "user4",
-        fullName: "Phạm Thu Thảo",
-        email: "thao.pham@company.com",
-        avatar: "",
-      },
-      toUser: {
-        id: "user3",
-        fullName: "Lê Hoàng Nam",
-        email: "nam.le@company.com",
-        avatar: "",
-      },
-      status: "accepted",
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-      message: "Cảm ơn bạn đã nhận quản lý công việc này!",
-    },
-    {
-      id: "6",
-      jobCode: "JOB006",
-      jobTitle: "Mobile Developer (Flutter)",
-      fromUser: {
-        id: "user1",
-        fullName: "Nguyễn Văn Minh",
-        email: "minh.nguyen@company.com",
-        avatar: "",
-      },
-      toUser: {
-        id: "user2",
-        fullName: "Trần Thị Hương",
-        email: "huong.tran@company.com",
-        avatar: "",
-      },
-      status: "rejected",
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-      message: "Nhờ bạn hỗ trợ tuyển dụng vị trí mobile developer.",
-    },
-    {
-      id: "7",
-      jobCode: "JOB007",
-      jobTitle: "Data Analyst",
-      fromUser: {
-        id: "user4",
-        fullName: "Phạm Thu Thảo",
-        email: "thao.pham@company.com",
-        avatar: "",
-      },
-      toUser: {
-        id: "user5",
-        fullName: "Võ Minh Tuấn",
-        email: "tuan.vo@company.com",
-        avatar: "",
-      },
-      status: "rejected",
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
-      message: "Vị trí này cần người có kinh nghiệm phân tích dữ liệu.",
-    },
-  ]);
+  const [activeTab, setActiveTab] = useState("PENDING");
+  const [shareRequests, setShareRequests] = useState<JobShareRequest[]>([]);
+  const [shareMyRequests, setShareMyRequests] = useState<JobShareRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const messageApi = useAntdMessage();
+  const { userProfile } = useSelector(selectAuthLogin);
 
   const fetchShareRequests = async () => {
     setLoading(true);
     try {
-      // Uncomment when API is ready
-      // const response = await JobServices.getShareRequests();
-      // setShareRequests(response);
-      
+      const response = await JobServices.getShareRequests(
+        null,
+        String(userProfile.id)
+      );
+      const responseMyReq = await JobServices.getShareRequests(
+        String(userProfile.id)
+      );
+      setShareMyRequests(responseMyReq.data);
+      setShareRequests(response.data);
       // Simulate API call delay
       setTimeout(() => {
         setLoading(false);
@@ -201,12 +74,12 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
     try {
       // Uncomment when API is ready
       // await JobServices.acceptShareRequest({ requestId });
-      
+
       // Simulate API call
       setTimeout(() => {
         setShareRequests((prev) =>
           prev.map((req) =>
-            req.id === requestId ? { ...req, status: "accepted" as const } : req
+            req.id === requestId ? { ...req, status: "ACCEPTED" as const } : req
           )
         );
         messageApi.success("Đã chấp nhận yêu cầu chia sẻ!");
@@ -225,12 +98,12 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
     try {
       // Uncomment when API is ready
       // await JobServices.rejectShareRequest({ requestId });
-      
+
       // Simulate API call
       setTimeout(() => {
         setShareRequests((prev) =>
           prev.map((req) =>
-            req.id === requestId ? { ...req, status: "rejected" as const } : req
+            req.id === requestId ? { ...req, status: "REJECTED" as const } : req
           )
         );
         messageApi.success("Đã từ chối yêu cầu chia sẻ!");
@@ -249,7 +122,7 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
     try {
       // Uncomment when API is ready
       // await JobServices.cancelShareRequest(requestId);
-      
+
       // Simulate API call
       setTimeout(() => {
         setShareRequests((prev) => prev.filter((req) => req.id !== requestId));
@@ -266,11 +139,11 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
+      case "PENDING":
         return "orange";
-      case "accepted":
+      case "ACCEPTED":
         return "green";
-      case "rejected":
+      case "REJECTED":
         return "red";
       default:
         return "default";
@@ -279,11 +152,11 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "pending":
+      case "PENDING":
         return "Chờ xác nhận";
-      case "accepted":
+      case "ACCEPTED":
         return "Đã chấp nhận";
-      case "rejected":
+      case "REJECTED":
         return "Đã từ chối";
       default:
         return status;
@@ -294,7 +167,10 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
     return shareRequests.filter((req) => req.status === status);
   };
 
-  const renderRequestCard = (request: JobShareRequest) => (
+  const renderRequestCard = (
+    request: JobShareRequest,
+    myRequests?: boolean
+  ) => (
     <List.Item className="request-item" key={request.id}>
       <div className="request-card">
         <div className="request-header">
@@ -306,7 +182,7 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
               text={getStatusText(request.status)}
             />
           </div>
-          {request.status === "pending" && (
+          {request.status === "PENDING" && !myRequests && (
             <div className="request-actions">
               <Tooltip title="Chấp nhận">
                 <Button
@@ -330,7 +206,7 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
               </Tooltip>
             </div>
           )}
-          {request.status === "pending" && (
+          {request.status === "PENDING" && (
             <Tooltip title="Hủy yêu cầu">
               <Button
                 type="text"
@@ -373,11 +249,11 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
           </div>
         </div>
 
-        {request.message && (
+        {/* {request.message && (
           <div className="request-message">
             <strong>Lời nhắn:</strong> {request.message}
           </div>
-        )}
+        )} */}
 
         <div className="request-footer">
           <span className="request-date">
@@ -388,13 +264,13 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
     </List.Item>
   );
 
-  const pendingRequests = filterRequestsByStatus("pending");
-  const acceptedRequests = filterRequestsByStatus("accepted");
-  const rejectedRequests = filterRequestsByStatus("rejected");
+  const pendingRequests = filterRequestsByStatus("PENDING");
+  const ACCEPTEDRequests = filterRequestsByStatus("ACCEPTED");
+  const rejectedRequests = filterRequestsByStatus("REJECTED");
 
   const tabItems = [
     {
-      key: "pending",
+      key: "PENDING",
       label: (
         <span>
           <FaClock /> Chờ duyệt{" "}
@@ -413,18 +289,18 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
             <List
               className="share-requests-list"
               dataSource={pendingRequests}
-              renderItem={renderRequestCard}
+              renderItem={(item) => renderRequestCard(item)}
             />
           )}
         </div>
       ),
     },
     {
-      key: "accepted",
+      key: "ACCEPTED",
       label: (
         <span>
           <FaCheck /> Đã chấp nhận{" "}
-          <Badge count={acceptedRequests.length} showZero color="green" />
+          <Badge count={ACCEPTEDRequests.length} showZero color="green" />
         </span>
       ),
       children: (
@@ -433,20 +309,20 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
             <div className="loading-container">
               <Spin size="large" />
             </div>
-          ) : acceptedRequests.length === 0 ? (
+          ) : ACCEPTEDRequests.length === 0 ? (
             <Empty description="Không có yêu cầu đã chấp nhận" />
           ) : (
             <List
               className="share-requests-list"
-              dataSource={acceptedRequests}
-              renderItem={renderRequestCard}
+              dataSource={ACCEPTEDRequests}
+              renderItem={(item) => renderRequestCard(item)}
             />
           )}
         </div>
       ),
     },
     {
-      key: "rejected",
+      key: "REJECTED",
       label: (
         <span>
           <FaTimes /> Đã từ chối{" "}
@@ -465,7 +341,33 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
             <List
               className="share-requests-list"
               dataSource={rejectedRequests}
-              renderItem={renderRequestCard}
+              renderItem={(item) => renderRequestCard(item)}
+            />
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "MY_REQUESTS",
+      label: (
+        <span>
+          <FaClock /> Đơn của tôi
+          <Badge count={shareMyRequests.length} showZero />
+        </span>
+      ),
+      children: (
+        <div className="requests-list-container">
+          {loading ? (
+            <div className="loading-container">
+              <Spin size="large" />
+            </div>
+          ) : shareMyRequests.length === 0 ? (
+            <Empty description="Không có yêu cầu chờ duyệt" />
+          ) : (
+            <List
+              className="share-requests-list"
+              dataSource={shareMyRequests}
+              renderItem={(item) => renderRequestCard(item, true)}
             />
           )}
         </div>

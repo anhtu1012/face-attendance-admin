@@ -1,120 +1,348 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { Card, DatePicker, Table, Button, Tag, Tooltip } from "antd";
-import { DownloadOutlined, DollarOutlined, RiseOutlined, FallOutlined, TrophyOutlined, CalendarOutlined, BankOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { SalaryReportItem } from "@/dtos/bao-cao/bao-cao-luong/bao-cao-luong.response.dto";
+import { DailySalaryDetail } from "@/dtos/bao-cao/bao-cao-luong/daily-salary-detail.dto";
+import BaoCaoSalaryServices from "@/services/bao-cao/bao-cao-luong.service";
+import {
+  BankOutlined,
+  CalendarOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  DollarOutlined,
+  DownloadOutlined,
+  FallOutlined,
+  FireOutlined,
+  RiseOutlined,
+  TrophyOutlined,
+} from "@ant-design/icons";
+import { Button, Card, DatePicker, Table, Tag, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
+import { useCallback, useEffect, useState } from "react";
 import "./UserSalaryTab.scss";
+import { PiPersonSimpleRun } from "react-icons/pi";
+import { formatCurrency } from "@/utils/client/formatCurrency";
 
 interface UserSalaryTabProps {
   userId: string;
 }
 
-interface SalaryData {
-  date: string;
-  totalSalary: number;
-  workSalary: number;
-  otSalary: number;
-  bonus: number;
-  totalFine: number;
-  isHoliday: boolean;
-  userId: string;
-  fullNameUser: string;
-  fullNameManager: string;
-  positionName: string;
-  departmentName: string;
-  note?: string;
-}
-
-const { RangePicker } = DatePicker;
-
 function UserSalaryTab({ userId }: UserSalaryTabProps) {
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([
-    dayjs().startOf("month"),
-    dayjs().endOf("month"),
-  ]);
+  const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
   const [loading, setLoading] = useState(false);
-  const [salaryData, setSalaryData] = useState<SalaryData[]>([]);
-
+  const [salaryData, setSalaryData] = useState<SalaryReportItem[]>([]);
+  const [salaryDataReport, setSalaryDataReport] =
+    useState<SalaryReportItem | null>(null);
+  const [dailyDetails, setDailyDetails] = useState<
+    Record<string, DailySalaryDetail[]>
+  >({});
+  const [loadingDetails, setLoadingDetails] = useState<Record<string, boolean>>(
+    {}
+  );
   const fetchSalaryData = useCallback(async () => {
     setLoading(true);
     try {
-      // Mock data - replace with actual API call
-      const mockData: SalaryData[] = [
+      const res = await BaoCaoSalaryServices.getSalaryReport([], undefined, {
+        userId,
+        year: selectedMonth.year(),
+      });
+      const resMonth = await BaoCaoSalaryServices.getSalaryReport(
+        [],
+        undefined,
         {
-          date: "2024-11-15",
-          totalSalary: 15000000,
-          workSalary: 12000000,
-          otSalary: 3000000,
-          bonus: 500000,
-          totalFine: 200000,
-          isHoliday: false,
-          userId: userId,
-          fullNameUser: "Phạm Hoàng Phúc",
-          fullNameManager: "Anh Nhím",
-          positionName: "Frontend Developer",
-          departmentName: "Phòng Phát triển phần mềm",
-          note: "Lương tháng 11",
-        },
-        {
-          date: "2024-10-15",
-          totalSalary: 14500000,
-          workSalary: 12000000,
-          otSalary: 2500000,
-          bonus: 0,
-          totalFine: 0,
-          isHoliday: false,
-          userId: userId,
-          fullNameUser: "Phạm Hoàng Phúc",
-          fullNameManager: "Anh Nhím",
-          positionName: "Frontend Developer",
-          departmentName: "Phòng Phát triển phần mềm",
-          note: "Lương tháng 10",
-        },
-        {
-          date: "2024-09-15",
-          totalSalary: 16000000,
-          workSalary: 12000000,
-          otSalary: 3000000,
-          bonus: 1000000,
-          totalFine: 0,
-          isHoliday: false,
-          userId: userId,
-          fullNameUser: "Phạm Hoàng Phúc",
-          fullNameManager: "Anh Nhím",
-          positionName: "Frontend Developer",
-          departmentName: "Phòng Phát triển phần mềm",
-          note: "Lương tháng 9 + thưởng dự án",
-        },
-      ];
-
-      setSalaryData(mockData);
+          userId,
+          year: selectedMonth.year(),
+          month: selectedMonth.month() + 1,
+        }
+      );
+      setSalaryDataReport(resMonth.data[0] || null);
+      setSalaryData(res.data);
     } catch (error) {
       console.error("Error fetching salary data:", error);
     } finally {
       setLoading(false);
     }
-  }, [userId, dateRange]);
+  }, [userId, selectedMonth]);
+
+  // Fetch chi tiết lương theo ngày khi expand row
+  const fetchDailyDetails = async (
+    monthKey: string,
+    record: SalaryReportItem
+  ) => {
+    // Nếu đã có dữ liệu thì không fetch lại
+    if (dailyDetails[monthKey]) {
+      return;
+    }
+
+    setLoadingDetails((prev) => ({ ...prev, [monthKey]: true }));
+    try {
+      // record.date may come as "MM/YYYY" (e.g. "11/2025").
+      // Safely parse month/year and build start/end ISO strings.
+      let monthDate = dayjs(record.date);
+      const parts = String(record.date).split("/");
+      if (parts.length === 2) {
+        const m = parseInt(parts[0], 10);
+        const y = parseInt(parts[1], 10);
+        if (!Number.isNaN(m) && !Number.isNaN(y)) {
+          monthDate = dayjs(new Date(y, m - 1, 1));
+        }
+      }
+
+      const param = {
+        userId,
+        fromDate: monthDate.startOf("month").toISOString(),
+        toDate: monthDate.endOf("month").toISOString(),
+      };
+      const response = await BaoCaoSalaryServices.getMonthlySalaryDetail(param);
+      setDailyDetails((prev) => ({
+        ...prev,
+        [monthKey]: response.data,
+      }));
+    } catch (error) {
+      console.error("Error fetching daily details:", error);
+    } finally {
+      setLoadingDetails((prev) => ({ ...prev, [monthKey]: false }));
+    }
+  };
+
+  const onExpand = async (expanded: boolean, record: SalaryReportItem) => {
+    const monthKey = record.date;
+    if (expanded) {
+      await fetchDailyDetails(monthKey, record);
+    }
+  };
 
   useEffect(() => {
     fetchSalaryData();
   }, [fetchSalaryData]);
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(value);
-  };
 
   const handleExport = () => {
     // Export logic here
     console.log("Exporting salary data...");
   };
 
-  const columns: ColumnsType<SalaryData> = [
+  // Render status attendance icon
+  const renderStatusIcon = (status: string) => {
+    const statusMap: Record<
+      string,
+      { icon: React.ReactElement; color: string; text: string }
+    > = {
+      PENDING: {
+        color: "processing",
+        icon: <CheckCircleOutlined />,
+        text: "Chưa bắt đầu",
+      },
+      START_ONTIME: {
+        color: "success",
+        icon: <CheckCircleOutlined />,
+        text: "Đã check-in",
+      },
+      START_LATE: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Check-in muộn",
+      },
+      END_ONTIME: {
+        color: "success",
+        icon: <CheckCircleOutlined />,
+        text: "Hoàn thành",
+      },
+      END_EARLY: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Về sớm",
+      },
+      END_LATE: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Đi trễ",
+      },
+      NOT_WORK: {
+        color: "default",
+        icon: <CheckCircleOutlined />,
+        text: "Không có chấm công",
+      },
+      FORGET_LOG: {
+        color: "error",
+        icon: <CheckCircleOutlined />,
+        text: "Quên chấm công",
+      },
+    };
+
+    const statusInfo = statusMap[status] || {
+      icon: <CalendarOutlined />,
+      color: "default",
+      text: status,
+    };
+
+    return (
+      <Tag icon={statusInfo.icon} color={statusInfo.color}>
+        {statusInfo.text}
+      </Tag>
+    );
+  };
+
+  // Render hệ số lương
+  const renderSalaryCoefficient = (ratio: string, isHoliday: boolean) => {
+    const coef = parseFloat(ratio);
+    let color = "default";
+    let icon = null;
+
+    if (isHoliday || coef >= 3) {
+      color = "red";
+      icon = <FireOutlined />;
+    } else if (coef >= 2) {
+      color = "orange";
+      icon = <RiseOutlined />;
+    } else if (coef > 1) {
+      color = "blue";
+    }
+
+    return (
+      <Tag icon={icon} color={color} style={{ fontWeight: 700 }}>
+        x{ratio}
+      </Tag>
+    );
+  };
+
+  // Columns cho bảng chi tiết theo ngày
+  const dailyColumns: ColumnsType<DailySalaryDetail> = [
+    {
+      title: "Ngày",
+      dataIndex: "date",
+      key: "date",
+      width: 120,
+      render: (date: string, record: DailySalaryDetail) => (
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontWeight: 700, color: "#1565c0" }}>
+            {dayjs(date).format("DD/MM")}
+          </div>
+          {record.isHoliday && (
+            <Tag color="red" style={{ fontSize: "10px", marginTop: 4 }}>
+              Ngày lễ
+            </Tag>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      width: 140,
+      render: (status: string) => renderStatusIcon(status),
+    },
+    {
+      title: "Hệ số",
+      dataIndex: "ratio",
+      key: "ratio",
+      width: 90,
+      align: "center",
+      render: (ratio: string, record: DailySalaryDetail) =>
+        renderSalaryCoefficient(ratio, record.isHoliday),
+    },
+    {
+      title: "Giờ vào",
+      dataIndex: "checkInTime",
+      key: "checkInTime",
+      width: 100,
+      render: (time?: string) => time || "—",
+    },
+    {
+      title: "Giờ ra",
+      dataIndex: "checkOutTime",
+      key: "checkOutTime",
+      width: 100,
+      render: (time?: string) => time || "—",
+    },
+
+    {
+      title: "Lương",
+      dataIndex: "workSalary",
+      key: "workSalary",
+      width: 140,
+      align: "right",
+      render: (value: number) => (
+        <span style={{ fontWeight: 600, color: "#0288d1" }}>
+          {formatCurrency(value)}
+        </span>
+      ),
+    },
+    {
+      title: "Lương OT",
+      dataIndex: "otSalary",
+      key: "otSalary",
+      width: 140,
+      align: "right",
+      render: (value: number) =>
+        value > 0 ? (
+          <span style={{ fontWeight: 600, color: "#722ed1" }}>
+            {formatCurrency(value)}
+          </span>
+        ) : (
+          "—"
+        ),
+    },
+    {
+      title: "Phạt",
+      dataIndex: "fineAmount",
+      key: "fineAmount",
+      width: 120,
+      align: "right",
+      render: (value?: number) =>
+        value && value > 0 ? (
+          <span style={{ fontWeight: 600, color: "#f44336" }}>
+            -{formatCurrency(value)}
+          </span>
+        ) : (
+          "—"
+        ),
+    },
+    {
+      title: "Tổng",
+      dataIndex: "totalSalary",
+      key: "totalSalary",
+      width: 160,
+      fixed: "right",
+      align: "right",
+      render: (value: number) => (
+        <span
+          style={{
+            fontWeight: 800,
+            fontSize: "15px",
+            color: "#0d47a1",
+          }}
+        >
+          {formatCurrency(value)}
+        </span>
+      ),
+    },
+  ];
+
+  // Render expanded row content
+  const expandedRowRender = (record: SalaryReportItem) => {
+    const monthKey = record.date;
+    const details = dailyDetails[monthKey] || [];
+    const isLoading = loadingDetails[monthKey] || false;
+
+    return (
+      <div className="expanded-content">
+        <Table
+          columns={dailyColumns}
+          dataSource={details}
+          loading={isLoading}
+          rowKey="date"
+          pagination={false}
+          size="small"
+          className="daily-details-table"
+          scroll={{ x: 1200 }}
+        />
+      </div>
+    );
+  };
+
+  const columns: ColumnsType<SalaryReportItem> = [
     {
       title: (
         <span>
@@ -126,16 +354,33 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
       key: "date",
       width: 140,
       fixed: "left",
-      render: (date: string) => {
-        const monthYear = dayjs(date).format("MM/YYYY");
+      render: (date: string, record: SalaryReportItem) => {
         return (
-          <Tooltip title={`Kỳ lương tháng ${monthYear}`}>
+          <Tooltip title={`Kỳ lương tháng ${date}`}>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontWeight: 700, color: "#1565c0", fontSize: "15px" }}>
-                {dayjs(date).format("DD/MM/YYYY")}
+              <div
+                style={{ fontWeight: 700, color: "#1565c0", fontSize: "15px" }}
+              >
+                {date}
               </div>
-              <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 600 }}>
-                Tháng {dayjs(date).format("MM")}
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: `${
+                    record.status === "PAID"
+                      ? "#0d5802ff"
+                      : record.status === "STOP"
+                      ? "#be0404ff"
+                      : "#c07e04ff"
+                  }`,
+                  fontWeight: 600,
+                }}
+              >
+                {record.status === "PAID"
+                  ? "Đã trả"
+                  : record.status === "STOP"
+                  ? "Tạm dừng"
+                  : "Đang tính"}
               </div>
             </div>
           </Tooltip>
@@ -151,32 +396,41 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
           Tổng lương
         </span>
       ),
-      dataIndex: "totalSalary",
-      key: "totalSalary",
+      dataIndex: "workSalary",
+      key: "workSalary",
       width: 200,
-      render: (value: number, record: SalaryData) => {
-        const netSalary = value - record.totalFine;
+      render: (value: number, record: SalaryReportItem) => {
         return (
-          <Tooltip title={
-            <div>
-              <div>Tổng cộng: {formatCurrency(value)}</div>
-              <div>Thực nhận: {formatCurrency(netSalary)}</div>
-            </div>
-          }>
+          <Tooltip
+            title={
+              <div>
+                <div>Tổng cộng: {formatCurrency(value)}</div>
+                <div>Thực nhận: {formatCurrency(record.totalSalary)}</div>
+              </div>
+            }
+          >
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontWeight: 800, fontSize: "17px", color: "#0d47a1" }}>
+              <div
+                style={{ fontWeight: 800, fontSize: "17px", color: "#0d47a1" }}
+              >
                 {formatCurrency(value)}
               </div>
               {record.totalFine > 0 && (
-                <div style={{ fontSize: "11px", color: "#f44336", fontWeight: 600 }}>
-                  Thực nhận: {formatCurrency(netSalary)}
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "#f44336",
+                    fontWeight: 600,
+                  }}
+                >
+                  Thực nhận: {formatCurrency(record.totalSalary)}
                 </div>
               )}
             </div>
           </Tooltip>
         );
       },
-      sorter: (a, b) => a.totalSalary - b.totalSalary,
+      sorter: (a, b) => a.workSalary - b.workSalary,
     },
     {
       title: (
@@ -185,8 +439,8 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
           Lương CB
         </span>
       ),
-      dataIndex: "workSalary",
-      key: "workSalary",
+      dataIndex: "grossSalary",
+      key: "grossSalary",
       width: 170,
       render: (value: number) => (
         <Tooltip title="Lương cơ bản">
@@ -195,7 +449,7 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
           </span>
         </Tooltip>
       ),
-      sorter: (a, b) => a.workSalary - b.workSalary,
+      sorter: (a, b) => a.grossSalary - b.grossSalary,
     },
     {
       title: (
@@ -209,43 +463,27 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
       width: 170,
       render: (value: number) => (
         <Tooltip title="Lương làm thêm giờ">
-          <div style={{
-            fontWeight: 600,
-            fontSize: "14px",
-            color: "#722ed1",
-            padding: "4px 10px",
-            background: value > 0 ? "linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%)" : "transparent",
-            borderRadius: "8px",
-            display: "inline-block",
-          }}>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: "14px",
+              color: "#722ed1",
+              padding: "4px 10px",
+              background:
+                value > 0
+                  ? "linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%)"
+                  : "transparent",
+              borderRadius: "8px",
+              display: "inline-block",
+            }}
+          >
             {formatCurrency(value)}
           </div>
         </Tooltip>
       ),
       sorter: (a, b) => a.otSalary - b.otSalary,
     },
-    {
-      title: (
-        <span>
-          <TrophyOutlined style={{ marginRight: 6 }} />
-          Thưởng
-        </span>
-      ),
-      dataIndex: "bonus",
-      key: "bonus",
-      width: 170,
-      render: (value: number) =>
-        value > 0 ? (
-          <Tooltip title={`Tiền thưởng: ${formatCurrency(value)}`}>
-            <Tag icon={<RiseOutlined />} color="success" style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}>
-              +{formatCurrency(value)}
-            </Tag>
-          </Tooltip>
-        ) : (
-          <span style={{ color: "#cbd5e1", fontWeight: 600 }}>—</span>
-        ),
-      sorter: (a, b) => a.bonus - b.bonus,
-    },
+
     {
       title: (
         <span>
@@ -259,7 +497,11 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
       render: (value: number) =>
         value > 0 ? (
           <Tooltip title={`Tiền phạt: ${formatCurrency(value)}`}>
-            <Tag icon={<FallOutlined />} color="error" style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}>
+            <Tag
+              icon={<FallOutlined />}
+              color="error"
+              style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}
+            >
               -{formatCurrency(value)}
             </Tag>
           </Tooltip>
@@ -269,67 +511,97 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
       sorter: (a, b) => a.totalFine - b.totalFine,
     },
     {
-      title: "🎉 Loại ngày",
-      dataIndex: "isHoliday",
-      key: "isHoliday",
-      width: 120,
-      render: (value: boolean) =>
-        value ? (
-          <Tooltip title="Ngày lễ - Hệ số lương cao hơn">
-            <Tag color="orange" style={{ fontWeight: 600, fontSize: "13px" }}>
-              🎊 Ngày lễ
+      title: (
+        <span>
+          <TrophyOutlined style={{ marginRight: 6 }} />
+          Tổng giờ làm
+        </span>
+      ),
+      dataIndex: "totalWorkHour",
+      key: "totalWorkHour",
+      width: 170,
+      render: (value: number) =>
+        value > 0 ? (
+          <Tooltip title={`Tổng: ${value} giờ`}>
+            <Tag
+              icon={<RiseOutlined />}
+              color="success"
+              style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}
+            >
+              {value} giờ
             </Tag>
           </Tooltip>
         ) : (
-          <Tag color="default" style={{ fontWeight: 500, fontSize: "12px" }}>
-            Thường
-          </Tag>
+          <span style={{ color: "#cbd5e1", fontWeight: 600 }}>—</span>
         ),
-      filters: [
-        { text: "Ngày lễ", value: true },
-        { text: "Ngày thường", value: false },
-      ],
-      onFilter: (value, record) => record.isHoliday === value,
+      sorter: (a, b) => a.totalWorkHour - b.totalWorkHour,
     },
     {
-      title: "📝 Ghi chú",
-      dataIndex: "note",
-      key: "note",
-      ellipsis: { showTitle: false },
-      render: (note: string) => (
-        <Tooltip title={note || "Không có ghi chú"}>
-          <span style={{ color: note ? "#475569" : "#cbd5e1", fontWeight: 500, fontStyle: note ? "normal" : "italic" }}>
-            {note || "—"}
-          </span>
-        </Tooltip>
+      title: (
+        <span>
+          <TrophyOutlined style={{ marginRight: 6 }} />
+          Tổng ngày làm
+        </span>
       ),
+      dataIndex: "totalWorkDay",
+      key: "totalWorkDay",
+      width: 170,
+      render: (value: number) =>
+        value > 0 ? (
+          <Tooltip title={`Tổng: ${value} ngày`}>
+            <Tag
+              icon={<RiseOutlined />}
+              color="success"
+              style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}
+            >
+              {value} ngày
+            </Tag>
+          </Tooltip>
+        ) : (
+          <span style={{ color: "#cbd5e1", fontWeight: 600 }}>—</span>
+        ),
+      sorter: (a, b) => a.totalWorkDay - b.totalWorkDay,
+    },
+    {
+      title: (
+        <span>
+          <PiPersonSimpleRun style={{ marginRight: 6 }} />
+          Tổng số lần đi trễ
+        </span>
+      ),
+      dataIndex: "lateCount",
+      key: "lateCount",
+      width: 170,
+      render: (value: number) =>
+        value > 0 ? (
+          <Tooltip title={`Số lần đi trễ: ${value}`}>
+            <Tag
+              icon={<RiseOutlined />}
+              color="error"
+              style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}
+            >
+              {value} lần
+            </Tag>
+          </Tooltip>
+        ) : (
+          <span style={{ color: "#cbd5e1", fontWeight: 600 }}>—</span>
+        ),
+      sorter: (a, b) => a.lateCount - b.lateCount,
     },
   ];
-
-  // Calculate total salary
-  const totalSalary = salaryData.reduce(
-    (sum, item) => sum + item.totalSalary,
-    0
-  );
-  const totalWorkSalary = salaryData.reduce(
-    (sum, item) => sum + item.workSalary,
-    0
-  );
-  const totalOtSalary = salaryData.reduce((sum, item) => sum + item.otSalary, 0);
-  const totalBonus = salaryData.reduce((sum, item) => sum + item.bonus, 0);
-  const totalFine = salaryData.reduce((sum, item) => sum + item.totalFine, 0);
 
   return (
     <div className="user-salary-tab">
       {/* Date Range Selector */}
       <div className="date-range-selector">
-        <RangePicker
-          value={dateRange}
-          onChange={(dates) => dates && setDateRange(dates as [Dayjs, Dayjs])}
-          format="DD/MM/YYYY"
-          placeholder={["Từ ngày", "Đến ngày"]}
+        <DatePicker
+          picker="month"
+          value={selectedMonth}
+          onChange={(date) => date && setSelectedMonth(date)}
+          format="MM/YYYY"
+          placeholder="Chọn tháng"
           size="large"
-          className="date-range-picker"
+          className="month-picker"
         />
         <Button
           type="primary"
@@ -351,7 +623,9 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
             </div>
             <div className="summary-content">
               <div className="label">Tổng lương</div>
-              <div className="value">{formatCurrency(totalSalary)}</div>
+              <div className="value">
+                {formatCurrency(salaryDataReport?.totalSalary || 0)}
+              </div>
             </div>
             <div className="summary-badge">💰</div>
           </div>
@@ -361,7 +635,9 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
             </div>
             <div className="summary-content">
               <div className="label">Lương cơ bản</div>
-              <div className="value">{formatCurrency(totalWorkSalary)}</div>
+              <div className="value">
+                {formatCurrency(salaryDataReport?.grossSalary || 0)}
+              </div>
             </div>
           </div>
           <div className="summary-item summary-ot">
@@ -370,7 +646,9 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
             </div>
             <div className="summary-content">
               <div className="label">Lương OT</div>
-              <div className="value">{formatCurrency(totalOtSalary)}</div>
+              <div className="value">
+                {formatCurrency(salaryDataReport?.otSalary || 0)}
+              </div>
             </div>
           </div>
           <div className="summary-item summary-bonus">
@@ -378,8 +656,10 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
               <TrophyOutlined />
             </div>
             <div className="summary-content">
-              <div className="label">Tổng thưởng</div>
-              <div className="value">{formatCurrency(totalBonus)}</div>
+              <div className="label">Phụ cấp</div>
+              <div className="value">
+                {formatCurrency(salaryDataReport?.totalAllowance || 0)}
+              </div>
             </div>
             <div className="summary-badge">🎁</div>
           </div>
@@ -389,7 +669,9 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
             </div>
             <div className="summary-content">
               <div className="label">Tổng phạt</div>
-              <div className="value">{formatCurrency(totalFine)}</div>
+              <div className="value">
+                {formatCurrency(salaryDataReport?.totalFine || 0)}
+              </div>
             </div>
           </div>
         </div>
@@ -399,10 +681,8 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
       <Card
         title={
           <div className="table-header">
-            <span className="table-title">💳 Chi tiết lương</span>
-            <span className="table-subtitle">
-              {dateRange[0].format("DD/MM/YYYY")} - {dateRange[1].format("DD/MM/YYYY")}
-            </span>
+            <span className="table-title">💳 Lịch sử lương </span>
+            <span className="table-subtitle">{selectedMonth.year()}</span>
           </div>
         }
         className="detail-card"
@@ -412,6 +692,23 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
           dataSource={salaryData}
           loading={loading}
           rowKey="date"
+          expandable={{
+            expandedRowRender,
+            onExpand,
+            expandRowByClick: false,
+            expandIcon: ({ expanded, onExpand, record }) => (
+              <Button
+                type="text"
+                size="small"
+                icon={expanded ? "▼" : "▶"}
+                onClick={(e) => onExpand(record, e)}
+                style={{
+                  color: "#1565c0",
+                  fontWeight: "bold",
+                }}
+              />
+            ),
+          }}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
@@ -427,4 +724,3 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
 }
 
 export default UserSalaryTab;
-

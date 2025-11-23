@@ -173,7 +173,7 @@ const TimekeepingTable = forwardRef<TableTimekeepingRef, TableTimekeepingProps>(
     );
 
     return (
-      <div className="timekeeping-table-wrapper">
+      <div>
         <TimekeepingDetailModal
           open={modalOpen}
           onClose={handleCloseModal}

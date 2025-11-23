@@ -6,6 +6,8 @@ export const NguoiDungItemSchema = z.object({
   id: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
+  positionName: z.string().optional(),
+  userCode: z.string().optional(),
   userName: z.string(),
   password: z.string(),
   roleId: z.string(),

@@ -1,57 +1,66 @@
-export interface HRUser {
-  id: string;
-  fullName: string;
-  email: string;
-  phone?: string;
-  avatar?: string;
-  department?: string;
-  position?: string;
-  status: "active" | "inactive";
-}
+import { z } from "zod";
 
-export interface ShareJobRequest {
-  jobCode: string;
-  toUserId: string;
-  message?: string;
-}
+export const HRUserSchema = z.object({
+  id: z.string(),
+  fullName: z.string(),
+  email: z.string(),
+  phone: z.string().optional(),
+  avatar: z.string().optional(),
+  department: z.string().optional(),
+  position: z.string().optional(),
+  status: z.enum(["active", "inactive"]),
+});
 
-export interface ShareJobResponse {
-  id: string;
-  jobCode: string;
-  fromUserId: string;
-  toUserId: string;
-  message?: string;
-  status: "pending" | "accepted" | "rejected";
-  createdAt: string;
-  updatedAt?: string;
-}
+export type HRUser = z.infer<typeof HRUserSchema>;
 
-export interface JobShareRequest {
-  id: string;
-  jobCode: string;
-  jobTitle: string;
-  fromUser: {
-    id: string;
-    fullName: string;
-    email: string;
-    avatar?: string;
-  };
-  toUser: {
-    id: string;
-    fullName: string;
-    email: string;
-    avatar?: string;
-  };
-  status: "pending" | "accepted" | "rejected";
-  createdAt: string;
-  message?: string;
-}
+export const ShareJobRequestSchema = z.object({
+  jobId: z.string(),
+  assignedHrId: z.string(),
+  hrId: z.string().optional(),
+});
+export type ShareJobRequest = z.infer<typeof ShareJobRequestSchema>;
 
-export interface AcceptShareRequest {
-  requestId: string;
-}
+export const ShareJobResponseSchema = z.object({
+  id: z.string(),
+  jobCode: z.string(),
+  fromUserId: z.string(),
+  toUserId: z.string(),
+  message: z.string().optional(),
+  status: z.enum(["PENDING", "ACCEPTED", "REJECTED", "INACTIVE"]),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+});
+export type ShareJobResponse = z.infer<typeof ShareJobResponseSchema>;
 
-export interface RejectShareRequest {
-  requestId: string;
-  reason?: string;
-}
+export const JobShareRequestSchema = z.object({
+  id: z.string(),
+  jobCode: z.string(),
+  jobTitle: z.string(),
+  fromUser: z.object({
+    id: z.string(),
+    fullName: z.string(),
+    email: z.string(),
+    avatar: z.string().optional(),
+  }),
+  toUser: z.object({
+    id: z.string(),
+    fullName: z.string(),
+    email: z.string(),
+    avatar: z.string().optional(),
+  }),
+  status: z.enum(["PENDING", "ACCEPTED", "REJECTED", "INACTIVE"]),
+  createdAt: z.string(),
+  message: z.string().optional(),
+});
+export type JobShareRequest = z.infer<typeof JobShareRequestSchema>;
+
+export const AcceptShareRequestSchema = z.object({
+  requestId: z.string(),
+});
+export type AcceptShareRequest = z.infer<typeof AcceptShareRequestSchema>;
+
+export const RejectShareRequestSchema = z.object({
+  requestId: z.string(),
+  reason: z.string().optional(),
+});
+export type RejectShareRequest = z.infer<typeof RejectShareRequestSchema>;

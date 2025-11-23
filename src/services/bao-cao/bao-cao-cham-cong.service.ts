@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
+import { TimekeepingReportData } from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
 import {
   TimekeepingDetailReportResponse,
   TimekeepingReportResponse,
@@ -15,6 +16,18 @@ class BaoCaoChamCongServicesBase extends AxiosService {
   ): Promise<TimekeepingReportResponse> {
     return this.getWithFilter(
       `${this.basePath}/bao-cao-cham-cong`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
+  async getTimekeepingReportByUser(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<TimekeepingReportData> {
+    return this.getWithFilter(
+      `/v1/time-keeping/thong-ke-cham-cong`,
       searchFilter,
       quickSearchText,
       params

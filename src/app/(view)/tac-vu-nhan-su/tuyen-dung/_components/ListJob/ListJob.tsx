@@ -107,7 +107,9 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
   const fetchPendingRequestsCount = async () => {
     try {
       const requests = await JobServices.getShareRequests();
-      const pendingCount = requests.filter((req) => req.status === "pending").length;
+      const pendingCount = requests.data.filter(
+        (req) => req.status === "PENDING"
+      ).length;
       setPendingRequestsCount(pendingCount);
     } catch (error) {
       console.log("Error fetching share requests count:", error);
@@ -115,12 +117,7 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
   };
 
   useEffect(() => {
-    // Fetch pending requests count when component mounts
     fetchPendingRequestsCount();
-
-    // Refresh count every 30 seconds
-    const interval = setInterval(fetchPendingRequestsCount, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   // Listen for global 'jobCreated' events so this list can refresh automatically

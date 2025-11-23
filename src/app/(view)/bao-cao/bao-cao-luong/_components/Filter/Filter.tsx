@@ -1,12 +1,12 @@
 "use client";
 import Cbutton from "@/components/basicUI/Cbutton";
-import CRangePicker from "@/components/basicUI/CrangePicker";
+import CdatePicker from "@/components/basicUI/CdatePicker";
 import Cselect from "@/components/Cselect";
 import { useSelectData } from "@/hooks/useSelectData";
 import { Col, Form, Row } from "antd";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FilterProps, FilterRef, FormValues } from "../../_types/prop";
 import "./Filter.scss";
@@ -18,13 +18,6 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
     fetchDepartment: true,
     fetchRole: true,
   });
-
-  const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(
-    dayjs().startOf("month")
-  );
-  const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(
-    dayjs().endOf("month")
-  );
 
   useImperativeHandle(ref, () => ({
     getFormValues: () => {
@@ -41,7 +34,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
         className="fiter-form"
         onFinish={onSubmit}
         initialValues={{
-          month: [dayjs().startOf("month"), dayjs().endOf("month")],
+          month: dayjs().startOf("month"),
         }}
         style={{ padding: "15px 20px" }}
       >
@@ -50,18 +43,11 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
             <Row gutter={[6, 6]}>
               <Col span={24}>
                 <Form.Item name="month" style={{ width: "100%" }}>
-                  <CRangePicker
-                    label={["Từ ngày", "Đến ngày"]}
-                    placeholder={["", ""]}
+                  <CdatePicker
+                    picker="month"
+                    label="Chọn tháng"
                     style={{ width: "100%", height: "36px" }}
-                    format={"DD/MM/YYYY"}
-                    value={startDate && endDate ? [startDate, endDate] : null}
-                    onChange={(dates) => {
-                      if (dates) {
-                        setStartDate(dates[0]);
-                        setEndDate(dates[1]);
-                      }
-                    }}
+                    format={"MM/YYYY"}
                   />
                 </Form.Item>
               </Col>
@@ -72,19 +58,13 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
                     label="Phòng ban"
                     allowClear
                     options={selectDepartment}
-                    placeholder="Chọn phòng ban"
                   />
                 </Form.Item>
               </Col>
 
               <Col span={24}>
                 <Form.Item name="positionId">
-                  <Cselect
-                    label="Chức vụ"
-                    allowClear
-                    options={selectRole}
-                    placeholder="Chọn chức vụ"
-                  />
+                  <Cselect label="Chức vụ" allowClear options={selectRole} />
                 </Form.Item>
               </Col>
             </Row>
@@ -107,9 +87,7 @@ const Filter = forwardRef<FilterRef, FilterProps>(({ onSubmit }, ref) => {
                 height: "36px",
                 fontWeight: "bold",
               }}
-              icon={
-                <AiOutlineLoading3Quarters size={20} className="loading-icon" />
-              }
+              icon={<AiOutlineLoading3Quarters size={20} />}
               onClick={() => form.submit()}
             >
               {t("query")}

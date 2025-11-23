@@ -529,6 +529,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
         open={shareModalOpen}
         onClose={() => setShareModalOpen(false)}
         jobCode={jobDetails.jobCode ?? ""}
+        jobId={String(jobDetails.id)}
         jobTitle={jobDetails.jobTitle ?? ""}
         onShareSuccess={() => {
           messageApi.success("Đã gửi yêu cầu chia sẻ công việc!");

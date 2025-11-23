@@ -1,131 +1,59 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import {
-  Card,
-  Col,
-  DatePicker,
-  Row,
-  Statistic,
-  Table,
-  Tag,
-  Button,
-  Tooltip,
-} from "antd";
-import {
-  DownloadOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  FireOutlined,
   CalendarOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  DownloadOutlined,
   FieldTimeOutlined,
+  FireOutlined,
 } from "@ant-design/icons";
+import { Button, Card, Col, DatePicker, Row, Table, Tag, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
+import { useCallback, useEffect, useState } from "react";
 import "./UserTimekeepingTab.scss";
+import BaoCaoChamCongServices from "@/services/bao-cao/bao-cao-cham-cong.service";
+import {
+  TimekeepingDetailItem,
+  TimekeepingReportData,
+} from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
 
 interface UserTimekeepingTabProps {
   userId: string;
 }
 
-interface TimekeepingSummary {
-  actualTimekeeping: number;
-  monthStandardTimekeeping: number;
-  actualHour: number;
-  monthStandardHour: number;
-  lateNumber: number;
-  earlyNumber: number;
-  offWorkNumber: number;
-  forgetLogNumber: number;
-  normalOtTimekeeping: number;
-  normalOtHour: number;
-  offDayOtTimekeeping: number;
-  offDayOtHour: number;
-  holidayOtTimekeeping: number;
-  holidayOtHour: number;
-  lateFine: string;
-  forgetLogFine: string;
-  userId: string;
-  fullNameUser: string;
-  fullNameManager: string;
-  positionName: string;
-  departmentName: string;
-}
-
-interface TimekeepingDetail {
-  date: string;
-  checkIn: string;
-  checkOut: string;
-  workHours: number;
-  status: string;
-  note: string;
-}
-
 function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
   const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
   const [loading, setLoading] = useState(false);
-  const [summary, setSummary] = useState<TimekeepingSummary | null>(null);
-  const [details, setDetails] = useState<TimekeepingDetail[]>([]);
+  const [summary, setSummary] = useState<TimekeepingReportData | null>(null);
+  const [details, setDetails] = useState<TimekeepingDetailItem[]>([]);
 
   const fetchTimekeepingData = useCallback(async () => {
     setLoading(true);
     try {
-      // Mock data - replace with actual API call
-      const mockSummary: TimekeepingSummary = {
-        actualTimekeeping: 3,
-        monthStandardTimekeeping: 20,
-        actualHour: 24,
-        monthStandardHour: 160,
-        lateNumber: 1,
-        earlyNumber: 1,
-        offWorkNumber: 7,
-        forgetLogNumber: 0,
-        normalOtTimekeeping: 0,
-        normalOtHour: 0,
-        offDayOtTimekeeping: 2.25,
-        offDayOtHour: 9,
-        holidayOtTimekeeping: 0,
-        holidayOtHour: 0,
-        lateFine: "0",
-        forgetLogFine: "0",
-        userId: userId,
-        fullNameUser: "Phạm Hoàng Phúc",
-        fullNameManager: "Anh Nhím",
-        positionName: "Frontend Developer",
-        departmentName: "Phòng Phát triển phần mềm",
-      };
+      const res = await BaoCaoChamCongServices.getTimekeepingReportByUser(
+        [],
+        undefined,
+        {
+          userId: userId,
+          month: selectedMonth.format("MM"),
+        }
+      );
+      const resDetail = await BaoCaoChamCongServices.getTimekeepingReportDetail(
+        [],
+        undefined,
+        {
+          userId: userId,
+          startTime: selectedMonth.startOf("month").toISOString(),
+          endTime: selectedMonth.endOf("month").toISOString(),
+        }
+      );
 
-      const mockDetails: TimekeepingDetail[] = [
-        {
-          date: "2024-11-01",
-          checkIn: "08:30:00",
-          checkOut: "17:30:00",
-          workHours: 8,
-          status: "Đúng giờ",
-          note: "",
-        },
-        {
-          date: "2024-11-02",
-          checkIn: "09:15:00",
-          checkOut: "17:20:00",
-          workHours: 7.5,
-          status: "Đi muộn",
-          note: "Đi muộn 15 phút",
-        },
-        {
-          date: "2024-11-03",
-          checkIn: "08:00:00",
-          checkOut: "18:30:00",
-          workHours: 9.5,
-          status: "Tăng ca",
-          note: "Tăng ca 1.5 giờ",
-        },
-      ];
-
-      setSummary(mockSummary);
-      setDetails(mockDetails);
+      setSummary(res);
+      setDetails(resDetail.data);
     } catch (error) {
       console.error("Error fetching timekeeping data:", error);
     } finally {
@@ -138,19 +66,62 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
   }, [fetchTimekeepingData]);
 
   const getStatusConfig = (status: string) => {
-    const configs: any = {
-      "Đúng giờ": { color: "success", icon: <CheckCircleOutlined /> },
-      "Đi muộn": { color: "warning", icon: <ClockCircleOutlined /> },
-      "Về sớm": { color: "warning", icon: <ClockCircleOutlined /> },
-      Nghỉ: { color: "error", icon: <CloseCircleOutlined /> },
-      "Tăng ca": { color: "blue", icon: <FireOutlined /> },
+    const configs: Record<
+      string,
+      { color: string; icon: React.ReactNode; text: string }
+    > = {
+      PENDING: {
+        color: "processing",
+        icon: <CheckCircleOutlined />,
+        text: "Chưa bắt đầu",
+      },
+      START_ONTIME: {
+        color: "success",
+        icon: <CheckCircleOutlined />,
+        text: "Đã check-in",
+      },
+      START_LATE: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Check-in muộn",
+      },
+      END_ONTIME: {
+        color: "success",
+        icon: <CheckCircleOutlined />,
+        text: "Hoàn thành",
+      },
+      END_EARLY: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Về sớm",
+      },
+      END_LATE: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Đi trễ",
+      },
+      NOT_WORK: {
+        color: "default",
+        icon: <CheckCircleOutlined />,
+        text: "Không có chấm công",
+      },
+      FORGET_LOG: {
+        color: "error",
+        icon: <CheckCircleOutlined />,
+        text: "Quên chấm công",
+      },
     };
+
     return (
-      configs[status] || { color: "default", icon: <ClockCircleOutlined /> }
+      configs[status] || {
+        color: "default",
+        icon: <ClockCircleOutlined />,
+        text: status || "Không xác định",
+      }
     );
   };
 
-  const columns: ColumnsType<TimekeepingDetail> = [
+  const columns: ColumnsType<TimekeepingDetailItem> = [
     {
       title: (
         <span>
@@ -195,14 +166,25 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
           Giờ vào
         </span>
       ),
-      dataIndex: "checkIn",
-      key: "checkIn",
-      width: 110,
+      dataIndex: "checkinTime",
+      key: "checkinTime",
+      width: 140,
       render: (time: string) => (
-        <Tooltip title="Thời gian check-in">
-          <span style={{ fontWeight: 600, fontSize: "14px", color: "#0288d1" }}>
-            {time}
-          </span>
+        <Tooltip
+          title={time ? `Thời gian check-in: ${time}` : "Chưa có thời gian"}
+        >
+          <div className="time-cell">
+            <div className={`time-badge checkin ${time ? "active" : "empty"}`}>
+              {time ? (
+                <CheckCircleOutlined style={{ color: "#fff", fontSize: 14 }} />
+              ) : (
+                <CloseCircleOutlined
+                  style={{ color: "#94a3b8", fontSize: 14 }}
+                />
+              )}
+              <span className="time-text">{time ?? "—"}</span>
+            </div>
+          </div>
         </Tooltip>
       ),
     },
@@ -213,14 +195,25 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
           Giờ ra
         </span>
       ),
-      dataIndex: "checkOut",
-      key: "checkOut",
-      width: 110,
+      dataIndex: "checkoutTime",
+      key: "checkoutTime",
+      width: 140,
       render: (time: string) => (
-        <Tooltip title="Thời gian check-out">
-          <span style={{ fontWeight: 600, fontSize: "14px", color: "#f57c00" }}>
-            {time}
-          </span>
+        <Tooltip
+          title={time ? `Thời gian check-out: ${time}` : "Chưa có thời gian"}
+        >
+          <div className="time-cell">
+            <div className={`time-badge checkout ${time ? "active" : "empty"}`}>
+              {time ? (
+                <ClockCircleOutlined style={{ color: "#fff", fontSize: 14 }} />
+              ) : (
+                <CloseCircleOutlined
+                  style={{ color: "#94a3b8", fontSize: 14 }}
+                />
+              )}
+              <span className="time-text">{time ?? "—"}</span>
+            </div>
+          </div>
         </Tooltip>
       ),
     },
@@ -231,9 +224,9 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
           Giờ công
         </span>
       ),
-      dataIndex: "workHours",
-      key: "workHours",
-      width: 120,
+      dataIndex: "totalWorkHour",
+      key: "totalWorkHour",
+      width: 150,
       render: (hours: number) => {
         const isFullDay = hours >= 8;
         return (
@@ -245,7 +238,7 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
                 color: isFullDay ? "#52c41a" : "#faad14",
                 padding: "4px 12px",
                 background: isFullDay ? "#f6ffed" : "#fffbe6",
-                borderRadius: "8px",
+                borderRadius: "20px",
                 border: `2px solid ${isFullDay ? "#b7eb8f" : "#ffe58f"}`,
                 display: "inline-block",
               }}
@@ -255,7 +248,7 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
           </Tooltip>
         );
       },
-      sorter: (a, b) => a.workHours - b.workHours,
+      sorter: (a, b) => a.totalWorkHour - b.totalWorkHour,
     },
     {
       title: (
@@ -271,37 +264,51 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
         const config = getStatusConfig(status);
         return (
           <Tag
+            className="status-tag"
             color={config.color}
             icon={config.icon}
-            style={{ fontWeight: 600, fontSize: "13px" }}
+            style={{
+              fontWeight: 700,
+              fontSize: "15px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+            }}
           >
-            {status}
+            {config.text ?? status}
           </Tag>
         );
       },
-      filters: [
-        { text: "Đúng giờ", value: "Đúng giờ" },
-        { text: "Đi muộn", value: "Đi muộn" },
-        { text: "Về sớm", value: "Về sớm" },
-        { text: "Nghỉ", value: "Nghỉ" },
-        { text: "Tăng ca", value: "Tăng ca" },
-      ],
       onFilter: (value, record) => record.status === value,
     },
     {
-      title: "📝 Ghi chú",
-      dataIndex: "note",
-      key: "note",
-      ellipsis: { showTitle: false },
-      render: (note: string) => (
-        <Tooltip title={note || "Không có ghi chú"}>
-          <span
-            style={{ color: note ? "#475569" : "#cbd5e1", fontWeight: 500 }}
-          >
-            {note || "—"}
-          </span>
-        </Tooltip>
+      title: (
+        <span>
+          <FireOutlined style={{ marginRight: 6 }} />
+          Tăng ca
+        </span>
       ),
+      dataIndex: "hasOT",
+      key: "hasOT",
+      width: 150,
+      render: (hasOT: boolean) => {
+        return (
+          <Tag
+            className="ot-tag"
+            color={hasOT ? "purple" : "default"}
+            icon={hasOT ? <FireOutlined /> : <CloseCircleOutlined />}
+            style={{
+              fontWeight: 700,
+              fontSize: "15px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+            }}
+          >
+            {hasOT ? "Có OT" : "Không OT"}
+          </Tag>
+        );
+      },
+
+      onFilter: (value, record) => record.status === value,
     },
   ];
 

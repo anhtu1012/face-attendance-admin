@@ -1,15 +1,20 @@
 "use client";
 
-import { useRef } from "react";
-import { Modal, Tag, Typography } from "antd";
-import { ClockCircleOutlined } from "@ant-design/icons";
-import { AgGridReact } from "@ag-grid-community/react";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import { ExtendedColDef } from "@/components/basicUI/cTableAG/interface/agProps";
+import { AgGridReact } from "@ag-grid-community/react";
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  FireOutlined,
+} from "@ant-design/icons";
+import { Modal, Tag, Tooltip, Typography } from "antd";
+import { useRef } from "react";
 
+import { TimekeepingDetailItem } from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
 import dayjs from "dayjs";
 import "./TimekeepingDetailModal.scss";
-import { TimekeepingDetailItem } from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
 
 const { Text } = Typography;
 
@@ -35,18 +40,41 @@ export default function TimekeepingDetailModal({
       width: 180,
       editable: false,
       pinned: "left",
+      autoHeight: true,
+      cellStyle: {
+        whiteSpace: "normal",
+        lineHeight: "16px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      },
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
         const dateObj = dayjs(params.data.date);
+        const dayOfWeek = dayjs(dateObj).format("dddd");
         return (
-          <div style={{ padding: "4px 0" }}>
-            <div style={{ fontWeight: 600, fontSize: "13px" }}>
-              {dateObj.format("DD/MM/YYYY")} -
-              <span style={{ color: "#999", fontSize: "11px" }}>
-                {dateObj.format("dddd")}
-              </span>
+          <Tooltip
+            title={`${dayOfWeek}, ${dayjs(dateObj).format("DD/MM/YYYY")}`}
+          >
+            <div style={{ textAlign: "center", padding: "10px" }}>
+              <div
+                style={{ fontWeight: 700, color: "#1565c0", fontSize: "15px" }}
+              >
+                {dayjs(dateObj).format("DD/MM/YYYY")}
+              </div>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "#94a3b8",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                }}
+              >
+                {dayjs(dateObj).format("ddd")}
+              </div>
             </div>
-          </div>
+          </Tooltip>
         );
       },
     },
@@ -116,13 +144,21 @@ export default function TimekeepingDetailModal({
       editable: false,
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
-        return params.data.hasOT ? (
-          <Tag color="success" style={{ margin: 0 }}>
-            Có
-          </Tag>
-        ) : (
-          <Tag color="default" style={{ margin: 0 }}>
-            Không
+        return (
+          <Tag
+            className="ot-tag"
+            color={params.data.hasOT ? "purple" : "default"}
+            icon={
+              params.data.hasOT ? <FireOutlined /> : <CloseCircleOutlined />
+            }
+            style={{
+              fontWeight: 700,
+              fontSize: "15px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+            }}
+          >
+            {params.data.hasOT ? "Có" : "Không"}
           </Tag>
         );
       },
@@ -136,22 +172,66 @@ export default function TimekeepingDetailModal({
       cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
         if (!params.data) return null;
         const status = params.data.status;
-        const statusConfig: Record<string, { color: string; text: string }> = {
-          PENDING: { color: "processing", text: "Chưa bắt đầu" },
-          START_ONTIME: { color: "success", text: "Đã check-in" },
-          START_LATE: { color: "warning", text: "Check-in muộn" },
-          END_ONTIME: { color: "success", text: "Hoàn thành" },
-          END_EARLY: { color: "warning", text: "Về sớm" },
-          END_LATE: { color: "warning", text: "Đi trễ" },
-          NOT_WORK: { color: "default", text: "Không có chấm công" },
-          FORGET_LOG: { color: "error", text: "Quên chấm công" },
+        const statusConfig: Record<
+          string,
+          { color: string; icon: React.ReactNode; text: string }
+        > = {
+          PENDING: {
+            color: "processing",
+            icon: <CheckCircleOutlined />,
+            text: "Chưa bắt đầu",
+          },
+          START_ONTIME: {
+            color: "success",
+            icon: <CheckCircleOutlined />,
+            text: "Đã check-in",
+          },
+          START_LATE: {
+            color: "warning",
+            icon: <CheckCircleOutlined />,
+            text: "Check-in muộn",
+          },
+          END_ONTIME: {
+            color: "success",
+            icon: <CheckCircleOutlined />,
+            text: "Hoàn thành",
+          },
+          END_EARLY: {
+            color: "warning",
+            icon: <CheckCircleOutlined />,
+            text: "Về sớm",
+          },
+          END_LATE: {
+            color: "warning",
+            icon: <CheckCircleOutlined />,
+            text: "Đi trễ",
+          },
+          NOT_WORK: {
+            color: "default",
+            icon: <CheckCircleOutlined />,
+            text: "Không có chấm công",
+          },
+          FORGET_LOG: {
+            color: "error",
+            icon: <CheckCircleOutlined />,
+            text: "Quên chấm công",
+          },
         };
         const config = statusConfig[status] || {
           color: "default",
           text: status,
         };
         return (
-          <Tag color={config.color} style={{ margin: 0 }}>
+          <Tag
+            color={config.color}
+            icon={config.icon}
+            style={{
+              fontWeight: 700,
+              fontSize: "15px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+            }}
+          >
             {config.text}
           </Tag>
         );
@@ -171,7 +251,7 @@ export default function TimekeepingDetailModal({
       }
       open={open}
       onCancel={onClose}
-      width={1100}
+      width={1200}
       footer={null}
       className="timekeeping-detail-modal"
     >
@@ -190,9 +270,8 @@ export default function TimekeepingDetailModal({
           checkboxes: false,
         }}
         columnFlex={1}
-        maxRowsVisible={15}
+        maxRowsVisible={10}
         exportDecorated={true}
-        domLayout="autoHeight"
       />
     </Modal>
   );

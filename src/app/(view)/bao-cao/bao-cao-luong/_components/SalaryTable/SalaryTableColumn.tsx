@@ -1,7 +1,8 @@
-import React from "react";
-import { SalaryReportData } from "../../_types/prop";
 import { ExtendedColDef } from "@/components/basicUI/cTableAG/interface/agProps";
-
+import { SalaryReportItem } from "@/dtos/bao-cao/bao-cao-luong/bao-cao-luong.response.dto";
+import { formatCurrency } from "@/utils/client/formatCurrency";
+import { FallOutlined, RiseOutlined } from "@ant-design/icons";
+import { Tag, Tooltip } from "antd";
 export const getSalaryTableColumn = (): ExtendedColDef[] => {
   return [
     {
@@ -12,10 +13,10 @@ export const getSalaryTableColumn = (): ExtendedColDef[] => {
       editable: false,
       autoHeight: true,
       cellStyle: { whiteSpace: "normal", lineHeight: "16px" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return null;
         return (
-          <div style={{ padding: "4px 0" }}>
+          <div style={{ padding: "10px 0" }}>
             <div style={{ fontWeight: 600, fontSize: "13px" }}>
               {params.data.fullNameUser}
             </div>
@@ -27,32 +28,43 @@ export const getSalaryTableColumn = (): ExtendedColDef[] => {
       },
     },
     {
-      headerName: "Người quản lý",
-      field: "fullNameManager",
-      width: 180,
-      editable: false,
-      cellStyle: { textAlign: "center" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
-        if (!params.data) return null;
-        return (
-          <span style={{ fontWeight: 500, fontSize: "13px" }}>
-            {params.data.fullNameManager}
-          </span>
-        );
-      },
-    },
-    {
-      headerName: "Ngày",
+      headerName: "Tháng",
       field: "date",
       width: 130,
       editable: false,
-      cellStyle: { textAlign: "center" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
+      autoHeight: true,
+      cellStyle: { whiteSpace: "normal", lineHeight: "16px" },
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return null;
         return (
-          <span style={{ fontWeight: 500, fontSize: "13px" }}>
-            {params.data.date}
-          </span>
+          <Tooltip title={`Kỳ lương tháng ${params.data.date}`}>
+            <div style={{ textAlign: "center" }}>
+              <div
+                style={{ fontWeight: 700, color: "#1565c0", fontSize: "15px" }}
+              >
+                {params.data.date}
+              </div>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: `${
+                    params.data.status === "PAID"
+                      ? "#0d5802ff"
+                      : params.data.status === "STOP"
+                      ? "#be0404ff"
+                      : "#c07e04ff"
+                  }`,
+                  fontWeight: 600,
+                }}
+              >
+                {params.data.status === "PAID"
+                  ? "Đã trả"
+                  : params.data.status === "STOP"
+                  ? "Tạm dừng"
+                  : "Đang tính"}
+              </div>
+            </div>
+          </Tooltip>
         );
       },
     },
@@ -61,37 +73,96 @@ export const getSalaryTableColumn = (): ExtendedColDef[] => {
       field: "totalSalary",
       width: 150,
       editable: false,
-      cellStyle: { textAlign: "right", fontWeight: "bold" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
+      autoHeight: true,
+      cellStyle: { whiteSpace: "normal", lineHeight: "16px" },
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return null;
         return (
-          <span style={{ fontSize: "14px", color: "#52c41a" }}>
-            {params.data.totalSalary.toLocaleString("vi-VN")} ₫
-          </span>
+          <Tooltip
+            title={
+              <div>
+                <div>Tổng cộng: {formatCurrency(params.data.workSalary)}</div>
+                <div>Thực nhận: {formatCurrency(params.data.totalSalary)}</div>
+              </div>
+            }
+          >
+            <div style={{ textAlign: "center" }}>
+              <div
+                style={{
+                  fontWeight: 800,
+                  fontSize: "17px",
+                  color: "#0d47a1",
+                  textAlign: "center",
+                }}
+              >
+                {params.data.workSalary > 0
+                  ? formatCurrency(params.data.totalSalary)
+                  : "--"}
+              </div>
+              {params.data.totalFine > 0 && (
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "#f44336",
+                    fontWeight: 600,
+                  }}
+                >
+                  Thực nhận: {formatCurrency(params.data.totalSalary)}
+                </div>
+              )}
+            </div>
+          </Tooltip>
         );
       },
-      valueGetter: (params: { data?: SalaryReportData }) => {
+      valueGetter: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return "";
         return params.data.totalSalary;
       },
     },
     {
-      headerName: "Lương công việc",
-      field: "workSalary",
+      headerName: "Lương cơ bản",
+      field: "grossSalary",
       width: 150,
       editable: false,
       cellStyle: { textAlign: "right" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return null;
         return (
-          <span style={{ fontSize: "13px", color: "#1890ff" }}>
-            {params.data.workSalary.toLocaleString("vi-VN")} ₫
-          </span>
+          <Tooltip title="Lương cơ bản">
+            <span
+              style={{ fontWeight: 600, fontSize: "14px", color: "#0288d1" }}
+            >
+              {formatCurrency(params.data?.grossSalary || 0)}
+            </span>
+          </Tooltip>
         );
       },
-      valueGetter: (params: { data?: SalaryReportData }) => {
+      valueGetter: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return "";
-        return params.data.workSalary;
+        return params.data.grossSalary;
+      },
+    },
+    {
+      headerName: "Phụ cấp",
+      field: "totalAllowance",
+      width: 150,
+      editable: false,
+      cellStyle: { textAlign: "right" },
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
+        if (!params.data) return null;
+        return (
+          <Tooltip title="Phụ cấp">
+            <span
+              style={{ fontWeight: 600, fontSize: "14px", color: "#0288d1" }}
+            >
+              {formatCurrency(params.data?.totalAllowance || 0)}
+            </span>
+          </Tooltip>
+        );
+      },
+      valueGetter: (params: { data?: SalaryReportItem }) => {
+        if (!params.data) return "";
+        return params.data.totalAllowance;
       },
     },
     {
@@ -100,40 +171,33 @@ export const getSalaryTableColumn = (): ExtendedColDef[] => {
       width: 140,
       editable: false,
       cellStyle: { textAlign: "right" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return null;
-        const color = params.data.otSalary > 0 ? "#fa8c16" : "#8c8c8c";
+
         return (
-          <span style={{ fontSize: "13px", color }}>
-            {params.data.otSalary.toLocaleString("vi-VN")} ₫
-          </span>
+          <Tooltip title="Lương làm thêm giờ">
+            <div
+              style={{
+                fontWeight: 600,
+                fontSize: "14px",
+                color: "#722ed1",
+                padding: "4px 10px",
+                background:
+                  params.data.otSalary > 0
+                    ? "linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%)"
+                    : "transparent",
+                borderRadius: "8px",
+                display: "inline-block",
+              }}
+            >
+              {formatCurrency(params.data.otSalary)}
+            </div>
+          </Tooltip>
         );
       },
-      valueGetter: (params: { data?: SalaryReportData }) => {
+      valueGetter: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return "";
         return params.data.otSalary;
-      },
-    },
-    {
-      headerName: "Có OT",
-      field: "hasOT",
-      width: 120,
-      editable: false,
-      cellStyle: { textAlign: "center" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
-        if (!params.data) return null;
-        const hasOT = params.data.hasOT > 0;
-        return (
-          <span
-            style={{
-              fontSize: "13px",
-              color: hasOT ? "#52c41a" : "#8c8c8c",
-              fontWeight: 600,
-            }}
-          >
-            {hasOT ? "Có" : "Không"}
-          </span>
-        );
       },
     },
     {
@@ -142,40 +206,109 @@ export const getSalaryTableColumn = (): ExtendedColDef[] => {
       width: 140,
       editable: false,
       cellStyle: { textAlign: "right" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return null;
-        const color = params.data.totalFine > 0 ? "#ff4d4f" : "#52c41a";
         return (
-          <span style={{ fontSize: "13px", color, fontWeight: 600 }}>
-            {params.data.totalFine.toLocaleString("vi-VN")} ₫
-          </span>
+          <Tooltip
+            title={`Tiền phạt: ${formatCurrency(params.data.totalFine)}`}
+          >
+            <Tag
+              icon={<FallOutlined />}
+              color="error"
+              style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}
+            >
+              -{formatCurrency(params.data.totalFine)}
+            </Tag>
+          </Tooltip>
         );
       },
-      valueGetter: (params: { data?: SalaryReportData }) => {
+      valueGetter: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return "";
         return params.data.totalFine;
       },
     },
     {
-      headerName: "Ngày lễ",
-      field: "isHoliday",
-      width: 120,
+      headerName: "Tổng giờ làm",
+      field: "totalWorkHour",
+      width: 170,
       editable: false,
-      cellStyle: { textAlign: "center" },
-      cellRenderer: (params: { data?: SalaryReportData }) => {
+      cellStyle: { textAlign: "right" },
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
         if (!params.data) return null;
-        const isHoliday = params.data.isHoliday > 0;
-        return (
-          <span
-            style={{
-              fontSize: "13px",
-              color: isHoliday ? "#722ed1" : "#8c8c8c",
-              fontWeight: 600,
-            }}
-          >
-            {isHoliday ? "Có" : "Không"}
-          </span>
+        const value = params.data.totalWorkHour;
+        return value > 0 ? (
+          <Tooltip title={`Tổng: ${value} giờ`}>
+            <Tag
+              icon={<RiseOutlined />}
+              color="success"
+              style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}
+            >
+              {value.toFixed(2)} giờ
+            </Tag>
+          </Tooltip>
+        ) : (
+          <span style={{ color: "#cbd5e1", fontWeight: 600 }}>—</span>
         );
+      },
+      valueGetter: (params: { data?: SalaryReportItem }) => {
+        if (!params.data) return "";
+        return params.data.totalWorkHour;
+      },
+    },
+    {
+      headerName: "Tổng ngày làm",
+      field: "totalWorkDay",
+      width: 170,
+      editable: false,
+      cellStyle: { textAlign: "right" },
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
+        if (!params.data) return null;
+        const value = params.data.totalWorkDay;
+        return value > 0 ? (
+          <Tooltip title={`Tổng: ${value} ngày`}>
+            <Tag
+              icon={<RiseOutlined />}
+              color="success"
+              style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}
+            >
+              {value} ngày
+            </Tag>
+          </Tooltip>
+        ) : (
+          <span style={{ color: "#cbd5e1", fontWeight: 600 }}>—</span>
+        );
+      },
+      valueGetter: (params: { data?: SalaryReportItem }) => {
+        if (!params.data) return "";
+        return params.data.totalWorkDay;
+      },
+    },
+    {
+      headerName: "Tổng số lần đi trễ",
+      field: "lateCount",
+      width: 170,
+      editable: false,
+      cellStyle: { textAlign: "right" },
+      cellRenderer: (params: { data?: SalaryReportItem }) => {
+        if (!params.data) return null;
+        const value = params.data.lateCount;
+        return value > 0 ? (
+          <Tooltip title={`Số lần đi trễ: ${value}`}>
+            <Tag
+              icon={<RiseOutlined />}
+              color="error"
+              style={{ fontWeight: 700, fontSize: "14px", padding: "6px 14px" }}
+            >
+              {value} lần
+            </Tag>
+          </Tooltip>
+        ) : (
+          <span style={{ color: "#cbd5e1", fontWeight: 600 }}>—</span>
+        );
+      },
+      valueGetter: (params: { data?: SalaryReportItem }) => {
+        if (!params.data) return "";
+        return params.data.lateCount;
       },
     },
   ];

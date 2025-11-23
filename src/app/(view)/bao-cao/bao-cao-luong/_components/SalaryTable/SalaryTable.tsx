@@ -2,8 +2,11 @@
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import AgGridComponent from "@/components/basicUI/cTableAG";
 import { ExtendedColDef } from "@/components/basicUI/cTableAG/interface/agProps";
+import { SalaryReportItem } from "@/dtos/bao-cao/bao-cao-luong/bao-cao-luong.response.dto";
+import BaoCaoSalaryServices from "@/services/bao-cao/bao-cao-luong.service";
 import { AgGridReact } from "@ag-grid-community/react";
 import { FilterOperationType } from "@chax-at/prisma-filter-common";
+import dayjs from "dayjs";
 import {
   forwardRef,
   useCallback,
@@ -16,7 +19,6 @@ import {
   FormValues,
   TableSalaryProps,
   TableSalaryRef,
-  SalaryReportData,
 } from "../../_types/prop";
 import "./SalaryTable.scss";
 import { getSalaryTableColumn } from "./SalaryTableColumn";
@@ -29,7 +31,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
     const [totalItem, setTotalItems] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(defaultPageSize);
     const [, setLoading] = useState(true);
-    const [rowData, setRowData] = useState<SalaryReportData[]>([]);
+    const [rowData, setRowData] = useState<SalaryReportItem[]>([]);
     const gridRef = useRef<AgGridReact>(null);
     const [quickSearchText] = useState<string | undefined>(undefined);
 
@@ -58,6 +60,12 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
             filterRef.current?.getFormValues() || {};
 
           const params = {
+            ...(filterValues.month
+              ? { year: dayjs(filterValues.month).format("YYYY") }
+              : {}),
+            ...(filterValues.month
+              ? { date: dayjs(filterValues.month).format("MM/YYYY") }
+              : {}),
             ...(filterValues.departmentId
               ? { departmentId: filterValues.departmentId }
               : {}),
@@ -66,54 +74,14 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
               : {}),
           };
 
-          console.log(params, searchFilter, quickSearchText);
+          const res = await BaoCaoSalaryServices.getSalaryReport(
+            searchFilter,
+            quickSearchText,
+            params
+          );
 
-          // Mock data - replace with actual API call
-          setRowData([
-            {
-              date: "2024-06-15",
-              totalSalary: 100000,
-              workSalary: 80000,
-              otSalary: 80000,
-              hasOT: 80000,
-              totalFine: 80000,
-              isHoliday: 80000,
-              userId: "1",
-              fullNameUser: "Nguyễn Anh Tú",
-              fullNameManager: "Phạm Văn A",
-              positionName: "Frontend Developer",
-              departmentName: "Kỹ thuật",
-            },
-            {
-              date: "2024-06-16",
-              totalSalary: 120000,
-              workSalary: 90000,
-              otSalary: 30000,
-              hasOT: 1,
-              totalFine: 0,
-              isHoliday: 0,
-              userId: "2",
-              fullNameUser: "Trần Thị B",
-              fullNameManager: "Phạm Văn A",
-              positionName: "Backend Developer",
-              departmentName: "Kỹ thuật",
-            },
-            {
-              date: "2024-06-17",
-              totalSalary: 95000,
-              workSalary: 80000,
-              otSalary: 20000,
-              hasOT: 1,
-              totalFine: 5000,
-              isHoliday: 0,
-              userId: "3",
-              fullNameUser: "Lê Văn C",
-              fullNameManager: "Nguyễn Văn D",
-              positionName: "UI/UX Designer",
-              departmentName: "Thiết kế",
-            },
-          ]);
-          setTotalItems(3);
+          setRowData(res.data);
+          setTotalItems(res.count);
           setLoading(false);
         } catch (error) {
           console.error("Error fetching salary data:", error);
