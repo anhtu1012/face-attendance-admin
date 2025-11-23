@@ -654,7 +654,8 @@ $signature-gradient-end: #1e88e5; // rgb(30, 136, 229)
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        
+        background: #fff;
+
         @media (max-width: 768px) {
           height: 8rem; // Smaller height on mobile
           border: 2px solid var(--primary-color);
@@ -1261,7 +1262,7 @@ $signature-gradient-end: #1e88e5; // rgb(30, 136, 229)
       page-break-after: always;
       margin: 0;
       padding: 0;
-      
+
       &:last-child {
         page-break-after: auto;
       }
@@ -1270,7 +1271,7 @@ $signature-gradient-end: #1e88e5; // rgb(30, 136, 229)
         position: relative;
         margin: 0;
         padding: 0;
-        
+
         canvas {
           display: block;
           margin: 0;
