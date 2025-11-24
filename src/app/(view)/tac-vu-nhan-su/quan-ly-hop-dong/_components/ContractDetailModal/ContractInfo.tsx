@@ -190,7 +190,7 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
           span={2}
         >
           <Text strong style={{ fontSize: "16px", color: "#52c41a" }}>
-            {contract.grossSalary} VNĐ
+            {formatCurrency(contract.grossSalary)}
           </Text>
         </Descriptions.Item>
 

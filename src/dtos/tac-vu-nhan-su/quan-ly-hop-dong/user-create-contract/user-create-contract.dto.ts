@@ -17,6 +17,9 @@ export const UserCreateContractItemSchema = z.object({
   currentAddress: z.string().max(255),
   nationality: z.string(),
   fullNameManager: z.string().optional(),
+  departmentId: z.string().optional(),
+  departmentName: z.string().optional(),
+  positionId: z.string().optional(),
   isActive: z.boolean().optional(),
   status: z.string().nullable().optional(),
 });

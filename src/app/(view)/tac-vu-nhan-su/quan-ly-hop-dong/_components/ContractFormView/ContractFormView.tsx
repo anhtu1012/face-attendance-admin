@@ -88,7 +88,7 @@ function ContractFormView({
         userId: contract.userId,
         contractTypeId: contract.contractTypeId,
         positionId: contract.positionId,
-        departmentId: contract.departmentId,
+        departmentId: selectedUser?.departmentId,
         grossSalary: parseFloat(contract.grossSalary) / 1_000_000, // Convert to millions
         allowanceIds: contract.allowanceInfors?.map((a) => a.allowanceId),
       });
@@ -512,6 +512,10 @@ function ContractFormView({
                 onContractTypeChange(selectedType.label);
               }
             }
+          }}
+          initialValues={{
+            departmentId:
+              contractDetailData?.contract.departmentId || undefined,
           }}
           className="modern-form"
         >

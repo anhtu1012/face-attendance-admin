@@ -142,6 +142,7 @@ class SocketRoomManager {
 
         case 6: // HR
           rooms.push({ room: `hr_${userIdStr}`, userId: userIdStr });
+          rooms.push({ room: `hr_all`, userId: userIdStr });
           break;
 
         default:
