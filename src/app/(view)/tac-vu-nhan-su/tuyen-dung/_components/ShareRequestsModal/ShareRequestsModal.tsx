@@ -1,6 +1,11 @@
 "use client";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 // import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import { JobShareRequest } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-share.dto";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import QuanLyDonTuServices from "@/services/tac-vu-nhan-su/quan-ly-don-tu/quan-ly-don-tu.service";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import { getDowFromDate } from "@/utils/client/getDowFromDate";
 import {
   Avatar,
   Badge,
@@ -15,11 +20,8 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { FaCheck, FaClock, FaTimes, FaUser, FaUserCheck } from "react-icons/fa";
-import "./ShareRequestsModal.scss";
-import { JobShareRequest } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-share.dto";
-import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
 import { useSelector } from "react-redux";
-import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import "./ShareRequestsModal.scss";
 
 interface ShareRequestsModalProps {
   open: boolean;
@@ -69,70 +71,39 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
     }
   }, [open]);
 
-  const handleAcceptRequest = async (requestId: string) => {
-    setActionLoading(requestId);
+  const handleRequest = async (
+    request: JobShareRequest,
+    status: "ACCEPTED" | "REJECTED" | "INACTIVE"
+  ) => {
+    setActionLoading(request.id);
     try {
-      // Uncomment when API is ready
-      // await JobServices.acceptShareRequest({ requestId });
-
-      // Simulate API call
-      setTimeout(() => {
-        setShareRequests((prev) =>
-          prev.map((req) =>
-            req.id === requestId ? { ...req, status: "ACCEPTED" as const } : req
-          )
-        );
-        messageApi.success("Đã chấp nhận yêu cầu chia sẻ!");
-        setActionLoading(null);
-        onRequestUpdate?.();
-      }, 500);
+      const dow = getDowFromDate(request.createdAt || undefined);
+      const res = await QuanLyDonTuServices.approveQuanLyDonTu(request.id, {
+        status,
+        response: status === "ACCEPTED" ? "Đồng ý" : "Từ chối",
+        dow,
+      });
+      messageApi.success(
+        status === "ACCEPTED"
+          ? "Đã chấp nhận yêu cầu chia sẻ!"
+          : " Đã từ chối yêu cầu chia sẻ!"
+      );
+      setShareRequests((prev) =>
+        prev.map((req) =>
+          req.id === request.id
+            ? {
+                ...req,
+                status: res.status,
+                response: res.response,
+              }
+            : req
+        )
+      );
+      setActionLoading(null);
+      onRequestUpdate?.();
     } catch (error) {
       console.error("Error accepting request:", error);
       messageApi.error("Không thể chấp nhận yêu cầu!");
-      setActionLoading(null);
-    }
-  };
-
-  const handleRejectRequest = async (requestId: string) => {
-    setActionLoading(requestId);
-    try {
-      // Uncomment when API is ready
-      // await JobServices.rejectShareRequest({ requestId });
-
-      // Simulate API call
-      setTimeout(() => {
-        setShareRequests((prev) =>
-          prev.map((req) =>
-            req.id === requestId ? { ...req, status: "REJECTED" as const } : req
-          )
-        );
-        messageApi.success("Đã từ chối yêu cầu chia sẻ!");
-        setActionLoading(null);
-        onRequestUpdate?.();
-      }, 500);
-    } catch (error) {
-      console.error("Error rejecting request:", error);
-      messageApi.error("Không thể từ chối yêu cầu!");
-      setActionLoading(null);
-    }
-  };
-
-  const handleCancelRequest = async (requestId: string) => {
-    setActionLoading(requestId);
-    try {
-      // Uncomment when API is ready
-      // await JobServices.cancelShareRequest(requestId);
-
-      // Simulate API call
-      setTimeout(() => {
-        setShareRequests((prev) => prev.filter((req) => req.id !== requestId));
-        messageApi.success("Đã hủy yêu cầu!");
-        setActionLoading(null);
-        onRequestUpdate?.();
-      }, 500);
-    } catch (error) {
-      console.error("Error cancelling request:", error);
-      messageApi.error("Không thể hủy yêu cầu!");
       setActionLoading(null);
     }
   };
@@ -189,7 +160,7 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
                   type="primary"
                   shape="circle"
                   icon={<FaCheck />}
-                  onClick={() => handleAcceptRequest(request.id)}
+                  onClick={() => handleRequest(request, "ACCEPTED")}
                   loading={actionLoading === request.id}
                   className="accept-btn"
                 />
@@ -199,7 +170,7 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
                   danger
                   shape="circle"
                   icon={<FaTimes />}
-                  onClick={() => handleRejectRequest(request.id)}
+                  onClick={() => handleRequest(request, "REJECTED")}
                   loading={actionLoading === request.id}
                   className="reject-btn"
                 />
@@ -212,7 +183,7 @@ const ShareRequestsModal: React.FC<ShareRequestsModalProps> = ({
                 type="text"
                 danger
                 icon={<FaTimes />}
-                onClick={() => handleCancelRequest(request.id)}
+                onClick={() => handleRequest(request, "INACTIVE")}
                 loading={actionLoading === request.id}
               />
             </Tooltip>

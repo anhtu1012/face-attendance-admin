@@ -154,7 +154,7 @@ const ContractSignaturePage: React.FC = () => {
         }
 
         padRef.current = new SignaturePad(canvas, {
-          backgroundColor: "rgb(241, 245, 249)",
+          backgroundColor: "rgb(255, 255, 255)",
           penColor: penColor,
           minWidth: 0.5,
           maxWidth: 2.5,

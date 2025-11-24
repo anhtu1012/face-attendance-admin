@@ -55,7 +55,7 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
       value: "DIRECTOR_SIGNED",
     },
     {
-      label: "Kèm theo phụ lục",
+      label: "Không hoạt động",
       value: "INACTIVE",
     },
     {
@@ -67,7 +67,7 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
       value: "ACTIVE",
     },
     {
-      label: "Hoạt động (PL+)",
+      label: "Hoạt động +",
       value: "ACTIVE_EXTENDED",
     },
   ]);

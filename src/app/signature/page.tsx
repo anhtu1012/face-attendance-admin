@@ -108,7 +108,7 @@ const Signature: React.FC = () => {
       const backgroundStyle =
         signatureBackground === "white"
           ? "rgb(255, 255, 255)"
-          : "rgb(241, 245, 249)";
+          : "rgb(255, 255, 255)";
 
       // Create new signature pad instance with mobile support
       signaturePadRef.current = new SignaturePad(canvas, {

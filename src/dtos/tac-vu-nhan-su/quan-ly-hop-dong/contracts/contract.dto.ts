@@ -43,8 +43,22 @@ export const UserContractItemSchema = z.object({
   contentHtml: z.string(),
   userSignature: z.string(),
   directorSignature: z.string(),
+  fileContract: z.string(),
+  contractTypeName: z.string(),
+  departmentName: z.string(),
+  isSignature: z.boolean(),
+  content: z.string(),
+  grossSalary: z.string(),
   otpVerified: z.boolean(),
   otpVerifiedAt: z.string(),
+  allowanceInfors: z.array(
+    z.object({
+      allowanceId: z.string(),
+      allowanceName: z.string(),
+      allowanceCode: z.string(),
+      value: z.string(),
+    })
+  ),
 });
 
 export type UserContractItem = z.infer<typeof UserContractItemSchema>;
