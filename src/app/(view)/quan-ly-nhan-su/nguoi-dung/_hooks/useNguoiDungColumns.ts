@@ -61,7 +61,7 @@ export function useNguoiDungColumns({
         field: "userName",
         headerName: t("userName"),
         editable: true,
-        width: 180,
+        width: 220,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
           return itemErrorCellStyle(itemId, "userName", params);
@@ -71,7 +71,7 @@ export function useNguoiDungColumns({
         field: "fullName",
         headerName: t("fullName"),
         editable: true,
-        width: 150,
+        width: 250,
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
           return itemErrorCellStyle(itemId, "fullName", params);
@@ -124,7 +124,7 @@ export function useNguoiDungColumns({
         field: "departmentId",
         headerName: t("Department"),
         editable: true,
-        width: 180,
+        width: 250,
         context: {
           typeColumn: "Select",
           selectOptions: selectDepartment,
@@ -138,7 +138,7 @@ export function useNguoiDungColumns({
         field: "positionName",
         headerName: t("positionName"),
         editable: false,
-        width: 150,
+        width: 250,
       },
       {
         field: "isActive",

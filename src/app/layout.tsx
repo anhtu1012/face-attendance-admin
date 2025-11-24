@@ -1,17 +1,18 @@
 import "@/app/globals.css";
+import PageTransition from "@/components/PageTransition";
+import SocketProvider from "@/components/SocketProvider";
+import TitleFromPermissions from "@/components/TitleFromPermissions";
+import AntdMessageProvider from "@/hooks/AntdMessageProvider";
+import NotificationHolder from "@/hooks/NotificationHolder";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AntdThemeProvider from "./AntdThemeProvider";
 import AntdAppProvider from "./AntdAppProvider";
-import AntdMessageProvider from "@/hooks/AntdMessageProvider";
+import AntdThemeProvider from "./AntdThemeProvider";
 import { ReduxProvider } from "./StoreProvider";
-import NotificationHolder from "@/hooks/NotificationHolder";
-import PageTransition from "@/components/PageTransition";
-import SocketProvider from "@/components/SocketProvider";
 // import BubbleCursor from "@/components/BubbleCursor";
 
 export default async function RootLayout({
@@ -28,6 +29,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <ReduxProvider>
+              <TitleFromPermissions />
               <SocketProvider />
               <AntdThemeProvider>
                 <AntdRegistry>
