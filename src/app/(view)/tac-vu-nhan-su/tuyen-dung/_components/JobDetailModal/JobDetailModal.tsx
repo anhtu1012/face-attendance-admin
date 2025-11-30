@@ -280,7 +280,12 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             <div className="progress-item">
               <span>Tỷ lệ ứng tuyển</span>
               <Progress
-                percent={jobDetails.statistics?.applicationRate || 0}
+                percent={
+                  // ensure percent is a number (not the string returned by toFixed)
+                  Math.round(
+                    Number(jobDetails.statistics?.applicationRate ?? 0) * 100
+                  ) / 100
+                }
                 strokeColor={{
                   "0%": "rgb(13, 71, 161)",
                   "100%": "rgb(30, 136, 229)",

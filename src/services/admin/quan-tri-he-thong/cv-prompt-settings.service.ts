@@ -7,39 +7,22 @@ import type {
 } from "@/types/CvPromptSettings";
 
 class CvPromptSettingsServiceBase extends AxiosService {
-  protected readonly basePath = "/api/cv-prompt-settings";
+  protected readonly basePath = "/v1/ai-cv";
 
   /**
    * Get all CV prompt settings
    */
-  async getAll(params?: {
-    isActive?: boolean;
-  }): Promise<{ data: CvPromptSettings[]; total: number }> {
-    const queryParams = new URLSearchParams();
-    if (params?.isActive !== undefined) {
-      queryParams.append("isActive", String(params.isActive));
-    }
-
-    const response = await fetch(`${this.basePath}?${queryParams.toString()}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch CV prompt settings");
-    }
-
-    return response.json();
+  async getAll(): Promise<any> {
+    return this.getWithFilter(`${this.basePath}/get-all-ai-cv-information`);
   }
 
   /**
    * Get default CV prompt settings
    */
   async getDefault(): Promise<{ data: CvPromptSettings; cached: boolean }> {
-    const response = await fetch(`${this.basePath}?default=true`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch default CV prompt settings");
-    }
-
-    return response.json();
+    const params = new URLSearchParams();
+    params.append("default", "true");
+    return this.getWithParams(`${this.basePath}`, params);
   }
 
   /**
@@ -50,20 +33,14 @@ class CvPromptSettingsServiceBase extends AxiosService {
     data: CvPromptSettings;
     message: string;
   }> {
-    const response = await fetch(this.basePath, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    return this.post<
+      {
+        success: boolean;
+        data: CvPromptSettings;
+        message: string;
       },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to create CV prompt settings");
-    }
-
-    return response.json();
+      CreateCvPromptSettingsRequest
+    >(this.basePath, payload);
   }
 
   /**
@@ -77,36 +54,23 @@ class CvPromptSettingsServiceBase extends AxiosService {
     data: CvPromptSettings;
     message: string;
   }> {
-    const response = await fetch(this.basePath, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
+    return this.put<
+      {
+        success: boolean;
+        data: CvPromptSettings;
+        message: string;
       },
-      body: JSON.stringify({ id, ...payload }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to update CV prompt settings");
-    }
-
-    return response.json();
+      UpdateCvPromptSettingsRequest
+    >(this.basePath, { id, ...payload });
   }
 
   /**
    * Delete CV prompt settings
    */
   async deleteById(id: string): Promise<{ success: boolean; message: string }> {
-    const response = await fetch(`${this.basePath}?id=${id}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to delete CV prompt settings");
-    }
-
-    return response.json();
+    return this.delete<{ success: boolean; message: string }>(
+      `${this.basePath}?id=${id}`
+    );
   }
 
   /**

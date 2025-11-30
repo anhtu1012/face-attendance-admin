@@ -34,6 +34,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import "./cv-prompt-settings.scss";
 import { translations } from "./translations";
+import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -57,7 +58,46 @@ function CvPromptSettingsPage() {
     setLoading(true);
     try {
       const response = await CvPromptSettingsService.getAll();
-      setSettings(response.data);
+      // Normalize response to an array and map fields that may come in different shapes
+      // (some APIs return { data, total } while others return an array)
+      // Also handle variations in field names like `matchScoreWeight` vs `matchScoreWeights`
+      // and `analysisInstruction` vs `analysisInstructions`.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const respAny: any = response;
+      let items: any[] = [];
+      if (Array.isArray(respAny)) {
+        items = respAny;
+      } else if (respAny && Array.isArray(respAny.data)) {
+        items = respAny.data;
+      }
+
+      const normalized = items.map((it: any) => {
+        const matchScoreWeights = it.matchScoreWeights ??
+          it.matchScoreWeight ?? {
+            technicalSkills: 0,
+            experience: 0,
+            seniority: 0,
+          };
+
+        const analysisInstructions = it.analysisInstructions ??
+          it.analysisInstruction ?? {
+            summaryGuidelines: [],
+            strengthsGuidelines: [],
+            weaknessesGuidelines: [],
+            generalRules: [],
+            maxStrengthsCount: 3,
+            maxWeaknessesCount: 3,
+            summarySentencesCount: 2,
+          };
+
+        return {
+          ...it,
+          matchScoreWeights,
+          analysisInstructions,
+        };
+      });
+
+      setSettings(normalized);
     } catch (error: any) {
       message.error(error.message || translations.messages.loadError.vi);
       // If no settings in DB, show default
@@ -254,7 +294,7 @@ function CvPromptSettingsPage() {
       width: 150,
       render: (_: any, record: CvPromptSettings) => (
         <Space>
-          {record.isDefault && (
+          {record.isDefault ? (
             <Tooltip title="Cấu hình mặc định / Default configuration">
               <Badge status="warning" />
               <Tag
@@ -264,22 +304,28 @@ function CvPromptSettingsPage() {
                 {translations.status.default.vi}
               </Tag>
             </Tooltip>
+          ) : (
+            <>
+              {" "}
+              <Tooltip
+                title={
+                  record.isActive
+                    ? "Click để vô hiệu hóa / Click to deactivate"
+                    : "Click để kích hoạt / Click to activate"
+                }
+              >
+                <Switch
+                  className="cv-prompt-settings__switch"
+                  checked={record.isActive}
+                  onChange={(checked) =>
+                    handleToggleActive(record.id!, checked)
+                  }
+                  checkedChildren={translations.status.active.vi}
+                  unCheckedChildren={translations.status.inactive.vi}
+                />
+              </Tooltip>
+            </>
           )}
-          <Tooltip
-            title={
-              record.isActive
-                ? "Click để vô hiệu hóa / Click to deactivate"
-                : "Click để kích hoạt / Click to activate"
-            }
-          >
-            <Switch
-              className="cv-prompt-settings__switch"
-              checked={record.isActive}
-              onChange={(checked) => handleToggleActive(record.id!, checked)}
-              checkedChildren={translations.status.active.vi}
-              unCheckedChildren={translations.status.inactive.vi}
-            />
-          </Tooltip>
         </Space>
       ),
     },
@@ -292,22 +338,34 @@ function CvPromptSettingsPage() {
       ),
       key: "weights",
       width: 200,
-      render: (_: any, record: CvPromptSettings) => (
-        <div className="cv-prompt-settings__weights">
-          <div>
-            <span>{translations.weights.technicalSkills.vi}:</span>
-            <span>{record.matchScoreWeights.technicalSkills}%</span>
+      render: (_: any, record: CvPromptSettings) => {
+        const weights =
+          // support both plural and singular field names
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (record as any).matchScoreWeights ??
+            (record as any).matchScoreWeight ?? {
+              technicalSkills: 0,
+              experience: 0,
+              seniority: 0,
+            };
+
+        return (
+          <div className="cv-prompt-settings__weights">
+            <div>
+              <span>{translations.weights.technicalSkills.vi}:</span>
+              <span>{weights.technicalSkills}%</span>
+            </div>
+            <div>
+              <span>{translations.weights.experience.vi}:</span>
+              <span>{weights.experience}%</span>
+            </div>
+            <div>
+              <span>{translations.weights.seniority.vi}:</span>
+              <span>{weights.seniority}%</span>
+            </div>
           </div>
-          <div>
-            <span>{translations.weights.experience.vi}:</span>
-            <span>{record.matchScoreWeights.experience}%</span>
-          </div>
-          <div>
-            <span>{translations.weights.seniority.vi}:</span>
-            <span>{record.matchScoreWeights.seniority}%</span>
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       title: (
@@ -362,36 +420,42 @@ function CvPromptSettingsPage() {
   ];
 
   return (
-    <div className="cv-prompt-settings__container">
-      <Card
-        className="cv-prompt-settings__card"
-        title={
-          <BilingualLabel
-            vi={translations.pageTitle.vi}
-            en={translations.pageTitle.en}
-          />
+    <div>
+      <LayoutContent
+        layoutType={1}
+        content1={
+          <div className="cv-prompt-settings__container">
+            <Card
+              className="cv-prompt-settings__card"
+              title={
+                <BilingualLabel
+                  vi={translations.pageTitle.vi}
+                  en={translations.pageTitle.en}
+                />
+              }
+              extra={
+                <Button
+                  type="primary"
+                  className="cv-prompt-settings__button--create"
+                  icon={<PlusOutlined />}
+                  onClick={handleCreate}
+                >
+                  {translations.createButton.vi}
+                </Button>
+              }
+            >
+              <Table
+                className="cv-prompt-settings__table"
+                loading={loading}
+                dataSource={settings}
+                columns={columns}
+                rowKey="id"
+                pagination={{ pageSize: 10 }}
+              />
+            </Card>
+          </div>
         }
-        extra={
-          <Button
-            type="primary"
-            className="cv-prompt-settings__button--create"
-            icon={<PlusOutlined />}
-            onClick={handleCreate}
-          >
-            {translations.createButton.vi}
-          </Button>
-        }
-      >
-        <Table
-          className="cv-prompt-settings__table"
-          loading={loading}
-          dataSource={settings}
-          columns={columns}
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
-        />
-      </Card>
-
+      />
       <Modal
         className="cv-prompt-settings__modal"
         title={

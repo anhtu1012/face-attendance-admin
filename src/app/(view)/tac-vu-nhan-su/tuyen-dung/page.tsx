@@ -993,10 +993,14 @@ function Page() {
               toolColumnWidth={100}
               showActionButtons={true}
               actionButtonsProps={{
-                hideAdd: selectedStatus !== "LIEN_HE" ? true : false,
-                hideDelete: selectedStatus !== "LIEN_HE" ? true : false,
-                hideDivider: selectedStatus !== "LIEN_HE" ? true : false,
-                hideSave: selectedStatus !== "LIEN_HE" ? true : false,
+                // hideAdd: selectedStatus !== "LIEN_HE" ? true : false,
+                // hideDelete: selectedStatus !== "LIEN_HE" ? true : false,
+                // hideDivider: selectedStatus !== "LIEN_HE" ? true : false,
+                // hideSave: selectedStatus !== "LIEN_HE" ? true : false,
+                hideAdd: true,
+                hideDelete: true,
+                hideDivider: true,
+                hideSave: true,
                 buttonProps: resetButton,
                 onSave: handleSave,
                 onDelete: handleDelete,
