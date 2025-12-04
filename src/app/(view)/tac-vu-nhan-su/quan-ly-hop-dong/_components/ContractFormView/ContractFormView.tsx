@@ -603,16 +603,24 @@ function ContractFormView({
                               getValueProps={(value) => ({
                                 value: value ? dayjs(value) : undefined,
                               })}
+                              normalize={(value) => {
+                                return value
+                                  ? value.startOf("month").toISOString()
+                                  : undefined;
+                              }}
                             >
                               <DatePicker
                                 style={{ width: "100%" }}
-                                format="DD/MM/YYYY"
+                                picker="month"
+                                format="MM/YYYY"
                                 disabledDate={(current) => {
                                   return (
-                                    current && current < dayjs().startOf("day")
+                                    current &&
+                                    current <
+                                      dayjs().add(1, "month").startOf("month")
                                   );
                                 }}
-                                placeholder="Chọn ngày bắt đầu"
+                                placeholder="Chọn tháng bắt đầu"
                                 size="large"
                               />
                             </Form.Item>
