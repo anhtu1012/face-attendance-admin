@@ -40,7 +40,7 @@ export function useNguoiDungData() {
         setLoading(false);
       }
     },
-    [currentPage, mes, pageSize]
+    [mes]
   );
 
   const handlePageChange = (page: number, size: number) => {
