@@ -22,20 +22,14 @@ import {
 } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import "./JobOfferModal.scss";
+import { TuyenDungItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.dto";
 
 const { TextArea } = Input;
-
-interface CandidateData {
-  id: string;
-  fullName: string;
-  email: string;
-  phone: string;
-}
 
 interface JobOfferModalProps {
   open: boolean;
   onClose: () => void;
-  candidateData?: CandidateData | CandidateData[];
+  candidateData: TuyenDungItem | TuyenDungItem[] | null;
   jobId: string;
   onSuccess?: () => void;
 }
@@ -68,6 +62,8 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
 
   // Normalize candidateData to array
   const candidates = useMemo(() => {
+    console.log("candidateData", candidateData);
+
     if (!candidateData) return [];
     return Array.isArray(candidateData) ? candidateData : [candidateData];
   }, [candidateData]);
@@ -92,9 +88,12 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
     const loadTemplates = async () => {
       if (!open) return;
       try {
-        const res = await JobOfferServices.getJobOffers([], undefined, {
+        const param = {
+          fromDate: dayjs().startOf("month").toISOString(),
+          toDate: dayjs().endOf("month").toISOString(),
           jobId: jobId,
-        });
+        };
+        const res = await JobOfferServices.getJobOffers([], undefined, param);
         const data = res?.data || [];
         setScheduleTemplate(data);
         const opts = data.map((t: any) => ({
@@ -147,7 +146,9 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
         jobId: jobId,
         userName: values.userName,
         hrId: userProfile ? String(userProfile.id) : "",
-        listParticipantId: candidates.map((c) => c.id),
+        listParticipantId: candidates
+          .map((c) => c.id)
+          .filter((id): id is string => id !== undefined),
       });
       messageApi.success("Tạo lịch hẹn nhận việc thành công!");
 

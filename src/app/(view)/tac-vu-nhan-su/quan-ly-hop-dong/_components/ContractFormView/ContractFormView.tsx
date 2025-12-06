@@ -306,14 +306,14 @@ function ContractFormView({
     if (startDate && endDate) {
       const start = dayjs(startDate);
       const end = dayjs(endDate);
-      const diffInDays = end.diff(start, "day");
-      const months = Math.floor(diffInDays / 30);
-      const days = diffInDays % 30;
+      const months = end.diff(start, 'month');
+      const tempDate = start.add(months, 'month');
+      const days = end.diff(tempDate, 'day');
 
       if (months > 0) {
         return `${months} tháng ${days > 0 ? `${days} ngày` : ""}`;
       }
-      return `${diffInDays} ngày`;
+      return `${days} ngày`;
     }
     return "";
   };

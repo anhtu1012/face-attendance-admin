@@ -93,7 +93,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const companyInfo = {
-    companyName: "FaceAI Technology Solutions",
+    companyName: "IT Human Resources Company",
     workingHours: "8:00 - 17:30 (T2-T6)",
     companyAddress: "123 Đường ABC, Quận 1, TP.HCM",
     location: "123 Đường ABC, Quận 1, TP.HCM",

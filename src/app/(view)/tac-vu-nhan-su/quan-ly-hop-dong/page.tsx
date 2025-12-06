@@ -100,7 +100,7 @@ function Page() {
 
   const handleExportPdf = async () => {
     if (pdfRef.current) {
-      await generatePdfFromHtml(pdfRef.current, "contract.pdf");
+      await generatePdfFromHtml(pdfRef.current, `HD-${contractDetailData?.userInfor.fullName}.pdf`);
     }
   };
 

@@ -1089,16 +1089,7 @@ function Page() {
         open={jobOfferModalOpen}
         onClose={handleCloseJobOfferModal}
         jobId={jobId}
-        candidateData={
-          selectedCandidate && !Array.isArray(selectedCandidate)
-            ? {
-                id: selectedCandidate.id || "",
-                fullName: selectedCandidate.fullName || "",
-                email: selectedCandidate.email || "",
-                phone: selectedCandidate.phone || "",
-              }
-            : undefined
-        }
+        candidateData={selectedCandidate}
         onSuccess={() => {
           hanldeViewSuccess("jobOffer");
           handleCloseJobOfferModal();

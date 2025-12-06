@@ -42,7 +42,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const messageApi = useAntdMessage();
   const companyInfo = {
-    companyName: "FaceAI Technology Solutions",
+    companyName: "IT Human Resources Company",
     workingHours: "8:00 - 17:30 (T2-T6)",
   };
   const fetchJobDetails = async (jobCode: string) => {

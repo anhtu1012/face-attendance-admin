@@ -152,7 +152,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
         className="job-creation-form"
         requiredMark="optional"
         initialValues={{
-          company: "FaceAI Technology Solutions",
+          company: "IT Human Resources Company",
           workingHours: "8:00 - 17:30 (T2-T6)",
           trialPeriod: "0",
           role: "5",
