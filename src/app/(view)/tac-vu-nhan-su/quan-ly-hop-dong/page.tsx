@@ -100,7 +100,14 @@ function Page() {
 
   const handleExportPdf = async () => {
     if (pdfRef.current) {
-      await generatePdfFromHtml(pdfRef.current, `HD-${contractDetailData?.userInfor.fullName}.pdf`);
+      const fileName = `HD_${(selectedUser?.fullName || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toUpperCase()
+        .replace(/\s+/g, "_")}.pdf`;
+      await generatePdfFromHtml(pdfRef.current, fileName);
     }
   };
 
