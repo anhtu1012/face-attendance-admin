@@ -59,6 +59,7 @@ export const getStatusColor = (status: string) => {
   const colorMap: Record<string, string> = {
     PENDING: "warning",
     USER_SIGNED: "processing",
+    NOT_START: "processing",
     DIRECTOR_SIGNED: "blue",
     INACTIVE: "default",
     ACTIVE_EXTENDED: "success",
@@ -77,6 +78,7 @@ export const getStatusText = (status: string) => {
     EXPIRED: "Hết hạn",
     ACTIVE_EXTENDED: "Hoạt động+",
     ACTIVE: "Đang hoạt động",
+    NOT_START: "Chưa bắt đầu",
   };
   return textMap[status] || status;
 };

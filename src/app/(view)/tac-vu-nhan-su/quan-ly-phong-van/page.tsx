@@ -172,7 +172,7 @@ function Page() {
           </strong>{" "}
           phải được phản hồi sau{" "}
           <strong style={{ fontSize: "15px", color: "orange" }}>7 tiếng</strong>{" "}
-          , nếu không phản hội hệ thổng sẽ{" "}
+          , nếu không phản hồi hệ thống sẽ{" "}
           <strong style={{ fontSize: "15px", color: "green" }}>
             TỰ ĐỘNG XÁC NHẬN
           </strong>{" "}
