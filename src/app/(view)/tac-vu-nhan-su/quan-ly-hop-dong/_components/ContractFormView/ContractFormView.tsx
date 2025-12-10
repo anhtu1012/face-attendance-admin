@@ -306,9 +306,9 @@ function ContractFormView({
     if (startDate && endDate) {
       const start = dayjs(startDate);
       const end = dayjs(endDate);
-      const months = end.diff(start, 'month');
-      const tempDate = start.add(months, 'month');
-      const days = end.diff(tempDate, 'day');
+      const months = end.diff(start, "month");
+      const tempDate = start.add(months, "month");
+      const days = end.diff(tempDate, "day");
 
       if (months > 0) {
         return `${months} tháng ${days > 0 ? `${days} ngày` : ""}`;
@@ -593,7 +593,7 @@ function ContractFormView({
                           <Col xs={24} md={24}>
                             <Form.Item
                               name="startDate"
-                              label="Ngày bắt đầu"
+                              label="Tháng bắt đầu"
                               rules={[
                                 {
                                   required: true,

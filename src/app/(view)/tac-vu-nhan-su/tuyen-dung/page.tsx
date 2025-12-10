@@ -1104,7 +1104,7 @@ function Page() {
         candidateName={reportListCandidate?.fullName}
         onViewDetail={(report) => {
           console.log("View report detail:", report);
-          messageApi.info("Chi tiết báo cáo: " + report.id);
+          // messageApi.info("Chi tiết báo cáo: " + report.id);
         }}
       />
 

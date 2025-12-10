@@ -299,9 +299,12 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
                 Thông tin thời gian và địa điểm
               </div>
 
-              <Form.Item label="Các mẫu nhận việc" name="scheduleTemplate">
+              <Form.Item
+                label="Các lịch nhận việc đã có"
+                name="scheduleTemplate"
+              >
                 <Select
-                  placeholder="Chọn mẫu để tự động điền"
+                  placeholder="Chọn lịch đã có để tự động điền"
                   size="large"
                   onChange={handleTemplateSelect}
                   options={templateOptions}

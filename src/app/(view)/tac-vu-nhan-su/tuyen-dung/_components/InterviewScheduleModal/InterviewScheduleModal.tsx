@@ -515,7 +515,7 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
 
                 <Form.Item label="Các lịch hẹn đã có" name="scheduleTemplate">
                   <Select
-                    placeholder="Chọn mẫu để tự động điền"
+                    placeholder="Chọn lịch hẹn để tự động điền"
                     size="large"
                     onChange={handleTemplateSelect}
                     options={templateOptions}
