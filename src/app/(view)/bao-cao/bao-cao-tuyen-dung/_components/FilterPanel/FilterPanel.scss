@@ -1,0 +1,60 @@
+.filter-panel {
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(0, 60, 151, 0.1);
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 60, 151, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 60, 151, 0.15);
+    border-color: rgba(0, 60, 151, 0.12);
+  }
+
+  .ant-card-body {
+    padding: 28px;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 60, 151, 0.02) 0%,
+      transparent 100%
+    );
+  }
+
+  .ant-form-item {
+    margin-bottom: 20px;
+  }
+
+  .ant-form-item-label > label {
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 14px;
+
+    &::before {
+      color: #003c97 !important;
+    }
+  }
+
+  .ant-btn-primary {
+    background: linear-gradient(135deg, #003c97 0%, #0056d6 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 60, 151, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 60, 151, 0.4);
+    }
+  }
+
+  .ant-btn:not(.ant-btn-primary) {
+    border-color: rgba(0, 60, 151, 0.2);
+    color: #003c97;
+
+    &:hover {
+      border-color: #003c97;
+      color: #003c97;
+      background: rgba(0, 60, 151, 0.05);
+    }
+  }
+}

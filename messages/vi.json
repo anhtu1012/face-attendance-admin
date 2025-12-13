@@ -200,7 +200,8 @@
     "xemChiTiet": "Xem thông tin chi tiết",
     "chinhSua": "Chỉnh sửa thông tin người dùng",
     "xoa": "Xóa người dùng",
-    "boPhan": "Phòng ban"
+    "boPhan": "Phòng ban",
+    "levelSalaryId": "Mức lương"
   },
   "DanhMucDon": {
     "maDon": "Mã đơn",
@@ -518,5 +519,10 @@
     "nhapMoTa": "Nhập mô tả",
     "vuilongNhapGiaTri": "Vui lòng nhập giá trị!",
     "nhapGiaTri": "Nhập giá trị"
+  },
+  "DanhMucMucLuong": {
+    "levelName": "Tên Mức Lương",
+    "startSalary": "Khoảng lương bắt đầu",
+    "endSalary": "Khoảng lương kết thúc"
   }
 }

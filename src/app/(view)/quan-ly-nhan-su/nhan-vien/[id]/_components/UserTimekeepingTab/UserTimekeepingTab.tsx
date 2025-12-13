@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -13,8 +12,10 @@ import {
   CloseCircleOutlined,
   FieldTimeOutlined,
   FireOutlined,
+  QuestionCircleOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Col, DatePicker, Row, Table, Tag, Tooltip } from "antd";
+import { Button, Card, DatePicker, Table, Tag, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
 import { useCallback, useEffect, useState } from "react";
@@ -342,110 +343,124 @@ function UserTimekeepingTab({ userId }: UserTimekeepingTabProps) {
 
       {/* Summary Statistics */}
       {summary && (
-        <Card className="summary-card" loading={loading}>
-          <Row gutter={[16, 16]}>
-            <Col xs={12} sm={12} md={8} lg={6}>
-              <div className="stat-item stat-success">
-                <div className="stat-icon">✓</div>
-                <div className="stat-content">
-                  <div className="stat-label">Công thực tế</div>
-                  <div className="stat-value">
-                    {summary.actualTimekeeping}
-                    <span className="stat-suffix">
-                      / {summary.monthStandardTimekeeping}
-                    </span>
-                  </div>
+        <div className="salary-stats-container">
+          <div className="salary-stats-card">
+            <div className="stats-header">
+              <CheckCircleOutlined className="stats-icon" />
+              <h3 className="stats-title">Tổng quan chấm công</h3>
+            </div>
+
+            {/* Highlight Card - Công thực tế */}
+            <div className="stat-item-highlight">
+              <div className="highlight-icon">
+                <CheckCircleOutlined />
+              </div>
+              <div className="highlight-content">
+                <div className="highlight-label">Công thực tế</div>
+                <div className="highlight-value">
+                  {summary.actualTimekeeping} /{" "}
+                  {summary.monthStandardTimekeeping}
                 </div>
               </div>
-            </Col>
-            <Col xs={12} sm={12} md={8} lg={6}>
-              <div className="stat-item stat-info">
-                <div className="stat-icon">⏱</div>
-                <div className="stat-content">
-                  <div className="stat-label">Giờ công</div>
-                  <div className="stat-value">
-                    {summary.actualHour}
-                    <span className="stat-suffix">
-                      / {summary.monthStandardHour}h
-                    </span>
-                  </div>
+              <CheckCircleOutlined className="highlight-decoration" />
+            </div>
+
+            {/* Row 1: Giờ công & Đi muộn */}
+            <div className="stat-row">
+              <div className="stat-item">
+                <div className="stat-label-wrapper">
+                  <ClockCircleOutlined className="stat-icon" />
+                  <span className="stat-label">Giờ công</span>
+                </div>
+                <div className="stat-value-wrapper">
+                  <span className="stat-value">{summary.actualHour}</span>
+                  <span className="stat-suffix">
+                    / {summary.monthStandardHour}h
+                  </span>
                 </div>
               </div>
-            </Col>
-            <Col xs={12} sm={12} md={8} lg={6}>
-              <div className="stat-item stat-warning">
-                <div className="stat-icon">⚠</div>
-                <div className="stat-content">
-                  <div className="stat-label">Đi muộn</div>
-                  <div className="stat-value">
-                    {summary.lateNumber}
-                    <span className="stat-suffix">lần</span>
-                  </div>
+              <div className="stat-item">
+                <div className="stat-label-wrapper">
+                  <WarningOutlined className="stat-icon" />
+                  <span className="stat-label">Đi muộn</span>
+                </div>
+                <div className="stat-value-wrapper">
+                  <span className="stat-value">{summary.lateNumber}</span>
+                  <span className="stat-suffix">lần</span>
                 </div>
               </div>
-            </Col>
-            <Col xs={12} sm={12} md={8} lg={6}>
-              <div className="stat-item stat-warning">
-                <div className="stat-icon">⏰</div>
-                <div className="stat-content">
-                  <div className="stat-label">Về sớm</div>
-                  <div className="stat-value">
-                    {summary.earlyNumber}
-                    <span className="stat-suffix">lần</span>
-                  </div>
+            </div>
+
+            {/* Row 2: Về sớm & Nghỉ phép */}
+            <div className="stat-row">
+              <div className="stat-item">
+                <div className="stat-label-wrapper">
+                  <FieldTimeOutlined className="stat-icon" />
+                  <span className="stat-label">Về sớm</span>
+                </div>
+                <div className="stat-value-wrapper">
+                  <span className="stat-value">{summary.earlyNumber}</span>
+                  <span className="stat-suffix">lần</span>
                 </div>
               </div>
-            </Col>
-            <Col xs={12} sm={12} md={8} lg={6}>
-              <div className="stat-item stat-error">
-                <div className="stat-icon">✗</div>
-                <div className="stat-content">
-                  <div className="stat-label">Nghỉ phép</div>
-                  <div className="stat-value">
+              <div className="stat-item">
+                <div className="stat-label-wrapper">
+                  <CloseCircleOutlined className="stat-icon" />
+                  <span className="stat-label">Nghỉ phép</span>
+                </div>
+                <div className="stat-value-wrapper">
+                  <span className="stat-value danger">
                     {summary.offWorkNumber}
-                    <span className="stat-suffix">ngày</span>
-                  </div>
+                  </span>
+                  <span className="stat-suffix">ngày</span>
                 </div>
               </div>
-            </Col>
-            <Col xs={12} sm={12} md={8} lg={6}>
-              <div className="stat-item stat-error">
-                <div className="stat-icon">?</div>
-                <div className="stat-content">
-                  <div className="stat-label">Quên chấm</div>
-                  <div className="stat-value">
+            </div>
+
+            {/* Row 3: Quên chấm & OT ngày thường */}
+            <div className="stat-row">
+              <div className="stat-item">
+                <div className="stat-label-wrapper">
+                  <QuestionCircleOutlined className="stat-icon" />
+                  <span className="stat-label">Quên chấm</span>
+                </div>
+                <div className="stat-value-wrapper">
+                  <span className="stat-value danger">
                     {summary.forgetLogNumber}
-                    <span className="stat-suffix">lần</span>
-                  </div>
+                  </span>
+                  <span className="stat-suffix">lần</span>
                 </div>
               </div>
-            </Col>
-            <Col xs={12} sm={12} md={8} lg={6}>
-              <div className="stat-item stat-purple">
-                <div className="stat-icon">🔥</div>
-                <div className="stat-content">
-                  <div className="stat-label">OT ngày thường</div>
-                  <div className="stat-value">
-                    {summary.normalOtHour}
-                    <span className="stat-suffix">giờ</span>
-                  </div>
+              <div className="stat-item">
+                <div className="stat-label-wrapper">
+                  <FireOutlined className="stat-icon" />
+                  <span className="stat-label">OT ngày thường</span>
+                </div>
+                <div className="stat-value-wrapper">
+                  <span className="stat-value">{summary.normalOtHour}</span>
+                  <span className="stat-suffix">giờ</span>
                 </div>
               </div>
-            </Col>
-            <Col xs={12} sm={12} md={8} lg={6}>
-              <div className="stat-item stat-purple">
-                <div className="stat-icon">🌙</div>
-                <div className="stat-content">
-                  <div className="stat-label">OT ngày nghỉ</div>
-                  <div className="stat-value">
-                    {summary.offDayOtHour}
-                    <span className="stat-suffix">giờ</span>
-                  </div>
+            </div>
+
+            {/* Row 4: OT ngày nghỉ */}
+            {/* <div className="stat-row">
+              <div className="stat-item">
+                <div className="stat-label-wrapper">
+                  <FireOutlined className="stat-icon" />
+                  <span className="stat-label">OT ngày nghỉ</span>
+                </div>
+                <div className="stat-value-wrapper">
+                  <span className="stat-value">{summary.offDayOtHour}</span>
+                  <span className="stat-suffix">giờ</span>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Card>
+              <div className="stat-item" style={{ visibility: "hidden" }}>
+              
+              </div>
+            </div> */}
+          </div>
+        </div>
       )}
 
       {/* Detailed Table */}

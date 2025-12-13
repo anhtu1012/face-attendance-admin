@@ -54,6 +54,7 @@
     "react-quill-new": "^3.6.0",
     "react-redux": "^9.2.0",
     "react-to-print": "^3.1.1",
+    "recharts": "^3.5.1",
     "redux-persist": "^6.0.0",
     "sass": "^1.86.3",
     "signature_pad": "^5.1.1",

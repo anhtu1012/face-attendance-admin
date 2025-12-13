@@ -22,7 +22,7 @@ import {
 } from "@/utils/client/validationHelpers";
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
-import { Segmented, Tooltip } from "antd";
+import { Dropdown, Segmented, Tooltip } from "antd";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -32,6 +32,15 @@ import { DiGoogleAnalytics } from "react-icons/di";
 import { FaPlusCircle } from "react-icons/fa";
 import { FcViewDetails } from "react-icons/fc";
 import { GoReport } from "react-icons/go";
+import {
+  MdAccessTime,
+  MdCancel,
+  MdCheckCircle,
+  MdExpandMore,
+  MdListAlt,
+  MdRefresh,
+  MdSchedule,
+} from "react-icons/md";
 import { useSelector } from "react-redux";
 import { ReportListModal } from "../_shared/AppointmentDetailTabs/components";
 import InterviewListModal from "./_components/InterviewListModal/InterviewListModal";
@@ -67,10 +76,12 @@ function Page() {
     undefined
   );
   const [selectedStatus, setSelectedStatus] = useState<string>("LIEN_HE");
+  const [interviewSubFilter, setInterviewSubFilter] = useState<string>("ALL");
   const [quantityStatus, setQuantityStatus] = useState<Record<
     string,
     number
   > | null>(null);
+  const [isProcessCollapsed, setIsProcessCollapsed] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
@@ -310,15 +321,110 @@ function Page() {
           quickSearch,
           params
         );
-        setRowData(response.data);
-        setTotalItems(response.data.length);
+
+        // Client-side filtering for interview sub-filter
+        let filteredData = response.data;
+        if (selectedStatus === "PHONG_VAN" && interviewSubFilter !== "ALL") {
+          const subFilterMap: Record<string, string[]> = {
+            CHO_PV: ["TO_INTERVIEW"],
+            DA_HEN: [
+              "INTERVIEW_SCHEDULED",
+              "INTERVIEW_SCHEDULED_R1",
+              "INTERVIEW_SCHEDULED_R2",
+              "INTERVIEW_SCHEDULED_R3",
+              "INTERVIEW_SCHEDULED_R4",
+              "INTERVIEW_SCHEDULED_R5",
+            ],
+            DA_HEN_R1: ["INTERVIEW_SCHEDULED_R1"],
+            DA_HEN_R2: ["INTERVIEW_SCHEDULED_R2"],
+            DA_HEN_R3: ["INTERVIEW_SCHEDULED_R3"],
+            DA_HEN_R4: ["INTERVIEW_SCHEDULED_R4"],
+            DA_HEN_R5: ["INTERVIEW_SCHEDULED_R5"],
+            DAU_VONG: [
+              "TO_INTERVIEW_R1",
+              "TO_INTERVIEW_R2",
+              "TO_INTERVIEW_R3",
+              "TO_INTERVIEW_R4",
+              "TO_INTERVIEW_R5",
+            ],
+            DAU_VONG_R1: ["TO_INTERVIEW_R1"],
+            DAU_VONG_R2: ["TO_INTERVIEW_R2"],
+            DAU_VONG_R3: ["TO_INTERVIEW_R3"],
+            DAU_VONG_R4: ["TO_INTERVIEW_R4"],
+            DAU_VONG_R5: ["TO_INTERVIEW_R5"],
+            THAT_BAI: [
+              "INTERVIEW_FAILED",
+              "NOT_COMING_INTERVIEW",
+              "INTERVIEW_REJECTED",
+            ],
+            HEN_LAI: ["INTERVIEW_RESCHEDULED"],
+          };
+
+          const allowedStatuses = subFilterMap[interviewSubFilter] || [];
+          filteredData = response.data.filter((item: TuyenDungItem) =>
+            allowedStatuses.includes(item.status || "")
+          );
+        }
+
+        // Sort by interview rounds for PHONG_VAN tab
+        if (selectedStatus === "PHONG_VAN") {
+          const getRoundPriority = (status: string) => {
+            const priorityMap: Record<string, number> = {
+              // Waiting - highest priority
+              TO_INTERVIEW: 1,
+
+              // Scheduled interviews - by round
+              INTERVIEW_SCHEDULED: 10,
+              INTERVIEW_SCHEDULED_R1: 11,
+              INTERVIEW_SCHEDULED_R2: 12,
+              INTERVIEW_SCHEDULED_R3: 13,
+              INTERVIEW_SCHEDULED_R4: 14,
+              INTERVIEW_SCHEDULED_R5: 15,
+
+              // Passed interviews - by round
+              TO_INTERVIEW_R1: 20,
+              TO_INTERVIEW_R2: 21,
+              TO_INTERVIEW_R3: 22,
+              TO_INTERVIEW_R4: 23,
+              TO_INTERVIEW_R5: 24,
+
+              // Rescheduled
+              INTERVIEW_RESCHEDULED: 30,
+
+              // Failed interviews
+              INTERVIEW_FAILED: 40,
+              NOT_COMING_INTERVIEW: 41,
+              INTERVIEW_REJECTED: 42,
+            };
+            return priorityMap[status] || 999;
+          };
+
+          filteredData.sort((a, b) => {
+            const priorityA = getRoundPriority(a.status || "");
+            const priorityB = getRoundPriority(b.status || "");
+
+            // First sort by priority
+            if (priorityA !== priorityB) {
+              return priorityA - priorityB;
+            }
+
+            // Then by created date (newest first)
+            return (
+              new Date(b.createdAt || 0).getTime() -
+              new Date(a.createdAt || 0).getTime()
+            );
+          });
+        }
+
+        setRowData(filteredData);
+        setTotalItems(filteredData.length);
       } catch (error: any) {
         showError(error.response?.data?.message || mes("fetchError"));
       } finally {
         setLoading(false);
       }
     },
-    [currentPage, jobId, mes, pageSize, selectedStatus]
+    [currentPage, jobId, mes, pageSize, selectedStatus, interviewSubFilter]
   );
 
   const columnDefs: ColDef[] = useMemo(
@@ -327,7 +433,7 @@ function Page() {
         field: "status",
         headerName: t("isActive"),
         editable: false,
-        width: 170,
+        width: 200,
         filter: false,
         context: {
           typeColumn: "Tag",
@@ -335,19 +441,51 @@ function Page() {
         },
         cellRendererParams: {
           colorMap: {
-            TO_CONTACT: "#1976D2", // blue
-            CANNOT_CONTACT: "#9E9E9E", // grey
-            TO_INTERVIEW: "#43A047", // green
-            INTERVIEW_SCHEDULED: "#0288D1", // light blue
-            INTERVIEW_FAILED: "#E53935", // red
-            INTERVIEW_RESCHEDULED: "#FB8C00", // orange
-            JOB_OFFERED: "#00796B", // teal
-            CONTRACT_SIGNING: "#6A1B9A", // purple
-            INTERVIEW_REJECTED: "#FF7043", // light red/orange
-            OFFER_REJECTED: "#C62828", // dark red
-            REJECTED: "#C62828", // dark red
-            NOT_SUITABLE: "#9E9E9E", // grey
-            HOAN_THANH: "#2E7D32", // dark green
+            // Liên hệ - Blue tones
+            TO_CONTACT: "#1976D2",
+            CANNOT_CONTACT: "#9E9E9E",
+
+            // Phỏng vấn chờ xử lý - Purple tones
+            TO_INTERVIEW: "#7B1FA2",
+
+            // Đã hẹn phỏng vấn - Light Blue tones (theo vòng)
+            INTERVIEW_SCHEDULED: "#0288D1",
+            INTERVIEW_SCHEDULED_R1: "#29B6F6",
+            INTERVIEW_SCHEDULED_R2: "#4FC3F7",
+            INTERVIEW_SCHEDULED_R3: "#81D4FA",
+            INTERVIEW_SCHEDULED_R4: "#B3E5FC",
+            INTERVIEW_SCHEDULED_R5: "#E1F5FE",
+
+            // Đậu phỏng vấn - Green tones (theo vòng, xanh đậm dần)
+            TO_INTERVIEW_R1: "#66BB6A",
+            TO_INTERVIEW_R2: "#4CAF50",
+            TO_INTERVIEW_R3: "#43A047",
+            TO_INTERVIEW_R4: "#388E3C",
+            TO_INTERVIEW_R5: "#2E7D32",
+
+            // Phỏng vấn thất bại - Red tones
+            INTERVIEW_FAILED: "#E53935",
+            NOT_COMING_INTERVIEW: "#D32F2F",
+            INTERVIEW_REJECTED: "#FF5252",
+
+            // Hẹn lại - Orange
+            INTERVIEW_RESCHEDULED: "#FB8C00",
+
+            // Nhận việc - Teal
+            JOB_OFFERED: "#00796B",
+            JOB_SCHEDULED: "#00897B",
+
+            // Hợp đồng - Purple
+            CONTRACT_SIGNING: "#6A1B9A",
+
+            // Từ chối/Không phù hợp - Grey/Red
+            OFFER_REJECTED: "#C62828",
+            NOT_COMING_OFFER: "#B71C1C",
+            REJECTED: "#C62828",
+            NOT_SUITABLE: "#9E9E9E",
+
+            // Hoàn thành - Dark Green
+            HOAN_THANH: "#1B5E20",
           },
         },
       },
@@ -941,22 +1079,373 @@ function Page() {
         content2={
           <>
             <div style={{ width: "100%" }}>
-              <Segmented
-                className="status-segmented"
-                options={segmentedOptions}
-                value={selectedStatus}
-                onChange={(value) => {
-                  const newStatus = value as string;
-                  setSelectedStatus(newStatus);
+              <div
+                className={`recruitment-process-flow ${
+                  isProcessCollapsed ? "collapsed" : ""
+                }`}
+              >
+                <div
+                  className="process-title"
+                  onClick={() => setIsProcessCollapsed(!isProcessCollapsed)}
+                >
+                  <MdListAlt size={24} />
+                  <span>Quy trình tuyển dụng</span>
+                  <MdExpandMore
+                    className={`expand-icon ${
+                      isProcessCollapsed ? "collapsed" : ""
+                    }`}
+                    size={24}
+                  />
+                </div>
 
-                  // Reset new count for this tab when user views it
-                  setNewCounts((prev) => ({
-                    ...prev,
-                    [newStatus]: 0,
-                  }));
-                }}
-              />
+                <div className="process-steps">
+                  {[
+                    {
+                      key: "LIEN_HE",
+                      icon: <MdAccessTime />,
+                      label: "Liên hệ",
+                      quantityKey: "toContactQuantity",
+                      color: "#1890ff",
+                      step: 1,
+                    },
+                    {
+                      key: "PHONG_VAN",
+                      icon: <MdSchedule />,
+                      label: "Phỏng vấn",
+                      quantityKey: "toInterviewQuantity",
+                      color: "#722ed1",
+                      step: 2,
+                    },
+                    {
+                      key: "NHAN_VIEC",
+                      icon: <MdCheckCircle />,
+                      label: "Nhận việc",
+                      quantityKey: "toJobOfferedQuantity",
+                      color: "#52c41a",
+                      step: 3,
+                    },
+                    {
+                      key: "HOP_DONG",
+                      icon: <MdCheckCircle />,
+                      label: "Hợp đồng",
+                      quantityKey: "toContractQuantity",
+                      color: "#13c2c2",
+                      step: 4,
+                    },
+                  ].map((stage, index, array) => {
+                    const count = quantityStatus?.[stage.quantityKey] || 0;
+                    const newCount = newCounts[stage.key] || 0;
+                    const isActive = selectedStatus === stage.key;
+                    const isCompleted =
+                      array.findIndex((s) => s.key === selectedStatus) > index;
+
+                    const displayCountLabel = (() => {
+                      if (stage.key === "PHONG_VAN") {
+                        return `${count} ứng viên chưa hẹn PV`;
+                      }
+                      if (stage.key === "NHAN_VIEC") {
+                        return `${count} ứng viên chưa hẹn NV`;
+                      }
+                      return `${count} ứng viên`;
+                    })();
+
+                    return (
+                      <React.Fragment key={stage.key}>
+                        <div
+                          className={`process-step ${
+                            isActive ? "active" : ""
+                          } ${isCompleted ? "completed" : ""}`}
+                          onClick={() => {
+                            setSelectedStatus(stage.key);
+                            setInterviewSubFilter("ALL");
+                            setNewCounts((prev) => ({
+                              ...prev,
+                              [stage.key]: 0,
+                            }));
+                          }}
+                        >
+                          <div className="step-number">{stage.step}</div>
+                          <div
+                            className="step-icon"
+                            style={{
+                              color: isActive ? stage.color : undefined,
+                            }}
+                          >
+                            {stage.icon}
+                          </div>
+                          <div className="step-content">
+                            <div className="step-label">{stage.label}</div>
+                            <div className="step-count">
+                              {displayCountLabel}
+                            </div>
+                          </div>
+                          {newCount > 0 && (
+                            <div className="step-badge">{newCount}</div>
+                          )}
+                          {isActive && <div className="step-indicator" />}
+                        </div>
+                        {index < array.length - 1 && (
+                          <div
+                            className={`step-connector ${
+                              isCompleted ? "completed" : ""
+                            }`}
+                          >
+                            <div className="connector-line" />
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+
+                <div className="process-others">
+                  <div className="others-label">Trạng thái khác:</div>
+                  {[
+                    { key: "HUY_HEN", label: "Hủy hẹn", icon: <MdCancel /> },
+                    {
+                      key: "CHUA_PHU_HOP",
+                      label: "Chưa phù hợp",
+                      icon: <MdCancel />,
+                    },
+                    {
+                      key: "HOAN_THANH",
+                      label: "Hoàn thành",
+                      icon: <MdCheckCircle />,
+                    },
+                  ].map((status) => (
+                    <button
+                      key={status.key}
+                      className={`other-status-btn ${
+                        selectedStatus === status.key ? "active" : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedStatus(status.key);
+                        setInterviewSubFilter("ALL");
+                        setNewCounts((prev) => ({
+                          ...prev,
+                          [status.key]: 0,
+                        }));
+                      }}
+                    >
+                      {status.icon}
+                      <span>{status.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
+
+            {/* Interview Sub-Filter - Only show when PHONG_VAN tab is active */}
+            {selectedStatus === "PHONG_VAN" && (
+              <div className="interview-filter-pills">
+                <div className="filter-title">
+                  <MdListAlt className="title-icon" />
+                  <span>Lọc theo trạng thái:</span>
+                </div>
+                <div className="pills-wrapper">
+                  <button
+                    className={`filter-pill ${
+                      interviewSubFilter === "ALL" ? "active" : ""
+                    }`}
+                    onClick={() => {
+                      setInterviewSubFilter("ALL");
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <MdListAlt className="pill-icon" />
+                    <span className="pill-text">Tất cả</span>
+                    <div className="pill-glow"></div>
+                  </button>
+
+                  <button
+                    className={`filter-pill ${
+                      interviewSubFilter === "CHO_PV" ? "active" : ""
+                    }`}
+                    onClick={() => {
+                      setInterviewSubFilter("CHO_PV");
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <MdAccessTime className="pill-icon" />
+                    <span className="pill-text">Chờ hẹn phỏng vấn</span>
+                    <div className="pill-glow"></div>
+                  </button>
+
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: "DA_HEN",
+                          label: "Tất cả đã hẹn",
+                          onClick: () => {
+                            setInterviewSubFilter("DA_HEN");
+                            setCurrentPage(1);
+                          },
+                        },
+                        { type: "divider" },
+                        {
+                          key: "DA_HEN_R1",
+                          label: "Vòng 1",
+                          onClick: () => {
+                            setInterviewSubFilter("DA_HEN_R1");
+                            setCurrentPage(1);
+                          },
+                        },
+                        {
+                          key: "DA_HEN_R2",
+                          label: "Vòng 2",
+                          onClick: () => {
+                            setInterviewSubFilter("DA_HEN_R2");
+                            setCurrentPage(1);
+                          },
+                        },
+                        {
+                          key: "DA_HEN_R3",
+                          label: "Vòng 3",
+                          onClick: () => {
+                            setInterviewSubFilter("DA_HEN_R3");
+                            setCurrentPage(1);
+                          },
+                        },
+                        {
+                          key: "DA_HEN_R4",
+                          label: "Vòng 4",
+                          onClick: () => {
+                            setInterviewSubFilter("DA_HEN_R4");
+                            setCurrentPage(1);
+                          },
+                        },
+                        {
+                          key: "DA_HEN_R5",
+                          label: "Vòng 5",
+                          onClick: () => {
+                            setInterviewSubFilter("DA_HEN_R5");
+                            setCurrentPage(1);
+                          },
+                        },
+                      ],
+                      selectable: true,
+                      selectedKeys: [interviewSubFilter],
+                    }}
+                    trigger={["click"]}
+                    placement="bottomLeft"
+                  >
+                    <button
+                      className={`filter-pill ${
+                        interviewSubFilter.startsWith("DA_HEN") ? "active" : ""
+                      }`}
+                    >
+                      <MdSchedule className="pill-icon" />
+                      <span className="pill-text">Đã hẹn lịch</span>
+                      <MdExpandMore className="expand-icon" />
+                      <div className="pill-glow"></div>
+                    </button>
+                  </Dropdown>
+
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: "DAU_VONG",
+                          label: "Tất cả đậu vòng",
+                          onClick: () => {
+                            setInterviewSubFilter("DAU_VONG");
+                            setCurrentPage(1);
+                          },
+                        },
+                        { type: "divider" },
+                        {
+                          key: "DAU_VONG_R1",
+                          label: "Vòng 1",
+                          onClick: () => {
+                            setInterviewSubFilter("DAU_VONG_R1");
+                            setCurrentPage(1);
+                          },
+                        },
+                        {
+                          key: "DAU_VONG_R2",
+                          label: "Vòng 2",
+                          onClick: () => {
+                            setInterviewSubFilter("DAU_VONG_R2");
+                            setCurrentPage(1);
+                          },
+                        },
+                        {
+                          key: "DAU_VONG_R3",
+                          label: "Vòng 3",
+                          onClick: () => {
+                            setInterviewSubFilter("DAU_VONG_R3");
+                            setCurrentPage(1);
+                          },
+                        },
+                        {
+                          key: "DAU_VONG_R4",
+                          label: "Vòng 4",
+                          onClick: () => {
+                            setInterviewSubFilter("DAU_VONG_R4");
+                            setCurrentPage(1);
+                          },
+                        },
+                        {
+                          key: "DAU_VONG_R5",
+                          label: "Vòng 5",
+                          onClick: () => {
+                            setInterviewSubFilter("DAU_VONG_R5");
+                            setCurrentPage(1);
+                          },
+                        },
+                      ],
+                      selectable: true,
+                      selectedKeys: [interviewSubFilter],
+                    }}
+                    trigger={["click"]}
+                    placement="bottomLeft"
+                  >
+                    <button
+                      className={`filter-pill ${
+                        interviewSubFilter.startsWith("DAU_VONG")
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      <MdCheckCircle className="pill-icon" />
+                      <span className="pill-text">Đậu các vòng</span>
+                      <MdExpandMore className="expand-icon" />
+                      <div className="pill-glow"></div>
+                    </button>
+                  </Dropdown>
+
+                  <button
+                    className={`filter-pill ${
+                      interviewSubFilter === "THAT_BAI" ? "active" : ""
+                    }`}
+                    onClick={() => {
+                      setInterviewSubFilter("THAT_BAI");
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <MdCancel className="pill-icon" />
+                    <span className="pill-text">Thất bại</span>
+                    <div className="pill-glow"></div>
+                  </button>
+
+                  <button
+                    className={`filter-pill ${
+                      interviewSubFilter === "HEN_LAI" ? "active" : ""
+                    }`}
+                    onClick={() => {
+                      setInterviewSubFilter("HEN_LAI");
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <MdRefresh className="pill-icon" />
+                    <span className="pill-text">Hẹn lại</span>
+                    <div className="pill-glow"></div>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <AgGridComponentWrapper
               showSearch={true}
               rowData={dataGrid.rowData}

@@ -227,7 +227,8 @@
     "xemChiTiet": "View details",
     "chinhSua": "Edit user information",
     "xoa": "Delete user",
-    "boPhan": "Department"
+    "boPhan": "Department",
+    "levelSalaryId": "Level Salary "
   },
   "DanhMucDon": {
     "maDon": "Form Code",
@@ -545,5 +546,10 @@
     "nhapMoTa": "Enter description",
     "vuilongNhapGiaTri": "Please enter value!",
     "nhapGiaTri": "Enter value"
+  },
+  "DanhMucMucLuong": {
+    "levelName": "Level Name",
+    "startSalary": "Start Salary",
+    "endSalary": "End Salary"
   }
 }

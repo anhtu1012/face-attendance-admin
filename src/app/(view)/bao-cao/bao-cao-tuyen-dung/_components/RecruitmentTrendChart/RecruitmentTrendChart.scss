@@ -1,0 +1,45 @@
+.recruitment-trend-chart {
+  height: 100%;
+  box-shadow: 0 4px 16px rgba(0, 60, 151, 0.1);
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 60, 151, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 12px 32px rgba(0, 60, 151, 0.2);
+    transform: translateY(-4px);
+    border-color: rgba(0, 60, 151, 0.15);
+  }
+
+  .ant-card-head {
+    border-bottom: 2px solid rgba(0, 60, 151, 0.1);
+    background: linear-gradient(
+      135deg,
+      rgba(0, 60, 151, 0.03) 0%,
+      transparent 100%
+    );
+  }
+
+  .ant-card-head-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &::before {
+      content: "";
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #003c97 0%, #0056d6 100%);
+      border-radius: 2px;
+    }
+  }
+
+  .ant-card-body {
+    padding: 28px;
+  }
+}

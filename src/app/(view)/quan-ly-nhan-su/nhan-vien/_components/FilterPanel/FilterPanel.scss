@@ -1,0 +1,61 @@
+.employee-filter-panel {
+  margin-bottom: 24px;
+  background: white;
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 60, 151, 0.15);
+    border-color: rgba(0, 60, 151, 0.12);
+  }
+
+  .ant-card-body {
+    padding: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 60, 151, 0.02) 0%,
+      transparent 100%
+    );
+  }
+
+  .ant-form-item {
+    margin-bottom: 10px !important;
+  }
+
+  .query-btn {
+    .loading-icon {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    &:hover {
+      border-color: #003c97;
+      color: #003c97;
+      background: rgba(0, 60, 151, 0.05);
+    }
+  }
+
+  .ant-select {
+    .ant-select-selector {
+      border-color: rgba(0, 60, 151, 0.15);
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: #003c97;
+      }
+    }
+
+    &.ant-select-focused .ant-select-selector {
+      border-color: #003c97;
+      box-shadow: 0 0 0 2px rgba(0, 60, 151, 0.1);
+    }
+  }
+}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import CloseOpenModal from "../closeOpenModal";
 import "./index.scss";
@@ -16,7 +17,7 @@ type LayoutContentProps = {
     sizeAdjust?: sizeArray; // Optional size adjustment
     floatButton?: boolean; // Optional full size adjustment
     hideContent?: number; // Optional flag to hide content
-    cardTitle?: string; // Optional title for card layout
+    cardTitle?: any; // Optional title for card layout
   };
 };
 

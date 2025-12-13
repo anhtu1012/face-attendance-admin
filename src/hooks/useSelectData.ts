@@ -9,6 +9,7 @@ type UseSelectDataOptions = {
   fetchDepartment?: boolean;
   fetchContractType?: boolean;
   fetchAllowance?: boolean;
+  fetchLevelSalary?: boolean;
 };
 
 export const useSelectData = (options: UseSelectDataOptions = {}) => {
@@ -19,6 +20,7 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     fetchDepartment: false,
     fetchContractType: false,
     fetchAllowance: false,
+    fetchLevelSalary: false,
   };
   const mergedOptions = { ...defaultOptions, ...options };
   const didFetchRef = useRef(false);
@@ -30,7 +32,9 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     []
   );
   const [selectAllowance, setSelectAllowance] = useState<SelectOption[]>([]);
-
+  const [selectLevelSalary, setSelectLevelSalary] = useState<SelectOption[]>(
+    []
+  );
   const [selectGender] = useState<SelectOption[]>([
     {
       label: "Nam",
@@ -176,6 +180,10 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
           const allowance = await SelectServices.getSelectAllowance();
           setSelectAllowance(allowance.data || []);
         }
+        if (mergedOptions.fetchLevelSalary !== false) {
+          const levelSalary = await SelectServices.getSelectLevelSalary();
+          setSelectLevelSalary(levelSalary.data || []);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -197,5 +205,6 @@ export const useSelectData = (options: UseSelectDataOptions = {}) => {
     selectAllowance,
     selectStatusContract,
     selectStatusForm,
+    selectLevelSalary,
   };
 };

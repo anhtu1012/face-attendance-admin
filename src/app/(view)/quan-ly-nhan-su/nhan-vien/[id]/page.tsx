@@ -86,7 +86,7 @@ function UserDetailPage() {
       label: (
         <span className="tab-label">
           <GiMoneyStack size={20} />
-          Lương
+          Lương theo chấm công
         </span>
       ),
       children: <UserSalaryTab userId={userId} />,

@@ -40,6 +40,7 @@ function Page() {
   const { selectDepartment } = useSelectData({
     fetchDepartment: true,
   });
+
   // Define columnDefs first before dataGrid hook
   const columnDefs: ColDef[] = useMemo(
     () => [
@@ -53,12 +54,13 @@ function Page() {
           return itemErrorCellStyle(itemId, "positionName", params);
         },
       },
+
       {
         field: "departmentId",
         headerName: t("boPhan"),
         editable: true,
         width: 150,
-        context: { typeColumn: "Tag", selectOptions: selectDepartment },
+        context: { typeColumn: "Select", selectOptions: selectDepartment },
       },
 
       {
