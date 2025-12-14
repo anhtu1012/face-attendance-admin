@@ -289,8 +289,8 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
     },
     {
       title: "Phạt",
-      dataIndex: "fineAmount",
-      key: "fineAmount",
+      dataIndex: "totalFine",
+      key: "totalFine",
       width: 120,
       align: "right",
       render: (value?: number) =>

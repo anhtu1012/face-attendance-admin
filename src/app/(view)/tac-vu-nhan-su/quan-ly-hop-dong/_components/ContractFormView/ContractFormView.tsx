@@ -8,6 +8,7 @@ import { ContractWithUser } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contrac
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { useSelectData } from "@/hooks/useSelectData";
 import MauHopDongServices from "@/services/danh-muc/mau-hop-dong/mau-hop-dong.service";
+import DanhMucMucLuongServices from "@/services/danh-muc/muc-luong/mucLuong.service";
 import SelectServices from "@/services/select/select.service";
 import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
 import {
@@ -71,12 +72,27 @@ function ContractFormView({
     useState<SelectOption[]>();
 
   const [contractTemplates, setContractTemplates] = useState<MauHopDong[]>([]);
+  const [levelSalaries, setLevelSalaries] = useState<any[]>([]);
+  const [selectedLevel, setSelectedLevel] = useState<any>(null);
 
   useEffect(() => {
     if (selectedUser) {
       form.setFieldValue("userId", selectedUser.id);
     }
   }, [selectedUser, form]);
+
+  // Fetch level salary data
+  useEffect(() => {
+    const fetchLevelSalaries = async () => {
+      try {
+        const response = await DanhMucMucLuongServices.getDanhMucMucLuong();
+        setLevelSalaries(response.data || []);
+      } catch (error) {
+        console.error("Error fetching level salaries:", error);
+      }
+    };
+    fetchLevelSalaries();
+  }, []);
 
   useEffect(() => {
     if (contractDetailData) {
@@ -396,6 +412,7 @@ function ContractFormView({
   // Check if form is ready to submit
   const isFormValid = () => {
     const values = form.getFieldsValue();
+    console.log("values", values);
 
     if (mode === "appendix") {
       // For appendix: contractTypeId, startDate, grossSalary, content
@@ -453,6 +470,34 @@ function ContractFormView({
       setPositionOptionsState([]);
       form.setFieldsValue({ positionId: undefined });
     }
+  };
+
+  const handleLevelSalaryChange = (value: string) => {
+    const level = levelSalaries.find((l) => l.id === value);
+    setSelectedLevel(level);
+    // Reset grossSalary when level changes
+    form.setFieldsValue({ grossSalary: undefined });
+  };
+
+  const validateGrossSalary = (_: any, value: number) => {
+    if (!selectedLevel) {
+      return Promise.reject(new Error("Vui lòng chọn cấp bậc trước!"));
+    }
+    if (!value) {
+      return Promise.reject(new Error("Vui lòng nhập lương cứng!"));
+    }
+    const startSalary = Number(selectedLevel.startSalary) / 1000000; // Convert to triệu
+    const endSalary = Number(selectedLevel.endSalary) / 1000000; // Convert to triệu
+    if (value < startSalary || value > endSalary) {
+      return Promise.reject(
+        new Error(
+          `Lương phải nằm trong khoảng ${startSalary.toFixed(
+            0
+          )} - ${endSalary.toFixed(0)} triệu VNĐ`
+        )
+      );
+    }
+    return Promise.resolve();
   };
 
   return (
@@ -772,7 +817,29 @@ function ContractFormView({
                             </Form.Item>
                           </Col>
                         )}
-                        <Col xs={24} lg={24}>
+                        <Col xs={24} lg={12}>
+                          <Form.Item
+                            name="levelSalaryId"
+                            label="Cấp bậc"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng chọn cấp bậc!",
+                              },
+                            ]}
+                          >
+                            <Select
+                              placeholder="Chọn cấp bậc ..."
+                              className="custom-select"
+                              onChange={handleLevelSalaryChange}
+                              options={levelSalaries.map((level) => ({
+                                label: level.levelName,
+                                value: level.id,
+                              }))}
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} lg={12}>
                           <Form.Item
                             name="grossSalary"
                             label="Lương cứng (triệu VNĐ)"
@@ -781,6 +848,7 @@ function ContractFormView({
                                 required: true,
                                 message: "Vui lòng nhập lương cứng!",
                               },
+                              { validator: validateGrossSalary },
                             ]}
                           >
                             <InputNumber
@@ -788,9 +856,30 @@ function ContractFormView({
                               className="custom-input-number"
                               style={{ width: "100%" }}
                               min={1}
-                              max={200}
+                              max={250}
+                              disabled={!selectedLevel}
                             />
                           </Form.Item>
+                          {selectedLevel && (
+                            <div style={{ marginTop: 5 }}>
+                              <Typography.Text
+                                type="secondary"
+                                style={{ fontSize: 12 }}
+                              >
+                                Khoảng lương:{" "}
+                                <strong>
+                                  {(
+                                    Number(selectedLevel.startSalary) / 1000000
+                                  ).toFixed(0)}{" "}
+                                  -{" "}
+                                  {(
+                                    Number(selectedLevel.endSalary) / 1000000
+                                  ).toFixed(0)}{" "}
+                                  triệu VNĐ
+                                </strong>
+                              </Typography.Text>
+                            </div>
+                          )}
                         </Col>
                         <Col xs={24} lg={24}>
                           <Form.Item

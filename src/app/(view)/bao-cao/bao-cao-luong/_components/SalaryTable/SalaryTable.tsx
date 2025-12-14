@@ -80,7 +80,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
               ? { year: dayjs(filterValues.month).format("YYYY") }
               : {}),
             ...(filterValues.month
-              ? { date: dayjs(filterValues.month).format("MM/YYYY") }
+              ? { month: dayjs(filterValues.month).format("MM") }
               : {}),
             ...(filterValues.departmentId
               ? { departmentId: filterValues.departmentId }
@@ -170,7 +170,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
         const worksheet = workbook.addWorksheet("Báo cáo lương");
 
         // Title row
-        worksheet.mergeCells("A1:M1");
+        worksheet.mergeCells("A1:N1");
         const titleCell = worksheet.getCell("A1");
         titleCell.value = "BÁO CÁO LƯƠNG NHÂN VIÊN";
         titleCell.font = { size: 18, bold: true, color: { argb: "FFFFFFFF" } };
@@ -183,7 +183,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
         worksheet.getRow(1).height = 40;
 
         // Info row
-        worksheet.mergeCells("A2:M2");
+        worksheet.mergeCells("A2:N2");
         const infoCell = worksheet.getCell("A2");
         const filterValues: Partial<FormValues> =
           filterRef.current?.getFormValues() || {};
@@ -208,6 +208,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
           "Kỳ lương",
           "Trạng thái",
           "Lương cơ bản",
+          "Lương công",
           "Lương OT",
           "Phụ cấp",
           "Tổng phạt",
@@ -280,6 +281,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
             record.date,
             statusText,
             Number(record.grossSalary ?? 0),
+            Number(record.workSalary ?? 0),
             Number(record.otSalary ?? 0),
             Number(record.totalAllowance ?? 0),
             Number(record.totalFine ?? 0),
@@ -298,15 +300,15 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
             };
 
             // Align and format numeric columns
-            // Currency columns: 6(gross),7(ot),8(allow),9(fine),13(total)
+            // Currency columns: 6(gross),7(workSalary),8(ot),9(allow),10(fine),14(total)
             if (
               colNumber === 6 ||
-              (colNumber >= 7 && colNumber <= 9) ||
-              colNumber === 13
+              (colNumber >= 7 && colNumber <= 10) ||
+              colNumber === 14
             ) {
               cell.alignment = { horizontal: "right", vertical: "middle" };
               cell.numFmt = "#,##0";
-            } else if (colNumber === 10) {
+            } else if (colNumber === 11) {
               // totalWorkHour as numeric with one decimal
               cell.alignment = { horizontal: "right", vertical: "middle" };
               cell.numFmt = "0.0";
@@ -327,7 +329,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
           });
 
           // Highlight total salary column
-          const totalCell = row.getCell(13);
+          const totalCell = row.getCell(14);
           totalCell.font = { bold: true, color: { argb: "FF1E40AF" } };
           totalCell.fill = {
             type: "pattern",
@@ -344,6 +346,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
           { key: "month", width: 12 },
           { key: "status", width: 25 },
           { key: "base", width: 15 },
+          { key: "work", width: 15 },
           { key: "ot", width: 15 },
           { key: "allow", width: 15 },
           { key: "fine", width: 15 },
@@ -395,7 +398,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
         },
       },
       {
-        title: "Lương cơ bản",
+        title: "Lương công",
         dataIndex: "workSalary",
         key: "workSalary",
         width: 130,
@@ -563,6 +566,18 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
         render: (value: number) => (
           <div className="money-cell">
             <span className="money-value primary">{formatCurrency(value)}</span>
+          </div>
+        ),
+      },
+      {
+        title: "Lương công",
+        dataIndex: "workSalary",
+        key: "workSalary",
+        width: 150,
+        align: "right",
+        render: (value: number) => (
+          <div className="money-cell">
+            <span className="money-value info">{formatCurrency(value)}</span>
           </div>
         ),
       },
