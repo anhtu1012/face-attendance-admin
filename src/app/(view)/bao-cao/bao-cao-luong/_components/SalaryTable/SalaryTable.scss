@@ -1,7 +1,419 @@
-.salary-table-container {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  min-height: 400px;
+// Modern Salary Table Styles (matching UserSalaryTab)
+.table-section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+
+    .table-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+
+      :global(.anticon) {
+        font-size: 20px;
+        color: #60a5fa;
+      }
+    }
+
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .export-button {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+          background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+
+        :global(.anticon) {
+          font-size: 16px;
+        }
+      }
+    }
+
+    :global(.ant-tag) {
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-weight: 600;
+    }
+  }
+
+  .modern-salary-table {
+    :global(.ant-table) {
+      background: transparent;
+    }
+
+    :global(.ant-table-thead) > tr > th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 12px;
+      border-bottom: 2px solid #e2e8f0;
+
+      &::before {
+        display: none;
+      }
+    }
+
+    :global(.ant-table-tbody) > tr {
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+
+        > td {
+          background: transparent;
+        }
+      }
+
+      > td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+      }
+    }
+
+    // Expand button styling
+    .expand-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #3b82f6;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+    }
+
+    // Cell Styles
+    .period-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .period-icon {
+        color: #3b82f6;
+        font-size: 16px;
+      }
+
+      .period-date {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 14px;
+      }
+    }
+
+    .period-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+
+      :global(.anticon) {
+        margin-right: 4px;
+      }
+    }
+
+    .money-cell {
+      .money-value {
+        font-weight: 600;
+        font-size: 14px;
+        color: #334155;
+
+        &.primary {
+          color: #2563eb;
+        }
+
+        &.purple {
+          color: #7c3aed;
+        }
+
+        &.success {
+          color: #059669;
+        }
+
+        &.danger {
+          color: #dc2626;
+        }
+      }
+
+      .empty-value {
+        color: #cbd5e1;
+      }
+    }
+
+    .stat-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+
+      .stat-value {
+        font-weight: 700;
+        font-size: 16px;
+        color: #1e293b;
+
+        &.warning {
+          color: #f59e0b;
+        }
+      }
+
+      .stat-unit {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .empty-value {
+        color: #cbd5e1;
+      }
+    }
+
+    .total-cell {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      // background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin: -4px 0;
+
+      .total-icon {
+        color: #2563eb;
+        font-size: 16px;
+      }
+
+      .total-value {
+        font-weight: 800;
+        font-size: 15px;
+        color: #1e40af;
+      }
+    }
+
+    .empty-value {
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    // Pagination
+    :global(.ant-pagination) {
+      margin: 16px;
+      padding: 16px 0;
+
+      :global(.ant-pagination-item) {
+        border-radius: 8px;
+        border: 2px solid #e2e8f0;
+        font-weight: 600;
+
+        &:hover {
+          border-color: #3b82f6;
+
+          a {
+            color: #3b82f6;
+          }
+        }
+      }
+
+      :global(.ant-pagination-item-active) {
+        border-color: #3b82f6;
+        background: #3b82f6;
+
+        a {
+          color: #fff;
+        }
+      }
+
+      :global(.ant-pagination-prev),
+      :global(.ant-pagination-next) {
+        :global(.ant-pagination-item-link) {
+          border-radius: 8px;
+          border: 2px solid #e2e8f0;
+
+          &:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+          }
+        }
+      }
+    }
+  }
+
+  // Expanded Content
+  .expanded-content {
+    background: #f8fafc;
+    padding: 20px;
+    margin: 0;
+
+    .expanded-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e2e8f0;
+
+      :global(.anticon) {
+        color: #3b82f6;
+        font-size: 18px;
+      }
+    }
+
+    .daily-details-table {
+      :global(.ant-table) {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      :global(.ant-table-thead) > tr > th {
+        background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        padding: 12px 10px;
+        border-bottom: none;
+
+        &::before {
+          display: none;
+        }
+      }
+
+      :global(.ant-table-tbody) > tr {
+        &:nth-child(even) {
+          background: #f8fafc;
+        }
+
+        &:hover > td {
+          background: #e0f2fe !important;
+        }
+
+        > td {
+          padding: 10px;
+          border-bottom: 1px solid #f1f5f9;
+        }
+      }
+
+      // Daily Cell Styles
+      .date-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+
+        .day-number {
+          font-weight: 800;
+          font-size: 18px;
+          color: #1e293b;
+          line-height: 1;
+        }
+
+        .day-name {
+          font-size: 11px;
+          color: #64748b;
+          text-transform: uppercase;
+          font-weight: 600;
+        }
+      }
+
+      .salary-value {
+        font-weight: 600;
+        font-size: 13px;
+
+        &.primary {
+          color: #2563eb;
+        }
+
+        &.purple {
+          color: #7c3aed;
+        }
+
+        &.success {
+          color: #059669;
+        }
+
+        &.danger {
+          color: #dc2626;
+        }
+
+        &.total {
+          font-weight: 800;
+          font-size: 14px;
+          color: #1e40af;
+        }
+      }
+
+      .empty-value {
+        color: #cbd5e1;
+      }
+    }
+  }
+}
+
+// Coefficient Tag Styles
+.coef-tag {
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+
+  &.holiday {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+  }
+
+  &.high {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    color: #ea580c;
+    border: 1px solid #fdba74;
+  }
+
+  &.medium {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #2563eb;
+    border: 1px solid #93c5fd;
+  }
+
+  &.normal {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+  }
 }

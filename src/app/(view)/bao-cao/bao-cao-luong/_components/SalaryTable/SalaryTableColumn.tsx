@@ -58,10 +58,10 @@ export const getSalaryTableColumn = (): ExtendedColDef[] => {
                 }}
               >
                 {params.data.status === "PAID"
-                  ? "Đã trả"
+                  ? "Đã gữi bảng lương"
                   : params.data.status === "STOP"
                   ? "Tạm dừng"
-                  : "Đang tính"}
+                  : "Đang trong tháng"}
               </div>
             </div>
           </Tooltip>

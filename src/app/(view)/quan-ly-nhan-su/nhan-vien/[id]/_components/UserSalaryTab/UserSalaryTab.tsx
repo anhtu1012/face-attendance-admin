@@ -512,7 +512,7 @@ function UserSalaryTab({ userId }: UserSalaryTabProps) {
       sorter: (a, b) => a.lateCount - b.lateCount,
     },
     {
-      title: "Thực nhận",
+      title: "Tổng lương",
       dataIndex: "totalSalary",
       key: "totalSalary",
       width: 160,

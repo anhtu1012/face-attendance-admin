@@ -16,6 +16,7 @@ import Filter from "./_components/Filter/Filter";
 import SalaryChart from "./_components/SalaryChart/SalaryChart";
 import SalaryTrendChart from "./_components/SalaryTrendChart/SalaryTrendChart";
 import SalaryBreakdownChart from "./_components/SalaryBreakdownChart/SalaryBreakdownChart";
+import SalarySummaryStats from "./_components/SalarySummaryStats";
 import {
   mockSalaryStats,
   mockDepartmentSalary,
@@ -43,6 +44,16 @@ function SalaryDashboardPage() {
     // TODO: Call API to fetch salary dashboard data based on filter
   };
 
+  // Get top 3 departments by average salary
+  const topDepartments = [...departmentSalary]
+    .sort((a, b) => b.averageSalary - a.averageSalary)
+    .slice(0, 3)
+    .map((dept) => ({
+      name: dept.departmentName,
+      avgSalary: dept.averageSalary,
+      count: dept.employeeCount,
+    }));
+
   return (
     <div className="salary-dashboard-page">
       <LayoutContent
@@ -53,6 +64,22 @@ function SalaryDashboardPage() {
         }}
         content1={
           <div className="salary-dashboard-content">
+            {/* Page Header */}
+            <div className="pageHeader">
+              <div className="headerContent">
+                <h1 className="pageTitle">Báo cáo lương</h1>
+                <p className="dateRange">
+                  Tháng 11/2024 • Cập nhật lúc 08:30 - 14/11/2024
+                </p>
+              </div>
+              <div className="totalSummary">
+                <div className="summaryLabel">Tổng quỹ lương</div>
+                <div className="summaryValue">
+                  {formatCurrency(salaryStats.totalSalary)}
+                </div>
+              </div>
+            </div>
+
             {/* Filter Section */}
             <Filter ref={filterRef} onSubmit={handleFilterSubmit} />
 
@@ -162,6 +189,18 @@ function SalaryDashboardPage() {
                 <SalaryTrendChart data={salaryTrendData} loading={loading} />
               </Col>
             </Row>
+
+            {/* Summary Statistics Card */}
+            <div className="container">
+              <SalarySummaryStats
+                totalSalary={salaryStats.totalSalary}
+                totalEmployees={salaryStats.totalEmployees}
+                averageSalary={salaryStats.averageSalary}
+                totalNetSalary={salaryStats.totalNetSalary}
+                formatCurrency={formatCurrency}
+                topDepartments={topDepartments}
+              />
+            </div>
           </div>
         }
       />

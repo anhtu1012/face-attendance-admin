@@ -18,6 +18,7 @@ import DepartmentChart from "./_components/DepartmentChart/DepartmentChart";
 import TrendChart from "./_components/TrendChart/TrendChart";
 import ViolationChart from "./_components/ViolationChart/ViolationChart";
 import OvertimeChart from "./_components/OvertimeChart/OvertimeChart";
+import SummaryStats from "./_components/SummaryStats";
 import {
   mockDashboardStats,
   mockDepartmentStats,
@@ -43,6 +44,16 @@ function DashboardPage() {
     // TODO: Call API to fetch dashboard data based on filter
   };
 
+  // Get top 3 departments by attendance rate
+  const topPerformers = [...departmentStats]
+    .sort((a, b) => b.attendanceRate - a.attendanceRate)
+    .slice(0, 3)
+    .map((dept) => ({
+      name: dept.departmentName,
+      department: dept.departmentName,
+      rate: dept.attendanceRate,
+    }));
+
   return (
     <div className="dashboard-page">
       <LayoutContent
@@ -53,6 +64,22 @@ function DashboardPage() {
         }}
         content1={
           <div className="dashboard-content">
+            {/* Page Header */}
+            <div className="pageHeader">
+              <div className="headerContent">
+                <h1 className="pageTitle"> Báo cáo chấm công</h1>
+                <p className="dateRange">
+                  Tháng 11/2024 • Cập nhật lúc 08:30 - 14/11/2024
+                </p>
+              </div>
+              <div className="totalSummary">
+                <div className="summaryLabel">Tỷ lệ chấm công</div>
+                <div className="summaryValue">
+                  {dashboardStats.attendanceRate}%
+                </div>
+              </div>
+            </div>
+
             {/* Filter Section */}
             <Filter ref={filterRef} onSubmit={handleFilterSubmit} />
 
@@ -166,6 +193,17 @@ function DashboardPage() {
                 <OvertimeChart data={departmentStats} loading={loading} />
               </Col>
             </Row>
+
+            {/* Summary Statistics Card */}
+            <div className="container">
+              <SummaryStats
+                totalEmployees={dashboardStats.totalEmployees}
+                presentCount={dashboardStats.totalPresent}
+                attendanceRate={dashboardStats.attendanceRate}
+                lateCount={dashboardStats.totalLate}
+                topPerformers={topPerformers}
+              />
+            </div>
           </div>
         }
       />

@@ -1,18 +1,16 @@
 "use client";
 
-import AgGridComponent from "@/components/basicUI/cTableAG";
-import { ExtendedColDef } from "@/components/basicUI/cTableAG/interface/agProps";
-import { AgGridReact } from "@ag-grid-community/react";
+import { TimekeepingDetailItem } from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
 import {
+  CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
+  FieldTimeOutlined,
   FireOutlined,
 } from "@ant-design/icons";
-import { Modal, Tag, Tooltip, Typography } from "antd";
-import { useRef } from "react";
-
-import { TimekeepingDetailItem } from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
+import { Modal, Table, Tag, Tooltip, Typography } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import "./TimekeepingDetailModal.scss";
 
@@ -31,37 +29,82 @@ export default function TimekeepingDetailModal({
   userName,
   data = [],
 }: TimekeepingDetailModalProps) {
-  const gridRef = useRef<AgGridReact<TimekeepingDetailItem>>(null);
-
-  const columnDefs: ExtendedColDef[] = [
-    {
-      headerName: "Ngày",
-      field: "date",
-      width: 180,
-      editable: false,
-      pinned: "left",
-      autoHeight: true,
-      cellStyle: {
-        whiteSpace: "normal",
-        lineHeight: "16px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+  const getStatusConfig = (status: string) => {
+    const configs: Record<
+      string,
+      { color: string; icon: React.ReactNode; text: string }
+    > = {
+      PENDING: {
+        color: "processing",
+        icon: <CheckCircleOutlined />,
+        text: "Chưa bắt đầu",
       },
-      cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
-        if (!params.data) return null;
-        const dateObj = dayjs(params.data.date);
-        const dayOfWeek = dayjs(dateObj).format("dddd");
+      START_ONTIME: {
+        color: "success",
+        icon: <CheckCircleOutlined />,
+        text: "Đã check-in",
+      },
+      START_LATE: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Check-in muộn",
+      },
+      END_ONTIME: {
+        color: "success",
+        icon: <CheckCircleOutlined />,
+        text: "Hoàn thành",
+      },
+      END_EARLY: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Về sớm",
+      },
+      END_LATE: {
+        color: "warning",
+        icon: <CheckCircleOutlined />,
+        text: "Đi trễ",
+      },
+      NOT_WORK: {
+        color: "default",
+        icon: <CheckCircleOutlined />,
+        text: "Không có chấm công",
+      },
+      FORGET_LOG: {
+        color: "error",
+        icon: <CheckCircleOutlined />,
+        text: "Quên chấm công",
+      },
+    };
+
+    return (
+      configs[status] || {
+        color: "default",
+        icon: <ClockCircleOutlined />,
+        text: status || "Không xác định",
+      }
+    );
+  };
+
+  const columns: ColumnsType<TimekeepingDetailItem> = [
+    {
+      title: (
+        <span>
+          <CalendarOutlined style={{ marginRight: 6 }} />
+          Ngày
+        </span>
+      ),
+      dataIndex: "date",
+      key: "date",
+      width: 140,
+      render: (date: string) => {
+        const dayOfWeek = dayjs(date).format("dddd");
         return (
-          <Tooltip
-            title={`${dayOfWeek}, ${dayjs(dateObj).format("DD/MM/YYYY")}`}
-          >
-            <div style={{ textAlign: "center", padding: "10px" }}>
+          <Tooltip title={`${dayOfWeek}, ${dayjs(date).format("DD/MM/YYYY")}`}>
+            <div style={{ textAlign: "center" }}>
               <div
                 style={{ fontWeight: 700, color: "#1565c0", fontSize: "15px" }}
               >
-                {dayjs(dateObj).format("DD/MM/YYYY")}
+                {dayjs(date).format("DD/MM")}
               </div>
               <div
                 style={{
@@ -71,158 +114,121 @@ export default function TimekeepingDetailModal({
                   textTransform: "uppercase",
                 }}
               >
-                {dayjs(dateObj).format("ddd")}
+                {dayjs(date).format("ddd")}
               </div>
             </div>
           </Tooltip>
         );
       },
+      sorter: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
+      defaultSortOrder: "descend",
     },
     {
-      headerName: "Giờ vào",
-      field: "checkinTime",
-      width: 90,
-      editable: false,
-      cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
-        if (!params.data) return null;
-        const time = params.data.checkinTime;
-        return (
-          <div
-            style={{
-              fontWeight: 600,
-              fontSize: "13px",
-              color: time ? "#015c92" : "#999",
-            }}
-          >
-            {time || "-"}
+      title: (
+        <span>
+          <FieldTimeOutlined style={{ marginRight: 6 }} />
+          Giờ vào
+        </span>
+      ),
+      dataIndex: "checkinTime",
+      key: "checkinTime",
+      width: 140,
+      render: (time: string) => (
+        <Tooltip
+          title={time ? `Thời gian check-in: ${time}` : "Chưa có thời gian"}
+        >
+          <div className="time-cell">
+            <div className={`time-badge checkin ${time ? "active" : "empty"}`}>
+              {time ? (
+                <CheckCircleOutlined style={{ color: "#fff", fontSize: 14 }} />
+              ) : (
+                <CloseCircleOutlined
+                  style={{ color: "#94a3b8", fontSize: 14 }}
+                />
+              )}
+              <span className="time-text">{time ?? "—"}</span>
+            </div>
           </div>
-        );
-      },
+        </Tooltip>
+      ),
     },
     {
-      headerName: "Giờ ra",
-      field: "checkoutTime",
-      width: 90,
-      editable: false,
-      cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
-        if (!params.data) return null;
-        const time = params.data.checkoutTime;
-        return (
-          <div
-            style={{
-              fontWeight: 600,
-              fontSize: "13px",
-              color: time ? "#52c41a" : "#999",
-            }}
-          >
-            {time || "-"}
+      title: (
+        <span>
+          <FieldTimeOutlined style={{ marginRight: 6 }} />
+          Giờ ra
+        </span>
+      ),
+      dataIndex: "checkoutTime",
+      key: "checkoutTime",
+      width: 140,
+      render: (time: string) => (
+        <Tooltip
+          title={time ? `Thời gian check-out: ${time}` : "Chưa có thời gian"}
+        >
+          <div className="time-cell">
+            <div className={`time-badge checkout ${time ? "active" : "empty"}`}>
+              {time ? (
+                <ClockCircleOutlined style={{ color: "#fff", fontSize: 14 }} />
+              ) : (
+                <CloseCircleOutlined
+                  style={{ color: "#94a3b8", fontSize: 14 }}
+                />
+              )}
+              <span className="time-text">{time ?? "—"}</span>
+            </div>
           </div>
-        );
-      },
+        </Tooltip>
+      ),
     },
     {
-      headerName: "Giờ làm",
-      field: "totalWorkHour",
-      width: 90,
-      editable: false,
-      cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
-        if (!params.data) return null;
-        const hours = params.data.totalWorkHour;
-        const color =
-          hours >= 8 ? "#52c41a" : hours > 0 ? "#faad14" : "#ff4d4f";
-        return (
-          <div style={{ fontWeight: 600, fontSize: "13px", color }}>
-            {hours}h
-          </div>
-        );
-      },
-    },
-    {
-      headerName: "Tăng ca",
-      field: "hasOT",
-      width: 90,
-      editable: false,
-      cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
-        if (!params.data) return null;
-        return (
-          <Tag
-            className="ot-tag"
-            color={params.data.hasOT ? "purple" : "default"}
-            icon={
-              params.data.hasOT ? <FireOutlined /> : <CloseCircleOutlined />
-            }
-            style={{
-              fontWeight: 700,
-              fontSize: "15px",
-              padding: "4px 12px",
-              borderRadius: "20px",
-            }}
-          >
-            {params.data.hasOT ? "Có" : "Không"}
-          </Tag>
-        );
-      },
-    },
-    {
-      headerName: "Trạng thái",
-      field: "status",
+      title: (
+        <span>
+          <ClockCircleOutlined style={{ marginRight: 6 }} />
+          Giờ công
+        </span>
+      ),
+      dataIndex: "totalWorkHour",
+      key: "totalWorkHour",
       width: 150,
-      editable: false,
-      pinned: "right",
-      cellRenderer: (params: { data?: TimekeepingDetailItem }) => {
-        if (!params.data) return null;
-        const status = params.data.status;
-        const statusConfig: Record<
-          string,
-          { color: string; icon: React.ReactNode; text: string }
-        > = {
-          PENDING: {
-            color: "processing",
-            icon: <CheckCircleOutlined />,
-            text: "Chưa bắt đầu",
-          },
-          START_ONTIME: {
-            color: "success",
-            icon: <CheckCircleOutlined />,
-            text: "Đã check-in",
-          },
-          START_LATE: {
-            color: "warning",
-            icon: <CheckCircleOutlined />,
-            text: "Check-in muộn",
-          },
-          END_ONTIME: {
-            color: "success",
-            icon: <CheckCircleOutlined />,
-            text: "Hoàn thành",
-          },
-          END_EARLY: {
-            color: "warning",
-            icon: <CheckCircleOutlined />,
-            text: "Về sớm",
-          },
-          END_LATE: {
-            color: "warning",
-            icon: <CheckCircleOutlined />,
-            text: "Đi trễ",
-          },
-          NOT_WORK: {
-            color: "default",
-            icon: <CheckCircleOutlined />,
-            text: "Không có chấm công",
-          },
-          FORGET_LOG: {
-            color: "error",
-            icon: <CheckCircleOutlined />,
-            text: "Quên chấm công",
-          },
-        };
-        const config = statusConfig[status] || {
-          color: "default",
-          text: status,
-        };
+      render: (hours: number) => {
+        const isFullDay = hours >= 8;
+        return (
+          <Tooltip title={isFullDay ? "Đủ giờ công" : "Chưa đủ giờ công"}>
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: "15px",
+                color: isFullDay ? "#52c41a" : "#faad14",
+                padding: "4px 12px",
+                background: isFullDay ? "#f6ffed" : "#fffbe6",
+                borderRadius: "20px",
+                border: `2px solid ${isFullDay ? "#b7eb8f" : "#ffe58f"}`,
+                display: "inline-block",
+              }}
+            >
+              {hours.toFixed(2)} giờ
+            </div>
+          </Tooltip>
+        );
+      },
+      sorter: (a, b) => a.totalWorkHour - b.totalWorkHour,
+    },
+    {
+      title: (
+        <span>
+          <CheckCircleOutlined style={{ marginRight: 6 }} />
+          Trạng thái
+        </span>
+      ),
+      dataIndex: "status",
+      key: "status",
+      width: 150,
+      render: (status: string) => {
+        const config = getStatusConfig(status);
         return (
           <Tag
+            className="status-tag"
             color={config.color}
             icon={config.icon}
             style={{
@@ -232,10 +238,40 @@ export default function TimekeepingDetailModal({
               borderRadius: "20px",
             }}
           >
-            {config.text}
+            {config.text ?? status}
           </Tag>
         );
       },
+      onFilter: (value, record) => record.status === value,
+    },
+    {
+      title: (
+        <span>
+          <FireOutlined style={{ marginRight: 6 }} />
+          Tăng ca
+        </span>
+      ),
+      dataIndex: "hasOT",
+      key: "hasOT",
+      width: 150,
+      render: (hasOT: boolean) => {
+        return (
+          <Tag
+            className="ot-tag"
+            color={hasOT ? "purple" : "default"}
+            icon={hasOT ? <FireOutlined /> : <CloseCircleOutlined />}
+            style={{
+              fontWeight: 700,
+              fontSize: "15px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+            }}
+          >
+            {hasOT ? "Có OT" : "Không OT"}
+          </Tag>
+        );
+      },
+      onFilter: (value, record) => record.status === value,
     },
   ];
 
@@ -243,8 +279,8 @@ export default function TimekeepingDetailModal({
     <Modal
       title={
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <ClockCircleOutlined style={{ color: "#ffffffff" }} />
-          <Text strong style={{ color: "#ffffffff", fontSize: 20 }}>
+          <ClockCircleOutlined style={{ color: "#262626" }} />
+          <Text strong style={{ color: "#262626", fontSize: 20 }}>
             Chi tiết chấm công - {userName}
           </Text>
         </div>
@@ -255,23 +291,18 @@ export default function TimekeepingDetailModal({
       footer={null}
       className="timekeeping-detail-modal"
     >
-      <AgGridComponent
-        gridRef={gridRef as React.RefObject<AgGridReact>}
-        rowData={data}
-        columnDefs={columnDefs}
-        showSTT={true}
-        showExportExcel={true}
-        exportFileName={`ChamCong_${userName}_${
-          new Date().toISOString().split("T")[0]
-        }`}
-        rowSelection={{
-          mode: "singleRow",
-          enableClickSelection: false,
-          checkboxes: false,
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey="date"
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: true,
+          showTotal: (total) => `Tổng ${total} bản ghi`,
+          pageSizeOptions: ["10", "20", "50"],
         }}
-        columnFlex={1}
-        maxRowsVisible={10}
-        exportDecorated={true}
+        scroll={{ x: 800 }}
+        className="modern-table"
       />
     </Modal>
   );

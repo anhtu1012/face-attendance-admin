@@ -1,1 +1,245 @@
+// Modern Timekeeping Table Styles (matching SalaryTable)
+.table-section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+
+    .table-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+
+      :global(.anticon) {
+        font-size: 20px;
+        color: #60a5fa;
+      }
+    }
+
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    :global(.ant-tag) {
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-weight: 600;
+    }
+  }
+
+  .modern-timekeeping-table {
+    :global(.ant-table) {
+      background: transparent;
+    }
+
+    :global(.ant-table-thead) > tr > th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 12px;
+      border-bottom: 2px solid #e2e8f0;
+
+      &::before {
+        display: none;
+      }
+    }
+
+    :global(.ant-table-tbody) > tr {
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+
+        > td {
+          background: transparent;
+        }
+      }
+
+      > td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+      }
+    }
+
+    .period-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+
+      .period-icon {
+        color: #3b82f6;
+        font-size: 14px;
+      }
+
+      .period-date {
+        font-weight: 600;
+        color: #1e293b;
+      }
+    }
+
+    .stat-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+
+      .stat-value {
+        font-weight: 700;
+        font-size: 15px;
+        color: #1e293b;
+
+        &.warning {
+          color: #f59e0b;
+        }
+
+        &.danger {
+          color: #ef4444;
+        }
+
+        &.purple {
+          color: #8b5cf6;
+        }
+      }
+
+      .stat-unit {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .empty-value {
+        color: #cbd5e1;
+        font-size: 14px;
+      }
+    }
+
+    .money-cell {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .money-value {
+        font-weight: 700;
+        font-size: 14px;
+        color: #1e293b;
+
+        &.danger {
+          color: #ef4444;
+        }
+      }
+
+      .empty-value {
+        color: #cbd5e1;
+        font-size: 14px;
+      }
+    }
+
+    .view-detail-btn {
+      font-weight: 600;
+      color: #3b82f6;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #1d4ed8;
+        transform: translateX(2px);
+      }
+
+      :global(.anticon) {
+        font-size: 16px;
+      }
+    }
+
+    // Pagination styles
+    :global(.ant-pagination) {
+      margin: 24px 0;
+      display: flex;
+      justify-content: center;
+
+      :global(.ant-pagination-item) {
+        border-radius: 8px;
+        border-color: #e2e8f0;
+        transition: all 0.2s ease;
+
+        &:hover {
+          border-color: #3b82f6;
+          transform: translateY(-2px);
+        }
+
+        &:global(.ant-pagination-item-active) {
+          background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+          border-color: #3b82f6;
+
+          a {
+            color: #fff;
+          }
+
+          &:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+          }
+        }
+      }
+
+      :global(.ant-pagination-prev),
+      :global(.ant-pagination-next) {
+        border-radius: 8px;
+        transition: all 0.2s ease;
+
+        &:hover button {
+          border-color: #3b82f6;
+          color: #3b82f6;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .table-section {
+    border-radius: 12px;
+
+    .table-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+
+      .table-title {
+        font-size: 16px;
+      }
+
+      .table-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    .modern-timekeeping-table {
+      :global(.ant-table-thead) > tr > th {
+        font-size: 11px;
+        padding: 12px 8px;
+      }
+
+      :global(.ant-table-tbody) > tr > td {
+        padding: 12px 8px;
+      }
+    }
+  }
+}
