@@ -341,7 +341,7 @@ function UserOverviewTab({ userId }: UserOverviewTabProps) {
 
               <div className="overview-main-stats salary-main">
                 <div className="salary-highlight">
-                  <div className="salary-label">Thực lãnh</div>
+                  <div className="salary-label">TỔNG LƯƠNG THEO CÔNG</div>
                   <div className="salary-amount">
                     {formatCurrency(salaryStats.totalSalary)}
                   </div>
