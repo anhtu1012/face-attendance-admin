@@ -22,7 +22,7 @@ import {
 } from "@/utils/client/validationHelpers";
 import { ColDef } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
-import { Dropdown, Segmented, Tooltip } from "antd";
+import { Dropdown, Tooltip } from "antd";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -108,78 +108,6 @@ function Page() {
     HOP_DONG: 0,
   });
 
-  const segmentedOptions = useMemo(() => {
-    // Helper to show count if available
-    const withCount = (label: string, key?: string) => {
-      const count =
-        key && quantityStatus && quantityStatus[key] !== undefined
-          ? ` (${quantityStatus[key]})`
-          : "";
-      console.log("count", count);
-      return `${label}`;
-    };
-
-    // Helper to create label with badge
-    const withBadge = (
-      label: string,
-      statusKey: string,
-      quantityKey?: string
-    ) => {
-      const baseLabel = withCount(label, quantityKey);
-      const newCount = newCounts[statusKey] || 0;
-
-      if (newCount > 0) {
-        return (
-          <span>
-            {baseLabel}
-            <span
-              className="segmented-new-badge"
-              style={{
-                position: "absolute",
-                top: "-3px",
-                right: "-7px",
-                background: "linear-gradient(135deg, #ff4081 0%, #ff6e40 100%)",
-                color: "white",
-                fontSize: "10px",
-                fontWeight: "700",
-                padding: "2px 6px",
-                borderRadius: "10px",
-                boxShadow: "0 2px 6px rgba(255, 64, 129, 0.5)",
-                animation: "pulse 2s ease-in-out infinite",
-              }}
-            >
-              {newCount}
-            </span>
-          </span>
-        );
-      }
-
-      return baseLabel;
-    };
-
-    return [
-      {
-        label: withBadge("Liên hệ", "LIEN_HE", "toContactQuantity"),
-        value: "LIEN_HE",
-      },
-      {
-        label: withBadge("Phỏng vấn", "PHONG_VAN", "toInterviewQuantity"),
-        value: "PHONG_VAN",
-      },
-      {
-        label: withBadge("Nhận việc", "NHAN_VIEC", "toJobOfferedQuantity"),
-        value: "NHAN_VIEC",
-      },
-      {
-        label: withBadge("Hợp đồng", "HOP_DONG", "toContractQuantity"),
-        value: "HOP_DONG",
-      },
-      { label: withCount("Hủy hẹn"), value: "HUY_HEN" },
-      { label: withCount("Chưa phù hợp"), value: "CHUA_PHU_HOP" },
-      { label: withCount("Hoàn thành"), value: "HOAN_THANH" },
-    ];
-  }, [quantityStatus, newCounts]);
-
   // Sử dụng custom hook để xử lý socket events
   useRecruitmentSocket({
     jobId,
@@ -226,6 +154,87 @@ function Page() {
         next[key] = Number(next[key] || 0) + 1;
         return next;
       });
+
+      // Update quantityStatus based on candidate status
+      setQuantityStatus((prev) => {
+        if (!prev) return prev;
+        const next = { ...prev };
+
+        // Determine which quantity to update based on status
+        switch (candidateInfo.status) {
+          case "TO_CONTACT":
+            // New candidate in contact stage
+            next.toContactQuantity = Number(next.toContactQuantity || 0) + 1;
+            break;
+
+          case "TO_INTERVIEW":
+          case "TO_INTERVIEW_R1":
+          case "TO_INTERVIEW_R2":
+          case "TO_INTERVIEW_R3":
+          case "TO_INTERVIEW_R4":
+          case "TO_INTERVIEW_R5":
+            // Candidate moved to interview stage (not scheduled yet)
+            // These are candidates waiting to be scheduled for interview
+            next.toInterviewQuantity =
+              Number(next.toInterviewQuantity || 0) + 1;
+            break;
+
+          case "INTERVIEW_SCHEDULED":
+          case "INTERVIEW_SCHEDULED_R1":
+          case "INTERVIEW_SCHEDULED_R2":
+          case "INTERVIEW_SCHEDULED_R3":
+          case "INTERVIEW_SCHEDULED_R4":
+          case "INTERVIEW_SCHEDULED_R5":
+            // Interview scheduled - decrease toInterviewQuantity (moved from waiting to scheduled)
+            next.toInterviewQuantity = Math.max(
+              Number(next.toInterviewQuantity || 0) - 1,
+              0
+            );
+            break;
+
+          case "JOB_OFFERED":
+          case "JOB_SCHEDULED":
+            // Candidate passed all interviews and received job offer
+            next.toJobOfferedQuantity =
+              Number(next.toJobOfferedQuantity || 0) + 1;
+            break;
+
+          case "CONTRACT_SIGNING":
+            // Candidate accepted job offer and moved to contract stage
+            next.toContractQuantity = Number(next.toContractQuantity || 0) + 1;
+            // Decrease job offered count as they moved to contract
+            next.toJobOfferedQuantity = Math.max(
+              Number(next.toJobOfferedQuantity || 0) - 1,
+              0
+            );
+            break;
+
+          case "INTERVIEW_FAILED":
+          case "NOT_COMING_INTERVIEW":
+          case "INTERVIEW_REJECTED":
+          case "OFFER_REJECTED":
+          case "NOT_COMING_OFFER":
+          case "REJECTED":
+          case "NOT_SUITABLE":
+          case "CANNOT_CONTACT":
+            // Failed/rejected statuses - these don't affect the main process counts
+            // They are filtered out from the main process flow
+            break;
+
+          case "INTERVIEW_RESCHEDULED":
+            // Rescheduled interview - back to waiting list
+            next.toInterviewQuantity =
+              Number(next.toInterviewQuantity || 0) + 1;
+            break;
+
+          default:
+            // Unknown status, no change
+            break;
+        }
+
+        return next;
+      });
+
       if (String(jobId) === String(newJobId)) {
         // If we're on LIEN_HE tab and status is TO_CONTACT, add to grid
         if (
@@ -248,6 +257,7 @@ function Page() {
         // If we're on PHONG_VAN tab and status is interview-related, update existing row
         if (selectedStatus === "PHONG_VAN") {
           const interviewStatuses = [
+            "TO_INTERVIEW",
             "TO_INTERVIEW_R1",
             "TO_INTERVIEW_R2",
             "TO_INTERVIEW_R3",
@@ -256,6 +266,12 @@ function Page() {
             "INTERVIEW_RESCHEDULED",
             "INTERVIEW_FAILED",
             "NOT_COMING_INTERVIEW",
+            "INTERVIEW_SCHEDULED",
+            "INTERVIEW_SCHEDULED_R1",
+            "INTERVIEW_SCHEDULED_R2",
+            "INTERVIEW_SCHEDULED_R3",
+            "INTERVIEW_SCHEDULED_R4",
+            "INTERVIEW_SCHEDULED_R5",
           ];
 
           if (interviewStatuses.includes(candidateInfo.status)) {

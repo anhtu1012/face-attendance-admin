@@ -2,7 +2,13 @@
 "use client";
 
 import { Card, Col, Descriptions, Row, Tag, Avatar, Divider } from "antd";
-import { UserOutlined, MailOutlined, PhoneOutlined, BankOutlined, IdcardOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  BankOutlined,
+  IdcardOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 import "./UserInfoTab.scss";
 
@@ -64,7 +70,11 @@ function UserInfoTab({ userData }: UserInfoTabProps) {
                 <PhoneOutlined /> {userData.phone}
               </Descriptions.Item>
               <Descriptions.Item label="Giới tính">
-                {userData.gender === "M" ? "Nam" : userData.gender === "F" ? "Nữ" : "Khác"}
+                {userData.gender === "M"
+                  ? "Nam"
+                  : userData.gender === "F"
+                  ? "Nữ"
+                  : "Khác"}
               </Descriptions.Item>
               <Descriptions.Item label="Ngày sinh">
                 {formatDate(userData.birthday)}
@@ -84,10 +94,13 @@ function UserInfoTab({ userData }: UserInfoTabProps) {
             {userData.positionName}
           </Descriptions.Item>
           <Descriptions.Item label="Phòng ban">
-            Phòng ban {userData.departmentId}
+            Phòng ban {userData.departmentName}
           </Descriptions.Item>
-          <Descriptions.Item label="Người quản lý" span={2}>
+          <Descriptions.Item label="Người quản lý">
             {userData.managerName}
+          </Descriptions.Item>
+          <Descriptions.Item label="Cấp Bậc">
+            {userData.levelSalaryName}
           </Descriptions.Item>
           <Descriptions.Item label="Ngày tạo">
             {formatDate(userData.createdAt)}
@@ -101,7 +114,14 @@ function UserInfoTab({ userData }: UserInfoTabProps) {
       <Row gutter={16}>
         {/* Identity Information */}
         <Col xs={24} lg={12}>
-          <Card title={<><IdcardOutlined /> Thông tin CMND/CCCD</>} className="info-card">
+          <Card
+            title={
+              <>
+                <IdcardOutlined /> Thông tin CMND/CCCD
+              </>
+            }
+            className="info-card"
+          >
             <Descriptions column={1} bordered>
               <Descriptions.Item label="Số CMND/CCCD">
                 {userData.citizenIdentityCard}
@@ -124,7 +144,14 @@ function UserInfoTab({ userData }: UserInfoTabProps) {
 
         {/* Bank Information */}
         <Col xs={24} lg={12}>
-          <Card title={<><BankOutlined /> Thông tin ngân hàng</>} className="info-card">
+          <Card
+            title={
+              <>
+                <BankOutlined /> Thông tin ngân hàng
+              </>
+            }
+            className="info-card"
+          >
             <Descriptions column={1} bordered>
               <Descriptions.Item label="Tên ngân hàng">
                 {userData.bankingName || "Chưa cập nhật"}
@@ -140,8 +167,14 @@ function UserInfoTab({ userData }: UserInfoTabProps) {
             <Divider />
 
             <div className="additional-info">
-              <p><strong>Tình trạng hôn nhân:</strong> {userData.marriedStatus || "Chưa cập nhật"}</p>
-              <p><strong>Tình trạng nghĩa vụ:</strong> {userData.militaryStatus || "Chưa cập nhật"}</p>
+              <p>
+                <strong>Tình trạng hôn nhân:</strong>{" "}
+                {userData.marriedStatus || "Chưa cập nhật"}
+              </p>
+              <p>
+                <strong>Tình trạng nghĩa vụ:</strong>{" "}
+                {userData.militaryStatus || "Chưa cập nhật"}
+              </p>
             </div>
           </Card>
         </Col>
@@ -163,4 +196,3 @@ function UserInfoTab({ userData }: UserInfoTabProps) {
 }
 
 export default UserInfoTab;
-

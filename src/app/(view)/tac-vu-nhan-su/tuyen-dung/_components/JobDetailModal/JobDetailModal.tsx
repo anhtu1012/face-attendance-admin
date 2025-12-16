@@ -1,7 +1,9 @@
 "use client";
 import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
+import { SelectOption } from "@/dtos/select/select.dto";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import SelectServices from "@/services/select/select.service";
 import { Badge, Button, Modal, Progress, Spin, Tabs } from "antd";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -23,6 +25,7 @@ import {
 } from "react-icons/fa";
 import { MdAutoDelete, MdEmail, MdPhone } from "react-icons/md";
 import { getStatusColor, getStatusText } from "../../_utils/status";
+import { JobCreationModal } from "../JobCreationModal";
 import JobShareModal from "../JobShareModal/JobShareModal";
 import "./JobDetailModal.scss";
 
@@ -40,11 +43,53 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
   const [jobDetails, setJobDetails] = useState<JobDetail>();
   const [viewsLoading, setViewsLoading] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectOptions, setSelectOptions] = useState<{
+    selectRole: SelectOption[];
+    selectSkill: SelectOption[];
+    selectExperience: SelectOption[];
+    selectDepartment: SelectOption[];
+  }>({
+    selectRole: [],
+    selectSkill: [],
+    selectExperience: [],
+    selectDepartment: [],
+  });
   const messageApi = useAntdMessage();
   const companyInfo = {
     companyName: "IT Human Resources Company",
     workingHours: "8:00 - 17:30 (T2-T6)",
   };
+  // Fetch select options for edit modal
+  const fetchSelectOptions = async () => {
+    try {
+      const [role, skill, department] = await Promise.all([
+        SelectServices.getSelectRole(),
+        SelectServices.getSelectSkill(),
+        SelectServices.getSelectDepartment(),
+      ]);
+
+      // Experience options are hardcoded
+      const experienceOptions = [
+        { value: "0", label: "Không cần kinh nghiệm" },
+        { value: "0-1", label: "Từ 0 đến 1 năm " },
+        { value: "1-3", label: "Từ 1 đến 3 năm" },
+        { value: "3-5", label: "Từ 3 đến 5 năm" },
+        { value: "5-7", label: "Từ 5 đến 7 năm" },
+        { value: "10", label: "Trên 10 năm" },
+      ];
+
+      setSelectOptions({
+        selectRole: role.data || [],
+        selectSkill: skill.data || [],
+        selectExperience: experienceOptions,
+        selectDepartment: department.data || [],
+      });
+    } catch (error) {
+      console.error("Error fetching select options:", error);
+    }
+  };
+
   const fetchJobDetails = async (jobCode: string) => {
     try {
       const res = await JobServices.getDetailJob(jobCode);
@@ -92,7 +137,19 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
   useEffect(() => {
     if (jobCode) {
       fetchJobDetails(jobCode);
+      fetchSelectOptions();
     }
+  }, [jobCode]);
+
+  // Refresh job details when job is updated
+  useEffect(() => {
+    const handleJobUpdated = () => {
+      if (jobCode) {
+        fetchJobDetails(jobCode);
+      }
+    };
+    window.addEventListener("jobUpdated", handleJobUpdated);
+    return () => window.removeEventListener("jobUpdated", handleJobUpdated);
   }, [jobCode]);
   if (!jobDetails) return null;
 
@@ -127,6 +184,18 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
 
   const handleShareJob = () => {
     setShareModalOpen(true);
+  };
+
+  const handleEditJob = () => {
+    setEditModalOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    setEditModalOpen(false);
+    // Refresh job details after successful edit
+    if (jobCode) {
+      fetchJobDetails(jobCode);
+    }
   };
 
   const tabItems = [
@@ -443,7 +512,11 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
               >
                 Chia sẻ
               </Button>
-              <Button icon={<FaEdit />} className="action-btn edit-btn">
+              <Button
+                icon={<FaEdit />}
+                className="action-btn edit-btn"
+                onClick={handleEditJob}
+              >
                 Chỉnh sửa
               </Button>
             </div>
@@ -539,6 +612,16 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
         onShareSuccess={() => {
           messageApi.success("Đã gửi yêu cầu chia sẻ công việc!");
         }}
+      />
+
+      {/* Job Edit Modal */}
+      <JobCreationModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+        selectOptions={selectOptions}
+        mode="edit"
+        initialData={jobDetails}
       />
     </Modal>
   );

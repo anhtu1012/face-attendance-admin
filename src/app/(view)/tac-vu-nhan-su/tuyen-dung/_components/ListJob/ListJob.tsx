@@ -310,7 +310,7 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
               </div>
               <div className="job-status-section">
                 <span className={`job-status ${getStatusClass(job.status)}`}>
-                  {getStatusText(job.status)}
+                  {getStatusText(job.status)} ({job.quantityStatus?.totalQuantity ?? 0})
                 </span>
               </div>
             </div>

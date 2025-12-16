@@ -127,21 +127,32 @@ export const getSelectionActionButtons = ({
 
       // When at least one selected row is JOB_SCHEDULED, show "Chuyển sang làm hợp đồng"
       if (hasJobScheduled) {
-        actions.push({
-          title: "Chuyển sang làm hợp đồng",
-          label: "Chuyển sang  làm hợp đồng",
-          confirmMessage:
-            "Bạn có chắc muốn chuyển các ứng viên này sang  làm hợp đồng?",
-          onClick: async () => {
-            const sd = getSelectedData();
-            const castedHandle = handleBatchStatusChange as unknown as (
-              rows: TuyenDungItem[],
-              status: string
-            ) => Promise<void>;
+        actions.push(
+          {
+            title: "Chuyển sang làm hợp đồng",
+            label: "Chuyển sang  làm hợp đồng",
+            confirmMessage:
+              "Bạn có chắc muốn chuyển các ứng viên này sang  làm hợp đồng?",
+            onClick: async () => {
+              const sd = getSelectedData();
+              const castedHandle = handleBatchStatusChange as unknown as (
+                rows: TuyenDungItem[],
+                status: string
+              ) => Promise<void>;
 
-            await castedHandle(sd, "CONTRACT_SIGNING");
+              await castedHandle(sd, "CONTRACT_SIGNING");
+            },
           },
-        });
+          {
+            title: "Gửi lại mail",
+            label: "Gửi lại mail",
+            confirmMessage: "Bạn có chắc muốn gữi lại mail không?",
+            onClick: async () => {
+              const sd = getSelectedData();
+              console.log("sd", sd);
+            },
+          }
+        );
       }
 
       return actions;

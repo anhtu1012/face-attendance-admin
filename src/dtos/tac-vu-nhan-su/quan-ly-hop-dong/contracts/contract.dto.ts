@@ -32,6 +32,7 @@ export const UserContractItemSchema = z.object({
   duration: z.number(),
   contractPdf: z.string(),
   status: ContractStatusEnum,
+  levelSalaryName: z.string(),
   branchCodes: z.array(z.string()),
   branchNames: z.array(z.string()),
   fullNameUser: z.string(),

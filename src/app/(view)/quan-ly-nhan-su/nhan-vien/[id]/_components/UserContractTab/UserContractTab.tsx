@@ -30,6 +30,8 @@ import "./UserContractTab.scss";
 import { UserContractItem } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 import { useCallback, useEffect, useState } from "react";
 import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
+import { getDurationYMDLabel } from "@/utils/client/getDurationYMDLabel";
+import { AppendixDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/appendix/appendix.dto";
 
 interface UserContractTabProps {
   userId: string;
@@ -37,10 +39,13 @@ interface UserContractTabProps {
 
 function UserContractTab({ userId }: UserContractTabProps) {
   const [contractData, setContractData] = useState<UserContractItem>();
+  const [historyData, setHistoryData] = useState<UserContractItem[]>([]);
+  const [appendixData, setAppendixData] = useState<AppendixDetail[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const formatDate = (date: string | null) => {
     return date ? dayjs(date).format("DD/MM/YYYY") : "N/A";
   };
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -52,11 +57,19 @@ function UserContractTab({ userId }: UserContractTabProps) {
         undefined,
         params
       );
+
+      setHistoryData(response.data);
       // kiểm tra response.data , chỉ lấy tk nào không có status là  EXPIRED  , INACTIVE
       const excludedStatuses = ["EXPIRED", "INACTIVE"];
       const activeContracts = response.data.filter(
         (contract: any) => !excludedStatuses.includes(contract.status as string)
       );
+      const responsePhuLuc = await QuanLyHopDongServices.getPhuLucHopDong(
+        [],
+        undefined,
+        { userContractId: activeContracts[0]?.id }
+      );
+      setAppendixData(responsePhuLuc.data);
       setContractData(
         activeContracts.length > 0 ? activeContracts[0] : response.data[0]
       );
@@ -120,44 +133,6 @@ function UserContractTab({ userId }: UserContractTabProps) {
       </Tag>
     );
   };
-
-  // Mock history data
-  const historyData = [
-    {
-      date: "2025-11-02",
-      action: "Tạo hợp đồng",
-      description: "Hợp đồng được tạo và gửi cho nhân viên",
-      user: "Admin System",
-    },
-    {
-      date: "2025-11-03",
-      action: "Nhân viên xem hợp đồng",
-      description: "Phạm Hoàng Phúc đã xem hợp đồng",
-      user: "Phạm Hoàng Phúc",
-    },
-    {
-      date: "2025-11-10",
-      action: "Gia hạn hợp đồng",
-      description: "Hợp đồng được gia hạn thêm 6 tháng",
-      user: "Anh Nhím",
-    },
-  ];
-
-  // Mock appendix data
-  const appendixData = [
-    {
-      id: "1",
-      name: "Phụ lục 1 - Bảng lương chi tiết",
-      createdAt: "2025-11-02",
-      fileUrl: "#",
-    },
-    {
-      id: "2",
-      name: "Phụ lục 2 - Quy định về chế độ làm việc",
-      createdAt: "2025-11-05",
-      fileUrl: "#",
-    },
-  ];
 
   const handleDownloadContract = () => {
     window.open(contractData?.fileContract, "_blank");
@@ -262,9 +237,12 @@ function UserContractTab({ userId }: UserContractTabProps) {
                     {formatDate(contractData.endDate)}
                   </Descriptions.Item>
                   <Descriptions.Item label="Thời hạn hợp đồng">
-                    {contractData.duration} tháng
+                    {getDurationYMDLabel(contractData.duration)}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Trạng thái ký">
+                  <Descriptions.Item label="Cấp bậc">
+                    {contractData.levelSalaryName}
+                  </Descriptions.Item>
+                  {/* <Descriptions.Item label="Trạng thái ký">
                     {contractData?.isSignature ? (
                       <Tag color="success" icon={<CheckCircleOutlined />}>
                         Đã ký
@@ -274,7 +252,7 @@ function UserContractTab({ userId }: UserContractTabProps) {
                         Chưa ký
                       </Tag>
                     )}
-                  </Descriptions.Item>
+                  </Descriptions.Item> */}
                 </Descriptions>
               </Card>
 
@@ -376,23 +354,6 @@ function UserContractTab({ userId }: UserContractTabProps) {
                     </div>
                   </div>
                 </div>
-                <Divider />
-                <div className="stat-item">
-                  <div
-                    className="stat-icon"
-                    style={{
-                      background: "linear-gradient(135deg, #52c41a, #73d13d)",
-                    }}
-                  >
-                    <BankOutlined />
-                  </div>
-                  <div className="stat-info">
-                    <div className="stat-label">Công ty</div>
-                    <div className="stat-value">
-                      ID: {(contractData as any)?.companyId ?? "N/A"}
-                    </div>
-                  </div>
-                </div>
               </Card>
             </Col>
           </Row>
@@ -404,7 +365,7 @@ function UserContractTab({ userId }: UserContractTabProps) {
               <Card
                 title={
                   <span className="card-title">
-                    <HistoryOutlined /> Lịch sử thay đổi
+                    <HistoryOutlined /> Lịch sử hợp đồng
                   </span>
                 }
                 className="history-card"
@@ -416,16 +377,21 @@ function UserContractTab({ userId }: UserContractTabProps) {
                     children: (
                       <div className="history-item">
                         <div className="history-header">
-                          <span className="history-action">{item.action}</span>
+                          <span className="history-action">
+                            {item.contractTypeName}
+                          </span>
                           <span className="history-date">
-                            {formatDate(item.date)}
+                            {formatDate(item.startDate) +
+                              "- " +
+                              formatDate(item.endDate)}
                           </span>
                         </div>
                         <div className="history-description">
-                          {item.description}
+                          {item.departmentName} - {item.positionName} -{" "}
+                          {item.levelSalaryName}
                         </div>
                         <div className="history-user">
-                          <UserOutlined /> {item.user}
+                          <UserOutlined /> {formatCurrency(item.grossSalary)}
                         </div>
                       </div>
                     ),
@@ -452,17 +418,21 @@ function UserContractTab({ userId }: UserContractTabProps) {
                           <FileTextOutlined />
                         </div>
                         <div className="appendix-info">
-                          <div className="appendix-name">{appendix.name}</div>
+                          <div className="appendix-name">
+                            {appendix.contractTypeName}
+                          </div>
                           <div className="appendix-date">
-                            Ngày tạo: {formatDate(appendix.createdAt)}
+                            Ngày tạo: {formatDate(appendix.startDate)}
                           </div>
                         </div>
                         <Button
                           type="link"
                           icon={<DownloadOutlined />}
-                          onClick={() =>
-                            window.open(appendix.fileUrl, "_blank")
-                          }
+                          onClick={() => {
+                            if (appendix.fileContract) {
+                              window.open(appendix.fileContract, "_blank");
+                            }
+                          }}
                         >
                           Tải
                         </Button>

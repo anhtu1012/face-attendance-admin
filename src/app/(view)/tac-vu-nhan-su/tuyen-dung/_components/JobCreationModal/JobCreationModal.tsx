@@ -1,5 +1,6 @@
 import { SelectOption } from "@/dtos/select/select.dto";
 import { CreateJobRequest } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.request.dto";
+import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
 import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import SelectServices from "@/services/select/select.service";
@@ -14,12 +15,22 @@ import {
   Select,
   Tabs,
 } from "antd";
-import dayjs from "dayjs";
-import React, { useState } from "react";
+import dayjs, { Dayjs } from "dayjs";
+import React, { useEffect, useState } from "react";
 import { FaBriefcase, FaCheck, FaInfoCircle, FaUsers } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import "./JobCreationModal.scss";
 import QuillEditor from "./QuillEditor";
+
+// Form values type with dayjs for DatePicker and extra fields for display
+type JobFormValues = Omit<CreateJobRequest, "expirationDate"> & {
+  expirationDate?: Dayjs | string;
+  supervisorName?: string;
+  recruiterEmail?: string;
+  recruiterPhone?: string;
+  recruiterPosition?: string;
+  role?: string;
+};
 
 interface JobCreationModalProps {
   open: boolean;
@@ -31,6 +42,8 @@ interface JobCreationModalProps {
     selectExperience: SelectOption[];
     selectDepartment: SelectOption[];
   };
+  mode?: "create" | "edit";
+  initialData?: JobDetail;
 }
 
 const JobCreationModal: React.FC<JobCreationModalProps> = ({
@@ -38,8 +51,10 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
   onClose,
   onSuccess,
   selectOptions,
+  mode = "create",
+  initialData,
 }) => {
-  const [form] = Form.useForm<CreateJobRequest>();
+  const [form] = Form.useForm<JobFormValues>();
   const [loading, setLoading] = useState(false);
   const messageApi = useAntdMessage();
   const { userProfile } = useSelector(selectAuthLogin);
@@ -93,29 +108,86 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
     { value: "3_MONTHS", label: "3 tháng" },
     { value: "6_MONTHS", label: "6 tháng" },
   ];
-  const handleSubmit = async (values: CreateJobRequest) => {
+
+  // Populate form when in edit mode
+  useEffect(() => {
+    if (mode === "edit" && initialData && open) {
+      // Note: role and departmentId might not be in JobDetail, so we check carefully
+      // For now, we'll populate available fields from initialData
+      
+      form.setFieldsValue({
+        jobTitle: initialData.jobTitle,
+        requireExperience: initialData.requireExperience,
+        positionId: initialData.positionId ? String(initialData.positionId) : undefined,
+        address: initialData.address,
+        fromSalary: initialData.fromSalary,
+        toSalary: initialData.toSalary,
+        trialPeriod: initialData.trialPeriod,
+        expirationDate: initialData.expirationDate ? dayjs(initialData.expirationDate) : undefined,
+        requireSkill: initialData.requireSkill,
+        jobDescription: initialData.jobDescription,
+        jobResponsibility: initialData.jobResponsibility,
+        jobOverview: initialData.jobOverview,
+        jobBenefit: initialData.jobBenefit,
+        supervisorId: initialData.supervisorId ? String(initialData.supervisorId) : undefined,
+        supervisorName: initialData.recruiter?.fullName || "",
+        recruiterEmail: initialData.recruiter?.email || "",
+        recruiterPhone: initialData.recruiter?.phone || "",
+        recruiterPosition: initialData.recruiter?.positionName || "HR Manager",
+      });
+    } else if (mode === "create" && open) {
+      // Reset form when switching back to create mode
+      form.resetFields();
+    }
+  }, [mode, initialData, open, form]);
+
+  const handleSubmit = async (values: JobFormValues) => {
     setLoading(true);
     try {
-      const res = await JobServices.createJob(values);
-      const jobId = res?.jobCode || "12345";
-      const jobLink = `${window.location.origin}/apply/${jobId}`;
-      messageApi.success("Tạo công việc thành công!");
-      form.resetFields();
-      // Notify parent about success (existing behavior)
-      onSuccess(jobLink);
+      // Convert dayjs to ISO string if present
+      const payload: CreateJobRequest = {
+        ...values,
+        expirationDate: values.expirationDate && dayjs.isDayjs(values.expirationDate)
+          ? values.expirationDate.toISOString() 
+          : typeof values.expirationDate === 'string' 
+            ? values.expirationDate 
+            : undefined,
+      };
 
-      // Dispatch a global event so other components (e.g., ListJob) can re-fetch job list
-      try {
-        const detail = res ?? { jobCode: jobId };
-        window.dispatchEvent(new CustomEvent("jobCreated", { detail }));
-      } catch (e) {
-        // ignore if environment doesn't support CustomEvent
-        // keep behavior best-effort
-        console.warn("Failed to dispatch jobCreated event", e);
+      if (mode === "edit" && initialData) {
+        // Update existing job
+        await JobServices.updateJob(String(initialData.id), payload);
+        const jobLink = `${window.location.origin}/apply/${initialData.jobCode}`;
+        messageApi.success("Cập nhật công việc thành công!");
+        form.resetFields();
+        onSuccess(jobLink);
+
+        // Dispatch a global event so other components can refresh
+        try {
+          window.dispatchEvent(new CustomEvent("jobUpdated", { detail: { jobCode: initialData.jobCode } }));
+        } catch (e) {
+          console.warn("Failed to dispatch jobUpdated event", e);
+        }
+      } else {
+        // Create new job
+        const res = await JobServices.createJob(payload);
+        const jobId = res?.jobCode || "12345";
+        const jobLink = `${window.location.origin}/apply/${jobId}`;
+        messageApi.success("Tạo công việc thành công!");
+        form.resetFields();
+        onSuccess(jobLink);
+
+        // Dispatch a global event so other components (e.g., ListJob) can re-fetch job list
+        try {
+          const detail = res ?? { jobCode: jobId };
+          window.dispatchEvent(new CustomEvent("jobCreated", { detail }));
+        } catch (e) {
+          console.warn("Failed to dispatch jobCreated event", e);
+        }
       }
     } catch (error: unknown) {
-      console.error("Error creating job:", error);
-      messageApi.error("Có lỗi xảy ra khi tạo công việc!");
+      console.error(`Error ${mode === "edit" ? "updating" : "creating"} job:`, error);
+      messageApi.error(`Có lỗi xảy ra khi ${mode === "edit" ? "cập nhật" : "tạo"} công việc!`);
     } finally {
       setLoading(false);
     }
@@ -132,7 +204,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
         <div className="modal-title">
           <div className="title-content">
             {/* <FaBriefcase className="title-icon" /> */}
-            <span className="title-text">Tạo Công Việc Mới</span>
+            <span className="title-text">{mode === "edit" ? "Chỉnh Sửa Công Việc" : "Tạo Công Việc Mới"}</span>
           </div>
 
           <div className="title-decoration"></div>
@@ -632,7 +704,10 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
             size="large"
             icon={<FaCheck />}
           >
-            {loading ? "Đang tạo công việc..." : "Tạo công việc"}
+            {loading 
+              ? (mode === "edit" ? "Đang cập nhật..." : "Đang tạo công việc...") 
+              : (mode === "edit" ? "Cập nhật công việc" : "Tạo công việc")
+            }
           </Button>
         </div>
         <Form.Item name="supervisorId" hidden>

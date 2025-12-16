@@ -6,6 +6,7 @@ export const QuantityStatusSchema = z.object({
   toInterviewQuantity: z.string(),
   toJobOfferedQuantity: z.string(),
   toContractQuantity: z.string(),
+  totalQuantity: z.string(),
 });
 
 export type QuantityStatus = z.infer<typeof QuantityStatusSchema>;

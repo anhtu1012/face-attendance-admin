@@ -1,5 +1,6 @@
 import Cbutton from "@/components/basicUI/Cbutton";
 import { ContractDetail } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
+import { getDurationYMDLabel } from "@/utils/client/getDurationYMDLabel";
 import {
   Badge,
   Card,
@@ -60,41 +61,6 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
   const formatDateTime = (dateString: string | null | undefined) => {
     if (!dateString) return "N/A";
     return dayjs(dateString).format("DD/MM/YYYY HH:mm");
-  };
-
-  const calculateDuration = (minutes: string) => {
-    const mins = parseInt(minutes);
-    const minutesPerDay = 1440;
-    const daysPerMonth = 30.4167;
-
-    const totalDays = Math.floor(mins / minutesPerDay);
-
-    if (totalDays >= 1) {
-      let months = Math.floor(totalDays / daysPerMonth);
-      let days = Math.round(totalDays - months * daysPerMonth);
-
-      const roundedDaysPerMonth = Math.round(daysPerMonth);
-      if (days >= roundedDaysPerMonth) {
-        months += 1;
-        days = 0;
-      }
-
-      months = Math.max(0, months);
-      days = Math.max(0, days);
-
-      if (months > 0) {
-        return `${months} tháng${days > 0 ? ` ${days} ngày` : ""}`;
-      }
-      return `${totalDays} ngày`;
-    }
-
-    if (mins >= 60) {
-      const hours = Math.floor(mins / 60);
-      const remainingMins = mins % 60;
-      return `${hours} giờ${remainingMins > 0 ? ` ${remainingMins} phút` : ""}`;
-    }
-
-    return `${mins} phút`;
   };
 
   const handleFileSelect = (file: File) => {
@@ -177,7 +143,7 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
         <Descriptions.Item label="Thời hạn" span={2}>
           <Badge
             status="processing"
-            text={calculateDuration(contract.duration)}
+            text={getDurationYMDLabel(contract.duration)}
           />
         </Descriptions.Item>
 

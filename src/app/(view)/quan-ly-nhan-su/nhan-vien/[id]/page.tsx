@@ -10,11 +10,15 @@ import UserInfoTab from "./_components/UserInfoTab/UserInfoTab";
 import UserTimekeepingTab from "./_components/UserTimekeepingTab/UserTimekeepingTab";
 import UserSalaryTab from "./_components/UserSalaryTab/UserSalaryTab";
 import UserContractTab from "./_components/UserContractTab/UserContractTab";
+import UserOverviewTab from "./_components/UserOverviewTab/UserOverviewTab";
+import UserFormsTab from "./_components/UserFormsTab/UserFormsTab";
 import "./page.scss";
 import { FaRegUserCircle } from "react-icons/fa";
 import { IoMdTimer } from "react-icons/io";
 import { GiMoneyStack } from "react-icons/gi";
 import { HiDocumentText } from "react-icons/hi";
+import { AiOutlineDashboard } from "react-icons/ai";
+import { MdAssignment } from "react-icons/md";
 import NguoiDungServices from "@/services/admin/quan-tri-he-thong/nguoi-dung.service";
 import { NguoiDungItem } from "@/dtos/quan-tri-he-thong/nguoi-dung/nguoi-dung.dto";
 
@@ -25,7 +29,7 @@ function UserDetailPage() {
 
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<NguoiDungItem | null>(null);
-  const [activeTab, setActiveTab] = useState("info");
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     if (userId) {
@@ -52,9 +56,19 @@ function UserDetailPage() {
 
   const tabItems = [
     {
-      key: "info",
+      key: "overview",
       label: (
         <span className="tab-label">
+          <AiOutlineDashboard size={20} />
+          Tổng quan
+        </span>
+      ),
+      children: <UserOverviewTab userId={userId} />,
+    },
+    {
+      key: "info",
+      label: (
+        <span className="tab-label" style={{ marginLeft: "12px" }}>
           <FaRegUserCircle size={20} />
           Thông tin cá nhân
         </span>
@@ -70,6 +84,16 @@ function UserDetailPage() {
         </span>
       ),
       children: <UserContractTab userId={userId} />,
+    },
+    {
+      key: "forms",
+      label: (
+        <span className="tab-label" style={{ marginLeft: "12px" }}>
+          <MdAssignment size={20} />
+          Đơn từ
+        </span>
+      ),
+      children: <UserFormsTab userId={userId} />,
     },
     {
       key: "timekeeping",

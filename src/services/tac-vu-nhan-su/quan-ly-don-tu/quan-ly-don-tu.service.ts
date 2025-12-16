@@ -19,6 +19,19 @@ class QuanLyDonTuServicesBase extends AxiosService {
     );
   }
 
+  async getDanhSachDonNguoiGui(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<QuanlyDonTuResponseGetItem> {
+    return this.getWithFilter(
+      `${this.basePath}/danh-sach-don-nguoi-gui`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
+
   async getQuanLyDonTuById(id: string): Promise<any> {
     return this.get<any>(`${this.basePath}/danh-sach-don/${id}`);
   }
