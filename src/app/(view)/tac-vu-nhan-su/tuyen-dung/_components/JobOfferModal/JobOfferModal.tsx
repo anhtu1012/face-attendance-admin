@@ -89,7 +89,7 @@ const JobOfferModal: React.FC<JobOfferModalProps> = ({
       if (!open) return;
       try {
         const param = {
-          fromDate: dayjs().startOf("month").toISOString(),
+          fromDate: dayjs().startOf("day").toISOString(),
           toDate: dayjs().endOf("month").toISOString(),
           jobId: jobId,
         };
