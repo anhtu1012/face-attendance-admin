@@ -31,36 +31,30 @@ interface SalaryChartProps {
 }
 
 const SalaryChart: React.FC<SalaryChartProps> = ({ data, loading = false }) => {
+  console.log({ data });
+
   const chartData = {
     labels: data.map((dept) => dept.departmentName),
     datasets: [
       {
-        label: "Lương cơ bản",
-        data: data.map((dept) => dept.totalSalary / 1000000),
+        label: "Lương trung bình",
+        data: data.map((dept) => dept.averageSalary / 1000000),
         backgroundColor: "rgba(24, 144, 255, 0.8)",
         borderColor: "rgba(24, 144, 255, 1)",
         borderWidth: 1,
         borderRadius: 6,
       },
       {
-        label: "Thưởng",
-        data: data.map((dept) => dept.totalBonus / 1000000),
-        backgroundColor: "rgba(82, 196, 26, 0.8)",
-        borderColor: "rgba(82, 196, 26, 1)",
-        borderWidth: 1,
-        borderRadius: 6,
-      },
-      {
-        label: "Tăng ca",
-        data: data.map((dept) => dept.overtimePay / 1000000),
+        label: "Lương OT trung bình",
+        data: data.map((dept) => dept.averageOT / 1000000),
         backgroundColor: "rgba(250, 173, 20, 0.8)",
         borderColor: "rgba(250, 173, 20, 1)",
         borderWidth: 1,
         borderRadius: 6,
       },
       {
-        label: "Khấu trừ",
-        data: data.map((dept) => dept.totalDeduction / 1000000),
+        label: "Phạt đi muộn trung bình",
+        data: data.map((dept) => dept.averageLateFine / 1000000),
         backgroundColor: "rgba(255, 77, 79, 0.8)",
         borderColor: "rgba(255, 77, 79, 1)",
         borderWidth: 1,
@@ -155,4 +149,3 @@ const SalaryChart: React.FC<SalaryChartProps> = ({ data, loading = false }) => {
 };
 
 export default SalaryChart;
-

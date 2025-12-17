@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SelectOption } from "@/dtos/select/select.dto";
 import { CreateJobRequest } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job.request.dto";
 import { JobDetail } from "@/dtos/tac-vu-nhan-su/tuyen-dung/job/job-detail.dto";
@@ -114,22 +115,36 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
     if (mode === "edit" && initialData && open) {
       // Note: role and departmentId might not be in JobDetail, so we check carefully
       // For now, we'll populate available fields from initialData
-      
+
       form.setFieldsValue({
         jobTitle: initialData.jobTitle,
         requireExperience: initialData.requireExperience,
-        positionId: initialData.positionId ? String(initialData.positionId) : undefined,
+        positionId: initialData.positionId
+          ? String(initialData.positionId)
+          : undefined,
         address: initialData.address,
         fromSalary: initialData.fromSalary,
         toSalary: initialData.toSalary,
         trialPeriod: initialData.trialPeriod,
-        expirationDate: initialData.expirationDate ? dayjs(initialData.expirationDate) : undefined,
-        requireSkill: initialData.requireSkill,
+        expirationDate: initialData.expirationDate
+          ? dayjs(initialData.expirationDate)
+          : undefined,
+        requireSkill: Array.isArray(initialData.requireSkill)
+          ? initialData.requireSkill.map((s) => {
+              const str = String(s);
+              const found = (selectOptions.selectSkill || []).find(
+                (o) => o.value === str || o.label === str
+              );
+              return found ? found.value : str;
+            })
+          : initialData.requireSkill,
         jobDescription: initialData.jobDescription,
         jobResponsibility: initialData.jobResponsibility,
         jobOverview: initialData.jobOverview,
         jobBenefit: initialData.jobBenefit,
-        supervisorId: initialData.supervisorId ? String(initialData.supervisorId) : undefined,
+        supervisorId: initialData.supervisorId
+          ? String(initialData.supervisorId)
+          : undefined,
         supervisorName: initialData.recruiter?.fullName || "",
         recruiterEmail: initialData.recruiter?.email || "",
         recruiterPhone: initialData.recruiter?.phone || "",
@@ -144,13 +159,23 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
   const handleSubmit = async (values: JobFormValues) => {
     setLoading(true);
     try {
+      // Normalize requireSkill to array of values (strings) in case Select
+      // returned label/value objects or mixed types during edit.
+      const normalizedSkills = Array.isArray(values.requireSkill)
+        ? values.requireSkill.map((s) =>
+            typeof s === "string" ? s : (s as any)?.value ?? String(s)
+          )
+        : undefined;
+
       // Convert dayjs to ISO string if present
       const payload: CreateJobRequest = {
         ...values,
-        expirationDate: values.expirationDate && dayjs.isDayjs(values.expirationDate)
-          ? values.expirationDate.toISOString() 
-          : typeof values.expirationDate === 'string' 
-            ? values.expirationDate 
+        requireSkill: normalizedSkills,
+        expirationDate:
+          values.expirationDate && dayjs.isDayjs(values.expirationDate)
+            ? values.expirationDate.toISOString()
+            : typeof values.expirationDate === "string"
+            ? values.expirationDate
             : undefined,
       };
 
@@ -164,7 +189,11 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
 
         // Dispatch a global event so other components can refresh
         try {
-          window.dispatchEvent(new CustomEvent("jobUpdated", { detail: { jobCode: initialData.jobCode } }));
+          window.dispatchEvent(
+            new CustomEvent("jobUpdated", {
+              detail: { jobCode: initialData.jobCode },
+            })
+          );
         } catch (e) {
           console.warn("Failed to dispatch jobUpdated event", e);
         }
@@ -186,8 +215,13 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
         }
       }
     } catch (error: unknown) {
-      console.error(`Error ${mode === "edit" ? "updating" : "creating"} job:`, error);
-      messageApi.error(`Có lỗi xảy ra khi ${mode === "edit" ? "cập nhật" : "tạo"} công việc!`);
+      console.error(
+        `Error ${mode === "edit" ? "updating" : "creating"} job:`,
+        error
+      );
+      messageApi.error(
+        `Có lỗi xảy ra khi ${mode === "edit" ? "cập nhật" : "tạo"} công việc!`
+      );
     } finally {
       setLoading(false);
     }
@@ -204,7 +238,9 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
         <div className="modal-title">
           <div className="title-content">
             {/* <FaBriefcase className="title-icon" /> */}
-            <span className="title-text">{mode === "edit" ? "Chỉnh Sửa Công Việc" : "Tạo Công Việc Mới"}</span>
+            <span className="title-text">
+              {mode === "edit" ? "Chỉnh Sửa Công Việc" : "Tạo Công Việc Mới"}
+            </span>
           </div>
 
           <div className="title-decoration"></div>
@@ -598,6 +634,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                           <Input
                             placeholder="VD: Nguyễn Thị Lan Anh"
                             className="custom-input"
+                            disabled={mode === "edit"}
                           />
                         </Form.Item>
                       </div>
@@ -615,6 +652,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                           <Input
                             placeholder="VD: HR Manager..."
                             className="custom-input"
+                            disabled={mode === "edit"}
                           />
                         </Form.Item>
                       </div>
@@ -633,6 +671,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                           <Input
                             placeholder="VD: lananh.nguyen@faceai.vn"
                             className="custom-input"
+                            disabled={mode === "edit"}
                           />
                         </Form.Item>
                       </div>
@@ -650,6 +689,7 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
                           <Input
                             placeholder="VD: 0912-345-678"
                             className="custom-input"
+                            disabled={mode === "edit"}
                           />
                         </Form.Item>
                       </div>
@@ -704,10 +744,13 @@ const JobCreationModal: React.FC<JobCreationModalProps> = ({
             size="large"
             icon={<FaCheck />}
           >
-            {loading 
-              ? (mode === "edit" ? "Đang cập nhật..." : "Đang tạo công việc...") 
-              : (mode === "edit" ? "Cập nhật công việc" : "Tạo công việc")
-            }
+            {loading
+              ? mode === "edit"
+                ? "Đang cập nhật..."
+                : "Đang tạo công việc..."
+              : mode === "edit"
+              ? "Cập nhật công việc"
+              : "Tạo công việc"}
           </Button>
         </div>
         <Form.Item name="supervisorId" hidden>

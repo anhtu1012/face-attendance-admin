@@ -3,7 +3,7 @@ import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { Form, Row, Col } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import Cbutton from "@/components/basicUI/Cbutton";
-import CRangePicker from "@/components/basicUI/CrangePicker";
+import CdatePicker from "@/components/basicUI/CdatePicker";
 import Cselect from "@/components/Cselect";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FilterProps, SalaryFilterValues } from "../../_types/salary.types";
@@ -14,10 +14,7 @@ const Filter = forwardRef<
   FilterProps
 >(({ onSubmit }, ref) => {
   const [form] = Form.useForm();
-  const [startDate, setStartDate] = useState<Dayjs | null>(
-    dayjs().startOf("month")
-  );
-  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs().endOf("month"));
+  const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(dayjs());
 
   useImperativeHandle(ref, () => ({
     getFormValues: () => {
@@ -26,8 +23,7 @@ const Filter = forwardRef<
     },
     resetForm: () => {
       form.resetFields();
-      setStartDate(dayjs().startOf("month"));
-      setEndDate(dayjs().endOf("month"));
+      setSelectedMonth(dayjs());
     },
   }));
 
@@ -50,27 +46,22 @@ const Filter = forwardRef<
         className="salary-filter-form"
         onFinish={onSubmit}
         initialValues={{
-          dateRange: [dayjs().startOf("month"), dayjs().endOf("month")],
+          monthYear: dayjs(),
           departmentId: "all",
         }}
       >
         <Row gutter={16}>
           <Col xs={24} sm={12} md={10}>
-            <Form.Item name="dateRange" style={{ marginBottom: 0 }}>
-              <CRangePicker
-                label={["Từ ngày", "Đến ngày"]}
-                placeholder={["", ""]}
+            <Form.Item name="monthYear" style={{ marginBottom: 0 }}>
+              <CdatePicker
+                label="Chọn tháng"
+                picker="month"
                 style={{ width: "100%", height: "40px" }}
-                format={"DD/MM/YYYY"}
-                value={startDate && endDate ? [startDate, endDate] : null}
-                onChange={(dates) => {
-                  if (dates && dates[0] && dates[1]) {
-                    setStartDate(dates[0]);
-                    setEndDate(dates[1]);
-                  } else {
-                    setStartDate(null);
-                    setEndDate(null);
-                  }
+                format="MM/YYYY"
+                value={selectedMonth}
+                onChange={(date) => {
+                  setSelectedMonth(date);
+                  form.setFieldsValue({ monthYear: date });
                 }}
               />
             </Form.Item>

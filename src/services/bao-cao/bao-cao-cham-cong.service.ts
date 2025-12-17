@@ -33,6 +33,18 @@ class BaoCaoChamCongServicesBase extends AxiosService {
       params
     );
   }
+  async getTimekeepingReportByUserAll(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    quickSearchText: string | undefined = undefined,
+    params?: Record<string, string | number | boolean>
+  ): Promise<TimekeepingReportData> {
+    return this.getWithFilter(
+      `/v1/report/timekeeping-of-staff`,
+      searchFilter,
+      quickSearchText,
+      params
+    );
+  }
   async getTimekeepingReportDetail(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,

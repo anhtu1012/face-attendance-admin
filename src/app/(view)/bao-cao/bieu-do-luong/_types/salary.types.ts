@@ -12,12 +12,10 @@ export interface SalaryStats {
 
 export interface DepartmentSalary {
   departmentName: string;
-  totalSalary: number;
   averageSalary: number;
-  totalBonus: number;
-  totalDeduction: number;
-  overtimePay: number;
   employeeCount: number;
+  averageOT: number;
+  averageLateFine: number;
 }
 
 export interface SalaryTrendData {
@@ -51,9 +49,8 @@ export interface SalaryBreakdown {
 }
 
 export interface SalaryFilterValues {
-  dateRange?: [Dayjs, Dayjs];
-  departmentId?: string;
   monthYear?: Dayjs;
+  departmentId?: string;
 }
 
 export interface FilterRef {
@@ -64,4 +61,3 @@ export interface FilterRef {
 export interface FilterProps {
   onSubmit: () => void;
 }
-

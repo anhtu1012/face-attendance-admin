@@ -247,7 +247,7 @@ const SalaryTable = forwardRef<TableSalaryRef, TableSalaryProps>(
             ? { year: dayjs(filterValuesExport.month).format("YYYY") }
             : {}),
           ...(filterValuesExport.month
-            ? { date: dayjs(filterValuesExport.month).format("MM/YYYY") }
+            ? { month: dayjs(filterValuesExport.month).format("MM") }
             : {}),
           ...(filterValuesExport.departmentId
             ? { departmentId: filterValuesExport.departmentId }

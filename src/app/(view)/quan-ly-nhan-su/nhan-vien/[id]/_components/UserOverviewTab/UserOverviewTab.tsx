@@ -16,25 +16,9 @@ import {
 import { Card, Col, Descriptions, Progress, Row, Spin } from "antd";
 import { useEffect, useState } from "react";
 import "./UserOverviewTab.scss";
-
-interface AttendanceStats {
-  actualTimekeeping: number;
-  monthStandardTimekeeping: number;
-  actualHour: number;
-  monthStandardHour: number;
-  lateNumber: number;
-  earlyNumber: number;
-  offWorkNumber: number;
-  forgetLogNumber: number;
-  normalOtTimekeeping: number;
-  normalOtHour: number;
-  offDayOtTimekeeping: number;
-  offDayOtHour: number;
-  holidayOtTimekeeping: number;
-  holidayOtHour: number;
-  lateFine: number;
-  forgetLogFine: number;
-}
+import BaoCaoChamCongServices from "@/services/bao-cao/bao-cao-cham-cong.service";
+import { TimekeepingReportData } from "@/dtos/bao-cao/bao-cao-cham-cong/bao-cao-cham-cong.dto";
+import BaoCaoSalaryServices from "@/services/bao-cao/bao-cao-luong.service";
 
 interface SalaryStats {
   totalWorkHour: number;
@@ -55,7 +39,7 @@ interface UserOverviewTabProps {
 function UserOverviewTab({ userId }: UserOverviewTabProps) {
   const [loading, setLoading] = useState(false);
   const [attendanceStats, setAttendanceStats] =
-    useState<AttendanceStats | null>(null);
+    useState<TimekeepingReportData | null>(null);
   const [salaryStats, setSalaryStats] = useState<SalaryStats | null>(null);
 
   useEffect(() => {
@@ -63,43 +47,25 @@ function UserOverviewTab({ userId }: UserOverviewTabProps) {
       setLoading(true);
       try {
         // TODO: Replace with actual API calls
-        // const attendance = await AttendanceServices.getStats(userId);
-        // const salary = await SalaryServices.getStats(userId);
+        const attendance =
+          await BaoCaoChamCongServices.getTimekeepingReportByUserAll(
+            [],
+            undefined,
+            {
+              userId: userId,
+            }
+          );
 
-        // Mock data matching the provided structure
-        const mockAttendance: AttendanceStats = {
-          actualTimekeeping: 22,
-          monthStandardTimekeeping: 26,
-          actualHour: 176,
-          monthStandardHour: 208,
-          lateNumber: 3,
-          earlyNumber: 1,
-          offWorkNumber: 2,
-          forgetLogNumber: 1,
-          normalOtTimekeeping: 5,
-          normalOtHour: 15,
-          offDayOtTimekeeping: 2,
-          offDayOtHour: 8,
-          holidayOtTimekeeping: 1,
-          holidayOtHour: 4,
-          lateFine: 150000,
-          forgetLogFine: 50000,
-        };
+        const salaryData = await BaoCaoSalaryServices.getSalaryReportByUserAll(
+          [],
+          undefined,
+          {
+            userId: userId,
+          }
+        );
 
-        const mockSalary: SalaryStats = {
-          totalWorkHour: 176,
-          totalWorkDay: 22,
-          totalSalary: 18500000,
-          workSalary: 15000000,
-          otSalary: 3500000,
-          lateCount: 3,
-          totalFine: 200000,
-          grossSalary: 15000000,
-          totalAllowance: 1000000,
-        };
-
-        setAttendanceStats(mockAttendance);
-        setSalaryStats(mockSalary);
+        setAttendanceStats(attendance);
+        setSalaryStats(salaryData.data[0]);
       } catch (error) {
         console.error("Error fetching overview data:", error);
       } finally {
@@ -110,15 +76,16 @@ function UserOverviewTab({ userId }: UserOverviewTabProps) {
     fetchData();
   }, [userId]);
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | string) => {
+    const num =
+      typeof value === "string"
+        ? parseFloat(value.replace(/[^\d.-]/g, "")) || 0
+        : value;
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
-    }).format(value);
+    }).format(num);
   };
-
-  const formatHour = (value: number) => `${value} giờ`;
-  const formatDay = (value: number) => `${value} ngày`;
 
   const calculateAttendanceRate = () => {
     if (!attendanceStats) return 0;
@@ -147,7 +114,7 @@ function UserOverviewTab({ userId }: UserOverviewTabProps) {
 
   const getTotalFines = () => {
     if (!attendanceStats) return 0;
-    return attendanceStats.lateFine + attendanceStats.forgetLogFine;
+    return attendanceStats.lateFine + attendanceStats.forgetLogNumber * 20000;
   };
 
   if (loading) {
@@ -308,7 +275,7 @@ function UserOverviewTab({ userId }: UserOverviewTabProps) {
                 <div className="info-item">
                   <span className="info-label">Phạt quên chấm</span>
                   <span className="info-value danger">
-                    {formatCurrency(attendanceStats.forgetLogFine)}
+                    {formatCurrency(attendanceStats.forgetLogNumber * 20000)}
                   </span>
                 </div>
                 <div className="info-item">
