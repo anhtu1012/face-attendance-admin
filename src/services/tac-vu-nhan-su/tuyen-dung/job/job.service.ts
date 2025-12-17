@@ -74,6 +74,10 @@ class JobServicesBase extends AxiosService {
     return this.post(`${this.basePath}/tuyen-dung/chia-se-cong-viec`, data);
   }
 
+  async reTryMail(data: any): Promise<any> {
+    return this.post(`${this.basePath}/lich-hen/retry-nhan-viec-email`, data);
+  }
+
   async getShareRequests(
     fromUser?: string | null,
     toUser?: string

@@ -1,8 +1,7 @@
 import {
-  SalaryStats,
-  DepartmentSalary,
-  SalaryTrendData,
   SalaryBreakdown,
+  SalaryStats,
+  SalaryTrendData,
 } from "../_types/salary.types";
 
 export const mockSalaryStats: SalaryStats = {
@@ -14,63 +13,6 @@ export const mockSalaryStats: SalaryStats = {
   averageSalary: 18269231, // ~18.3 triệu
   totalEmployees: 156,
 };
-
-export const mockDepartmentSalary: DepartmentSalary[] = [
-  {
-    departmentName: "Kỹ thuật",
-    totalSalary: 945000000,
-    averageSalary: 21000000,
-    totalBonus: 68000000,
-    totalDeduction: 42000000,
-    overtimePay: 38000000,
-    employeeCount: 45,
-  },
-  {
-    departmentName: "Kinh doanh",
-    totalSalary: 672000000,
-    averageSalary: 21000000,
-    totalBonus: 52000000,
-    totalDeduction: 28000000,
-    overtimePay: 18000000,
-    employeeCount: 32,
-  },
-  {
-    departmentName: "Marketing",
-    totalSalary: 504000000,
-    averageSalary: 18000000,
-    totalBonus: 28000000,
-    totalDeduction: 22000000,
-    overtimePay: 12000000,
-    employeeCount: 28,
-  },
-  {
-    departmentName: "Nhân sự",
-    totalSalary: 306000000,
-    averageSalary: 17000000,
-    totalBonus: 15000000,
-    totalDeduction: 18000000,
-    overtimePay: 8000000,
-    employeeCount: 18,
-  },
-  {
-    departmentName: "Tài chính",
-    totalSalary: 352000000,
-    averageSalary: 16000000,
-    totalBonus: 18000000,
-    totalDeduction: 22000000,
-    overtimePay: 12000000,
-    employeeCount: 22,
-  },
-  {
-    departmentName: "Hành chính",
-    totalSalary: 154000000,
-    averageSalary: 14000000,
-    totalBonus: 8000000,
-    totalDeduction: 10000000,
-    overtimePay: 6000000,
-    employeeCount: 11,
-  },
-];
 
 export const mockSalaryTrendData: SalaryTrendData[] = [
   {
@@ -191,4 +133,3 @@ export const formatFullCurrency = (value: number): string => {
     currency: "VND",
   }).format(value);
 };
-

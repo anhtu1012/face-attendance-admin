@@ -1480,6 +1480,7 @@ function Page() {
               selectionActionButtons={getSelectionActionButtons({
                 selectedStatus,
                 gridRef,
+                messageApi,
                 handleBatchStatusChange,
                 handleBatchInterviewSchedule,
                 handleBatchJobOffer,

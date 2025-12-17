@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SelectionActionButton } from "@/components/basicUI/cTableAG/components/SelectionInfoBar/SelectionInfoBar";
 import { TuyenDungItem } from "@/dtos/tac-vu-nhan-su/tuyen-dung/tuyen-dung.dto";
+import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
 import { AgGridReact } from "@ag-grid-community/react";
 
 interface GetSelectionActionButtonsParams {
   selectedStatus: string;
   gridRef: React.RefObject<AgGridReact>;
+  messageApi: any;
   handleBatchStatusChange: (
     selectedRows: TuyenDungItem[],
     status:
@@ -26,6 +29,7 @@ interface GetSelectionActionButtonsParams {
 export const getSelectionActionButtons = ({
   selectedStatus,
   gridRef,
+  messageApi,
   handleBatchStatusChange,
   handleBatchInterviewSchedule,
   handleBatchJobOffer,
@@ -148,8 +152,14 @@ export const getSelectionActionButtons = ({
             label: "Gửi lại mail",
             confirmMessage: "Bạn có chắc muốn gữi lại mail không?",
             onClick: async () => {
-              const sd = getSelectedData();
-              console.log("sd", sd);
+              const parti = getSelectedData();
+              const data = parti.map((item) => item.id);
+              try {
+                await JobServices.reTryMail({ listParticipantIds: data });
+                messageApi.success("Gửi lại mail thành công");
+              } catch {
+                messageApi.error("Gửi lại mail thất bại");
+              }
             },
           }
         );
