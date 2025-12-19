@@ -451,18 +451,19 @@
   padding: 16px;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.05);
+  border-left: 3px solid rgb(13, 71, 161);
   position: relative;
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229));
-    border-radius: 2px 0 0 2px;
-  }
+  // &::before {
+  //   content: "";
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   width: 3px;
+  //   height: 100%;
+  //   background: linear-gradient(to right, rgb(13, 71, 161), rgb(30, 136, 229));
+  //   border-radius: 2px 0 0 2px;
+  // }
 
   p {
     margin: 0;

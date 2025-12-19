@@ -148,9 +148,10 @@
       .step-indicator {
         position: absolute;
         bottom: -1.5px;
-        left: 0;
+        left: 8px;
         right: 0;
         height: 3px;
+        width: 92%;
         background: linear-gradient(
           to right,
           rgb(13, 71, 161),
