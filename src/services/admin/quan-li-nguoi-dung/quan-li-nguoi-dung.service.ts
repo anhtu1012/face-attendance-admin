@@ -59,7 +59,7 @@ class QlNguoiDungServicesBase extends AxiosService {
     listUserIds: string[];
     listDates: string[];
   }): Promise<any> {
-    return this.post(`/v1/schedule/create-schedule`, {});
+    return this.post(`/v1/sa/user/create-schedule-sep`, data);
   }
 }
 
