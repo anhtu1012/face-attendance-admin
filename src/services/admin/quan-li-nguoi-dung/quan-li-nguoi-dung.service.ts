@@ -53,6 +53,14 @@ class QlNguoiDungServicesBase extends AxiosService {
       params
     );
   }
+
+  async createSchedule(data: {
+    departmentId: string;
+    listUserIds: string[];
+    listDates: string[];
+  }): Promise<any> {
+    return this.post(`/v1/schedule/create-schedule`, {});
+  }
 }
 
 const QlNguoiDungServices = new QlNguoiDungServicesBase();

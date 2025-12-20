@@ -25,6 +25,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className="light" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.png" />
+      </head>
       <body suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>

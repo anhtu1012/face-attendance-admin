@@ -1,8 +1,8 @@
-// Weekend Overtime Schedule Page Styles
+// Work Schedule Page Styles
 // Following the user's design system with gradient blues, glassmorphism, and modern animations
 
 .overtime-page {
-  padding: 0;
+  padding: 12px;
 }
 
 // Page Header Styles
@@ -94,6 +94,71 @@
       font-size: 14px;
     }
   }
+}
+
+// Department Select Card (in Create Mode - Left Side)
+.departmentSelectCard {
+  border-radius: 12px;
+  border: 2px solid rgba(0, 60, 151, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 60, 151, 0.1);
+  transition: all 0.3s ease;
+  padding: 5px;
+
+  &:hover {
+    border-color: #003c97;
+    box-shadow: 0 6px 16px rgba(0, 60, 151, 0.2);
+  }
+
+  .departmentSelectWrapper {
+    .selectLabel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #003c97;
+      margin-bottom: 12px;
+
+      .label-icon {
+        font-size: 16px;
+      }
+    }
+
+    .departmentSelect {
+      .ant-select-selector {
+        border-radius: 8px;
+        border-color: rgba(0, 60, 151, 0.2);
+        padding: 6px 12px;
+
+        &:hover,
+        &:focus {
+          border-color: #003c97;
+          box-shadow: 0 0 0 2px rgba(0, 60, 151, 0.1);
+        }
+      }
+    }
+
+    .selectedDeptInfo {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 60, 151, 0.1);
+    }
+  }
+
+  .ant-card-body {
+    padding: 16px;
+  }
+}
+
+// No Shift Info Display
+.noShiftInfo {
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+  border-radius: 12px;
+  margin-bottom: 16px;
 }
 
 // Employee List
@@ -282,7 +347,100 @@
   }
 }
 
-// Weekend Days
+// Week Days (Full week - Monday to Sunday)
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+
+  .dayCard {
+    padding: 16px 12px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    &:hover {
+      border-color: #003c97;
+      background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 60, 151, 0.15);
+    }
+
+    &.selected {
+      border-color: #0056d6;
+      background: linear-gradient(135deg, #003c97 0%, #0056d6 100%);
+      color: white;
+      box-shadow: 0 8px 24px rgba(0, 60, 151, 0.35);
+
+      .dayName {
+        color: white !important;
+      }
+
+      .dayDate {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+
+    // Off Day Style (ngày nghỉ)
+    &.off-day {
+      background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+
+      &:hover {
+        border-color: transparent;
+        background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+        transform: none;
+        box-shadow: none;
+      }
+
+      .dayName {
+        color: #999;
+      }
+
+      .dayDate {
+        color: #bbb;
+      }
+    }
+
+    .dayHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+
+      .dayName {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+    }
+
+    .dayDate {
+      font-size: 16px;
+      font-weight: 700;
+      color: #003c97;
+      margin-bottom: 8px;
+    }
+
+    .dayInfo {
+      min-height: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
+// Old weekend days style for backward compatibility
 .weekendDays {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -310,7 +468,7 @@
 
       .dayName,
       .dayDate {
-        color: white;
+        color: white !important;
       }
 
       .ant-badge-status-dot {
@@ -329,7 +487,7 @@
       .dayName {
         font-size: 16px;
         font-weight: 700;
-        color: #1a1a1a;
+        // color: #1a1a1a;
       }
     }
 
@@ -427,6 +585,79 @@
     .timePicker {
       width: 120px;
       border-radius: 8px;
+      border-color: rgba(0, 60, 151, 0.2);
+
+      &:hover,
+      &:focus {
+        border-color: #003c97;
+        box-shadow: 0 0 0 2px rgba(0, 60, 151, 0.1);
+      }
+    }
+
+    &.departmentItem {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .statLabelWrapper {
+        margin-bottom: 12px;
+      }
+
+      .departmentSelect {
+        width: 100%;
+
+        .ant-select-selector {
+          border-radius: 8px;
+          border-color: rgba(0, 60, 151, 0.2);
+
+          &:hover,
+          &:focus {
+            border-color: #003c97;
+            box-shadow: 0 0 0 2px rgba(0, 60, 151, 0.1);
+          }
+        }
+      }
+    }
+  }
+
+  // Shift Info Display
+  .shiftInfo {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(0, 60, 151, 0.15);
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0, 60, 151, 0.1);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .info-icon {
+        font-size: 16px;
+        color: #003c97;
+        min-width: 20px;
+      }
+
+      .info-label {
+        font-size: 13px;
+        color: #555;
+        font-weight: 500;
+        min-width: 100px;
+      }
+
+      .info-value {
+        font-size: 14px;
+        color: #1a1a1a;
+        font-weight: 600;
+        flex: 1;
+        text-align: right;
+      }
 
       &:hover,
       &:focus {
@@ -571,6 +802,26 @@
     }
   }
 
+  .weekDays {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 8px;
+
+    .dayCard {
+      padding: 12px 8px;
+      min-height: 90px;
+
+      .dayHeader {
+        .dayName {
+          font-size: 11px;
+        }
+      }
+
+      .dayDate {
+        font-size: 14px;
+      }
+    }
+  }
+
   .weekendDays {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -599,6 +850,12 @@
       .timePicker {
         width: 100%;
       }
+
+      &.departmentItem {
+        .departmentSelect {
+          width: 100%;
+        }
+      }
     }
   }
 }
@@ -606,10 +863,10 @@
 // Mode Segmented
 .mode-segmented {
   margin-left: auto;
-  
+
   .ant-segmented-item {
     transition: all 0.3s ease;
-    
+
     &-selected {
       background: linear-gradient(135deg, #003c97 0%, #0056d6 100%);
       color: white;
@@ -703,6 +960,31 @@
     color: #003c97;
     margin-bottom: 12px;
     padding-bottom: 12px;
+    border-bottom: 2px solid rgba(0, 60, 151, 0.15);
+
+    .detail-icon {
+      font-size: 18px;
+    }
+  }
+
+  .detail-department {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #003c97;
+    box-shadow: 0 2px 8px rgba(0, 60, 151, 0.08);
+
+    .dept-icon {
+      font-size: 16px;
+    }
+  }
+
+  .detail-time {
     border-bottom: 1px dashed rgba(0, 60, 151, 0.2);
 
     .detail-icon {
