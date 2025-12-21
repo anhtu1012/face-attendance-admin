@@ -301,7 +301,7 @@ function Page() {
       setSelectedDays([]);
     } catch (error) {
       console.error("Error creating schedule:", error);
-      messageApi.error("Không thể tạo lịch làm việc");
+      messageApi.error("Nhân viên đã có lịch làm việc trong ngày !");
     } finally {
       setSubmitting(false);
     }
