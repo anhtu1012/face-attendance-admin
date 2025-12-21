@@ -60,6 +60,18 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
     companyName: "IT Human Resources Company",
     workingHours: "8:00 - 17:30 (T2-T6)",
   };
+  const probationOptions = [
+    { value: "1_MONTH", label: "1 tháng" },
+    { value: "2_MONTHS", label: "2 tháng" },
+    { value: "3_MONTHS", label: "3 tháng" },
+    { value: "6_MONTHS", label: "6 tháng" },
+  ];
+
+  const getProbationLabel = (value?: string) => {
+    if (!value) return "";
+    const opt = probationOptions.find((o) => o.value === value);
+    return opt ? opt.label : value;
+  };
   // Fetch select options for edit modal
   const fetchSelectOptions = async () => {
     try {
@@ -254,7 +266,9 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({
             </div>
             <div className="info-item">
               <span className="info-label">Thời gian thử việc:</span>
-              <span className="info-value">{jobDetails.trialPeriod}</span>
+              <span className="info-value">
+                {getProbationLabel(jobDetails.trialPeriod)}
+              </span>
             </div>
             <div className="info-item">
               <span className="info-label">Hạn nộp hồ sơ:</span>

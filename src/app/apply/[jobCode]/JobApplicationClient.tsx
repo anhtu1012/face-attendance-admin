@@ -356,7 +356,7 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
 
             // Show success message
             const message = cached
-              ? "Phân tích CV thành công! (Kết quả từ cache)"
+              ? "Phân tích CV thành công!"
               : duration
               ? `Phân tích CV thành công! (${(duration / 1000).toFixed(1)}s)`
               : "Phân tích CV thành công!";

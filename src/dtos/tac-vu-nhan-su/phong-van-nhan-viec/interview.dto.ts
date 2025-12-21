@@ -37,6 +37,7 @@ export const AppointmentItemSchema = z.object({
     "CANCELLED", // Hủy bỏ
   ]),
   notes: z.string().optional(),
+  candidateCount: z.number().optional(),
   // Legacy fields for backward compatibility
   candidateId: z.string().optional(),
   candidateName: z.string().optional(),

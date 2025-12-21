@@ -171,7 +171,9 @@ const InterviewScheduleModal: React.FC<InterviewScheduleModalProps> = ({
           value: t.id as string,
           label: `${dayjs(t.date).format("DD/MM/YYYY")} - ${dayjs(
             t.startTime
-          ).format("HH:mm")} đến ${dayjs(t.endTime).format("HH:mm")}`,
+          ).format("HH:mm")} đến ${dayjs(t.endTime).format("HH:mm")}- Đã có ${
+            t.candidateCount
+          } ứng viên`,
         }));
         setTemplateOptions(data);
       } catch (err) {
