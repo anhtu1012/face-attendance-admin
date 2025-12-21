@@ -297,7 +297,7 @@ function UserOverviewTab({ userId }: UserOverviewTabProps) {
                 <div className="header-left">
                   <DollarOutlined className="header-icon" />
                   <div className="header-text">
-                    <h3 className="header-title">Lương</h3>
+                    <h3 className="header-title">Lương theo công</h3>
                     <p className="header-subtitle">Tổng tất cả</p>
                   </div>
                 </div>
