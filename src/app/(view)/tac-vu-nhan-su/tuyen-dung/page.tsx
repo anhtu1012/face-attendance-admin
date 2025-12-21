@@ -923,7 +923,7 @@ function Page() {
       NHAN_VIEC: ["JOB_OFFERED", "JOB_SCHEDULED"],
       HOP_DONG: "CONTRACT_SIGNING",
       HUY_HEN: undefined,
-      CHUA_PHU_HOP: undefined,
+      CHUA_PHU_HOP: ["NOT_SUITABLE"],
       HOAN_THANH: undefined,
     };
 

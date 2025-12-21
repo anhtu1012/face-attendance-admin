@@ -183,6 +183,20 @@ export const getSelectionActionButtons = ({
         },
       ];
 
+    case "CHUA_PHU_HOP":
+      return [
+        {
+          title: "Chuyển sang phỏng vấn",
+          label: "Chuyển sang phỏng vấn",
+          confirmMessage:
+            "Bạn có chắc muốn chuyển các ứng viên này sang phỏng vấn?",
+          onClick: async () => {
+            const selectedData = getSelectedData();
+            await handleBatchStatusChange(selectedData, "TO_INTERVIEW");
+          },
+        },
+      ];
+
     default:
       return undefined;
   }
