@@ -89,6 +89,7 @@ function Page() {
 
   // Get off day numbers
   const offDayNumbers = (companyInformation?.offDays ?? [])
+    .flatMap((day) => day.split(",").map((d) => d.trim()))
     .map(getIsoWeekdayFromShortName)
     .filter((day): day is number => day !== null);
 
