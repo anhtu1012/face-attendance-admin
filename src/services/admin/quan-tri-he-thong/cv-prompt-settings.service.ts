@@ -17,6 +17,23 @@ class CvPromptSettingsServiceBase extends AxiosService {
   }
 
   /**
+   * Get default CV prompt settings from the list
+   * Returns the item where isDefault = true
+   */
+  async getDefaultFromList(): Promise<CvPromptSettings | null> {
+    const response = await this.getAll();
+    // Handle different response formats
+    const items: CvPromptSettings[] = Array.isArray(response)
+      ? response
+      : response?.data || [];
+
+    // Find item with isDefault = true
+    return (
+      items.find((item: CvPromptSettings) => item.isDefault === true) || null
+    );
+  }
+
+  /**
    * Get default CV prompt settings
    */
   async getDefault(): Promise<{ data: CvPromptSettings; cached: boolean }> {

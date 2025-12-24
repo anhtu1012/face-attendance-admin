@@ -13,7 +13,9 @@ import { useSelectData } from "@/hooks/useSelectData";
 // JobServices import removed (not used in this component)
 import ApplyServices from "@/services/apply/apply.service";
 import JobServices from "@/services/tac-vu-nhan-su/tuyen-dung/job/job.service";
+import CvPromptSettingsService from "@/services/admin/quan-tri-he-thong/cv-prompt-settings.service";
 import { AnalysisResult } from "@/types/AnalysisResult";
+import type { CvPromptSettings } from "@/types/CvPromptSettings";
 import { extractFile } from "@/utils/extractFile";
 import {
   Badge,
@@ -92,6 +94,8 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [defaultSettings, setDefaultSettings] =
+    useState<CvPromptSettings | null>(null);
   const companyInfo = {
     companyName: "IT Human Resources Company",
     workingHours: "8:00 - 17:30 (T2-T6)",
@@ -100,6 +104,23 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
     companyEmail: "company12@gmail.com",
     companyPhone: "0123 456 789",
   };
+  // Fetch default AI settings on mount
+  useEffect(() => {
+    const loadDefaultSettings = async () => {
+      try {
+        const settings = await CvPromptSettingsService.getDefaultFromList();
+
+        if (settings) {
+          setDefaultSettings(settings);
+          console.log("[Client] Loaded default AI settings:", settings.name);
+        }
+      } catch (error) {
+        console.warn("[Client] Failed to load default settings:", error);
+      }
+    };
+    loadDefaultSettings();
+  }, []);
+
   useEffect(() => {
     if (!jobCode) return;
 
@@ -239,7 +260,12 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
         : null;
 
       try {
-        const payload: any = { jobDetail, language: "vi" };
+        const payload: any = {
+          jobDetail,
+          language: "vi",
+          useCustomSettings: true, // Sử dụng cấu hình AI mặc định từ backend
+          customSettings: defaultSettings, // Truyền settings từ client
+        };
 
         // Convert file to base64 and add to payload
         const base64 = await fileToBase64(file);
@@ -565,6 +591,8 @@ const JobApplicationClient: React.FC<JobApplicationClientProps> = ({
   const uploadProps = {
     name: "file",
     accept: ".pdf,.doc,.docx",
+    multiple: false,
+    maxCount: 1,
     showUploadList: {
       showPreviewIcon: true,
       showDownloadIcon: true,

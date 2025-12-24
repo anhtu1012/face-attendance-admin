@@ -79,6 +79,64 @@ const analysisSchema = {
   ],
 };
 
+/**
+ * Build dynamic schema based on custom settings
+ * Enforces maxStrengthsCount and maxWeaknessesCount from settings
+ */
+const buildDynamicSchema = (settings: CvPromptSettings) => {
+  const { maxStrengthsCount, maxWeaknessesCount } =
+    settings.analysisInstruction;
+
+  return {
+    type: Type.OBJECT,
+    properties: {
+      matchScore: {
+        type: Type.INTEGER,
+        description:
+          "A percentage match score from 0 to 100 representing the candidate's compatibility with the job description.",
+      },
+      summary: {
+        type: Type.STRING,
+        description: `A concise summary (${settings.analysisInstruction.summarySentencesCount} sentences) of the candidate's suitability for the role, including years of experience and key technical fit.`,
+      },
+      strengths: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.STRING,
+        },
+        minItems: maxStrengthsCount,
+        maxItems: maxStrengthsCount,
+        description: `Exactly ${maxStrengthsCount} key strength${
+          maxStrengthsCount > 1 ? "s" : ""
+        } that align with job requirements. Be specific with evidence from CV.`,
+      },
+      weaknesses: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.STRING,
+        },
+        minItems: maxWeaknessesCount,
+        maxItems: maxWeaknessesCount,
+        description: `Exactly ${maxWeaknessesCount} critical weakness${
+          maxWeaknessesCount > 1 ? "es" : ""
+        }, missing skills, or concerns. Focus on deal-breakers only.`,
+      },
+      recommendation: {
+        type: Type.STRING,
+        description:
+          "A final hiring recommendation. Must be one of: 'Strongly Recommend', 'Recommend', 'Consider', 'Not a good fit'.",
+      },
+    },
+    required: [
+      "matchScore",
+      "summary",
+      "strengths",
+      "weaknesses",
+      "recommendation",
+    ],
+  };
+};
+
 const buildJobDescriptionText = (jobDetail: JobDetail): string => {
   const parts: string[] = [];
 
@@ -134,33 +192,33 @@ const buildPromptFromSettings = (
   language: "en" | "vi",
   settings: CvPromptSettings
 ): string => {
+  console.log("faaa", settings);
+
   const jobDescriptionText = buildJobDescriptionText(jobDetail);
   const langConfig = settings.languages[language];
-  const { matchScoreWeights, recommendationThresholds, analysisInstructions } =
+  const { matchScoreWeight, recommendationThresholds, analysisInstruction } =
     settings;
 
   // Build compact sections
   const matchScoreSection = `1. MatchScore (0-100):
-   - Kỹ năng kỹ thuật: ${matchScoreWeights.technicalSkills}%
-   - Kinh nghiệm: ${matchScoreWeights.experience}%
-   - Seniority: ${matchScoreWeights.seniority}%`;
+   - Kỹ năng kỹ thuật: ${matchScoreWeight.technicalSkills}%
+   - Kinh nghiệm: ${matchScoreWeight.experience}%
+   - Seniority: ${matchScoreWeight.seniority}%`;
 
   const summarySection = `2. Summary (${
-    analysisInstructions.summarySentencesCount
+    analysisInstruction.summarySentencesCount
   } câu):
-${analysisInstructions.summaryGuidelines.map((g) => `   - ${g}`).join("\n")}`;
+${analysisInstruction.summaryGuidelines.map((g) => `   - ${g}`).join("\n")}`;
 
   const strengthsSection = `3. Strengths (${
-    analysisInstructions.maxStrengthsCount
+    analysisInstruction.maxStrengthsCount
   } điểm):
-${analysisInstructions.strengthsGuidelines.map((g) => `   - ${g}`).join("\n")}`;
+${analysisInstruction.strengthsGuidelines.map((g) => `   - ${g}`).join("\n")}`;
 
   const weaknessesSection = `4. Weaknesses (${
-    analysisInstructions.maxWeaknessesCount
+    analysisInstruction.maxWeaknessesCount
   } điểm):
-${analysisInstructions.weaknessesGuidelines
-  .map((g) => `   - ${g}`)
-  .join("\n")}`;
+${analysisInstruction.weaknessesGuidelines.map((g) => `   - ${g}`).join("\n")}`;
 
   const recommendationSection = `5. Recommendation:
    - "${recommendationThresholds.stronglyRecommend.label}": ${recommendationThresholds.stronglyRecommend.min}-${recommendationThresholds.stronglyRecommend.max}%
@@ -168,7 +226,7 @@ ${analysisInstructions.weaknessesGuidelines
    - "${recommendationThresholds.consider.label}": ${recommendationThresholds.consider.min}-${recommendationThresholds.consider.max}%
    - "${recommendationThresholds.notGoodFit.label}": ${recommendationThresholds.notGoodFit.min}-${recommendationThresholds.notGoodFit.max}%`;
 
-  const rulesSection = analysisInstructions.generalRules
+  const rulesSection = analysisInstruction.generalRules
     .map((r) => `- ${r}`)
     .join("\n");
 
@@ -349,12 +407,17 @@ export async function analyzeCv(
   }
 
   try {
+    // Use dynamic schema if custom settings provided, otherwise use default
+    const schema = customSettings
+      ? buildDynamicSchema(customSettings)
+      : analysisSchema;
+
     const response = await client.models.generateContent({
       model: model,
       contents: contents,
       config: {
         responseMimeType: "application/json",
-        responseSchema: analysisSchema,
+        responseSchema: schema,
         temperature: 0.1, // Lower temperature for faster, more consistent results
       },
     });

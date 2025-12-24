@@ -39,27 +39,35 @@ export const RecommendationThresholdsSchema = z.object({
  * Schema cho Analysis Instructions
  */
 export const AnalysisInstructionsSchema = z.object({
-  summaryGuidelines: z.array(z.string()).default([
-    "Số năm kinh nghiệm tổng + kinh nghiệm liên quan",
-    "Kỹ năng chính có/thiếu so với yêu cầu",
-    "Kết luận phù hợp hay không",
-  ]),
-  strengthsGuidelines: z.array(z.string()).default([
-    "Ưu tiên: Kỹ năng kỹ thuật chính, kinh nghiệm nổi bật, thành tích đo lường được",
-    "Ghi cụ thể: tên công nghệ, số năm, dự án thực tế",
-  ]),
-  weaknessesGuidelines: z.array(z.string()).default([
-    "Chỉ liệt kê: Kỹ năng BẮT BUỘC thiếu, kinh nghiệm không đủ, red flag nghiêm trọng",
-    "Bỏ qua: Thiếu sót nhỏ, kỹ năng nice-to-have",
-  ]),
-  generalRules: z.array(z.string()).default([
-    "Dựa vào CHỨNG CỨ cụ thể từ CV, không đoán mò",
-    "So sánh TRỰC TIẾP với từng yêu cầu công việc",
-    "Đánh giá KHÁCH QUAN, tránh thiên vị",
-    "TẬP TRUNG vào yêu cầu QUAN TRỌNG NHẤT",
-    "NGẮN GỌN, SÚNG ĐẠN",
-    "Không dài dòng, không mô tả chung chung",
-  ]),
+  summaryGuidelines: z
+    .array(z.string())
+    .default([
+      "Số năm kinh nghiệm tổng + kinh nghiệm liên quan",
+      "Kỹ năng chính có/thiếu so với yêu cầu",
+      "Kết luận phù hợp hay không",
+    ]),
+  strengthsGuidelines: z
+    .array(z.string())
+    .default([
+      "Ưu tiên: Kỹ năng kỹ thuật chính, kinh nghiệm nổi bật, thành tích đo lường được",
+      "Ghi cụ thể: tên công nghệ, số năm, dự án thực tế",
+    ]),
+  weaknessesGuidelines: z
+    .array(z.string())
+    .default([
+      "Chỉ liệt kê: Kỹ năng BẮT BUỘC thiếu, kinh nghiệm không đủ, red flag nghiêm trọng",
+      "Bỏ qua: Thiếu sót nhỏ, kỹ năng nice-to-have",
+    ]),
+  generalRules: z
+    .array(z.string())
+    .default([
+      "Dựa vào CHỨNG CỨ cụ thể từ CV, không đoán mò",
+      "So sánh TRỰC TIẾP với từng yêu cầu công việc",
+      "Đánh giá KHÁCH QUAN, tránh thiên vị",
+      "TẬP TRUNG vào yêu cầu QUAN TRỌNG NHẤT",
+      "NGẮN GỌN, SÚNG ĐẠN",
+      "Không dài dòng, không mô tả chung chung",
+    ]),
   maxStrengthsCount: z.number().min(1).max(10).default(4),
   maxWeaknessesCount: z.number().min(1).max(10).default(3),
   summarySentencesCount: z.number().min(1).max(5).default(3),
@@ -83,7 +91,7 @@ export const CvPromptSettingsSchema = z.object({
   description: z.string().optional(),
   isActive: z.boolean().default(true),
   isDefault: z.boolean().default(false),
-  
+
   // Language configurations
   languages: z.object({
     vi: LanguageConfigSchema,
@@ -91,13 +99,13 @@ export const CvPromptSettingsSchema = z.object({
   }),
 
   // Match score weights
-  matchScoreWeights: MatchScoreWeightsSchema,
+  matchScoreWeight: MatchScoreWeightsSchema,
 
   // Recommendation thresholds
   recommendationThresholds: RecommendationThresholdsSchema,
 
   // Analysis instructions
-  analysisInstructions: AnalysisInstructionsSchema,
+  analysisInstruction: AnalysisInstructionsSchema,
 
   // Metadata
   createdAt: z.string().optional(),
@@ -146,7 +154,7 @@ export const DEFAULT_CV_PROMPT_SETTINGS_VI: CvPromptSettings = {
       rulesTitle: "RULES",
     },
   },
-  matchScoreWeights: {
+  matchScoreWeight: {
     technicalSkills: 50,
     experience: 35,
     seniority: 15,
@@ -173,7 +181,7 @@ export const DEFAULT_CV_PROMPT_SETTINGS_VI: CvPromptSettings = {
       label: "Not a good fit",
     },
   },
-  analysisInstructions: {
+  analysisInstruction: {
     summaryGuidelines: [
       "Số năm kinh nghiệm tổng + kinh nghiệm liên quan",
       "Kỹ năng chính có/thiếu so với yêu cầu",
@@ -200,4 +208,3 @@ export const DEFAULT_CV_PROMPT_SETTINGS_VI: CvPromptSettings = {
     summarySentencesCount: 3,
   },
 };
-

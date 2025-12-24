@@ -45,6 +45,7 @@ export async function POST(req: Request) {
       inlineData?: { data: string; mimeType: string };
       language?: "en" | "vi";
       useCustomSettings?: boolean;
+      customSettings?: CvPromptSettings;
     };
 
     const {
@@ -53,6 +54,7 @@ export async function POST(req: Request) {
       inlineData,
       language = "vi",
       useCustomSettings = true,
+      customSettings: receivedSettings,
     } = parsed;
 
     if (!jobDetail) {
@@ -72,23 +74,23 @@ export async function POST(req: Request) {
 
     const jobDetailTyped = jobDetail as JobDetail;
 
-    // Get custom prompt settings if requested
+    // Use custom prompt settings from payload if provided
     let customSettings: CvPromptSettings | undefined = undefined;
-    if (useCustomSettings) {
-      try {
-        const defaultSettings = await kv.get<CvPromptSettings>(
-          "cv-prompt-settings:default"
-        );
-        if (defaultSettings) {
-          customSettings = defaultSettings;
-          console.log("[Analysis] Using custom prompt settings");
-        }
-      } catch (kvError) {
-        console.warn(
-          "[Analysis] Failed to load custom settings, using default:",
-          kvError
-        );
-      }
+    if (useCustomSettings && receivedSettings) {
+      customSettings = receivedSettings;
+      console.log(
+        "[Analysis] Using custom prompt settings from client payload"
+      );
+      console.log(
+        "[Analysis] Settings ID:",
+        receivedSettings.id,
+        "Name:",
+        receivedSettings.name
+      );
+    } else if (useCustomSettings) {
+      console.warn(
+        "[Analysis] useCustomSettings=true but no settings provided in payload"
+      );
     }
 
     // Generate cache key
