@@ -26,6 +26,7 @@ import { useCallback, useEffect, useState } from "react";
 import "./cv-prompt-settings.scss";
 import { translations } from "./translations";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -43,6 +44,7 @@ function CvPromptSettingsPage() {
   const [defaultSetting, setDefaultSetting] = useState<CvPromptSettings | null>(
     null
   );
+  const messageApi = useAntdMessage();
 
   // Helper to convert array fields to/from textarea
   const arrayToText = (arr: string[]) => arr.join("\n");
@@ -134,7 +136,7 @@ function CvPromptSettingsPage() {
         form.setFieldsValue(formValues);
       }
     } catch (error: any) {
-      message.error(error.message || translations.messages.loadError.vi);
+      messageApi.error(error.message || translations.messages.loadError.vi);
       setDefaultSetting(DEFAULT_CV_PROMPT_SETTINGS_VI);
     } finally {
       setLoading(false);
@@ -172,16 +174,16 @@ function CvPromptSettingsPage() {
       if (defaultSetting?.id) {
         // Update existing default
         await CvPromptSettingsService.update(defaultSetting.id, payload);
-        message.success(translations.messages.updateSuccess.vi);
+        messageApi.success(translations.messages.updateSuccess.vi);
       } else {
         // Create new default
         await CvPromptSettingsService.create({ ...payload, isDefault: true });
-        message.success(translations.messages.createSuccess.vi);
+        messageApi.success(translations.messages.createSuccess.vi);
       }
 
       fetchDefaultSettings();
     } catch (error: any) {
-      message.error(error.message || translations.messages.saveError.vi);
+      messageApi.error(error.message || translations.messages.saveError.vi);
     } finally {
       setLoading(false);
     }

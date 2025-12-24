@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PlusOutlined } from "@ant-design/icons";
 import {
+  App,
   Card,
   Col,
   DatePicker,
@@ -17,6 +18,7 @@ import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 import dayjs from "dayjs";
 import "../index.scss"; // Import styles
 import { LegalRepresentativeDto } from "@/types/dtoRepresent";
+import DanhMucCompanyInfoServices from "@/services/danh-muc/thong-tin-cong-ty/thong-tin-cong-ty.service";
 
 const { Option } = Select;
 
@@ -49,10 +51,28 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
+  const [upcomingOffDays, setUpcomingOffDays] = useState<string[]>([]);
+  const [loadingOffDays, setLoadingOffDays] = useState(false);
   const messageApi = useAntdMessage();
+  const { modal } = App.useApp();
 
   // Use Form.useWatch to reactively watch logoUrl (which may be a fileList or a url string)
   const watchedLogoUrl = Form.useWatch("logoUrl", form);
+
+  // Fetch upcoming off days
+  const fetchOffDays = async () => {
+    try {
+      const offDays = await DanhMucCompanyInfoServices.getOffDayList();
+      setUpcomingOffDays(offDays || []);
+    } catch (error) {
+      console.error("Failed to fetch off days:", error);
+    }
+  };
+
+  // Fetch upcoming off days on mount
+  useEffect(() => {
+    fetchOffDays();
+  }, []);
 
   useEffect(() => {
     // Normalize watched value into a fileList for the Upload preview
@@ -122,10 +142,41 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
     }
     return false; // Prevent auto upload, handle manually
   };
+  // Handle delete upcoming off days
+  const handleDeleteOffDays = () => {
+    modal.confirm({
+      title: "Xác nhận xóa",
+      content: "Bạn có chắc chắn muốn xóa danh sách ngày nghỉ sắp áp dụng?",
+      okText: "Xóa",
+      cancelText: "Hủy",
+      okType: "danger",
+      onOk: async () => {
+        setLoadingOffDays(true);
+        try {
+          await DanhMucCompanyInfoServices.deleteOffDayList();
+          setUpcomingOffDays([]);
+          messageApi.success("Đã xóa danh sách ngày nghỉ sắp áp dụng");
+        } catch (error) {
+          console.error("Failed to delete off days:", error);
+          messageApi.error("Xóa danh sách ngày nghỉ thất bại!");
+        } finally {
+          setLoadingOffDays(false);
+        }
+      },
+    });
+  };
+
   // Handle form validation failure
   const handleFinishFailed = (errorInfo: any) => {
     console.log("Form validation failed:", errorInfo);
     messageApi.error("Vui lòng kiểm tra lại các trường bắt buộc!");
+  };
+
+  // Wrapper for handleSubmit to refresh off days after
+  const handleFormSubmit = async (values: any) => {
+    await handleSubmit(values);
+    // Refresh off days list after successful submission
+    await fetchOffDays();
   };
 
   return (
@@ -134,7 +185,7 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
         form={form}
         layout="vertical"
         labelCol={{ span: 24 }}
-        onFinish={handleSubmit}
+        onFinish={handleFormSubmit}
         onFinishFailed={handleFinishFailed}
         initialValues={{
           country: "Việt Nam",
@@ -320,7 +371,13 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
           </Col>
           <Col span={6}>
             <Form.Item
-              label="Ngày nghỉ"
+              label={
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <span>Ngày nghỉ</span>
+                </div>
+              }
               name="offDays"
               rules={[{ required: true, message: "Vui lòng chọn ngày nghỉ" }]}
             >
@@ -338,6 +395,54 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({
                 ]}
               />
             </Form.Item>
+            {upcomingOffDays.length > 0 && (
+              <div
+                style={{
+                  marginTop: "-12px",
+                  marginBottom: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <span style={{ fontSize: "12px", color: "#888" }}>
+                  ( Sẽ áp dụng đầu tháng)
+                </span>
+                {upcomingOffDays.map((day) => (
+                  <span
+                    key={day}
+                    style={{
+                      background: "#e6f7ff",
+                      border: "1px solid #91d5ff",
+                      borderRadius: "4px",
+                      padding: "2px 8px",
+                      fontSize: "12px",
+                      color: "#0050b3",
+                    }}
+                  >
+                    {day}
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleDeleteOffDays}
+                  disabled={loadingOffDays}
+                  style={{
+                    background: "#ff4d4f",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "2px 12px",
+                    fontSize: "12px",
+                    cursor: loadingOffDays ? "not-allowed" : "pointer",
+                    opacity: loadingOffDays ? 0.6 : 1,
+                  }}
+                >
+                  {loadingOffDays ? "Đang xóa..." : "Xóa"}
+                </button>
+              </div>
+            )}
           </Col>
           <Col span={6}>
             <Form.Item

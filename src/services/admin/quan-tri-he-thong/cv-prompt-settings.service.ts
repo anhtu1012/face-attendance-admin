@@ -71,14 +71,14 @@ class CvPromptSettingsServiceBase extends AxiosService {
     data: CvPromptSettings;
     message: string;
   }> {
-    return this.put<
+    return this.post<
       {
         success: boolean;
         data: CvPromptSettings;
         message: string;
       },
       UpdateCvPromptSettingsRequest
-    >(this.basePath, { id, ...payload });
+    >(`/v1/ai-cv/update-ai-cv/${id}`, { id, ...payload });
   }
 
   /**

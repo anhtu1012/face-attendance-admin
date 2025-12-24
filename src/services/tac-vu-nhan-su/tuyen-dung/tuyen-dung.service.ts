@@ -19,6 +19,9 @@ import {
 class TuyenDungServicesBase extends AxiosService {
   protected readonly basePath = "/v1/recruitment";
 
+  async getSeting(): Promise<any> {
+    return this.getWithFilter(`/v1/company/public-system-setting`);
+  }
   async getTuyenDung(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,

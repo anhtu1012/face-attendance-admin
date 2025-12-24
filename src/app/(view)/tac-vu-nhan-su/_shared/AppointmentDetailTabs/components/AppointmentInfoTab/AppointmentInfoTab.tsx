@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  App,
   Button,
   Card,
   Col,
@@ -34,6 +35,7 @@ import { RoleAdmin } from "@/types/enum";
 import InfoInterviewLeader from "@/app/(view)/tac-vu-nhan-su/_components/InfoInterviewLeader/InfoInterviewLeader";
 import { useState } from "react";
 import QuanLyPhongVanServices from "@/services/tac-vu-nhan-su/quan-ly-phong-van/quan-ly-phong-van.service";
+import { useAntdMessage } from "@/hooks/AntdMessageProvider";
 
 interface AppointmentInfoTabProps {
   interview: AppointmentListWithInterview;
@@ -52,10 +54,12 @@ export default function AppointmentInfoTab({
 }: AppointmentInfoTabProps) {
   const isOnline = interview.typeAppointment === "online";
   const { userProfile } = useSelector(selectAuthLogin);
+  const messageApi = useAntdMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInterviewers, setSelectedInterviewers] = useState<
     InterviewerSelection[]
   >([]);
+  const { modal } = App.useApp();
 
   const probationOptions = [
     { value: "1_MONTH", label: "1 tháng" },
@@ -69,10 +73,43 @@ export default function AppointmentInfoTab({
       (opt) => opt.value === interview.jobInfor?.trialPeriod
     )?.label || "-";
 
-  const handleChange = (interview: AppointmentListWithInterview) => {
+  const handleChangeInterviewer = (interview: AppointmentListWithInterview) => {
     // Logic to handle the change action
     console.log("Change action for interview:", interview);
     setIsModalOpen(true);
+  };
+
+  const handleUpdateStatus = async (status: "COMPLETED" | "CANCELLED") => {
+    try {
+      await QuanLyPhongVanServices.updateTrangThaiPhongVan({
+        appointmentId: interview.appointmentId,
+        status: status,
+      });
+      await Promise.resolve(onRefresh());
+      messageApi.success(
+        status === "COMPLETED"
+          ? "Cập nhật thông tin thành công"
+          : "Hủy lịch hẹn thành công"
+      );
+    } catch (error) {
+      console.error(error);
+      messageApi.error(
+        status === "COMPLETED"
+          ? "Cập nhật thông tin thất bại"
+          : "Hủy lịch hẹn thất bại"
+      );
+    }
+  };
+
+  const handleCancelAppointment = () => {
+    modal.confirm({
+      title: "Xác nhận hủy lịch hẹn",
+      content: "Bạn có chắc chắn muốn hủy lịch hẹn này không?",
+      okText: "Xác nhận",
+      cancelText: "Hủy",
+      okType: "danger",
+      onOk: () => handleUpdateStatus("CANCELLED"),
+    });
   };
 
   const handleModalOk = async () => {
@@ -87,10 +124,10 @@ export default function AppointmentInfoTab({
       } catch (refreshErr) {
         console.error("Refresh failed:", refreshErr);
       }
-      message.success("Cập nhật người phỏng vấn thành công");
+      messageApi.success("Cập nhật người phỏng vấn thành công");
     } catch (error) {
       console.error(error);
-      message.error("Cập nhật người phỏng vấn thất bại");
+      messageApi.error("Cập nhật người phỏng vấn thất bại");
     }
   };
 
@@ -445,7 +482,9 @@ export default function AppointmentInfoTab({
                             {userProfile.roleId === RoleAdmin.HR &&
                               interviewer.status === "REJECTED" && (
                                 <Cbutton
-                                  onClick={() => handleChange(interview)}
+                                  onClick={() =>
+                                    handleChangeInterviewer(interview)
+                                  }
                                 >
                                   Thay Đổi
                                 </Cbutton>
@@ -490,15 +529,24 @@ export default function AppointmentInfoTab({
       )}
 
       {/* Actions */}
-      {userProfile.roleId === RoleAdmin.HR && (
-        <div className="actions-section">
-          <Space>
-            <Button type="primary">Cập nhật thông tin</Button>
-            <Button>Gửi email nhắc nhở</Button>
-            <Button danger>Hủy lịch hẹn</Button>
-          </Space>
-        </div>
-      )}
+
+      <div className="actions-section">
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleUpdateStatus("COMPLETED")}
+          >
+            Hoàn thành phỏng vấn
+          </Button>
+          <Button>Gửi email nhắc nhở</Button>
+          {userProfile.roleId === RoleAdmin.HR && (
+            <Button danger onClick={handleCancelAppointment}>
+              Hủy lịch hẹn
+            </Button>
+          )}
+        </Space>
+      </div>
+
       {/* Modal for changing interviewers */}
       <Modal
         title="Chọn người phỏng vấn"

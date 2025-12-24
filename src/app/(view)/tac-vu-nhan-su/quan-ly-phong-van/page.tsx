@@ -22,6 +22,7 @@ function Page() {
   const { userProfile } = useSelector(selectAuthLogin);
   const [loadingInterviews, setLoadingInterviews] = useState(false);
   const [interviewFilters, setInterviewFilters] = useState<FilterValues>({});
+  const [confirm, setConfirm] = useState<string>();
   const socket = useSocket();
   // Status options for filters
   const interviewStatusOptions = useMemo(
@@ -67,6 +68,9 @@ function Page() {
         undefined,
         param
       );
+      const comf = await TuyenDungServices.getSeting();
+
+      setConfirm(comf.data?.find((item: any) => item.id === "4")?.value);
       setInterviewData(response.data || []);
     } catch (error: any) {
       showError(
@@ -77,9 +81,9 @@ function Page() {
     }
   }, [userProfile, interviewFilters]);
 
-  useEffect(() => {
-    fetchInterviews();
-  }, [fetchInterviews]);
+  // useEffect(() => {
+  //   fetchInterviews();
+  // }, []);
 
   // Filter handlers
   const handleInterviewFilter = (filters: FilterValues) => {
@@ -171,7 +175,9 @@ function Page() {
             CHỜ XÁC NHẬN
           </strong>{" "}
           phải được phản hồi sau{" "}
-          <strong style={{ fontSize: "15px", color: "orange" }}>7 tiếng</strong>{" "}
+          <strong style={{ fontSize: "15px", color: "orange" }}>
+            {confirm} tiếng
+          </strong>{" "}
           , nếu không phản hồi hệ thống sẽ{" "}
           <strong style={{ fontSize: "15px", color: "green" }}>
             TỰ ĐỘNG XÁC NHẬN

@@ -11,6 +11,14 @@ class DanhMucCompanyInfoServicesBase extends AxiosService {
   protected readonly basePath = "/v1/company/thong-tin-cong-ty";
   protected readonly baseCustom = "/v1/company";
 
+  async getOffDayList(): Promise<string[]> {
+    return this.get<string[]>(`${this.baseCustom}/offdays-upcoming`);
+  }
+
+  async deleteOffDayList(): Promise<string[]> {
+    return this.delete<string[]>(`${this.baseCustom}/offdays-upcoming`);
+  }
+
   async getDanhMucCompanyInfo(
     searchFilter: FilterQueryStringTypeItem[] = [],
     quickSearchText: string | undefined = undefined,

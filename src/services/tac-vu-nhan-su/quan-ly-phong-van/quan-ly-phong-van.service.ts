@@ -10,11 +10,23 @@ interface UpdatePhongVanRequest {
   status: "ACCEPTED" | "REJECTED";
   reason?: string;
 }
+interface UpdateTrangthaiRequest {
+  appointmentId: string;
+  status: "COMPLETED" | "CANCELLED";
+}
 class QuanLyPhongVanServicesBase extends AxiosService {
   protected readonly basePath = "/v1/recruitment";
 
   updateLichPhongVan = async (data: UpdatePhongVanRequest): Promise<any> => {
     return this.post(`${this.basePath}/lich-hen/cap-nhat-hen-phong-van`, data);
+  };
+  updateTrangThaiPhongVan = async (
+    data: UpdateTrangthaiRequest
+  ): Promise<any> => {
+    return this.post(
+      `${this.basePath}/lich-hen/cap-nhat-trang-thai-cuoc-hen/${data.appointmentId}`,
+      data
+    );
   };
   async getUngVien(
     searchFilter: FilterQueryStringTypeItem[] = [],
