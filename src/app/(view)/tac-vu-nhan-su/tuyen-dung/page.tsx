@@ -1490,7 +1490,7 @@ function Page() {
               onSelectionChanged={dataGrid.onSelectionChanged}
               paginationCurrentPage={currentPage}
               pagination={true}
-              maxRowsVisible={15}
+              maxRowsVisible={7}
               onChangePage={handlePageChange}
               onQuicksearch={dataGrid.handleQuicksearch}
               columnFlex={0}

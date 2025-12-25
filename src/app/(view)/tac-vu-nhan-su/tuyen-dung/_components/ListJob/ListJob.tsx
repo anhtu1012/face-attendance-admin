@@ -15,7 +15,7 @@ import {
   MdWork,
 } from "react-icons/md";
 import { FaUserCheck } from "react-icons/fa";
-import { Badge } from "antd";
+import { Badge, App } from "antd";
 import { getStatusClass, getStatusText } from "../../_utils/status";
 import FilterDropdown, { FilterValues } from "../FilterDropdown";
 import JobDetailModal from "../JobDetailModal/JobDetailModal";
@@ -33,6 +33,7 @@ type ListJobProps = {
 };
 
 function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
+  const { modal } = App.useApp();
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [clickEffect, setClickEffect] = useState<number | null>(null);
   const [jobDetailOpen, setJobDetailOpen] = useState(false);
@@ -56,6 +57,19 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
     } else {
       setCollapsedJobs(new Set(dataJobs.map((j) => Number(j.id))));
     }
+  };
+
+  const handleConfirmClose = (e: React.MouseEvent, job: JobItem) => {
+    e.stopPropagation();
+    modal.confirm({
+      title: "Xác nhận",
+      content: "Bạn có chắc chắn muốn đóng tuyển dụng này?",
+      okText: "Đồng ý",
+      cancelText: "Hủy",
+      onOk: async () => {
+        await handleCloseJob(job);
+      },
+    });
   };
 
   const fetchDataJobs = async (
@@ -310,7 +324,8 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
               </div>
               <div className="job-status-section">
                 <span className={`job-status ${getStatusClass(job.status)}`}>
-                  {getStatusText(job.status)} ({job.quantityStatus?.totalQuantity ?? 0})
+                  {getStatusText(job.status)} (
+                  {job.quantityStatus?.totalQuantity ?? 0})
                 </span>
               </div>
             </div>
@@ -365,18 +380,18 @@ function ListJob({ onJobCardClick, newJobIds, onClearNewBadge }: ListJobProps) {
               <div className="job-actions">
                 <button
                   className="btn-primary"
-                  onClick={() => handleCloseJob(job)}
-                >
-                  Đóng Tuyển Dụng
-                </button>
-                <button
-                  className="btn-secondary"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleViewJobDetail(job);
                   }}
                 >
                   Xem chi tiết
+                </button>
+                <button
+                  className="btn-secondary"
+                  onClick={(e) => handleConfirmClose(e, job)}
+                >
+                  Đóng Tuyển Dụng
                 </button>
               </div>
             </div>

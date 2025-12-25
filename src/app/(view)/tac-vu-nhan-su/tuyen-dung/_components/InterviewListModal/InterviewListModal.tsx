@@ -25,6 +25,7 @@ const statusColorMap: Record<string, string> = {
   ACCEPTED: "#43A047",
   CONFIRMED: "#1976D2",
   CANCELLED: "#E53935",
+  COMPLETED: "#6A1B9A",
   PENDING: "#FB8C00",
 };
 
