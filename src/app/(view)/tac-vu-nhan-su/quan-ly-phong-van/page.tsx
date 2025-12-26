@@ -81,14 +81,13 @@ function Page() {
     }
   }, [userProfile, interviewFilters]);
 
-  // useEffect(() => {
-  //   fetchInterviews();
-  // }, []);
+  useEffect(() => {
+    fetchInterviews();
+  }, [fetchInterviews]);
 
   // Filter handlers
   const handleInterviewFilter = (filters: FilterValues) => {
     setInterviewFilters(filters);
-    fetchInterviews();
   };
 
   // Handle interview item click
