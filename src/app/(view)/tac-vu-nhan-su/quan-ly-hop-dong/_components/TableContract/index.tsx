@@ -73,7 +73,7 @@ const TableContract = forwardRef<TableContractRef, TableContractProps>(
               PENDING: "#FB8C00",
               USER_SIGNED: "#1976D2",
               DIRECTOR_SIGNED: "#0288D1",
-              INACTIVE: "#00796B",
+              INACTIVE: "#f3311fff",
               EXPIRED: "#C62828",
               ACTIVE: "#2E7D32",
               ACTIVE_EXTENDED: "#2E7D32",

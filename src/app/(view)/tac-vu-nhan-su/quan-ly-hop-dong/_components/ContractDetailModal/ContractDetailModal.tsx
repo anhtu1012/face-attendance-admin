@@ -1,7 +1,7 @@
 import { ContractWithUser } from "@/dtos/tac-vu-nhan-su/quan-ly-hop-dong/contracts/contract.dto";
 import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
 import Cbutton from "@/components/basicUI/Cbutton";
-import { Modal, Space, Spin, Tabs, message } from "antd";
+import { App, Modal, Space, Spin, Tabs, message } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   FaFileContract,
@@ -45,7 +45,7 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
   );
   const [appendixModalOpen, setAppendixModalOpen] = useState(false);
   const [appendixList, setAppendixList] = useState<AppendixDetail[]>([]); // Replace 'any' with the actual type
-
+const { modal } = App.useApp();
   const fetchContractDetail = useCallback(async () => {
     if (!contractId) return;
 
@@ -118,7 +118,7 @@ const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
   const handleTerminateContract = () => {
     if (data && onTerminateContract) {
-      Modal.confirm({
+      modal.confirm({
         title: "Xác nhận ngưng hợp đồng",
         content: "Bạn có chắc chắn muốn ngưng hợp đồng này không?",
         okText: "Xác nhận",

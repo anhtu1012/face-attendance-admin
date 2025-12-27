@@ -18,6 +18,7 @@ import { FilterRef, TableContractRef } from "./_types/prop";
 import "./index.scss";
 import { useSelector } from "react-redux";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import QuanLyHopDongServices from "@/services/tac-vu-nhan-su/quan-ly-hop-dong/quan-ly-hop-dong.service";
 
 function Page() {
   const filterRef = useRef<FilterRef>(null);
@@ -123,9 +124,15 @@ function Page() {
     setSelected("Tạo hợp đồng");
   };
 
-  const handleTerminateContract = (contractData: ContractWithUser) => {
-    // TODO: Implement terminate contract logic
-    console.log("Terminate contract:", contractData);
+  const handleTerminateContract = async (contractData: ContractWithUser) => {
+    try {
+      await QuanLyHopDongServices.dungHopDong({
+        userContractId: contractData.contract.id,
+      });
+      tableRef.current?.refetch();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
