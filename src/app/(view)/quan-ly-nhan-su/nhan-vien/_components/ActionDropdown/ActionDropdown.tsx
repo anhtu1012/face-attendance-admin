@@ -13,6 +13,7 @@ interface ActionDropdownProps {
   onChangePassword: (data: any) => void;
   onUpdateManager: (data: any) => void;
   onUpdateAccountStatus: (data: any) => void;
+  onEdit?: (data: any) => void;
 }
 
 export function ActionDropdown({
@@ -21,6 +22,7 @@ export function ActionDropdown({
   onChangePassword,
   onUpdateManager,
   onUpdateAccountStatus,
+  onEdit,
 }: ActionDropdownProps) {
   const [open, setOpen] = useState(false);
 
@@ -34,6 +36,22 @@ export function ActionDropdown({
             onClick: () => {
               setOpen(false);
               onViewDetail(data);
+            },
+          },
+          {
+            type: "divider" as const,
+          },
+        ]
+      : []),
+    ...(onEdit
+      ? [
+          {
+            key: "edit",
+            label: "Chỉnh sửa",
+            icon: <IoSettingsOutline />,
+            onClick: () => {
+              setOpen(false);
+              onEdit(data);
             },
           },
           {

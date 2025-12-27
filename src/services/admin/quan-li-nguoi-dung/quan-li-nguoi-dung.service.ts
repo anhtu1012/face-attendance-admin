@@ -25,6 +25,11 @@ class QlNguoiDungServicesBase extends AxiosService {
   async getUserByCode(userCode: string): Promise<any> {
     return this.get(`/v1/business/get-user-by-management?userCode=${userCode}`);
   }
+
+  async createUser(formData: any): Promise<any> {
+    return this.post(`${this.basePath}`, formData);
+  }
+
   async updateUserManager(data: {
     userId: string;
     managedByUserId: string;
@@ -37,7 +42,7 @@ class QlNguoiDungServicesBase extends AxiosService {
     formData: UserRequestUpdateUsser
   ): Promise<any> {
     await ValidateBaseClass.validate(formData, UserRequestChangePasswordSchema);
-    return this.put(`${this.basePath}/${id}`, formData);
+    return this.put(`/v1/sa/user/${id}`, formData);
   }
 
   async deleteUser(id: string): Promise<any> {

@@ -82,6 +82,8 @@ export function NguoiDungTable({
       actionButtonsProps={{
         onSave,
         onDelete,
+        hideDelete: true,
+        hideDivider: true,
         rowSelected,
         showAddRowsModal: true,
         modalInitialCount: 1,

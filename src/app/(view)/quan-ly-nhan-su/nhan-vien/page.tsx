@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { AgGridReact } from "@ag-grid-community/react";
 import { FiFilter, FiBarChart2 } from "react-icons/fi";
 import { BiTransferAlt } from "react-icons/bi";
+import { FloatButton } from "antd";
+import { UserAddOutlined } from "@ant-design/icons";
 import LayoutContent from "@/components/LayoutContentForder/layoutContent";
 import { useSelectData } from "@/hooks/useSelectData";
 import { useNguoiDungColumns } from "./_hooks/useNguoiDungColumns";
@@ -19,6 +21,8 @@ import {
   ChangePasswordModal,
   UpdateManagerModal,
   UpdateAccountStatusModal,
+  AddUserModal,
+  UpdateUserModal,
 } from "./_modals";
 import "./page.scss";
 
@@ -38,6 +42,13 @@ function Page() {
   }>({ open: false, userData: null });
 
   const [updateStatusModal, setUpdateStatusModal] = useState<{
+    open: boolean;
+    userData: any;
+  }>({ open: false, userData: null });
+
+  const [addUserModal, setAddUserModal] = useState<boolean>(false);
+
+  const [updateUserModal, setUpdateUserModal] = useState<{
     open: boolean;
     userData: any;
   }>({ open: false, userData: null });
@@ -64,12 +75,21 @@ function Page() {
     setUpdateStatusModal({ open: true, userData: data });
   };
 
+  const handleAddUser = () => {
+    setAddUserModal(true);
+  };
+
+  const handleEditUser = (data: any) => {
+    setUpdateUserModal({ open: true, userData: data });
+  };
+
   // Custom hooks for modularity
   const { columnDefs, actionCellRenderer } = useNguoiDungColumns({
     onViewDetail: handleViewDetail,
     onChangePassword: handleChangePassword,
     onUpdateManager: handleUpdateManager,
     onUpdateAccountStatus: handleUpdateAccountStatus,
+    onEdit: handleEditUser,
   });
 
   const {
@@ -247,6 +267,23 @@ function Page() {
         open={updateStatusModal.open}
         onCancel={() => setUpdateStatusModal({ open: false, userData: null })}
         userData={updateStatusModal.userData}
+        onSuccess={() =>
+          handleFetchUser(currentPage, pageSize, quickSearchText)
+        }
+      />
+
+      <AddUserModal
+        open={addUserModal}
+        onCancel={() => setAddUserModal(false)}
+        onSuccess={() =>
+          handleFetchUser(currentPage, pageSize, quickSearchText)
+        }
+      />
+
+      <UpdateUserModal
+        open={updateUserModal.open}
+        onCancel={() => setUpdateUserModal({ open: false, userData: null })}
+        userData={updateUserModal.userData}
         onSuccess={() =>
           handleFetchUser(currentPage, pageSize, quickSearchText)
         }

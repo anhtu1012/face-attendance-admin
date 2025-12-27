@@ -14,7 +14,7 @@ export const NguoiDungItemSchema = z.object({
   fullName: z.string(),
   email: z.string(),
   faceImg: z.string().optional(),
-  birthDay: z.date(),
+  birthday: z.date(),
   gender: z.enum(["M", "F", ""]),
   phone: z.string().min(10, "Số điện thoại không hợp lệ"),
   address: z.string().max(255, "Địa chỉ không hợp lệ").optional(),

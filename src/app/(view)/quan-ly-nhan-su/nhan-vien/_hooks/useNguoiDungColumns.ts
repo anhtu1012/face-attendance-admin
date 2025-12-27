@@ -19,6 +19,7 @@ interface UseNguoiDungColumnsParams {
   onChangePassword?: (data: any) => void;
   onUpdateManager?: (data: any) => void;
   onUpdateAccountStatus?: (data: any) => void;
+  onEdit?: (data: any) => void;
 }
 
 export function useNguoiDungColumns({
@@ -26,6 +27,7 @@ export function useNguoiDungColumns({
   onChangePassword,
   onUpdateManager,
   onUpdateAccountStatus,
+  onEdit,
 }: UseNguoiDungColumnsParams = {}) {
   const t = useTranslations("NguoiDung");
   const itemErrorsFromRedux = useSelector(selectAllItemErrors);
@@ -50,7 +52,7 @@ export function useNguoiDungColumns({
         width: 180,
         context: {
           typeColumn: "Select",
-          selectOptions: selectRole,
+          selectOptions: selectRole.filter((item: any) => item.value !== "1"),
         },
         cellStyle: (params) => {
           const itemId = params.data ? getItemId(params.data) : "";
@@ -169,10 +171,11 @@ export function useNguoiDungColumns({
           onChangePassword,
           onUpdateManager,
           onUpdateAccountStatus,
+          onEdit,
         },
       });
     };
-  }, [onViewDetail, onChangePassword, onUpdateManager, onUpdateAccountStatus]);
+  }, [onViewDetail, onChangePassword, onUpdateManager, onUpdateAccountStatus, onEdit]);
 
   return {
     columnDefs,

@@ -8,6 +8,7 @@ interface ActionCellRendererProps {
     onChangePassword?: (data: any) => void;
     onUpdateManager?: (data: any) => void;
     onUpdateAccountStatus?: (data: any) => void;
+    onEdit?: (data: any) => void;
   };
 }
 
@@ -25,6 +26,7 @@ export function ActionCellRenderer({ data, context }: ActionCellRendererProps) {
       onChangePassword={context.onChangePassword || (() => {})}
       onUpdateManager={context.onUpdateManager || (() => {})}
       onUpdateAccountStatus={context.onUpdateAccountStatus || (() => {})}
+      onEdit={context.onEdit}
     />
   );
 }

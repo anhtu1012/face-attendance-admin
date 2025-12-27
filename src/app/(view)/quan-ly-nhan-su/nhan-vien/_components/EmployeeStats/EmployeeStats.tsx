@@ -74,7 +74,7 @@ const EmployeeStats: React.FC<EmployeeStatsProps> = ({
                         <span className="stat-name">{dept.name}</span>
                         <span className="stat-count">{dept.count}</span>
                       </div>
-                      <div className="stat-bar">
+                      {/* <div className="stat-bar">
                         <div
                           className="stat-bar-fill"
                           style={{
@@ -82,7 +82,7 @@ const EmployeeStats: React.FC<EmployeeStatsProps> = ({
                             background: dept.color,
                           }}
                         />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ))}
@@ -103,7 +103,7 @@ const EmployeeStats: React.FC<EmployeeStatsProps> = ({
                         <span className="stat-name">{position.name}</span>
                         <span className="stat-count">{position.count}</span>
                       </div>
-                      <div className="stat-bar">
+                      {/* <div className="stat-bar">
                         <div
                           className="stat-bar-fill"
                           style={{
@@ -113,7 +113,7 @@ const EmployeeStats: React.FC<EmployeeStatsProps> = ({
                             background: position.color,
                           }}
                         />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ))}
