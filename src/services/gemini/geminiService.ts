@@ -35,69 +35,129 @@ function ensureServerClient() {
   return ai;
 }
 
-const analysisSchema = {
-  type: Type.OBJECT,
-  properties: {
-    matchScore: {
-      type: Type.INTEGER,
-      description:
-        "A percentage match score from 0 to 100 representing the candidate's compatibility with the job description.",
-    },
-    summary: {
-      type: Type.STRING,
-      description:
-        "A concise, 2-3 sentences summary of the candidate's suitability for the role, including years of experience and key technical fit.",
-    },
-    strengths: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.STRING,
-      },
-      description:
-        "Top 3-4 key strengths that align with job requirements. Be specific with evidence from CV.",
-    },
-    weaknesses: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.STRING,
-      },
-      description:
-        "Top 2-3 critical weaknesses, missing skills, or concerns. Focus on deal-breakers only.",
-    },
-    recommendation: {
-      type: Type.STRING,
-      description:
-        "A final hiring recommendation. Must be one of: 'Strongly Recommend', 'Recommend', 'Consider', 'Not a good fit'.",
-    },
-  },
-  required: [
-    "matchScore",
-    "summary",
-    "strengths",
-    "weaknesses",
-    "recommendation",
-  ],
+/**
+ * Schema descriptions in Vietnamese
+ */
+const schemaDescriptionsVi = {
+  matchScore:
+    "Điểm phù hợp phần trăm từ 0 đến 100 đại diện cho mức độ phù hợp của ứng viên với mô tả công việc.",
+  summary:
+    "Bản tóm tắt ngắn gọn 2-3 câu về mức độ phù hợp của ứng viên cho vai trò, bao gồm số năm kinh nghiệm và kỹ năng kỹ thuật chính.",
+  strengths:
+    "3-4 điểm mạnh chính phù hợp với yêu cầu công việc. Hãy cụ thể với bằng chứng từ CV.",
+  weaknesses:
+    "2-3 điểm yếu quan trọng, kỹ năng còn thiếu, hoặc mối quan ngại. Chỉ tập trung vào những vấn đề nghiêm trọng.",
+  recommendation:
+    "Đề xuất tuyển dụng cuối cùng. Phải là một trong: 'Strongly Recommend', 'Recommend', 'Consider', 'Not a good fit'.",
 };
 
 /**
- * Build dynamic schema based on custom settings
- * Enforces maxStrengthsCount and maxWeaknessesCount from settings
+ * Schema descriptions in English
  */
-const buildDynamicSchema = (settings: CvPromptSettings) => {
-  const { maxStrengthsCount, maxWeaknessesCount } =
-    settings.analysisInstruction;
+const schemaDescriptionsEn = {
+  matchScore:
+    "A percentage match score from 0 to 100 representing the candidate's compatibility with the job description.",
+  summary:
+    "A concise, 2-3 sentences summary of the candidate's suitability for the role, including years of experience and key technical fit.",
+  strengths:
+    "Top 3-4 key strengths that align with job requirements. Be specific with evidence from CV.",
+  weaknesses:
+    "Top 2-3 critical weaknesses, missing skills, or concerns. Focus on deal-breakers only.",
+  recommendation:
+    "A final hiring recommendation. Must be one of: 'Strongly Recommend', 'Recommend', 'Consider', 'Not a good fit'.",
+};
+
+/**
+ * Build schema based on language
+ */
+const buildAnalysisSchema = (language: "vi" | "en") => {
+  const descriptions =
+    language === "vi" ? schemaDescriptionsVi : schemaDescriptionsEn;
 
   return {
     type: Type.OBJECT,
     properties: {
       matchScore: {
         type: Type.INTEGER,
-        description:
-          "A percentage match score from 0 to 100 representing the candidate's compatibility with the job description.",
+        description: descriptions.matchScore,
       },
       summary: {
         type: Type.STRING,
-        description: `A concise summary (${settings.analysisInstruction.summarySentencesCount} sentences) of the candidate's suitability for the role, including years of experience and key technical fit.`,
+        description: descriptions.summary,
+      },
+      strengths: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.STRING,
+        },
+        description: descriptions.strengths,
+      },
+      weaknesses: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.STRING,
+        },
+        description: descriptions.weaknesses,
+      },
+      recommendation: {
+        type: Type.STRING,
+        description: descriptions.recommendation,
+      },
+    },
+    required: [
+      "matchScore",
+      "summary",
+      "strengths",
+      "weaknesses",
+      "recommendation",
+    ],
+  };
+};
+
+/**
+ * Build dynamic schema based on custom settings and language
+ * Enforces maxStrengthsCount and maxWeaknessesCount from settings
+ */
+const buildDynamicSchema = (
+  settings: CvPromptSettings,
+  language: "vi" | "en"
+) => {
+  const { maxStrengthsCount, maxWeaknessesCount, summarySentencesCount } =
+    settings.analysisInstruction;
+
+  const descriptions =
+    language === "vi" ? schemaDescriptionsVi : schemaDescriptionsEn;
+
+  // Language-specific dynamic descriptions
+  const dynamicDescriptions = {
+    summary:
+      language === "vi"
+        ? `Bản tóm tắt ngắn gọn (${summarySentencesCount} câu) về mức độ phù hợp của ứng viên cho vai trò, bao gồm số năm kinh nghiệm và kỹ năng kỹ thuật chính.`
+        : `A concise summary (${summarySentencesCount} sentences) of the candidate's suitability for the role, including years of experience and key technical fit.`,
+    strengths:
+      language === "vi"
+        ? `Chính xác ${maxStrengthsCount} điểm mạnh chính phù hợp với yêu cầu công việc. Hãy cụ thể với bằng chứng từ CV.`
+        : `Exactly ${maxStrengthsCount} key strength${
+            maxStrengthsCount > 1 ? "s" : ""
+          } that align with job requirements. Be specific with evidence from CV.`,
+    weaknesses:
+      language === "vi"
+        ? `Chính xác ${maxWeaknessesCount} điểm yếu quan trọng, kỹ năng còn thiếu, hoặc mối quan ngại. Chỉ tập trung vào những vấn đề nghiêm trọng.`
+        : `Exactly ${maxWeaknessesCount} critical weakness${
+            maxWeaknessesCount > 1 ? "es" : ""
+          }, missing skills, or concerns. Focus on deal-breakers only.`,
+  };
+
+  return {
+    type: Type.OBJECT,
+    properties: {
+      matchScore: {
+        type: Type.INTEGER,
+        description: descriptions.matchScore,
+      },
+      summary: {
+        type: Type.STRING,
+        description: dynamicDescriptions.summary,
       },
       strengths: {
         type: Type.ARRAY,
@@ -106,9 +166,7 @@ const buildDynamicSchema = (settings: CvPromptSettings) => {
         },
         minItems: maxStrengthsCount,
         maxItems: maxStrengthsCount,
-        description: `Exactly ${maxStrengthsCount} key strength${
-          maxStrengthsCount > 1 ? "s" : ""
-        } that align with job requirements. Be specific with evidence from CV.`,
+        description: dynamicDescriptions.strengths,
       },
       weaknesses: {
         type: Type.ARRAY,
@@ -117,14 +175,11 @@ const buildDynamicSchema = (settings: CvPromptSettings) => {
         },
         minItems: maxWeaknessesCount,
         maxItems: maxWeaknessesCount,
-        description: `Exactly ${maxWeaknessesCount} critical weakness${
-          maxWeaknessesCount > 1 ? "es" : ""
-        }, missing skills, or concerns. Focus on deal-breakers only.`,
+        description: dynamicDescriptions.weaknesses,
       },
       recommendation: {
         type: Type.STRING,
-        description:
-          "A final hiring recommendation. Must be one of: 'Strongly Recommend', 'Recommend', 'Consider', 'Not a good fit'.",
+        description: descriptions.recommendation,
       },
     },
     required: [
@@ -192,12 +247,18 @@ const buildPromptFromSettings = (
   language: "en" | "vi",
   settings: CvPromptSettings
 ): string => {
-  console.log("faaa", settings);
+  console.log("[Gemini] Using settings:", settings.name);
 
   const jobDescriptionText = buildJobDescriptionText(jobDetail);
   const langConfig = settings.languages[language];
   const { matchScoreWeight, recommendationThresholds, analysisInstruction } =
     settings;
+
+  // Language-specific instruction to enforce output language
+  const languageInstruction =
+    language === "vi"
+      ? "\n\n**QUAN TRỌNG: BẠN PHẢI TRẢ LỜI HOÀN TOÀN BẰNG TIẾNG VIỆT. Mọi nội dung trong summary, strengths, và weaknesses đều PHẢI là tiếng Việt.**\n"
+      : "\n\n**IMPORTANT: YOU MUST RESPOND ENTIRELY IN ENGLISH. All content in summary, strengths, and weaknesses MUST be in English.**\n";
 
   // Build compact sections
   const matchScoreSection = `1. MatchScore (0-100):
@@ -231,7 +292,7 @@ ${analysisInstruction.weaknessesGuidelines.map((g) => `   - ${g}`).join("\n")}`;
     .join("\n");
 
   // Construct compact prompt - single language only
-  return `${langConfig.roleDescription}
+  return `${langConfig.roleDescription}${languageInstruction}
 
 **JOB:**
 ${jobDescriptionText}
@@ -409,8 +470,8 @@ export async function analyzeCv(
   try {
     // Use dynamic schema if custom settings provided, otherwise use default
     const schema = customSettings
-      ? buildDynamicSchema(customSettings)
-      : analysisSchema;
+      ? buildDynamicSchema(customSettings, language)
+      : buildAnalysisSchema(language);
 
     const response = await client.models.generateContent({
       model: model,
